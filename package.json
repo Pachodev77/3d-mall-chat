@@ -1,0 +1,24 @@
+{
+  "name": "3d-mall-chat",
+  "version": "1.0.0",
+  "description": "3D Mall Chat Application with WebSocket",
+  "main": "chat-server.js",
+  "scripts": {
+    "start": "node chat-server.js",
+    "dev": "node chat-server.js",
+    "build": "echo 'No build step required'",
+    "vercel-build": "echo 'Build completed'"
+  },
+  "dependencies": {
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "pm2": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": ["3d", "chat", "websocket", "threejs"],
+  "author": "Your Name",
+  "license": "MIT"
+}
