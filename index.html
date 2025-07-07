@@ -3597,10 +3597,10 @@
             // Piernas (cilindros)
             const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2C3E50 });
             const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
-            leftLeg.position.set(-0.13, 0.025, 0);
+            leftLeg.position.set(-0.13, 0.225, 0); // Ajuste: pies al nivel del suelo
             avatarGroup.add(leftLeg);
             const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
-            rightLeg.position.set(0.13, 0.025, 0);
+            rightLeg.position.set(0.13, 0.225, 0); // Ajuste: pies al nivel del suelo
             avatarGroup.add(rightLeg);
             // Brazos (cilindros)
             const armMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
