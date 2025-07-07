@@ -3596,26 +3596,32 @@
             avatarGroup.add(head);
             // Piernas (cilindros)
             const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2C3E50 });
-            const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.4, 8), legMaterial);
-            leg1.position.set(-0.12, 0.1, 0);
-            avatarGroup.add(leg1);
-            const leg2 = leg1.clone();
-            leg2.position.x = 0.12;
-            avatarGroup.add(leg2);
+            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
+            leftLeg.position.set(-0.13, 0.025, 0);
+            avatarGroup.add(leftLeg);
+            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
+            rightLeg.position.set(0.13, 0.025, 0);
+            avatarGroup.add(rightLeg);
             // Brazos (cilindros)
             const armMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
-            const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.4, 8), armMaterial);
-            arm1.position.set(-0.32, 0.55, 0);
-            arm1.rotation.z = Math.PI / 10;
-            avatarGroup.add(arm1);
-            const arm2 = arm1.clone();
-            arm2.position.x = 0.32;
-            arm2.rotation.z = -Math.PI / 10;
-            avatarGroup.add(arm2);
+            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.42, 0.13), armMaterial);
+            leftArm.position.set(-0.34, 0.58, 0);
+            avatarGroup.add(leftArm);
+            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.42, 0.13), armMaterial);
+            rightArm.position.set(0.34, 0.58, 0);
+            avatarGroup.add(rightArm);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
+                body,
+                head,
+                leftLeg,
+                rightLeg,
+                leftArm,
+                rightArm,
                 targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                lastPosition: new THREE.Vector3(position.x, position.y, position.z),
+                walkTime: 0,
                 targetRotation: 0,
                 currentFloor: floor
             });
@@ -3627,6 +3633,25 @@
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 // Interpolación suave de rotación
                 avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+                // --- Animación de caminar tipo Roblox ---
+                const pos = avatar.group.position;
+                const last = avatar.lastPosition;
+                const speed = pos.distanceTo(last);
+                // Si se mueve, animar
+                if (speed > 0.001) {
+                    avatar.walkTime += speed * 18; // Factor de velocidad de animación
+                } else {
+                    avatar.walkTime *= 0.8; // Suavizar al detenerse
+                }
+                // Fase de caminata
+                const phase = avatar.walkTime;
+                if (avatar.leftArm && avatar.rightArm && avatar.leftLeg && avatar.rightLeg) {
+                    avatar.leftArm.rotation.x = Math.sin(phase) * 0.5;
+                    avatar.rightArm.rotation.x = -Math.sin(phase) * 0.5;
+                    avatar.leftLeg.rotation.x = -Math.sin(phase) * 0.5;
+                    avatar.rightLeg.rotation.x = Math.sin(phase) * 0.5;
+                }
+                avatar.lastPosition.copy(pos);
             });
         }
 
