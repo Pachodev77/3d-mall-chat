@@ -481,6 +481,18 @@
         #simple-panel button:active {
             transform: translateY(0);
         }
+        .chat-message {
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: rgba(40,40,40,0.7);
+            display: inline-block;
+            max-width: 90%;
+            word-break: break-word;
+        }
+        .chat-message.own {
+            background: linear-gradient(90deg, #FFD70033, #FFD70011);
+        }
     </style>
 </head>
 <body>
@@ -672,6 +684,9 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
         const originalStoreLinks = [
@@ -2563,9 +2578,15 @@
         };
 
         // --- WebSocket Chat Logic ---
-        let ws = null;
-        let isConnected = false;
-        
+        // [ELIMINADO] let ws = null;
+        // [ELIMINADO] let isConnected = false;
+        // [ELIMINADO] function connectWebSocket() { ... }
+        // [ELIMINADO] ws = new WebSocket('ws://localhost:8000');
+        // [ELIMINADO] ws.onopen, ws.onmessage, ws.onclose, ws.onerror
+        // [ELIMINADO] connectWebSocket();
+        // ... código posterior ...
+        // Asegúrate de que toda la lógica de chat y posiciones use solo Firebase.
+
         // Colores para usuarios
         const userColors = [
             '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
@@ -2574,37 +2595,6 @@
             '#F9E79F', '#ABEBC6', '#FAD7A0', '#AED6F1', '#F5B7B1'
         ];
         const userColorMap = new Map();
-
-        function connectWebSocket() {
-            try {
-                ws = new WebSocket('ws://localhost:8000');
-                
-                ws.onopen = () => {
-                    console.log('Conectado al chat');
-                    isConnected = true;
-                    
-                    // Enviar alias automáticamente al conectarse
-                    sendAlias();
-                };
-                
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    handleChatMessage(data);
-                };
-                
-                ws.onclose = () => {
-                    console.log('Desconectado del chat');
-                    isConnected = false;
-                };
-                
-                ws.onerror = (error) => {
-                    console.error('Error de WebSocket:', error);
-                    isConnected = false;
-                };
-            } catch (error) {
-                console.error('Error conectando al WebSocket:', error);
-            }
-        }
 
         function getOrAssignUserColor(alias) {
             if (!userColorMap.has(alias)) {
@@ -3142,21 +3132,24 @@
 
         function sendMessage() {
             const message = chatInput.value.trim();
-            if (message.length > 0 && isConnected && userAlias) {
-                ws.send(JSON.stringify({
-                    type: 'message',
-                    message: message
-                }));
+            if (message.length > 0 && userAlias) {
+                // TODO: Enviar mensaje a Firebase (Firestore o Realtime Database)
+                // Ejemplo:
+                // firebase.database().ref('chat').push({ alias: userAlias, message });
                 chatInput.value = '';
             }
         }
 
         function sendAlias() {
-            if (isConnected && userAlias) {
-                ws.send(JSON.stringify({
-                    type: 'alias',
-                    alias: userAlias
-                }));
+            if (userAlias) {
+                // TODO: Guardar alias en Firebase si es necesario
+            }
+        }
+
+        function sendUserPosition() {
+            if (userAlias) {
+                // TODO: Enviar posición a Firebase
+                // firebase.database().ref('positions').child(userAlias).set({ ... })
             }
         }
 
@@ -3942,30 +3935,9 @@
         loadCustomization();
 
         function sendUserPosition() {
-            if (isConnected && userAlias) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                
-                // Normalizar la rotación antes de enviar
-                let normalizedRotation = camera.rotation.y;
-                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
-                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                
-                ws.send(JSON.stringify({
-                    type: 'position',
-                    position: position,
-                    floor: currentFloor,
-                    rotation: normalizedRotation
-                }));
-                
-                // Log para depuración (solo cuando hay cambio significativo)
-                const rotationDegrees = (normalizedRotation * 180 / Math.PI).toFixed(1);
-                if (Math.abs(normalizedRotation) > 0.1) {
-                    console.log(`Enviando rotación: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
-                }
+            if (userAlias) {
+                // TODO: Enviar posición a Firebase
+                // firebase.database().ref('positions').child(userAlias).set({ ... })
             }
         }
 
@@ -4025,6 +3997,103 @@
                     return false;
                 });
             }
+        });
+
+        // --- Lógica de integración con Firebase ---
+        let userAlias = localStorage.getItem('userAlias') || '';
+
+        // Mostrar prompt de alias si no existe
+        if (!userAlias) {
+            userAlias = prompt('Ingresa tu alias:');
+            if (userAlias) {
+                localStorage.setItem('userAlias', userAlias);
+            } else {
+                userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
+                localStorage.setItem('userAlias', userAlias);
+            }
+        }
+
+        // Conectar al chat de Firebase
+        connectToChat(userAlias);
+
+        // Enviar mensaje al presionar el botón o Enter
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatInput = document.getElementById('chat-input');
+        chatSendBtn.onclick = () => {
+            const message = chatInput.value.trim();
+            if (message.length > 0) {
+                sendMessage(message);
+                chatInput.value = '';
+            }
+        };
+        chatInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                const message = chatInput.value.trim();
+                if (message.length > 0) {
+                    sendMessage(message);
+                    chatInput.value = '';
+                }
+            }
+        });
+
+        // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
+        setInterval(() => {
+            if (typeof camera !== 'undefined') {
+                const position = {
+                    x: camera.position.x,
+                    y: camera.position.y,
+                    z: camera.position.z
+                };
+                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
+                const rotation = typeof camera.rotation !== 'undefined' ? camera.rotation.y : 0;
+                sendPosition(position, floor, rotation);
+            }
+        }, 500);
+
+        // Función mejorada para mostrar mensajes en el chat
+        function addMessageToChat(alias, message, type = 'user', timestamp = null) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            let timeStr = '';
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+            }
+            const isOwn = (alias === userAlias || type === 'own');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
+            msgDiv.style.margin = '6px 0';
+            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+            msgDiv.innerHTML = `
+                <span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span>
+                <span style="color:#fff;">${message}</span>
+                ${timeStr}
+            `;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Listener de mensajes de Firebase
+        messagesRef.on('child_added', (snapshot) => {
+            const msg = snapshot.val();
+            addMessageToChat(msg.alias, msg.message, msg.alias === userAlias ? 'own' : 'user', msg.timestamp);
+        });
+
+        // Listener de posiciones de avatares en Firebase
+        positionsRef.on('value', (snapshot) => {
+            const positions = snapshot.val() || {};
+            Object.keys(positions).forEach(alias => {
+                if (alias !== userAlias) {
+                    const userData = positions[alias];
+                    updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                }
+            });
+            // Eliminar avatares de usuarios que ya no están
+            Object.keys(userAvatars).forEach(alias => {
+                if (!positions[alias] && alias !== userAlias) {
+                    removeUserAvatar(alias);
+                }
+            });
         });
     </script>
 </body>
