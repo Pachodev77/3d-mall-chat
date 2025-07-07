@@ -2230,6 +2230,7 @@
 
         // --- Manejadores de Eventos ---
         function setupEventListeners() {
+            console.log("2. Event Listeners - Configurando escuchas de teclado y ratón.");
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
             window.addEventListener('resize', onWindowResize);
@@ -2237,93 +2238,45 @@
         }
         
         function setupUIButtons() {
-            console.log('Configurando botones de UI...');
-            
-            // Verificar que el bot├│n se encontr├│ correctamente
+            const changeAliasBtn = document.getElementById('change-alias-btn');
             if (changeAliasBtn) {
-                console.log('Bot├│n de personalizaci├│n encontrado');
-                changeAliasBtn.onclick = () => {
-                    console.log('Bot├│n de personalizaci├│n clickeado');
-                    // Mostrar el panel de personalizaci├│n completo
-                    openCustomizationPanel();
-                };
-            } else {
-                console.error('No se encontr├│ el bot├│n de personalizaci├│n');
-            }
-            
-
-            
-            // Verificar que los elementos de personalizaci├│n se encontraron correctamente
-            if (customizationPanel) {
-                console.log('Panel de personalizaci├│n encontrado');
-                console.log('Panel inicial display:', customizationPanel.style.display);
-                console.log('Panel inicial visibility:', customizationPanel.style.visibility);
-            } else {
-                console.error('No se encontr├│ el panel de personalizaci├│n');
-            }
-            
-            if (customizationCloseBtn) {
-                console.log('Bot├│n de cerrar personalizaci├│n encontrado');
-                customizationCloseBtn.onclick = closeCustomizationPanel;
-            } else {
-                console.error('No se encontr├│ el bot├│n de cerrar personalizaci├│n');
-            }
-            
-            if (saveCustomizationBtn) {
-                console.log('Bot├│n de guardar personalizaci├│n encontrado');
-                saveCustomizationBtn.onclick = saveCustomization;
-            } else {
-                console.error('No se encontr├│ el bot├│n de guardar personalizaci├│n');
-            }
-            
-            if (resetCustomizationBtn) {
-                console.log('Bot├│n de resetear personalizaci├│n encontrado');
-                resetCustomizationBtn.onclick = resetCustomization;
-            } else {
-                console.error('No se encontr├│ el bot├│n de resetear personalizaci├│n');
+                changeAliasBtn.onclick = openCustomizationPanel;
             }
         }
 
         function onKeyDown(event) {
-            // Si el chat est├í abierto, no procesar controles del juego
-            if (chatOpen) {
+            // Si un panel de UI está abierto, no procesar controles del juego
+            if (chatOpen || customizationPanelOpen) {
                 return;
             }
+            console.log(`Key Down: ${event.code}`); // DEBUG: Muestra la tecla presionada
             
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = true;
+
+            // Mapeo adicional para que las flechas también funcionen
             if (event.code === 'ArrowUp') keys.W = true;
             if (event.code === 'ArrowDown') keys.S = true;
-            if (event.code === 'ArrowLeft') keys.A = true;
-            if (event.code === 'ArrowRight') keys.D = true;
-            
-            if (event.code === 'KeyW' && !keyW) { // W para subir de piso (solo una vez)
+
+            // Cambiar de piso con Q y E para liberar W y S
+            if (event.code === 'KeyE') {
                 if (currentFloor < MAX_FLOOR) currentFloor++;
-                keyW = true;
+                 console.log(`Piso cambiado a: ${currentFloor}`); // DEBUG
             }
-            if (event.code === 'KeyS' && !keyS) { // S para bajar de piso (solo una vez)
+            if (event.code === 'KeyQ') {
                 if (currentFloor > MIN_FLOOR) currentFloor--;
-                keyS = true;
-            }
-            if (event.code === 'KeyA') { // A para moverse hacia la izquierda
-                keyA = true;
-            }
-            if (event.code === 'KeyD') { // D para moverse hacia la derecha
-                keyD = true;
+                 console.log(`Piso cambiado a: ${currentFloor}`); // DEBUG
             }
         }
 
         function onKeyUp(event) {
+            if (chatOpen || customizationPanelOpen) return;
+
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = false;
+
             if (event.code === 'ArrowUp') keys.W = false;
             if (event.code === 'ArrowDown') keys.S = false;
-            if (event.code === 'ArrowLeft') keys.A = false;
-            if (event.code === 'ArrowRight') keys.D = false;
-            if (event.code === 'KeyA') keyA = false;
-            if (event.code === 'KeyD') keyD = false;
-            if (event.code === 'KeyW') keyW = false;
-            if (event.code === 'KeyS') keyS = false;
         }
 
         function onWindowResize() {
@@ -2333,86 +2286,59 @@
         }
         
         function onMouseDown(event) {
-            // Si el chat est├í abierto, no procesar clics del juego
-            if (chatOpen) {
-                return;
-            }
-            
-            // Si el panel de personalizaci├│n est├í abierto, no procesar clics del juego
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel && simplePanel.style.display === 'block') {
-                return;
-            }
-            
-            if (event.button !== 0) return; // Solo clic izquierdo
+            if (chatOpen || customizationPanelOpen || event.button !== 0) return;
+
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(clickableObjects);
+
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
-                
-                // Verificar si es un clic en el nombre del avatar para personalizaci├│n
-                if (clickedObject.userData && clickedObject.userData.type === 'customization') {
-                    openCustomizationPanel();
-                    return;
-                }
-                
-                // Verificar si es un clic en una tienda
                 if (clickedObject.userData.URL) {
+                    console.log(`Abriendo URL: ${clickedObject.userData.URL}`); // DEBUG
                     window.open(clickedObject.userData.URL, '_blank');
                 }
             }
         }
 
         function updateMovement() {
-            // Si el chat est├í abierto, no actualizar movimiento
-            if (chatOpen) {
-                return;
-            }
-            
-            // --- Rotaci├│n con flechas izquierda/derecha ---
-            if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
+            if (chatOpen || customizationPanelOpen) return;
 
-            // --- Movimiento hacia adelante/atr├ís con flechas ---
+            // --- DEBUG: Muestra el estado de las teclas en cada frame ---
+            if (keys.W || keys.S || keys.A || keys.D || keys.ArrowLeft || keys.ArrowRight) {
+                 console.log(`Estado de teclas en updateMovement: W=${keys.W}, A=${keys.A}, S=${keys.S}, D=${keys.D}, ←=${keys.ArrowLeft}, →=${keys.ArrowRight}`);
+            }
+
+            // --- Rotación con flechas o A/D ---
+            if (keys.A || keys.ArrowLeft) targetRotationY += ROTATE_SPEED;
+            if (keys.D || keys.ArrowRight) targetRotationY -= ROTATE_SPEED;
+            
+            const velocity = new THREE.Vector3();
             const direction = new THREE.Vector3();
+
+            // --- Movimiento adelante/atrás con W y S ---
             camera.getWorldDirection(direction);
             direction.y = 0;
             direction.normalize();
+            if (keys.W) {
+                velocity.add(direction);
+            }
+            if (keys.S) {
+                velocity.sub(direction);
+            }
             
-            const velocity = new THREE.Vector3();
-            
-            // Movimiento hacia adelante/atr├ís con flechas arriba/abajo
-            if (keys.ArrowUp) velocity.add(direction);
-            if (keys.ArrowDown) velocity.sub(direction);
-            
-            // Movimiento lateral con A y D (teclas)
-            const rightDirection = new THREE.Vector3();
-            rightDirection.setFromMatrixColumn(camera.matrix, 0);
-            rightDirection.y = 0;
-            rightDirection.normalize();
-            
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
-            
-            if (velocity.length() > 0) {
+            if (velocity.lengthSq() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
                 const newPosition = targetPosition.clone().add(velocity);
-                
-                // --- Colisiones optimizadas ---
-                const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
+
+                const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(0.8, CAMERA_HEIGHT, 0.8));
                 let collision = false;
                 
-                // Optimizaci├│n: solo verificar colisiones cercanas
-                const nearbyCollisions = collisionObjects.filter(wallBox => {
-                    const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
-                    return distance < 20; // Solo verificar objetos dentro de 20 unidades
-                });
-                
-                for (const wallBox of nearbyCollisions) {
+                for (const wallBox of collisionObjects) {
                     if (playerBox.intersectsBox(wallBox)) {
                         collision = true;
+                        console.warn("¡COLISIÓN DETECTADA!"); // DEBUG
                         break;
                     }
                 }
@@ -2422,43 +2348,21 @@
                 }
             }
 
-            // --- Cambio de Piso ---
             const floorStep = HALL_HEIGHT + 1;
             const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
             targetPosition.y = targetY;
 
-            // --- Interpolaci├│n para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
         }
 
-        function animate(currentTime) {
+        function animate() {
             requestAnimationFrame(animate);
-            
-            // Control de FPS
-            const deltaTime = currentTime - lastTime;
-            if (deltaTime < frameInterval) {
-                return;
-            }
-            
-            lastTime = currentTime - (deltaTime % frameInterval);
-            frameCount++;
-            
-            // Actualizar el color del cielo cada minuto (60000 ms)
-            if (currentTime - lastSkyUpdate > 60000) {
-                scene.background = getSkyColor();
-                lastSkyUpdate = currentTime;
-            }
-            
             updateMovement();
-            updateAvatarPositions(); // Actualizar posiciones de avatares
-            
-            // Enviar posici├│n del usuario cada 100ms (10 veces por segundo)
-            if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
-                sendUserPosition();
-            }
-            
+            updateAvatarPositions();
+            if (frameCount % 6 === 0) sendUserPosition();
             renderer.render(scene, camera);
+            frameCount++;
         }
         
         // Funci├│n para limpiar recursos
