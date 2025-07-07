@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paseo Virtual por Centro Comercial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -492,6 +493,94 @@
         }
         .chat-message.own {
             background: linear-gradient(90deg, #FFD70033, #FFD70011);
+        }
+        /* --- PIXEL ART STYLES FOR CUSTOMIZATION PANEL --- */
+        #simple-panel, #customization-panel {
+          font-family: 'Press Start 2P', 'VT323', 'Courier New', monospace !important;
+          font-size: 12px !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          border: 4px solid #222 !important;
+          background: #181818 !important;
+        }
+        #simple-panel h3, #customization-panel h3 {
+          font-size: 13px !important;
+          letter-spacing: 1px;
+          margin: 0 0 10px 0 !important;
+          color: #FFD700 !important;
+          text-shadow: none !important;
+        }
+        #simple-panel input, #customization-panel input {
+          font-family: inherit !important;
+          font-size: 12px !important;
+          padding: 6px 8px !important;
+          border: 2px solid #444 !important;
+          border-radius: 0 !important;
+          background: #222 !important;
+          color: #fff !important;
+          box-shadow: none !important;
+          outline: none !important;
+        }
+        #simple-panel button, #customization-panel button {
+          font-family: inherit !important;
+          font-size: 12px !important;
+          padding: 6px 12px !important;
+          border: 2px solid #FFD700 !important;
+          border-radius: 0 !important;
+          background: #222 !important;
+          color: #FFD700 !important;
+          box-shadow: none !important;
+          cursor: pointer;
+          margin: 2px 0;
+          transition: background 0.1s, color 0.1s;
+        }
+        #simple-panel button:hover, #customization-panel button:hover {
+          background: #FFD700 !important;
+          color: #222 !important;
+        }
+        #avatar-preview {
+          width: 80px !important;
+          height: 110px !important;
+          border: 2px solid #FFD700 !important;
+          background: #111 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          margin: 0 auto !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+        #avatar-preview * {
+          font-family: inherit !important;
+          font-size: 10px !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+        .color-btn {
+          width: 22px !important;
+          height: 22px !important;
+          border: 2px solid #444 !important;
+          border-radius: 0 !important;
+          margin: 2px !important;
+          box-shadow: none !important;
+          transition: border 0.1s;
+        }
+        .color-btn.selected, .color-btn:focus, .color-btn:hover {
+          border: 2px solid #FFD700 !important;
+        }
+        .color-grid {
+          display: grid !important;
+          grid-template-columns: repeat(8, 1fr) !important;
+          gap: 2px !important;
+        }
+        #preview-alias {
+          font-size: 10px !important;
+          color: #FFD700 !important;
+          background: #111 !important;
+          border: 2px solid #FFD700 !important;
+          border-radius: 0 !important;
+          padding: 4px 0 !important;
+          margin: 4px 0 !important;
         }
     </style>
 </head>
