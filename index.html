@@ -3581,13 +3581,37 @@
 
         // --- Función para crear un avatar de usuario ---
         function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
-            // Solo crear si no existe
             if (userAvatars.has(alias)) return;
-            // Aquí deberías crear el avatar 3D y añadirlo a la escena
-            // Ejemplo básico (ajusta según tu lógica 3D):
             const avatarGroup = new THREE.Group();
             avatarGroup.position.set(position.x, position.y, position.z);
-            // Puedes añadir más geometría/materiales aquí
+            // Cuerpo (cubo)
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x4ECDC4 });
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.3), bodyMaterial);
+            body.position.y = 0.35;
+            avatarGroup.add(body);
+            // Cabeza (cubo)
+            const headMaterial = new THREE.MeshStandardMaterial({ color: 0xFFE4C4 });
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), headMaterial);
+            head.position.y = 0.85;
+            avatarGroup.add(head);
+            // Piernas (cilindros)
+            const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2C3E50 });
+            const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.4, 8), legMaterial);
+            leg1.position.set(-0.12, 0.1, 0);
+            avatarGroup.add(leg1);
+            const leg2 = leg1.clone();
+            leg2.position.x = 0.12;
+            avatarGroup.add(leg2);
+            // Brazos (cilindros)
+            const armMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+            const arm1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.4, 8), armMaterial);
+            arm1.position.set(-0.32, 0.55, 0);
+            arm1.rotation.z = Math.PI / 10;
+            avatarGroup.add(arm1);
+            const arm2 = arm1.clone();
+            arm2.position.x = 0.32;
+            arm2.rotation.z = -Math.PI / 10;
+            avatarGroup.add(arm2);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
