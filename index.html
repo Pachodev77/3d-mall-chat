@@ -525,7 +525,6 @@
         function getLogoTexture(domain) {
             const logoFileName = domainToLogoMap[domain];
             if (!logoFileName) {
-                console.error('No logoFileName for domain:', domain);
                 return null;
             }
             
@@ -908,13 +907,7 @@
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
             script.onload = function() {
-                // Importar OrbitControls después de que Three.js esté cargado
-                const controlsScript = document.createElement('script');
-                controlsScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js';
-                controlsScript.onload = function() {
-                    setupThreeJS();
-                };
-                document.head.appendChild(controlsScript);
+                setupThreeJS();
             };
             document.head.appendChild(script);
         }

@@ -285,19 +285,19 @@
         Desconectado
     </div>
     
-    <button id="customization-btn" title="Personalizar Avatar">≡ƒæñ</button>
-    <button id="chat-toggle-btn" title="Chat">≡ƒÆ¼</button>
+    <button id="customization-btn" title="Personalizar Avatar">👤</button>
+    <button id="chat-toggle-btn" title="Chat">💬</button>
     
     <div id="alias-prompt">
         <h2 style="color: white; margin-bottom: 20px;">3D Mall Chat</h2>
-        <input type="text" id="alias-input" placeholder="Ingresa tu alias (m├íx. 18 caracteres)" maxlength="18">
+        <input type="text" id="alias-input" placeholder="Ingresa tu alias (máx. 18 caracteres)" maxlength="18">
         <button onclick="connectToChat()">Conectar</button>
     </div>
     
     <div id="chat-panel">
         <div id="chat-header">
             <span>Chat del Mall</span>
-            <button id="chat-close-btn">├ù</button>
+            <button id="chat-close-btn">×</button>
         </div>
         <div id="chat-content">
             <div id="chat-main">
@@ -315,7 +315,7 @@
     </div>
     
     <div id="customization-panel">
-        <button class="close-btn" onclick="closeCustomization()">├ù</button>
+        <button class="close-btn" onclick="closeCustomization()">×</button>
         <h2 style="color: white; margin-bottom: 20px;">Personalizar Avatar</h2>
         
         <div style="margin-bottom: 20px;">
@@ -360,7 +360,7 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
         import { getDatabase, ref, set, push, onValue, onChildAdded, remove } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
 
-        // Configuraci├│n de Firebase
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDjPYZJeoLgisI3KZyA6_0OwmH_UESGR14",
             authDomain: "ccapp-b8301.firebaseapp.com",
@@ -388,11 +388,11 @@
         const messagesRef = ref(db, 'messages');
         const positionsRef = ref(db, 'positions');
 
-        // Funci├│n para conectar al chat
+        // Función para conectar al chat
         window.connectToChat = function() {
             const alias = document.getElementById('alias-input').value.trim();
             if (!alias || alias.length === 0) {
-                alert('Por favor ingresa un alias v├ílido');
+                alert('Por favor ingresa un alias válido');
                 return;
             }
             
@@ -443,7 +443,7 @@
             initThreeJS();
         };
 
-        // Funci├│n para enviar mensaje
+        // Función para enviar mensaje
         window.sendMessage = function() {
             const input = document.getElementById('chat-input');
             const message = input.value.trim();
@@ -461,7 +461,7 @@
             input.value = '';
         };
 
-        // Funci├│n para enviar posici├│n
+        // Función para enviar posición
         function sendPosition(position, floor, rotation) {
             if (!isConnected || !currentUser) return;
             
@@ -475,7 +475,7 @@
             set(ref(db, `positions/${currentUser.alias}`), positionData);
         }
 
-        // Funci├│n para desconectar
+        // Función para desconectar
         function disconnectFromChat() {
             if (currentUser) {
                 remove(ref(db, `users/${currentUser.alias}`));
@@ -485,7 +485,7 @@
             isConnected = false;
         }
 
-        // Funci├│n para actualizar lista de usuarios
+        // Función para actualizar lista de usuarios
         function updateUsersList(users) {
             const usersList = document.getElementById('users-list');
             if (usersList) {
@@ -501,7 +501,7 @@
             }
         }
 
-        // Funci├│n para agregar mensaje al chat
+        // Función para agregar mensaje al chat
         function addMessageToChat(alias, message, type) {
             const chatMessages = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
@@ -517,7 +517,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Funci├│n para actualizar posici├│n de avatar
+        // Función para actualizar posición de avatar
         function updateAvatarPosition(alias, position, floor, rotation) {
             if (!otherAvatars.has(alias)) {
                 // Crear nuevo avatar
@@ -528,7 +528,7 @@
                 scene.add(newAvatar);
                 otherAvatars.set(alias, newAvatar);
             } else {
-                // Actualizar posici├│n existente
+                // Actualizar posición existente
                 const existingAvatar = otherAvatars.get(alias);
                 existingAvatar.position.set(position.x, position.y, position.z);
                 existingAvatar.rotation.y = rotation;
@@ -557,12 +557,12 @@
 
         document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
 
-        // Funci├│n para cerrar panel de personalizaci├│n
+        // Función para cerrar panel de personalización
         window.closeCustomization = function() {
             document.getElementById('customization-panel').style.display = 'none';
         };
 
-        // Funciones de cambio de color (se implementar├ín con Three.js)
+        // Funciones de cambio de color (se implementarán con Three.js)
         window.changeShirtColor = function(color) {
             if (avatar && avatar.children[0]) {
                 avatar.children[0].material.color.setHex(parseInt(color.replace('#', '0x')));
@@ -593,7 +593,7 @@
         }
 
         function setupThreeJS() {
-            // Configuraci├│n b├ísica de Three.js
+            // Configuración básica de Three.js
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -612,7 +612,7 @@
             // Crear avatar del usuario
             createAvatar();
 
-            // Posicionar c├ímara
+            // Posicionar cámara
             camera.position.set(0, 5, 10);
             controls.target.set(0, 0, 0);
 
@@ -624,7 +624,7 @@
             }
             animate();
 
-            // Enviar posici├│n peri├│dicamente
+            // Enviar posición periódicamente
             setInterval(() => {
                 if (isConnected && currentUser && avatar) {
                     sendPosition(avatar.position, 0, avatar.rotation.y);
@@ -745,7 +745,7 @@
             }
         });
 
-        // Limpiar al cerrar la p├ígina
+        // Limpiar al cerrar la página
         window.addEventListener('beforeunload', function() {
             disconnectFromChat();
         });
