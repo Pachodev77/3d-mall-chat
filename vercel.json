@@ -9,6 +9,10 @@
     {
       "src": "assets/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/firebase-config.js",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
