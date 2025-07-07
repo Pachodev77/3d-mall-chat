@@ -766,10 +766,6 @@
             </div>
 
         </div>
-        <div id="customization-actions">
-            <button id="reset-customization-btn" class="customization-btn">Restablecer</button>
-            <button id="save-customization-btn" class="customization-btn">Guardar</button>
-        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -2770,11 +2766,15 @@
             
             // Actualizar selección visual en los botones
             updateColorButtonSelection('shirt', color);
+            
+            // Guardar automáticamente en localStorage
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         }
         
         function changePantsColor(color) {
             console.log('Cambiando color de pantalón a:', color);
             pantsColor = color;
+            currentCustomization.pantsColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
             const avatar = userAvatars.get(userAlias);
@@ -2783,16 +2783,17 @@
                 avatar.pantsMaterial.needsUpdate = true;
             }
             
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
+            // Actualizar selección visual en los botones
             updateColorButtonSelection('pants', color);
+            
+            // Guardar automáticamente en localStorage
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         }
         
         function changeShoesColor(color) {
             console.log('Cambiando color de zapatos a:', color);
             shoesColor = color;
+            currentCustomization.shoesColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
             const avatar = userAvatars.get(userAlias);
@@ -2801,11 +2802,11 @@
                 avatar.shoeMaterial.needsUpdate = true;
             }
             
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
+            // Actualizar selección visual en los botones
             updateColorButtonSelection('shoes', color);
+            
+            // Guardar automáticamente en localStorage
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         }
         
         function updateColorButtonSelection(type, selectedColor) {
@@ -3693,21 +3694,27 @@
                 });
             }
             
-            // Configurar event listeners para el panel de personalización completo
+            // Configurar event listener para el botón de cerrar del panel de personalización
             const customizationCloseBtn = document.getElementById('customization-close-btn');
-            const saveCustomizationBtn = document.getElementById('save-customization-btn');
-            const resetCustomizationBtn = document.getElementById('reset-customization-btn');
-            
             if (customizationCloseBtn) {
                 customizationCloseBtn.addEventListener('click', closeCustomizationPanel);
             }
             
-            if (saveCustomizationBtn) {
-                saveCustomizationBtn.addEventListener('click', saveCustomization);
-            }
-            
-            if (resetCustomizationBtn) {
-                resetCustomizationBtn.addEventListener('click', resetCustomization);
+            // Configurar event listener para el input de alias para guardar automáticamente
+            const aliasInput = document.getElementById('customization-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', function() {
+                    const newAlias = this.value.trim();
+                    if (newAlias.length > 0 && newAlias.length <= 20) {
+                        userAlias = newAlias;
+                        localStorage.setItem('userAlias', userAlias);
+                        
+                        // Enviar alias al servidor si está conectado
+                        if (isConnected) {
+                            sendAlias();
+                        }
+                    }
+                });
             }
         });
 
