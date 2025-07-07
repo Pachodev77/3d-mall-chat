@@ -10,6 +10,9 @@ const server = http.createServer((req, res) => {
         filePath = './index.html';
     }
 
+    // Log all requests to help debug 404 errors
+    console.log(`Request: ${req.url} -> ${filePath}`);
+
     const extname = path.extname(filePath);
     let contentType = 'text/html';
     
@@ -37,13 +40,16 @@ const server = http.createServer((req, res) => {
     fs.readFile(filePath, (error, content) => {
         if (error) {
             if (error.code === 'ENOENT') {
+                console.log(`404 Not Found: ${filePath}`);
                 res.writeHead(404);
                 res.end('File not found');
             } else {
+                console.log(`500 Server Error: ${filePath} - ${error.code}`);
                 res.writeHead(500);
                 res.end('Server error: ' + error.code);
             }
         } else {
+            console.log(`200 OK: ${filePath}`);
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(content, 'utf-8');
         }
