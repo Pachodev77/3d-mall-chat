@@ -4206,12 +4206,14 @@
             const dx = touch.clientX - cameraLastX;
             const dy = touch.clientY - cameraLastY;
             
-            // Rotar cámara horizontalmente (más suave)
-            targetRotationY -= dx * 0.005;
+            // Rotar cámara horizontalmente (más natural)
+            // Deslizar hacia la derecha = girar hacia la derecha
+            targetRotationY += dx * 0.005;
             
-            // Inclinar cámara verticalmente (limitado y más suave)
+            // Inclinar cámara verticalmente (más natural)
+            // Deslizar hacia arriba = mirar hacia arriba
             const currentPitch = camera.rotation.x;
-            const newPitch = currentPitch - dy * 0.003;
+            const newPitch = currentPitch + dy * 0.003;
             camera.rotation.x = Math.max(-0.3, Math.min(0.3, newPitch));
             
             cameraLastX = touch.clientX;
