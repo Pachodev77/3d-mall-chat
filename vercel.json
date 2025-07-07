@@ -1,7 +1,11 @@
 {
   "version": 2,
-  "name": "3d-mall-chat-firebase",
+  "name": "3d-mall-chat",
   "builds": [
+    {
+      "src": "chat-server.js",
+      "use": "@vercel/node"
+    },
     {
       "src": "index.html",
       "use": "@vercel/static"
@@ -18,10 +22,15 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/chat-server.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
+  },
+  "functions": {
+    "chat-server.js": {
+      "maxDuration": 30
+    }
   }
 } 
