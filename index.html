@@ -3446,7 +3446,8 @@
                     z: camera.position.z
                 };
                 const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                const rotation = typeof camera.rotation !== 'undefined' ? camera.rotation.y : 0;
+                // Invertir la rotación para que los avatares miren igual que la cámara
+                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
                 sendPosition(position, floor, rotation);
             } else {
                 console.warn('Cámara o posición no definida:', camera);
