@@ -3942,6 +3942,10 @@
         }
 
         function updateAvatarPosition(alias, position, floor, rotation = 0) {
+            if (!position || typeof position.x === 'undefined' || typeof position.y === 'undefined' || typeof position.z === 'undefined') {
+                console.warn('Posición inválida para alias:', alias, position);
+                return;
+            }
             // No crear avatar para el usuario propio
             if (alias === userAlias) {
                 return;
