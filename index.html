@@ -199,9 +199,11 @@
         #alias-prompt input {
             padding: 10px;
             font-size: 16px;
-            border-radius: 6px;
             border: none;
-            margin-bottom: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            width: 200px;
+            text-align: center;
         }
         #alias-prompt button {
             padding: 8px 18px;
@@ -582,6 +584,110 @@
           padding: 4px 0 !important;
           margin: 4px 0 !important;
         }
+        
+        /* Estilos para controles móviles */
+        .mobile-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .joystick-container {
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+            touch-action: none;
+        }
+        
+        .joystick-base {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.3) 70%);
+        }
+        
+        .joystick-stick {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 215, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            touch-action: none;
+            transition: background 0.2s;
+        }
+        
+        .joystick-stick:active {
+            background: rgba(255, 215, 0, 1);
+        }
+        
+        .camera-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .camera-area {
+            width: 200px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            position: relative;
+            touch-action: none;
+        }
+        
+        .camera-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFD700;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .joystick-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFD700;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        /* Mostrar controles solo en móviles */
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: block;
+            }
+            .camera-controls {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -767,6 +873,21 @@
 
         </div>
     </div>
+    
+    <!-- Controles móviles -->
+    <div class="mobile-controls">
+        <div class="joystick-label">Movimiento</div>
+        <div class="joystick-container" id="joystick-container">
+            <div class="joystick-base"></div>
+            <div class="joystick-stick" id="joystick-stick"></div>
+        </div>
+    </div>
+    
+    <div class="camera-controls">
+        <div class="camera-label">Cámara</div>
+        <div class="camera-area" id="camera-area"></div>
+    </div>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -3966,97 +4087,189 @@
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
         }
 
-        // --- Controles táctiles para móvil ---
+        // --- Variables para controles móviles ---
+        let joystickActive = false;
+        let joystickCenter = { x: 0, y: 0 };
+        let joystickPosition = { x: 0, y: 0 };
+        let joystickMaxDistance = 35;
+        
+        let cameraControlActive = false;
+        let cameraStartX = 0, cameraStartY = 0;
+        let cameraLastX = 0, cameraLastY = 0;
+
+        // --- Sistema de Joystick Virtual ---
+        function initMobileControls() {
+            if (!isMobile()) return;
+            
+            const joystickContainer = document.getElementById('joystick-container');
+            const joystickStick = document.getElementById('joystick-stick');
+            const cameraArea = document.getElementById('camera-area');
+            
+            if (!joystickContainer || !joystickStick || !cameraArea) return;
+            
+            // Configurar joystick
+            joystickContainer.addEventListener('touchstart', handleJoystickStart, { passive: false });
+            joystickContainer.addEventListener('touchmove', handleJoystickMove, { passive: false });
+            joystickContainer.addEventListener('touchend', handleJoystickEnd, { passive: false });
+            
+            // Configurar controles de cámara
+            cameraArea.addEventListener('touchstart', handleCameraStart, { passive: false });
+            cameraArea.addEventListener('touchmove', handleCameraMove, { passive: false });
+            cameraArea.addEventListener('touchend', handleCameraEnd, { passive: false });
+            
+            // Obtener posición inicial del joystick
+            const rect = joystickContainer.getBoundingClientRect();
+            joystickCenter.x = rect.width / 2;
+            joystickCenter.y = rect.height / 2;
+        }
+        
+        function handleJoystickStart(e) {
+            e.preventDefault();
+            joystickActive = true;
+            const touch = e.touches[0];
+            const rect = e.target.getBoundingClientRect();
+            joystickPosition.x = touch.clientX - rect.left;
+            joystickPosition.y = touch.clientY - rect.top;
+            updateJoystickPosition();
+        }
+        
+        function handleJoystickMove(e) {
+            if (!joystickActive) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = e.target.getBoundingClientRect();
+            joystickPosition.x = touch.clientX - rect.left;
+            joystickPosition.y = touch.clientY - rect.top;
+            updateJoystickPosition();
+        }
+        
+        function handleJoystickEnd(e) {
+            joystickActive = false;
+            joystickPosition.x = joystickCenter.x;
+            joystickPosition.y = joystickCenter.y;
+            updateJoystickPosition();
+        }
+        
+        function updateJoystickPosition() {
+            const joystickStick = document.getElementById('joystick-stick');
+            if (!joystickStick) return;
+            
+            // Calcular distancia desde el centro
+            const dx = joystickPosition.x - joystickCenter.x;
+            const dy = joystickPosition.y - joystickCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Limitar distancia máxima
+            if (distance > joystickMaxDistance) {
+                const angle = Math.atan2(dy, dx);
+                joystickPosition.x = joystickCenter.x + Math.cos(angle) * joystickMaxDistance;
+                joystickPosition.y = joystickCenter.y + Math.sin(angle) * joystickMaxDistance;
+            }
+            
+            // Actualizar posición visual del stick
+            joystickStick.style.transform = `translate(${joystickPosition.x - 25}px, ${joystickPosition.y - 25}px)`;
+        }
+        
+        function handleCameraStart(e) {
+            e.preventDefault();
+            cameraControlActive = true;
+            const touch = e.touches[0];
+            cameraStartX = cameraLastX = touch.clientX;
+            cameraStartY = cameraLastY = touch.clientY;
+        }
+        
+        function handleCameraMove(e) {
+            if (!cameraControlActive) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const dx = touch.clientX - cameraLastX;
+            const dy = touch.clientY - cameraLastY;
+            
+            // Rotar cámara horizontalmente
+            targetRotationY -= dx * 0.01;
+            
+            // Inclinar cámara verticalmente (limitado)
+            const currentPitch = camera.rotation.x;
+            const newPitch = currentPitch - dy * 0.005;
+            camera.rotation.x = Math.max(-0.5, Math.min(0.5, newPitch));
+            
+            cameraLastX = touch.clientX;
+            cameraLastY = touch.clientY;
+        }
+        
+        function handleCameraEnd(e) {
+            cameraControlActive = false;
+        }
+        
+        // --- Función de movimiento actualizada para móvil ---
+        function updateMobileMovement() {
+            if (!isMobile() || !joystickActive) return;
+            
+            // Calcular dirección del joystick
+            const dx = joystickPosition.x - joystickCenter.x;
+            const dy = joystickPosition.y - joystickCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 5) { // Umbral mínimo para movimiento
+                // Normalizar dirección
+                const normalizedDx = dx / distance;
+                const normalizedDy = dy / distance;
+                
+                // Calcular velocidad basada en distancia
+                const speed = Math.min(distance / joystickMaxDistance, 1.0) * MOVE_SPEED;
+                
+                // Obtener dirección de la cámara
+                const cameraDirection = new THREE.Vector3();
+                camera.getWorldDirection(cameraDirection);
+                cameraDirection.y = 0;
+                cameraDirection.normalize();
+                
+                // Calcular dirección derecha de la cámara
+                const cameraRight = new THREE.Vector3();
+                cameraRight.crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0));
+                
+                // Calcular movimiento
+                const moveDirection = new THREE.Vector3();
+                moveDirection.addScaledVector(cameraDirection, -normalizedDy); // Adelante/atrás
+                moveDirection.addScaledVector(cameraRight, normalizedDx); // Izquierda/derecha
+                moveDirection.normalize();
+                
+                // Aplicar movimiento
+                const velocity = moveDirection.multiplyScalar(speed);
+                const newPosition = targetPosition.clone().add(velocity);
+                
+                // Verificar colisiones
+                const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
+                let collision = false;
+                const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
+                for (const wallBox of nearbyCollisions) {
+                    if (playerBox.intersectsBox(wallBox)) {
+                        collision = true;
+                        break;
+                    }
+                }
+                
+                if (!collision) {
+                    targetPosition.copy(newPosition);
+                }
+            }
+        }
+        
+        // --- Inicializar controles móviles ---
         if (isMobile()) {
-            let touchStartX = 0, touchStartY = 0;
-            let lastTouchX = 0, lastTouchY = 0;
-            let rotating = false;
-            let moving = false;
-            let moveDir = 0;
-            let touchMoved = false;
-            const minSwipe = 10;
-
-            renderer.domElement.addEventListener('touchstart', function(e) {
-                if (e.touches.length === 1) {
-                    touchStartX = lastTouchX = e.touches[0].clientX;
-                    touchStartY = lastTouchY = e.touches[0].clientY;
-                    rotating = true;
-                    moving = true;
-                    moveDir = 0;
-                    touchMoved = false;
-                }
-            }, { passive: false });
-            renderer.domElement.addEventListener('touchmove', function(e) {
-                if (e.touches.length === 1) {
-                    const dx = e.touches[0].clientX - lastTouchX;
-                    const dy = e.touches[0].clientY - lastTouchY;
-                    // Horizontal: rotar cámara
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        targetRotationY -= dx * 0.01;
-                    }
-                    // Vertical: mover adelante/atrás
-                    else if (Math.abs(dy) > minSwipe) {
-                        moveDir = dy < 0 ? 1 : -1;
-                        touchMoved = true;
-                    }
-                    lastTouchX = e.touches[0].clientX;
-                    lastTouchY = e.touches[0].clientY;
-                }
-                e.preventDefault();
-            }, { passive: false });
-            renderer.domElement.addEventListener('touchend', function(e) {
-                rotating = false;
-                moving = false;
-                moveDir = 0;
-            }, { passive: false });
-
-            // Modificar updateMovement para móvil
-            const originalUpdateMovement = updateMovement;
-            updateMovement = function() {
-                if (chatOpen) return;
-                // Rotación ya se maneja por touch
-                // Movimiento adelante/atrás
-                if (moveDir !== 0) {
-                    const direction = new THREE.Vector3();
-                    camera.getWorldDirection(direction);
-                    direction.y = 0;
-                    direction.normalize();
-                    const velocity = direction.multiplyScalar(MOVE_SPEED * moveDir);
-                    const newPosition = targetPosition.clone().add(velocity);
-                    // Colisiones (igual que original)
-                    const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
-                    let collision = false;
-                    const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
-                    for (const wallBox of nearbyCollisions) {
-                        if (playerBox.intersectsBox(wallBox)) {
-                            collision = true;
-                            break;
-                        }
-                    }
-                    if (!collision) {
-                        targetPosition.copy(newPosition);
-                    }
-                }
-                // Interpolación
-                camera.position.lerp(targetPosition, 0.2);
-                camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            // Esperar a que el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMobileControls);
+            } else {
+                initMobileControls();
+            }
+            
+            // Modificar la función de animación para incluir movimiento móvil
+            const originalAnimate = animate;
+            animate = function() {
+                updateMobileMovement();
+                originalAnimate();
             };
-
-            // Overlay de ayuda para controles móviles
-            const help = document.createElement('div');
-            help.style.position = 'fixed';
-            help.style.bottom = '10px';
-            help.style.left = '50%';
-            help.style.transform = 'translateX(-50%)';
-            help.style.background = 'rgba(0,0,0,0.7)';
-            help.style.color = '#FFD700';
-            help.style.fontFamily = 'monospace';
-            help.style.fontSize = '13px';
-            help.style.padding = '10px 18px';
-            help.style.borderRadius = '8px';
-            help.style.zIndex = '9999';
-            help.innerHTML = 'Desliza horizontal para mirar<br>Desliza vertical para avanzar/retroceder';
-            document.body.appendChild(help);
         }
     </script>
 </body>
