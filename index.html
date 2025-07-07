@@ -3586,13 +3586,13 @@
             avatarGroup.position.set(position.x, position.y, position.z);
             // Cuerpo (cubo)
             const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x4ECDC4 });
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.3), bodyMaterial);
-            body.position.y = 0.685; // Ajuste: torso sobre las piernas
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.3), bodyMaterial); // Altura menor
+            body.position.y = 0.725; // Más arriba sobre las piernas
             avatarGroup.add(body);
             // Cabeza (cubo)
             const headMaterial = new THREE.MeshStandardMaterial({ color: 0xFFE4C4 });
             const head = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), headMaterial);
-            head.position.y = 1.21; // Ajuste: cabeza sobre el torso
+            head.position.y = 1.15; // Encima del torso
             avatarGroup.add(head);
             // Piernas (cilindros)
             const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2C3E50 });
