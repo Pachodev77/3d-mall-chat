@@ -2514,7 +2514,7 @@
         let connectedUsers = [];
         
         chatToggleBtn.onclick = () => {
-            // Cerrar panel de personalizaci├│n si est├í abierto
+            // Cerrar panel de personalización si está abierto
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
                 closeSimplePanel();
@@ -2528,7 +2528,7 @@
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
             }
-            // Enviar alias autom├íticamente al servidor
+            // Enviar alias automáticamente al servidor
             if (isConnected) {
                 sendAlias();
             }
@@ -4263,7 +4263,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
-                overlay.style.pointerEvents = 'auto';
+                // Set pointer-events to 'none' by default (overlay hidden)
+                overlay.style.pointerEvents = 'none';
                 overlay.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
