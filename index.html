@@ -2670,18 +2670,8 @@
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
             shirtColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.bodyMaterial) {
-                avatar.bodyMaterial.color.setHex(color);
-                avatar.bodyMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
+            currentCustomization.shirtColor = color;
             updateAvatarPreview();
-            
-            // Feedback visual en los botones
             updateColorButtonSelection('shirt', color);
         }
         
