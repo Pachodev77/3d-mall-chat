@@ -2,173 +2,214 @@
 
 Una aplicación de chat 3D con un centro comercial virtual donde los usuarios pueden personalizar avatares y chatear en tiempo real.
 
-## 🚀 Despliegue Rápido en Vercel
+## 🚀 Despliegue en Diferentes Hostings
 
-### Opción 1: Despliegue Automático (Recomendado)
+### 1. **VPS/Dedicado (Recomendado)**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tu-usuario/3d-mall-chat)
-
-1. Haz clic en el botón "Deploy with Vercel" arriba
-2. Conecta tu cuenta de GitHub
-3. Selecciona el repositorio
-4. ¡Listo! Tu aplicación estará disponible en minutos
-
-### Opción 2: Despliegue Manual
-
+#### Opción A: Con PM2 (Automático)
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/3d-mall-chat.git
-cd 3d-mall-chat
+# Clonar el proyecto
+git clone <tu-repositorio>
+cd proyecto
 
-# 2. Instalar dependencias
-npm install
-
-# 3. Desplegar en Vercel
-npx vercel
+# Ejecutar script de despliegue
+chmod +x deploy.sh
+./deploy.sh
 ```
 
-## 🛠️ Desarrollo Local
-
+#### Opción B: Manual
 ```bash
 # Instalar dependencias
 npm install
 
-# Ejecutar servidor de desarrollo
-npm run dev
+# Instalar PM2
+npm install -g pm2
 
-# O ejecutar directamente
-node chat-server.js
+# Iniciar servidor
+pm2 start ecosystem.config.js --env production
+
+# Configurar inicio automático
+pm2 startup
+pm2 save
 ```
 
-La aplicación estará disponible en `http://localhost:8000`
+### 2. **Hosting Compartido (Sin Node.js)**
 
-## 📋 Características
+Para hosting que no permite servidores Node.js:
 
-- ✅ **Chat en tiempo real** con WebSockets
-- ✅ **Personalización de avatares** (camisa, pantalones, zapatos)
-- ✅ **Mundo 3D** con Three.js
-- ✅ **Vista previa del avatar** en tiempo real
-- ✅ **Almacenamiento local** de preferencias
-- ✅ **Interfaz moderna** y responsive
+#### Opción A: Netlify/Vercel + Servicio WebSocket Externo
+1. **Subir archivos estáticos** a Netlify/Vercel
+2. **Usar servicio de WebSocket** como:
+   - Firebase Realtime Database
+   - Pusher
+   - Socket.io con servidor separado
 
-## 🏗️ Estructura del Proyecto
+#### Opción B: Heroku
+```bash
+# Crear app en Heroku
+heroku create tu-app-name
 
+# Configurar variables de entorno
+heroku config:set NODE_ENV=production
+
+# Desplegar
+git push heroku main
 ```
-project/
-├── chat-server.js          # Servidor WebSocket
-├── index.html              # Aplicación principal
-├── package.json            # Dependencias
-├── assets/                 # Imágenes y recursos
-│   └── images/
-├── components/             # Componentes React (si aplica)
-└── README.md              # Este archivo
+
+### 3. **Docker (Para cualquier hosting)**
+
+Crear `Dockerfile`:
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 8000
+CMD ["npm", "start"]
 ```
 
-## 🔧 Tecnologías Utilizadas
+```bash
+# Construir imagen
+docker build -t 3d-mall-chat .
 
-- **Backend**: Node.js + WebSocket
-- **Frontend**: HTML5 + CSS3 + JavaScript
-- **3D Graphics**: Three.js
-- **Real-time**: WebSocket API
-- **Hosting**: Vercel (recomendado)
+# Ejecutar contenedor
+docker run -p 8000:8000 3d-mall-chat
+```
 
-## 🌐 Opciones de Despliegue
+## 📋 Comandos Útiles
 
-### Vercel (Recomendado)
-- ✅ Soporte nativo para Node.js
-- ✅ WebSockets funcionan perfectamente
-- ✅ Despliegue automático desde GitHub
-- ✅ SSL automático
-- ✅ Dominio personalizado gratuito
+### PM2 (Gestión del servidor)
+```bash
+# Ver estado
+pm2 status
 
-### Otros Hostings
-- **Railway**: Excelente para desarrollo
-- **Render**: Buena opción gratuita
-- **Heroku**: Confiable pero con costos
-- **Netlify**: Solo para versión estática + Firebase
+# Ver logs
+pm2 logs chat-server
 
-## 📱 Uso
+# Reiniciar
+pm2 restart chat-server
 
-1. **Personalizar Avatar**:
-   - Haz clic en "👤 Personalizar"
-   - Elige colores para camisa, pantalones y zapatos
-   - Escribe tu nombre
-   - Guarda la personalización
+# Detener
+pm2 stop chat-server
 
-2. **Chat en Tiempo Real**:
-   - Haz clic en "💬 Chat"
-   - Escribe mensajes y presiona Enter
-   - Ve mensajes de otros usuarios en tiempo real
+# Eliminar
+pm2 delete chat-server
+```
 
-3. **Navegación 3D**:
-   - Usa WASD para moverte
-   - Haz clic en las tiendas para visitarlas
-   - Explora el centro comercial virtual
+### Monitoreo
+```bash
+# Dashboard de PM2
+pm2 monit
+
+# Ver uso de recursos
+pm2 show chat-server
+```
+
+## 🔧 Configuración de Producción
+
+### Variables de Entorno
+```bash
+NODE_ENV=production
+PORT=8000
+```
+
+### Firewall
+```bash
+# Abrir puerto 8000
+sudo ufw allow 8000
+```
+
+### Nginx (Proxy reverso)
+```nginx
+server {
+    listen 80;
+    server_name tu-dominio.com;
+    
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+## 📊 Monitoreo y Logs
+
+### Logs del Sistema
+```bash
+# Ver logs en tiempo real
+tail -f logs/chat-server.log
+
+# Ver logs de PM2
+pm2 logs chat-server --lines 100
+```
+
+### Monitoreo de Recursos
+```bash
+# Ver uso de CPU y memoria
+pm2 monit
+
+# Estadísticas detalladas
+pm2 show chat-server
+```
 
 ## 🔒 Seguridad
 
-- Validación de entrada en cliente y servidor
-- Sanitización de mensajes
-- Límites de caracteres para nombres
-- Timeouts para conexiones inactivas
+### Recomendaciones
+1. **Usar HTTPS** en producción
+2. **Configurar firewall** apropiadamente
+3. **Limitar conexiones** por IP
+4. **Validar datos** de entrada
+5. **Usar variables de entorno** para configuraciones sensibles
+
+### Ejemplo de configuración segura
+```javascript
+// En chat-server.js
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+
+app.use(helmet());
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100 // máximo 100 requests por ventana
+}));
+```
 
 ## 🆘 Solución de Problemas
 
-### Error: "Puerto 8000 en uso"
+### Servidor no inicia
 ```bash
-# Cambiar puerto en chat-server.js
-const PORT = process.env.PORT || 8000;
+# Verificar puerto
+netstat -tulpn | grep :8000
+
+# Verificar logs
+pm2 logs chat-server
+
+# Reiniciar PM2
+pm2 restart chat-server
 ```
 
-### Error: "WebSocket no conecta"
-- Verifica que el servidor esté ejecutándose
-- Revisa la consola del navegador (F12)
-- Asegúrate de que no haya firewall bloqueando
+### Conexiones WebSocket fallan
+- Verificar que el puerto 8000 esté abierto
+- Verificar configuración de proxy/firewall
+- Revisar logs del servidor
 
-### Error: "Three.js no carga"
-- Verifica la conexión a internet
-- Revisa que el CDN de Three.js esté disponible
-
-## 📊 Monitoreo
-
-### Logs del Servidor
+### Alto uso de memoria
 ```bash
-# Ver logs en tiempo real
-npm run logs
+# Ver uso de memoria
+pm2 monit
 
-# O directamente
-node chat-server.js
+# Reiniciar si es necesario
+pm2 restart chat-server
 ```
-
-### Métricas
-- Usuarios conectados
-- Mensajes por minuto
-- Uso de memoria y CPU
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
 ## 📞 Soporte
 
-- **Issues**: [GitHub Issues](https://github.com/tu-usuario/3d-mall-chat/issues)
-- **Discusiones**: [GitHub Discussions](https://github.com/tu-usuario/3d-mall-chat/discussions)
-- **Email**: tu-email@example.com
-
-## 🎉 Agradecimientos
-
-- Three.js por la librería 3D
-- Vercel por el hosting gratuito
-- La comunidad de desarrolladores
-
----
-
-**¡Disfruta chateando en el centro comercial virtual! 🛍️💬** 
+Para problemas específicos:
+1. Revisar logs: `pm2 logs chat-server`
+2. Verificar estado: `pm2 status`
+3. Reiniciar servicio: `pm2 restart chat-server` 

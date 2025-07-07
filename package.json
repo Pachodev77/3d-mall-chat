@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node chat-server.js",
     "dev": "node chat-server.js",
-    "build": "echo 'No build step required'",
-    "vercel-build": "echo 'Build completed'"
+    "prod": "pm2 start ecosystem.config.js --env production",
+    "stop": "pm2 stop chat-server",
+    "restart": "pm2 restart chat-server",
+    "logs": "pm2 logs chat-server"
   },
   "dependencies": {
     "ws": "^8.13.0"
