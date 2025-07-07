@@ -2590,52 +2590,12 @@
         let usersRef, messagesRef, positionsRef;
         let currentUser = null;
 
-        // Función para probar conectividad a Firebase
-        async function testFirebaseConnectivity() {
-            try {
-                console.log('🔍 Probando conectividad a Firebase...');
-                console.log('📍 Database URL:', 'https://ccapp-b8301-default-rtdb.firebaseio.com');
-                
-                // Probar si podemos resolver el dominio
-                const testUrl = 'https://ccapp-b8301-default-rtdb.firebaseio.com/.json';
-                console.log('🌐 Probando URL:', testUrl);
-                
-                const response = await fetch(testUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    console.log('✅ Firebase database es accesible');
-                    return true;
-                } else {
-                    console.error('❌ Firebase database no es accesible. Status:', response.status, response.statusText);
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Error de conectividad a Firebase:', error.message);
-                console.error('🔍 Tipo de error:', error.name);
-                console.error('📋 Posibles causas:');
-                console.error('   1. Firebase Realtime Database no está habilitado para este proyecto');
-                console.error('   2. El ID del proyecto es incorrecto');
-                console.error('   3. Problemas de conectividad de red');
-                console.error('   4. Las reglas de seguridad están bloqueando el acceso');
-                console.error('   5. El proyecto ha sido eliminado o deshabilitado');
-                console.error('💡 Solución: Ve a Firebase Console y habilita Realtime Database');
-                return false;
-            }
-        }
-
         // Inicializar Firebase
         async function initializeFirebase() {
             try {
-                console.log('Inicializando Firebase...');
-                
                 const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
-                const { getDatabase, ref, connectDatabaseEmulator } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
-                
+                const { getDatabase, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+
                 const firebaseConfig = {
                     apiKey: "AIzaSyDjPYZJeoLgisI3KZyA6_0OwmH_UESGR14",
                     authDomain: "ccapp-b8301.firebaseapp.com",
@@ -2647,25 +2607,8 @@
                     databaseURL: "https://ccapp-b8301-default-rtdb.firebaseio.com"
                 };
 
-                console.log('Configuración Firebase:', firebaseConfig);
                 firebaseApp = initializeApp(firebaseConfig);
                 firebaseDb = getDatabase(firebaseApp);
-                
-                // Verificar conectividad a la base de datos
-                console.log('🔍 Verificando conectividad a Firebase...');
-                try {
-                    // Intentar una operación simple para verificar conectividad
-                    const testRef = ref(firebaseDb, '.info/connected');
-                    console.log('✅ Referencia de prueba creada:', testRef);
-                } catch (dbError) {
-                    console.error('❌ Error al crear referencia de prueba:', dbError);
-                    console.error('🔍 Detalles del error:', {
-                        message: dbError.message,
-                        code: dbError.code,
-                        name: dbError.name
-                    });
-                    throw new Error('No se puede conectar a la base de datos Firebase. Verifica que Realtime Database esté habilitado.');
-                }
                 
                 // Referencias a la base de datos
                 usersRef = ref(firebaseDb, 'users');
@@ -2673,174 +2616,84 @@
                 positionsRef = ref(firebaseDb, 'positions');
                 
                 console.log('Firebase inicializado correctamente');
-                console.log('Referencias creadas:', { usersRef, messagesRef, positionsRef });
                 return true;
             } catch (error) {
                 console.error('Error inicializando Firebase:', error);
-                console.error('Detalles del error:', {
-                    message: error.message,
-                    code: error.code,
-                    stack: error.stack
-                });
-                
-                // Mostrar información adicional para debugging
-                if (error.code === 'PERMISSION_DENIED') {
-                    console.error('Error de permisos: Verifica las reglas de seguridad de Firebase');
-                } else if (error.code === 'UNAVAILABLE') {
-                    console.error('Error de conectividad: La base de datos no está disponible');
-                }
-                
                 return false;
             }
         }
 
         async function connectToFirebaseChat() {
-            try {
-                console.log('Conectando al chat de Firebase...');
-                
-                // Verificar que Firebase esté inicializado
-                if (!firebaseDb) {
-                    throw new Error('Firebase no está inicializado');
-                }
-                
-                // Usar el alias guardado en localStorage o crear uno automático
-                let alias = userAlias;
-                if (!alias || alias.length === 0) {
-                    alias = 'Usuario_' + Math.floor(Math.random() * 10000);
-                    userAlias = alias;
-                    localStorage.setItem('userAlias', alias);
-                }
-                
-                // Firebase forbidden characters: . # $ [ ]
-                const forbidden = /[.#$\[\]]/;
-                if (forbidden.test(alias)) {
-                    // Si el alias guardado tiene caracteres prohibidos, crear uno nuevo
-                    alias = 'Usuario_' + Math.floor(Math.random() * 10000);
-                    userAlias = alias;
-                    localStorage.setItem('userAlias', alias);
-                }
-                
-                console.log('Alias a usar:', alias);
-                
-                currentUser = {
-                    alias: alias,
-                    position: { x: 25, y: 1.6, z: 25 },
-                    floor: 0,
-                    rotation: 0,
-                    timestamp: Date.now()
-                };
-                
-                console.log('Usuario actual:', currentUser);
-                
-                // Guardar usuario en Firebase
-                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
-                console.log('Guardando usuario en Firebase...');
-                
-                try {
-                    await set(ref(firebaseDb, `users/${currentUser.alias}`), currentUser);
-                    console.log('Usuario guardado exitosamente');
-                } catch (setError) {
-                    console.error('Error al guardar usuario:', setError);
-                    if (setError.code === 'PERMISSION_DENIED') {
-                        throw new Error('No tienes permisos para escribir en la base de datos. Verifica las reglas de seguridad de Firebase.');
-                    } else if (setError.code === 'UNAVAILABLE') {
-                        throw new Error('La base de datos no está disponible. Verifica tu conexión a internet.');
-                    } else {
-                        throw setError;
-                    }
-                }
-                
-                // Escuchar cambios en usuarios
-                const { onValue } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
-                console.log('Configurando listener de usuarios...');
-                onValue(usersRef, (snapshot) => {
-                    const users = snapshot.val() || {};
-                    console.log('Usuarios actualizados:', users);
-                    updateUsersList(Object.values(users));
-                });
-                
-                // Escuchar mensajes
-                const { onChildAdded } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
-                console.log('🔍 Configurando listener de mensajes...');
-                onChildAdded(messagesRef, (snapshot) => {
-                    const message = snapshot.val();
-                    console.log('📨 Nuevo mensaje recibido:', message);
-                    console.log('👤 Usuario actual:', currentUser.alias);
-                    console.log('📝 Mensaje de:', message.alias);
-                    
-                    if (message && message.alias && message.alias !== currentUser.alias) {
-                        console.log('✅ Agregando mensaje de otro usuario al chat');
-                        addMessageToChat(message.alias, message.message, 'user');
-                    } else if (message && message.alias === currentUser.alias) {
-                        console.log('🔄 Mensaje propio recibido (ignorando para evitar duplicado)');
-                    } else {
-                        console.log('❌ Mensaje inválido o sin alias');
-                    }
-                });
-                
-                // Escuchar posiciones
-                console.log('Configurando listener de posiciones...');
-                onValue(positionsRef, (snapshot) => {
-                    const positions = snapshot.val() || {};
-                    console.log('Posiciones actualizadas:', positions);
-                    Object.keys(positions).forEach(alias => {
-                        if (alias !== currentUser.alias) {
-                            const userData = positions[alias];
-                            updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
-                        }
-                    });
-                });
-                
-                isConnected = true;
-                const aliasPrompt = document.getElementById('alias-prompt');
-                if (aliasPrompt) {
-                    aliasPrompt.style.display = 'none';
-                }
-                
-                console.log('Conectado al chat como:', currentUser.alias);
-                
-                // Inicializar Three.js ANTES de usar las variables de cámara
-                init();
-                
-                // Ahora que Three.js está inicializado, podemos usar las variables de cámara
-                // Las funciones sendAlias y sendUserPosition usarán camera.position y camera.rotation
-            } catch (error) {
-                console.error('Error conectando al chat de Firebase:', error);
-                console.error('Detalles del error:', {
-                    message: error.message,
-                    code: error.code,
-                    stack: error.stack
-                });
-                alert('Error conectando al chat. Por favor, intenta de nuevo.');
-            }
-        }
-
-        // Reemplazar la función de WebSocket con Firebase
-        async function connectWebSocket() {
-            console.log('Intentando conectar a Firebase...');
-            
-            // Primero probar conectividad básica
-            const isConnectable = await testFirebaseConnectivity();
-            if (!isConnectable) {
-                console.error('❌ No se puede conectar a Firebase database');
-                alert('No se puede conectar a Firebase. Verifica:\n' +
-                    '1. Tu conexión a internet\n' +
-                    '2. Que la base de datos Firebase esté habilitada\n' +
-                    '3. Las reglas de seguridad de Firebase\n\n' +
-                    'Inicializando en modo offline...');
-                init();
+            const alias = document.getElementById('simple-alias-input').value.trim();
+            if (!alias || alias.length === 0) {
+                alert('Por favor ingresa un alias válido');
                 return;
             }
             
-            // Si la conectividad básica funciona, intentar inicializar Firebase
-            const success = await initializeFirebase();
-            if (success) {
-                connectToFirebaseChat();
-            } else {
-                console.error('No se pudo inicializar Firebase');
-                alert('No se pudo inicializar Firebase. Inicializando en modo offline...');
-                init();
+            // Firebase forbidden characters: . # $ [ ]
+            const forbidden = /[.#$\[\]]/;
+            if (forbidden.test(alias)) {
+                alert('El alias no puede contener los siguientes caracteres: . # $ [ ]');
+                return;
             }
+            
+            currentUser = {
+                alias: alias,
+                position: { x: 25, y: 1.6, z: 25 },
+                floor: 0,
+                rotation: 0,
+                timestamp: Date.now()
+            };
+            
+            // Guardar usuario en Firebase
+            const { set } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+            set(ref(firebaseDb, `users/${currentUser.alias}`), currentUser);
+            
+            // Escuchar cambios en usuarios
+            const { onValue } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val() || {};
+                updateUsersList(Object.values(users));
+            });
+            
+            // Escuchar mensajes
+            const { onChildAdded } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+            onChildAdded(messagesRef, (snapshot) => {
+                const message = snapshot.val();
+                if (message.alias !== currentUser.alias) {
+                    addMessageToChat(message.alias, message.message, 'user');
+                }
+            });
+            
+            // Escuchar posiciones
+            onValue(positionsRef, (snapshot) => {
+                const positions = snapshot.val() || {};
+                Object.keys(positions).forEach(alias => {
+                    if (alias !== currentUser.alias) {
+                        const userData = positions[alias];
+                        updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                    }
+                });
+            });
+            
+            isConnected = true;
+            document.getElementById('alias-prompt').style.display = 'none';
+            
+            console.log('Conectado al chat como:', currentUser.alias);
+            
+            // Inicializar Three.js
+            init();
+        }
+
+        // Reemplazar la función de WebSocket con Firebase
+        function connectWebSocket() {
+            initializeFirebase().then(success => {
+                if (success) {
+                    connectToFirebaseChat();
+                } else {
+                    alert('Error conectando a Firebase. Por favor, intenta de nuevo.');
+                }
+            });
         }
 
         function getOrAssignUserColor(alias) {
@@ -3379,50 +3232,21 @@
 
         async function sendMessage() {
             const message = chatInput.value.trim();
-            console.log('🔍 Intentando enviar mensaje:', {
-                message: message,
-                messageLength: message.length,
-                isConnected: isConnected,
-                userAlias: userAlias,
-                messagesRef: messagesRef
-            });
-            
-            if (message.length > 0 && isConnected && userAlias && messagesRef) {
-                try {
-                    console.log('📤 Enviando mensaje a Firebase...');
-                    // Enviar mensaje a Firebase
-                    const { push } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
-                    const messageData = {
-                        alias: userAlias,
-                        message: message,
-                        timestamp: Date.now()
-                    };
-                    console.log('📋 Datos del mensaje:', messageData);
-                    
-                    await push(messagesRef, messageData);
-                    console.log('✅ Mensaje enviado exitosamente');
-                    
-                    // Agregar el mensaje propio al chat localmente
-                    addMessageToChat(userAlias, message, 'own');
-                    
-                    chatInput.value = '';
-                } catch (error) {
-                    console.error('❌ Error enviando mensaje:', error);
-                    alert('Error enviando mensaje: ' + error.message);
-                }
-            } else {
-                console.log('❌ No se puede enviar mensaje:', {
-                    messageEmpty: message.length === 0,
-                    notConnected: !isConnected,
-                    noAlias: !userAlias,
-                    noMessagesRef: !messagesRef
+            if (message.length > 0 && isConnected && userAlias) {
+                // Enviar mensaje a Firebase
+                const { push } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                push(messagesRef, {
+                    alias: userAlias,
+                    message: message,
+                    timestamp: Date.now()
                 });
+                chatInput.value = '';
             }
         }
 
         async function sendAlias() {
-            if (isConnected && userAlias && camera) {
-                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+            if (isConnected && userAlias) {
+                const { set } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
                 await set(ref(firebaseDb, `users/${userAlias}`), {
                     alias: userAlias,
                     position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
@@ -3434,8 +3258,8 @@
         }
 
         async function sendUserPosition() {
-            if (isConnected && userAlias && camera) {
-                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+            if (isConnected && userAlias) {
+                const { set } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
                 let normalizedRotation = camera.rotation.y;
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
@@ -3457,16 +3281,16 @@
             }
         }
 
-        // Conectar al WebSocket al cargar la página
+        // Conectar al WebSocket al cargar la p├ígina
         connectWebSocket();
         
-        // Crear alias automático si no hay uno guardado
+        // Crear alias autom├ítico si no hay uno guardado
         if (!userAlias) {
             userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
             localStorage.setItem('userAlias', userAlias);
         }
         
-        // Mostrar/ocultar botón de cambiar alias según si hay alias guardado
+        // Mostrar/ocultar bot├│n de cambiar alias seg├║n si hay alias guardado
         if (userAlias) {
             changeAliasBtn.style.display = 'flex';
         }
@@ -3488,7 +3312,7 @@
 
 
 
-        // --- Funciones de personalización de avatar ---
+        // --- Funciones de personalizaci├│n de avatar ---
         const customizationPanel = document.getElementById('customization-panel');
         const customizationCloseBtn = document.getElementById('customization-close-btn');
         const saveCustomizationBtn = document.getElementById('save-customization-btn');
@@ -3500,7 +3324,7 @@
 
 
         function openCustomizationPanel() {
-            console.log('Abriendo panel simple de personalización');
+            console.log('Abriendo panel simple de personalizaci├│n');
             
             // Cerrar chat si est├í abierto
             if (chatOpen) {
@@ -3542,7 +3366,7 @@
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
                 
-                console.log('✅ Panel simple mostrado');
+                console.log('Γ£à Panel simple mostrado');
                             // Mostrar overlay y bloquear clics
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
@@ -3551,7 +3375,7 @@
                 overlay.style.zIndex = '1002';
             }
             } else {
-                console.log('❌ Panel simple no encontrado');
+                console.log('Γ¥î Panel simple no encontrado');
             }
         }
         
@@ -3682,7 +3506,7 @@
         }
         
         function resetSimpleCustomization() {
-            console.log('Restableciendo personalización');
+            console.log('Restableciendo personalizaci├│n');
             
             // Restablecer colores por defecto
             shirtColor = 0xFF6B6B;
@@ -3719,18 +3543,18 @@
                 btn.style.boxShadow = 'none';
             });
             
-                            console.log('✅ Personalización restablecida');
+            console.log('Γ£à Personalizaci├│n restablecida');
         }
         
         function saveSimpleCustomization() {
-            console.log('Guardando personalización');
+            console.log('Guardando personalizaci├│n');
             
             const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput ? aliasInput.value.trim() : '';
             
             // Validar alias
             if (newAlias.length > 20) {
-                alert('El nombre no puede tener más de 20 caracteres');
+                alert('El nombre no puede tener m├ís de 20 caracteres');
                 return;
             }
             
@@ -3758,11 +3582,11 @@
             // Cerrar panel
             closeSimplePanel();
             
-                            console.log('✅ Personalización guardada:', customizationData);
+            console.log('Γ£à Personalizaci├│n guardada:', customizationData);
         }
         
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorado');
+            console.log('Abriendo panel de personalizaci├│n mejorado');
             
             // Cerrar chat si est├í abierto
             if (chatOpen) {
@@ -3796,7 +3620,7 @@
                 updateColorButtonSelection('pants', pantsColor);
                 updateColorButtonSelection('shoes', shoesColor);
                 
-                console.log('✅ Panel de personalización mejorado mostrado');
+                console.log('Γ£à Panel de personalizaci├│n mejorado mostrado');
                 
                 // Mostrar overlay
                 const overlay = document.getElementById('ui-overlay');
@@ -3822,7 +3646,7 @@
                     overlay.style.zIndex = '999';
                 }
                 
-                console.log('Panel de personalización cerrado');
+                console.log('Panel de personalizaci├│n cerrado');
             }
         }
         
@@ -3883,7 +3707,7 @@
             
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
             closeSimplePanel();
-                            alert('¡Personalización guardada!');
+            alert('┬íPersonalizaci├│n guardada!');
         }
         
         function createWorkingColorGrids() {
@@ -4183,7 +4007,7 @@
             closeCustomizationPanel();
             
             // Mostrar mensaje de confirmaci├│n
-                            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
+            addMessageToChat('Sistema', 'Personalizaci├│n guardada exitosamente', 'system');
         }
 
         function resetCustomization() {
@@ -4271,28 +4095,6 @@
                 });
             }
         });
-
-        // Función de prueba para verificar el chat
-        function testChat() {
-            console.log('🧪 Probando funcionalidad del chat...');
-            console.log('📊 Estado actual:', {
-                isConnected: isConnected,
-                userAlias: userAlias,
-                messagesRef: messagesRef,
-                firebaseDb: firebaseDb,
-                currentUser: currentUser
-            });
-            
-            // Probar agregar un mensaje de prueba
-            if (typeof addMessageToChat === 'function') {
-                console.log('✅ Función addMessageToChat disponible');
-                addMessageToChat('Sistema', 'Prueba del chat - ' + new Date().toLocaleTimeString(), 'system');
-            } else {
-                console.log('❌ Función addMessageToChat no disponible');
-            }
-        }
-
-        connectWebSocket();
 
     </script>
     </body>
