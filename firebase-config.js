@@ -63,7 +63,6 @@ function sendMessage(message) {
         timestamp: Date.now()
     };
     messagesRef.push(messageData);
-    addMessageToChat(currentUser.alias, message, 'own');
 }
 
 function sendPosition(position, floor, rotation) {
