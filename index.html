@@ -2519,7 +2519,6 @@
         let connectedUsers = [];
         
         chatToggleBtn.onclick = () => {
-            // Cerrar panel de personalización si está abierto
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
                 closeSimplePanel();
@@ -2527,21 +2526,15 @@
             chatPanel.style.display = 'flex';
             chatOpen = true;
             chatInput.focus();
-            // Mostrar overlay
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
             }
-            // Enviar alias automáticamente al servidor
-            if (isConnected) {
-                sendAlias();
-            }
         };
         chatCloseBtn.onclick = () => {
             chatPanel.style.display = 'none';
             chatOpen = false;
-            // Ocultar overlay
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
                 overlay.style.display = 'none';
@@ -2549,10 +2542,8 @@
             }
         };
 
-
         // --- Emojis ---
         const emojis = ['😊', '😂', '❤️', '👍', '🎉', '🔥', '😎', '🤔', '😢', '😡', '👋', '💪', '🎯', '⭐', '💯', '🚀', '💎', '🎮', '🍕', '☕', '🌮', '🍺', '🎵', '🎬', '⚽', '🏀', '🎾', '🏈', '⚡', '🌈', '🌙', '☀️'];
-
         function createEmojiPanel() {
             emojiPanel.innerHTML = '';
             emojis.forEach(emoji => {
@@ -2567,7 +2558,6 @@
                 emojiPanel.appendChild(btn);
             });
         }
-
         emojiToggle.onclick = () => {
             if (emojiPanel.style.display === 'none' || !emojiPanel.style.display) {
                 emojiPanel.style.display = 'flex';
@@ -2577,612 +2567,36 @@
             }
         };
 
-        // --- WebSocket Chat Logic ---
-        // [ELIMINADO] let ws = null;
-        // [ELIMINADO] let isConnected = false;
-        // [ELIMINADO] function connectWebSocket() { ... }
-        // [ELIMINADO] ws = new WebSocket('ws://localhost:8000');
-        // [ELIMINADO] ws.onopen, ws.onmessage, ws.onclose, ws.onerror
-        // [ELIMINADO] connectWebSocket();
-        // ... código posterior ...
-        // Asegúrate de que toda la lógica de chat y posiciones use solo Firebase.
-
-        // Colores para usuarios
-        const userColors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-            '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2',
-            '#F9E79F', '#ABEBC6', '#FAD7A0', '#AED6F1', '#F5B7B1'
-        ];
-        const userColorMap = new Map();
-
-        function getOrAssignUserColor(alias) {
-            if (!userColorMap.has(alias)) {
-                const colorIndex = userColorMap.size % userColors.length;
-                userColorMap.set(alias, userColors[colorIndex]);
-            }
-            return userColorMap.get(alias);
-        }
-
-        function createUserAvatar(alias, initialPosition = null, initialFloor = 0) {
-            console.log(`Creando avatar para: ${alias}`);
-            
-            const avatarGroup = new THREE.Group();
-            
-            // Color del avatar basado en el alias (solo para usuarios que no son el propio)
-            const colorIndex = userAvatars.size % avatarColors.length;
-            const avatarColor = avatarColors[colorIndex];
-            
-            // Materiales estilo Minecraft/Roblox
-            const bodyMaterial = new THREE.MeshStandardMaterial({ 
-                color: alias === userAlias ? currentCustomization.shirtColor : avatarColor,
-                roughness: 0.9,
-                metalness: 0.1
-            });
-            
-            const skinMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xFFE4C4,
-                roughness: 0.9,
-                metalness: 0.1
-            });
-            
-            const pantsMaterial = new THREE.MeshStandardMaterial({ 
-                color: alias === userAlias ? currentCustomization.pantsColor : 0x2C3E50,
-                roughness: 0.9,
-                metalness: 0.1
-            });
-            
-            const shoeMaterial = new THREE.MeshStandardMaterial({ 
-                color: alias === userAlias ? currentCustomization.shoesColor : 0x8B4513,
-                roughness: 0.7,
-                metalness: 0.1
-            });
-            
-            const eyeMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x000000,
-                roughness: 0.5,
-                metalness: 0.5
-            });
-            
-            // CABEZA (caja cuadrada estilo Minecraft/Roblox - más pequeña)
-            const headGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-            const head = new THREE.Mesh(headGeometry, skinMaterial);
-            head.position.y = 1.5;
-            avatarGroup.add(head);
-            
-            // OJOS (puntos negros más grandes)
-            const eyeGeometry = new THREE.BoxGeometry(0.12, 0.12, 0.12);
-            
-            // Ojo izquierdo
-            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            leftEye.position.set(-0.15, 1.52, 0.25);
-            avatarGroup.add(leftEye);
-            
-            // Ojo derecho
-            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            rightEye.position.set(0.15, 1.52, 0.25);
-            avatarGroup.add(rightEye);
-            
-            // PÁRPADOS (para animación de parpadeo)
-            const eyelidGeometry = new THREE.BoxGeometry(0.15, 0.03, 0.15);
-            const eyelidMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xFFE4C4, // Mismo color que la piel
-                roughness: 0.9,
-                metalness: 0.1
-            });
-            
-            // Párpado izquierdo
-            const leftEyelid = new THREE.Mesh(eyelidGeometry, eyelidMaterial);
-            leftEyelid.position.set(-0.2, 1.62, 0.35);
-            leftEyelid.visible = false; // Inicialmente oculto
-            avatarGroup.add(leftEyelid);
-            
-            // Párpado derecho
-            const rightEyelid = new THREE.Mesh(eyelidGeometry, eyelidMaterial);
-            rightEyelid.position.set(0.2, 1.62, 0.35);
-            rightEyelid.visible = false; // Inicialmente oculto
-            avatarGroup.add(rightEyelid);
-            
-            // TORSO (cuerpo principal - caja cuadrada estilo Minecraft)
-            const torsoGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.3);
-            const torso = new THREE.Mesh(torsoGeometry, bodyMaterial);
-            torso.position.y = 0.8;
-            avatarGroup.add(torso);
-            
-            // BRAZOS (cajas rectangulares estilo Minecraft)
-            const armGeometry = new THREE.BoxGeometry(0.25, 0.6, 0.25);
-            
-            // Brazo izquierdo
-            const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            leftArm.position.set(-0.45, 0.9, 0);
-            avatarGroup.add(leftArm);
-            
-            // Brazo derecho
-            const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            rightArm.position.set(0.45, 0.9, 0);
-            avatarGroup.add(rightArm);
-            
-            // MANOS (cajas pequeñas estilo Minecraft)
-            const handGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-            
-            // Mano izquierda
-            const leftHand = new THREE.Mesh(handGeometry, skinMaterial);
-            leftHand.position.set(-0.45, 0.55, 0);
-            avatarGroup.add(leftHand);
-            
-            // Mano derecha
-            const rightHand = new THREE.Mesh(handGeometry, skinMaterial);
-            rightHand.position.set(0.45, 0.55, 0);
-            avatarGroup.add(rightHand);
-            
-            // MUSLOS (piernas superiores estilo Minecraft)
-            const thighGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-            
-            // Muslo izquierdo
-            const leftThigh = new THREE.Mesh(thighGeometry, pantsMaterial);
-            leftThigh.position.set(-0.2, 0.25, 0);
-            avatarGroup.add(leftThigh);
-            
-            // Muslo derecho
-            const rightThigh = new THREE.Mesh(thighGeometry, pantsMaterial);
-            rightThigh.position.set(0.2, 0.25, 0);
-            avatarGroup.add(rightThigh);
-            
-            // PANTORRILLAS (piernas inferiores estilo Minecraft)
-            const calfGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-            
-            // Pantorrilla izquierda
-            const leftCalf = new THREE.Mesh(calfGeometry, pantsMaterial);
-            leftCalf.position.set(-0.2, -0.05, 0);
-            avatarGroup.add(leftCalf);
-            
-            // Pantorrilla derecha
-            const rightCalf = new THREE.Mesh(calfGeometry, pantsMaterial);
-            rightCalf.position.set(0.2, -0.05, 0);
-            avatarGroup.add(rightCalf);
-            
-            // PIES (cajas rectangulares estilo Minecraft - más pequeños)
-            const footGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.4);
-            
-            // Pie izquierdo
-            const leftFoot = new THREE.Mesh(footGeometry, shoeMaterial);
-            leftFoot.position.set(-0.2, -0.3, 0.05);
-            avatarGroup.add(leftFoot);
-            
-            // Pie derecho
-            const rightFoot = new THREE.Mesh(footGeometry, shoeMaterial);
-            rightFoot.position.set(0.2, -0.3, 0.05);
-            avatarGroup.add(rightFoot);
-            
-            // Nombre flotante estilo moderno y bonito
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 512;
-            canvas.height = 128;
-            
-            // Crear gradiente de fondo
-            const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
-            gradient.addColorStop(0.5, 'rgba(20, 20, 20, 0.9)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
-            
-            // Fondo con gradiente
-            context.fillStyle = gradient;
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Borde exterior con gradiente
-            const borderGradient = context.createLinearGradient(0, 0, canvas.width, 0);
-            borderGradient.addColorStop(0, '#4B0000'); // Rojo oscuro
-            borderGradient.addColorStop(0.5, '#FFD700'); // Dorado
-            borderGradient.addColorStop(1, '#4B0000'); // Rojo oscuro
-            
-            context.strokeStyle = borderGradient;
-            context.lineWidth = 8;
-            context.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
-            
-            // Borde interior blanco
-            context.strokeStyle = '#FFFFFF';
-            context.lineWidth = 2;
-            context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-            
-            // Sombra del texto
-            context.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            context.font = 'bold 48px "Arial", sans-serif';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(alias, canvas.width / 2 + 2, canvas.height / 2 + 2);
-            
-            // Texto principal con gradiente
-            const textGradient = context.createLinearGradient(0, 0, canvas.width, 0);
-            textGradient.addColorStop(0, '#FFFFFF'); // Blanco
-            textGradient.addColorStop(0.5, '#FFD700'); // Dorado
-            textGradient.addColorStop(1, '#FFFFFF'); // Blanco
-            
-            context.fillStyle = textGradient;
-            context.fillText(alias, canvas.width / 2, canvas.height / 2);
-            
-            // Efecto de brillo en la parte superior
-            const shineGradient = context.createLinearGradient(0, 0, 0, canvas.height / 2);
-            shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-            shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            context.fillStyle = shineGradient;
-            context.fillRect(8, 8, canvas.width - 16, canvas.height / 2 - 8);
-            
-            const nameTexture = new THREE.CanvasTexture(canvas);
-            const nameMaterial = new THREE.MeshBasicMaterial({ 
-                map: nameTexture, 
-                transparent: true,
-                alphaTest: 0.1
-            });
-            const namePlane = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 1), nameMaterial);
-            namePlane.position.y = 2.2;
-            
-            // Hacer el nombre clickeable solo para el usuario propio
-            if (alias === userAlias) {
-                namePlane.userData = { clickable: true, type: 'customization' };
-                clickableObjects.push(namePlane);
-            }
-            
-            avatarGroup.add(namePlane);
-            
-            // Posición inicial
-            if (initialPosition) {
-                // Ajustar la posición Y para que esté sobre el piso
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = initialFloor * floorStep + 0.4; // Ajustado para las nuevas proporciones
-                avatarGroup.position.set(initialPosition.x, targetY, initialPosition.z);
-            } else {
-                // Posición por defecto cerca del centro
-                const randomX = (HALL_SIZE / 2) + (Math.random() - 0.5) * 20;
-                const randomZ = (HALL_SIZE / 2) + (Math.random() - 0.5) * 20;
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = initialFloor * floorStep + 0.4; // Ajustado para las nuevas proporciones
-                avatarGroup.position.set(randomX, targetY, randomZ);
-            }
-            
-            // Agregar a la escena
-            scene.add(avatarGroup);
-            
-            // Guardar referencia con elementos para animación
-            userAvatars.set(alias, {
-                group: avatarGroup,
-                namePlane: namePlane,
-                targetPosition: avatarGroup.position.clone(),
-                currentFloor: initialFloor,
-                // Elementos para animación de caminar
-                leftHand: leftHand,
-                rightHand: rightHand,
-                leftThigh: leftThigh,
-                rightThigh: rightThigh,
-                leftCalf: leftCalf,
-                rightCalf: rightCalf,
-                leftFoot: leftFoot,
-                rightFoot: rightFoot,
-                // Elementos para animación de parpadeo
-                leftEye: leftEye,
-                rightEye: rightEye,
-                leftEyelid: leftEyelid,
-                rightEyelid: rightEyelid,
-                // Materiales para personalización
-                bodyMaterial: bodyMaterial,
-                pantsMaterial: pantsMaterial,
-                shoeMaterial: shoeMaterial,
-                // Variables de animación
-                walkCycle: 0,
-                isMoving: false,
-                lastPosition: avatarGroup.position.clone(),
-                // Variables para parpadeo
-                blinkTimer: Math.random() * 3000, // Tiempo aleatorio para el primer parpadeo
-                isBlinking: false
-            });
-            
-            console.log(`Avatar creado para ${alias} en posición:`, avatarGroup.position);
-            return avatarGroup;
-        }
-
-        function removeUserAvatar(alias) {
-            console.log(`Removiendo avatar para: ${alias}`);
-            const avatar = userAvatars.get(alias);
-            if (avatar) {
-                scene.remove(avatar.group);
-                userAvatars.delete(alias);
-                console.log(`Avatar removido para ${alias}`);
-            }
-        }
-
-        function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
-                // Hacer que el nombre siempre mire hacia la cámara
-                avatar.namePlane.lookAt(camera.position);
-                
-                // Interpolación suave hacia la posición objetivo
-                avatar.group.position.lerp(avatar.targetPosition, 0.1);
-                
-                // Interpolación suave de la rotación
-                if (avatar.targetRotation !== undefined) {
-                    const oldRotation = avatar.group.rotation.y;
-                    // Corregir la rotación: agregar 90 grados (π/2 radianes) para alinear con la dirección de mirada
-                    // Esto es necesario porque el modelo del avatar está orientado de lado por defecto
-                    const correctedRotation = avatar.targetRotation + Math.PI / 2;
-                    avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, correctedRotation, 0.15);
-                    // Debug: solo mostrar cuando hay cambio significativo
-                    if (Math.abs(oldRotation - avatar.group.rotation.y) > 0.05) {
-                        console.log(`Avatar ${alias} rotando de ${(oldRotation * 180 / Math.PI).toFixed(1)}° a ${(avatar.group.rotation.y * 180 / Math.PI).toFixed(1)}° (corregido)`);
-                    }
-                }
-                
-                // Animar caminar
-                animateAvatarWalk(avatar, alias);
-                
-                // Animar parpadeo
-                animateAvatarBlink(avatar, alias);
-            });
-        }
-
-        function animateAvatarWalk(avatar, alias) {
-            // Calcular si el avatar se está moviendo
-            const currentPos = avatar.group.position;
-            const distance = currentPos.distanceTo(avatar.lastPosition);
-            const isMoving = distance > 0.01; // Umbral mínimo de movimiento
-            
-            if (isMoving) {
-                // Incrementar ciclo de caminar estilo Minecraft (más lento y simple)
-                const speed = Math.min(distance * 10, 1);
-                avatar.walkCycle += 0.4 * speed;
-                
-                // Animar solo los brazos desde los hombros (movimiento simple y rítmico)
-                const armSwing = Math.sin(avatar.walkCycle) * 0.25; // Balanceo simple de brazos
-                avatar.leftHand.rotation.z = armSwing;
-                avatar.rightHand.rotation.z = -armSwing;
-                
-                // Animar solo las piernas desde las caderas (movimiento simple y alternado)
-                const legSwing = Math.sin(avatar.walkCycle) * 0.15; // Movimiento simple de piernas
-                avatar.leftThigh.rotation.z = legSwing;
-                avatar.rightThigh.rotation.z = -legSwing;
-                
-                // Las pantorrillas y pies se mantienen estáticos
-                avatar.leftCalf.rotation.z = 0;
-                avatar.rightCalf.rotation.z = 0;
-                avatar.leftFoot.position.y = -0.3;
-                avatar.rightFoot.position.y = -0.3;
-                
-                // Sin movimiento vertical del cuerpo
-                // avatar.group.position.y se mantiene estático
-                
-                // La cabeza se mantiene estática (sin head bob)
-                avatar.group.children.forEach(child => {
-                    if (child.geometry && child.geometry.type === 'BoxGeometry' && 
-                        child.geometry.parameters.width === 0.6 && 
-                        child.geometry.parameters.height === 0.6) {
-                        // Es la cabeza - posición estática
-                        child.position.y = 1.5;
-                        
-                        // Hacer que la cabeza mire en la dirección del movimiento
-                        if (avatar.targetRotation !== undefined) {
-                            // Corregir la rotación de la cabeza también
-                            child.rotation.y = avatar.targetRotation + Math.PI / 2;
-                        }
-                    }
-                });
-                
-            } else {
-                // Posición neutral cuando está quieto (sin respiración)
-                
-                // Resetear a posición neutral cuando no se mueve
-                avatar.leftHand.position.y = 0.55;
-                avatar.leftHand.position.z = 0;
-                avatar.rightHand.position.y = 0.55;
-                avatar.rightHand.position.z = 0;
-                avatar.leftHand.rotation.z = 0;
-                avatar.rightHand.rotation.z = 0;
-                avatar.leftThigh.rotation.z = 0;
-                avatar.rightThigh.rotation.z = 0;
-                avatar.leftCalf.rotation.z = 0;
-                avatar.rightCalf.rotation.z = 0;
-                avatar.leftFoot.position.y = -0.3;
-                avatar.rightFoot.position.y = -0.3;
-                avatar.leftFoot.rotation.z = 0;
-                avatar.rightFoot.rotation.z = 0;
-                avatar.group.rotation.z = 0;
-                
-                // Sin movimiento del torso
-                // avatar.group.position.y se mantiene estático
-                
-                // Resetear posición de la cabeza
-                avatar.group.children.forEach(child => {
-                    if (child.geometry && child.geometry.type === 'BoxGeometry' && 
-                        child.geometry.parameters.width === 0.6 && 
-                        child.geometry.parameters.height === 0.6) {
-                        // Es la cabeza
-                        child.position.y = 1.5;
-                        
-                        // Mantener la rotación de la cabeza
-                        if (avatar.targetRotation !== undefined) {
-                            // Corregir la rotación de la cabeza también
-                            child.rotation.y = avatar.targetRotation + Math.PI / 2;
-                        }
-                    }
-                });
-                
-                // Resetear ciclo de caminar
-                avatar.walkCycle = 0;
-            }
-            
-            // Actualizar posición anterior
-            avatar.lastPosition.copy(currentPos);
-        }
-
-        function animateAvatarBlink(avatar, alias) {
-            const currentTime = Date.now();
-            
-            // Reducir el timer de parpadeo
-            avatar.blinkTimer -= 16; // Aproximadamente 60 FPS
-            
-            if (avatar.blinkTimer <= 0) {
-                if (!avatar.isBlinking) {
-                    // Iniciar parpadeo
-                    avatar.isBlinking = true;
-                    avatar.blinkTimer = 150; // Duración del parpadeo (150ms)
-                    
-                    // Ocultar ojos y mostrar párpados
-                    avatar.leftEye.visible = false;
-                    avatar.rightEye.visible = false;
-                    avatar.leftEyelid.visible = true;
-                    avatar.rightEyelid.visible = true;
-                } else {
-                    // Terminar parpadeo
-                    avatar.isBlinking = false;
-                    avatar.blinkTimer = 2000 + Math.random() * 3000; // Tiempo aleatorio hasta el siguiente parpadeo
-                    
-                    // Mostrar ojos y ocultar párpados
-                    avatar.leftEye.visible = true;
-                    avatar.rightEye.visible = true;
-                    avatar.leftEyelid.visible = false;
-                    avatar.rightEyelid.visible = false;
-                }
-            }
-            
-            // Hacer que los ojos miren en la dirección del avatar
-            if (avatar.targetRotation !== undefined) {
-                // Corregir la rotación de los ojos también
-                const correctedRotation = avatar.targetRotation + Math.PI / 2;
-                avatar.leftEye.rotation.y = correctedRotation;
-                avatar.rightEye.rotation.y = correctedRotation;
-                avatar.leftEyelid.rotation.y = correctedRotation;
-                avatar.rightEyelid.rotation.y = correctedRotation;
-            }
-        }
-
-        function updateUsersList() {
-            usersList.innerHTML = '';
-            connectedUsers.forEach(user => {
-                const userDiv = document.createElement('div');
-                userDiv.className = 'user-item';
-                userDiv.textContent = user;
-                userDiv.style.borderLeft = `3px solid ${getOrAssignUserColor(user)}`;
-                usersList.appendChild(userDiv);
-            });
-        }
-
-        function handleChatMessage(data) {
-            switch (data.type) {
-                case 'system':
-                    addMessageToChat('Sistema', data.message, 'system');
-                    break;
-                case 'message':
-                    addMessageToChat(data.alias, data.message, 'user', data.timestamp);
-                    break;
-                case 'userJoined':
-                    addMessageToChat('Sistema', `${data.alias} se unió al chat`, 'system');
-                    // No crear avatar para el usuario propio
-                    if (data.alias !== userAlias) {
-                        createUserAvatar(data.alias); // Crear avatar del usuario
-                    }
-                    if (data.users) {
-                        connectedUsers = data.users;
-                        updateUsersList();
-                    }
-                    break;
-                case 'userLeft':
-                    addMessageToChat('Sistema', `${data.alias} se desconectó`, 'system');
-                    removeUserAvatar(data.alias); // Remover avatar del usuario
-                    if (data.users) {
-                        connectedUsers = data.users;
-                        updateUsersList();
-                    }
-                    break;
-                case 'userPosition':
-                    // Actualizar posición de un avatar específico
-                    updateAvatarPosition(data.alias, data.position, data.floor, data.rotation);
-                    break;
-                case 'userPositions':
-                    // Recibir posiciones de todos los usuarios existentes
-                    data.positions.forEach(userPos => {
-                        // No procesar el usuario propio
-                        if (userPos.alias !== userAlias) {
-                            updateAvatarPosition(userPos.alias, userPos.position, userPos.floor, userPos.rotation);
-                        }
-                    });
-                    break;
-            }
-        }
-
-        function addMessageToChat(alias, message, type, timestamp = '') {
-            const messageDiv = document.createElement('div');
-            messageDiv.style.marginBottom = '8px';
-            messageDiv.style.padding = '6px 8px';
-            messageDiv.style.borderRadius = '6px';
-            
-            if (type === 'system') {
-                messageDiv.style.background = '#333';
-                messageDiv.style.color = '#aaa';
-                messageDiv.style.fontStyle = 'italic';
-                messageDiv.textContent = message;
-            } else {
-                messageDiv.style.background = '#444';
-                messageDiv.style.color = '#fff';
-                const timeStr = timestamp ? ` [${timestamp}]` : '';
-                const userColor = getOrAssignUserColor(alias);
-                messageDiv.innerHTML = `<strong style="color: ${userColor}">${alias}:</strong> ${message}${timeStr}`;
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function sendMessage() {
-            const message = chatInput.value.trim();
-            if (message.length > 0 && userAlias) {
-                // TODO: Enviar mensaje a Firebase (Firestore o Realtime Database)
-                // Ejemplo:
-                // firebase.database().ref('chat').push({ alias: userAlias, message });
-                chatInput.value = '';
-            }
-        }
-
-        function sendAlias() {
-            if (userAlias) {
-                // TODO: Guardar alias en Firebase si es necesario
-            }
-        }
-
-        function sendUserPosition() {
-            if (userAlias) {
-                // TODO: Enviar posición a Firebase
-                // firebase.database().ref('positions').child(userAlias).set({ ... })
-            }
-        }
-
-        // Conectar al WebSocket al cargar la página
-        // connectWebSocket(); // ELIMINADO: Solo usar Firebase
-        
-        // Crear alias automático si no hay uno guardado
-        if (!userAlias) {
-            userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
-            localStorage.setItem('userAlias', userAlias);
-        }
-        
-        // Mostrar/ocultar botón de cambiar alias según si hay alias guardado
-        if (userAlias) {
-            changeAliasBtn.style.display = 'flex';
-        }
-
-        // Cerrar panel de emojis al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (!emojiPanel.contains(e.target) && !emojiToggle.contains(e.target)) {
                 emojiPanel.style.display = 'none';
             }
         });
 
-        // Event listeners para el chat
-        chatSendBtn.onclick = sendMessage;
+        // --- Firebase Chat Logic ---
+        function handleSendMessage() {
+            const message = chatInput.value.trim();
+            if (message.length > 0 && userAlias) {
+                sendMessage(message); // Provided by firebase-config.js
+                chatInput.value = '';
+            }
+        }
+        chatSendBtn.onclick = handleSendMessage;
         chatInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
-                sendMessage();
+                handleSendMessage();
             }
         });
 
-
+        // Alias setup and connect to chat
+        if (!userAlias) {
+            userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
+            localStorage.setItem('userAlias', userAlias);
+        }
+        if (userAlias) {
+            changeAliasBtn.style.display = 'flex';
+        }
+        connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
         const customizationPanel = document.getElementById('customization-panel');
