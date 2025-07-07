@@ -17,6 +17,10 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/firebase-config.js",
+      "dest": "/firebase-config.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
