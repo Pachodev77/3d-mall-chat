@@ -4199,6 +4199,24 @@
 
         connectWebSocket();
 
+        // --- Función para actualizar la posición de un avatar remoto ---
+        function updateAvatarPosition(alias, position, floor, rotation) {
+            const avatar = userAvatars.get(alias);
+            if (avatar) {
+                // Actualizar la posición objetivo del avatar
+                avatar.targetPosition.set(position.x, position.y, position.z);
+                avatar.currentFloor = floor;
+                avatar.targetRotation = rotation;
+                // Opcional: puedes agregar logs para depuración
+                // console.log(`Avatar remoto actualizado: ${alias} -> Posición:`, position, 'Piso:', floor, 'Rotación:', rotation);
+            } else {
+                // Si el avatar aún no existe, podrías crearlo aquí si lo deseas
+                // createUserAvatar(alias, position, floor);
+                // Por ahora, solo loguea
+                // console.warn(`No se encontró avatar para ${alias} al intentar actualizar posición.`);
+            }
+        }
+
     </script>
     </body>
 </html>
