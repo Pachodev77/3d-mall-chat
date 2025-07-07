@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -521,6 +521,7 @@
 
         // Cache para texturas de logos
         const logoTextureCache = new Map();
+        const failedLogos = new Set(); // Track failed logo loads
         
         function getLogoTexture(domain) {
             const logoFileName = domainToLogoMap[domain];
@@ -531,7 +532,13 @@
             
             // Verificar si ya está en cache
             if (logoTextureCache.has(domain)) {
-                return logoTextureCache.get(domain);
+                const cached = logoTextureCache.get(domain);
+                return cached === 'failed' ? null : cached;
+            }
+            
+            // Si ya falló antes, no intentar de nuevo
+            if (failedLogos.has(domain)) {
+                return null;
             }
             
             try {
@@ -549,8 +556,9 @@
                     // onError callback
                     function(error) {
                         console.error(`Error cargando logo ${logoFileName}:`, error);
-                        // Remover del cache si falla
-                        logoTextureCache.delete(domain);
+                        // Marcar como fallido para evitar reintentos
+                        logoTextureCache.set(domain, 'failed');
+                        failedLogos.add(domain);
                     }
                 );
                 
@@ -559,6 +567,7 @@
                 return texture;
             } catch (error) {
                 console.error(`Error creando textura para ${domain}:`, error);
+                failedLogos.add(domain);
                 return null;
             }
         }
@@ -580,10 +589,10 @@
                     plane.material.map.dispose();
                 }
                 
-                if (logoTexture) {
+                if (logoTexture && logoTexture !== 'failed') {
                     plane.material.map = logoTexture;
                 } else {
-                    // Fallback a la textura generada si no hay logo
+                    // Fallback a la textura generada si no hay logo o falló la carga
                     const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
                     plane.material.map = texture;
                 }
@@ -679,17 +688,33 @@
 
         aliasSubmit.addEventListener('click', () => {
             const alias = aliasInput.value.trim();
-            if (alias.length > 0 && alias.length <= 18) {
+            // Firebase forbidden characters: . # $ [ ]
+            const forbidden = /[.#$\[\]]/;
+            if (alias.length > 0 && alias.length <= 18 && !forbidden.test(alias)) {
                 currentUser = alias;
                 aliasPrompt.style.display = 'none';
                 connectToChat();
                 initThreeJS();
+            } else {
+                // Show error to user
+                alert('El alias no puede contener los siguientes caracteres: . # $ [ ]');
             }
         });
 
         aliasInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                aliasSubmit.click();
+                const alias = aliasInput.value.trim();
+                // Firebase forbidden characters: . # $ [ ]
+                const forbidden = /[.#$\[\]]/;
+                if (alias.length > 0 && alias.length <= 18 && !forbidden.test(alias)) {
+                    currentUser = alias;
+                    aliasPrompt.style.display = 'none';
+                    connectToChat();
+                    initThreeJS();
+                } else {
+                    // Show error to user
+                    alert('El alias no puede contener los siguientes caracteres: . # $ [ ]');
+                }
             }
         });
 
