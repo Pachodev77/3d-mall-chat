@@ -2302,47 +2302,39 @@
             }
         }
 
+        // --- BLOQUE ROBUSTO DE MOVIMIENTO Y ANIMACIÓN ---
         function updateMovement() {
             if (chatOpen || customizationPanelOpen) return;
 
-            // --- DEBUG: Muestra el estado de las teclas en cada frame ---
-            if (keys.W || keys.S || keys.A || keys.D || keys.ArrowLeft || keys.ArrowRight) {
-                 console.log(`Estado de teclas en updateMovement: W=${keys.W}, A=${keys.A}, S=${keys.S}, D=${keys.D}, ←=${keys.ArrowLeft}, →=${keys.ArrowRight}`);
-            }
+            // DEBUG: Mostrar posición y rotación antes de actualizar
+            console.log('[updateMovement] Antes:', camera.position.toArray(), 'Target:', targetPosition.toArray(), 'Rot:', camera.rotation.y, 'TargetRot:', targetRotationY);
 
-            // --- Rotación con flechas o A/D ---
+            // Rotación con flechas o A/D
             if (keys.A || keys.ArrowLeft) targetRotationY += ROTATE_SPEED;
             if (keys.D || keys.ArrowRight) targetRotationY -= ROTATE_SPEED;
-            
+
             const velocity = new THREE.Vector3();
             const direction = new THREE.Vector3();
 
-            // --- Movimiento adelante/atrás con W y S ---
+            // Movimiento adelante/atrás con W y S
             camera.getWorldDirection(direction);
             direction.y = 0;
             direction.normalize();
-            if (keys.W) {
-                velocity.add(direction);
-            }
-            if (keys.S) {
-                velocity.sub(direction);
-            }
-            
+            if (keys.W) velocity.add(direction);
+            if (keys.S) velocity.sub(direction);
+
             if (velocity.lengthSq() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
                 const newPosition = targetPosition.clone().add(velocity);
-
                 const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(0.8, CAMERA_HEIGHT, 0.8));
                 let collision = false;
-                
                 for (const wallBox of collisionObjects) {
                     if (playerBox.intersectsBox(wallBox)) {
                         collision = true;
-                        console.warn("¡COLISIÓN DETECTADA!"); // DEBUG
+                        console.warn('[updateMovement] ¡COLISIÓN DETECTADA!');
                         break;
                     }
                 }
-                
                 if (!collision) {
                     targetPosition.copy(newPosition);
                 }
@@ -2352,8 +2344,12 @@
             const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
             targetPosition.y = targetY;
 
+            // Interpolación suave
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+
+            // DEBUG: Mostrar posición y rotación después de actualizar
+            console.log('[updateMovement] Después:', camera.position.toArray(), 'Rot:', camera.rotation.y);
         }
 
         function animate() {
