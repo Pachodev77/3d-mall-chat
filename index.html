@@ -3503,6 +3503,33 @@
                 }
             });
         });
+
+        // --- Función para crear un avatar de usuario ---
+        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
+            // Solo crear si no existe
+            if (userAvatars.has(alias)) return;
+            // Aquí deberías crear el avatar 3D y añadirlo a la escena
+            // Ejemplo básico (ajusta según tu lógica 3D):
+            const avatarGroup = new THREE.Group();
+            avatarGroup.position.set(position.x, position.y, position.z);
+            // Puedes añadir más geometría/materiales aquí
+            scene.add(avatarGroup);
+            userAvatars.set(alias, {
+                group: avatarGroup,
+                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                targetRotation: 0,
+                currentFloor: floor
+            });
+        }
+        // --- Función para actualizar todas las posiciones de avatares ---
+        function updateAvatarPositions() {
+            userAvatars.forEach((avatar, alias) => {
+                // Interpolación suave hacia la posición objetivo
+                avatar.group.position.lerp(avatar.targetPosition, 0.2);
+                // Interpolación suave de rotación
+                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+            });
+        }
     </script>
 </body>
 </html>
