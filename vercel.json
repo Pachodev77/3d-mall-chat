@@ -3,34 +3,22 @@
   "name": "3d-mall-chat",
   "builds": [
     {
-      "src": "chat-server.js",
-      "use": "@vercel/node"
+      "src": "*.html",
+      "use": "@vercel/static"
     },
     {
-      "src": "index.html",
+      "src": "assets/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
     {
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/chat-server.js"
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "chat-server.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 } 

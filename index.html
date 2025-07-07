@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -234,7 +234,7 @@
             background: #555;
         }
         
-        /* Estilos para el panel de personalización */
+        /* Estilos para el panel de personalizaci├│n */
         #customization-panel {
             position: fixed;
             top: 50%;
@@ -375,7 +375,7 @@
         }
         
         .color-option::after {
-            content: '✓';
+            content: 'Γ£ô';
             position: absolute;
             top: 50%;
             left: 50%;
@@ -486,10 +486,10 @@
 <body>
     <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1002; pointer-events:auto;"></div>
     <div id="crosshair"></div>
-    <button id="chat-toggle-btn" title="Abrir chat">💬</button>
-    <button id="change-alias-btn" title="Personalizar avatar">👤</button>
+            <button id="chat-toggle-btn" title="Abrir chat">💬</button>
+        <button id="change-alias-btn" title="Personalizar avatar">👤</button>
     
-    <!-- Panel de personalización completamente rediseñado -->
+    <!-- Panel de personalizaci├│n completamente redise├▒ado -->
     <div id="simple-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 900px; max-width: 95vw; height: 650px; background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98)); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1004; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); border: 2px solid #4B0000;">
         <!-- Header elegante -->
         <div style="background: linear-gradient(135deg, #4B0000, #800000); color: #fff; padding: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #FFD700;">
@@ -497,24 +497,24 @@
                 <span style="font-size: 24px;">👤</span>
                 <span style="font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">Personalizar Avatar</span>
             </div>
-            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">✖</button>
+            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">Γ£û</button>
         </div>
         
         <!-- Contenido principal -->
         <div style="flex: 1; padding: 30px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
             <!-- Columna izquierda - Opciones -->
             <div style="display: flex; flex-direction: column; gap: 25px;">
-                <!-- Sección de Alias -->
+                <!-- Secci├│n de Alias -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">📝</span>
+                        <span style="font-size: 20px;">👤</span>
                         Nombre del Avatar
                     </h3>
                     <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 16px;">Sin nombre</strong></p>
                     <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 15px; font-size: 16px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
                 </div>
                 
-                <!-- Sección de Colores de Camisa -->
+                <!-- Secci├│n de Colores de Camisa -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">👕</span>
@@ -536,7 +536,7 @@
                     </div>
                 </div>
                 
-                <!-- Sección de Colores de Pantalón -->
+                <!-- Secci├│n de Colores de Pantal├│n -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">👖</span>
@@ -558,10 +558,10 @@
                     </div>
                 </div>
                 
-                <!-- Sección de Colores de Zapatos -->
+                <!-- Secci├│n de Colores de Zapatos -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">👞</span>
+                        <span style="font-size: 20px;">👟</span>
                         Color de Zapatos
                     </h3>
                     <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
@@ -582,7 +582,7 @@
                 <!-- Vista previa del avatar -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span style="font-size: 20px;">👤</span>
+                        <span style="font-size: 20px;">≡ƒæñ</span>
                         Vista Previa
                     </h3>
                     <div id="avatar-preview" style="width: 150px; height: 200px; margin: 0 auto; position: relative; background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(30,30,30,0.5)); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid #333;">
@@ -590,7 +590,7 @@
                     </div>
                 </div>
                 
-                <!-- Información del alias -->
+                <!-- Informaci├│n del alias -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                         <span style="font-size: 20px;">📝</span>
@@ -610,7 +610,7 @@
     <div id="chat-panel">
         <div id="chat-header">
             Chat
-            <button id="chat-close-btn" title="Cerrar">✖</button>
+            <button id="chat-close-btn" title="Cerrar">❌</button>
         </div>
         <div id="chat-content">
             <div id="chat-main">
@@ -629,11 +629,11 @@
         </div>
     </div>
     
-    <!-- Panel de personalización de avatar -->
+    <!-- Panel de personalizaci├│n de avatar -->
     <div id="customization-panel">
         <div id="customization-header">
             Personalizar Avatar
-            <button id="customization-close-btn" title="Cerrar">✖</button>
+            <button id="customization-close-btn" title="Cerrar">❌</button>
         </div>
         <div id="customization-content">
             <div class="customization-section">
@@ -657,7 +657,7 @@
                 </div>
             </div>
             <div class="customization-section">
-                <h3><span class="section-icon">👞</span> Color de Zapatos</h3>
+                <h3><span class="section-icon">👟</span> Color de Zapatos</h3>
                 <div class="color-section">
                     <h4>Zapatos</h4>
                     <div class="color-grid" id="shoes-colors"></div>
@@ -748,7 +748,7 @@
             storeLinks.push(...originalStoreLinks);
         }
 
-        // --- Constantes y Configuración Global ---
+        // --- Constantes y Configuraci├│n Global ---
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
         const HALL_HEIGHT = 4;
         const MOVE_SPEED = 0.8;
@@ -772,13 +772,13 @@
             0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1, 0xF5B7B1
         ];
 
-        // --- Variables de personalización de avatar ---
+        // --- Variables de personalizaci├│n de avatar ---
         const customizationColors = [
             // Colores vibrantes para camisas
             0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
             0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
             0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
-            // Colores más oscuros para pantalones
+            // Colores m├ís oscuros para pantalones
             0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
             0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
             0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
@@ -794,9 +794,14 @@
             shoesColor: 0x8B4513  // Color por defecto
         };
         
+        // Variables para colores de avatar (compatibilidad con funciones existentes)
+        let shirtColor = 0x4ECDC4;
+        let pantsColor = 0x2C3E50;
+        let shoesColor = 0x8B4513;
+        
         let customizationPanelOpen = false;
 
-        // --- Variables de Interacción y Movimiento ---
+        // --- Variables de Interacci├│n y Movimiento ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let targetPosition;
@@ -808,7 +813,7 @@
         let keyS = false;
         let shopNumberCounter = 1; // Contador global para numerar las tiendas
 
-        // Función para obtener el siguiente número de tienda solo cuando se crea una
+        // Funci├│n para obtener el siguiente n├║mero de tienda solo cuando se crea una
         const getNextShopNumber = () => {
             return shopNumberCounter++;
         };
@@ -821,7 +826,7 @@
         const frameInterval = 1000 / targetFPS;
         let lastSkyUpdate = 0; // Para actualizar el cielo cada minuto
 
-        // --- Cache de materiales para reutilización ---
+        // --- Cache de materiales para reutilizaci├│n ---
         const materialCache = new Map();
         const textureCache = new Map();
 
@@ -842,7 +847,7 @@
             if (!textureCache.has(key)) {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                const canvasW = Math.min(512, width * 64); // Reducir tamaño del canvas
+                const canvasW = Math.min(512, width * 64); // Reducir tama├▒o del canvas
                 const canvasH = Math.min(512, height * 64);
                 canvas.width = canvasW;
                 canvas.height = canvasH;
@@ -862,17 +867,17 @@
             return textureCache.get(key);
         }
 
-        // --- Función para obtener el color del cielo según la hora ---
+        // --- Funci├│n para obtener el color del cielo seg├║n la hora ---
         function getSkyColor() {
             const now = new Date();
             const hour = now.getHours();
             
-            // Transiciones suaves entre colores según la hora
+            // Transiciones suaves entre colores seg├║n la hora
             if (hour >= 6 && hour < 12) {
-                // Mañana: azul claro
+                // Ma├▒ana: azul claro
                 return new THREE.Color(0x87CEEB); // Sky blue
             } else if (hour >= 12 && hour < 18) {
-                // Tarde: azul más intenso
+                // Tarde: azul m├ís intenso
                 return new THREE.Color(0x4682B4); // Steel blue
             } else if (hour >= 18 && hour < 20) {
                 // Atardecer: naranja/rosa
@@ -887,7 +892,7 @@
         }
 
         function init() {
-            // --- Configuración de la Escena, Cámara y Renderer ---
+            // --- Configuraci├│n de la Escena, C├ímara y Renderer ---
             setupScene();
             setupLighting();
             createMall();
@@ -898,17 +903,17 @@
             // --- Configurar botones de UI ---
             setupUIButtons();
 
-            // --- Iniciar Animación ---
+            // --- Iniciar Animaci├│n ---
             animate();
         }
 
         function setupScene() {
             scene = new THREE.Scene();
-            scene.background = getSkyColor(); // Color dinámico del cielo
-            scene.fog = new THREE.Fog(0x1a1a1a, 15, 105); // Ajustado para el nuevo tamaño
+            scene.background = getSkyColor(); // Color din├ímico del cielo
+            scene.fog = new THREE.Fog(0x1a1a1a, 15, 105); // Ajustado para el nuevo tama├▒o
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(25, CAMERA_HEIGHT, 25); // Posición más cerca del centro
+            camera.position.set(25, CAMERA_HEIGHT, 25); // Posici├│n m├ís cerca del centro
             camera.lookAt(HALL_SIZE / 2, CAMERA_HEIGHT, HALL_SIZE / 2);
 
             targetPosition = camera.position.clone();
@@ -926,7 +931,7 @@
             scene.add(ambientLight);
 
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); // Reducir intensidad
-            directionalLight.position.set(30, 45, 15); // Ajustado para el nuevo tamaño
+            directionalLight.position.set(30, 45, 15); // Ajustado para el nuevo tama├▒o
             directionalLight.castShadow = false; // Desactivar sombras
             scene.add(directionalLight);
         }
@@ -937,7 +942,7 @@
             const wallMaterial = getCachedMaterial(0x6B8E23, 0.9); // Verde oliva
             const separatorMaterial = getCachedMaterial(0xFFFFFF, 0.9); // Blanco para muros separadores
 
-            // --- Creación del Centro Comercial ---
+            // --- Creaci├│n del Centro Comercial ---
             let linkIndex = 0;
             
             // Planta baja con tiendas
@@ -956,7 +961,7 @@
             const clockCubeY = centralStructureY + cubeSize * 2.4;
             createDigitalClockCube(HALL_SIZE / 2, clockCubeY, HALL_SIZE / 2, cubeSize);
 
-            // Cúpula
+            // C├║pula
             const pyramidHeight = cubeSize * 1.5;
             const pyramidGeometry = new THREE.ConeGeometry(cubeSize / Math.SQRT2 * 1.2, pyramidHeight, 4);
             const pyramidMaterial = getCachedMaterial(0xA0522D, 0.8, 0.1); // Sienna
@@ -967,13 +972,13 @@
             // pyramid.receiveShadow = true;
             scene.add(pyramid);
 
-            // Crear área de descanso completa (restaurar 8 mesas)
+            // Crear ├írea de descanso completa (restaurar 8 mesas)
             const gardenRadius = 8;
             const tableCount = 8; // Restaurar 8 mesas
             
             for (let i = 0; i < tableCount; i++) {
                 const angle = (i / tableCount) * Math.PI * 2;
-                const radius = gardenRadius + Math.random() * 2 - 1; // Variación en el radio
+                const radius = gardenRadius + Math.random() * 2 - 1; // Variaci├│n en el radio
                 
                 // Crear mesa
                 const tableTopGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 8);
@@ -1022,7 +1027,7 @@
                 const parasolMaterial = getCachedMaterial(0x000080); // Azul oscuro
                 const parasol = new THREE.Mesh(parasolGeometry, parasolMaterial);
                 parasol.position.set(tableX, 3.25, tableZ);
-                parasol.rotation.x = 0; // Quitar la rotación para que apunte hacia arriba (invertido)
+                parasol.rotation.x = 0; // Quitar la rotaci├│n para que apunte hacia arriba (invertido)
                 // parasol.castShadow = false; // Desactivar sombras para mejor rendimiento
                 // parasol.receiveShadow = true;
                 scene.add(parasol);
@@ -1031,7 +1036,7 @@
                 const chairCount = 4; // Restaurar 4 sillas
                 for (let k = 0; k < chairCount; k++) {
                     // Posicionar sillas en los 4 puntos cardinales alrededor de la mesa
-                    const chairAngle = (k / chairCount) * Math.PI * 2; // 0°, 90°, 180°, 270°
+                    const chairAngle = (k / chairCount) * Math.PI * 2; // 0┬░, 90┬░, 180┬░, 270┬░
                     const chairRadius = 1.8; // Distancia fija desde la mesa
                     
                     // Asiento de la silla
@@ -1068,14 +1073,14 @@
         }
 
         function createFloorLevel(yOffset, floorMaterial, wallMaterial, separatorMaterial, startLinkIndex) {
-            // --- Suelo con patrón de tablero de ajedrez optimizado ---
+            // --- Suelo con patr├│n de tablero de ajedrez optimizado ---
             // Crear textura de tablero de ajedrez
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
             
-            const tileSize = 64; // Tamaño de cada cuadrado en la textura
+            const tileSize = 64; // Tama├▒o de cada cuadrado en la textura
             const tilesPerTexture = 8; // 8x8 cuadrados en la textura
             
             for (let x = 0; x < tilesPerTexture; x++) {
@@ -1097,14 +1102,14 @@
                 metalness: 0.1 
             });
             
-            // Calcular el tamaño del área central (sin tiendas ni corredores)
+            // Calcular el tama├▒o del ├írea central (sin tiendas ni corredores)
             const storeDepth = 12;
             const corridorWidth = 8;
             const sueloOffset = corridorWidth / 2;
-            // Hacer el área central más pequeña para que se vea mejor la separación
-            const areaCentralSize = HALL_SIZE - 2 * (storeDepth + sueloOffset + 4); // Agregar 4 unidades más de margen
+            // Hacer el ├írea central m├ís peque├▒a para que se vea mejor la separaci├│n
+            const areaCentralSize = HALL_SIZE - 2 * (storeDepth + sueloOffset + 4); // Agregar 4 unidades m├ís de margen
             
-            // Crear suelo de ajedrez solo para el área central
+            // Crear suelo de ajedrez solo para el ├írea central
             const floor = new THREE.Mesh(new THREE.PlaneGeometry(areaCentralSize, areaCentralSize), chessboardMaterial);
             floor.rotation.x = -Math.PI / 2;
             floor.position.set(HALL_SIZE / 2, yOffset, HALL_SIZE / 2);
@@ -1113,16 +1118,16 @@
             collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
-            const storeWidth = 8; // Reducido para que las tiendas sean más estrechas
+            const storeWidth = 8; // Reducido para que las tiendas sean m├ís estrechas
             const storeSpacing = 1.5; // Espaciado ajustado para un balance entre densidad y espacio
             const numStoresPerSide = Math.floor(HALL_SIZE / (storeWidth + storeSpacing));
             const totalStoresWidth = numStoresPerSide * storeWidth + (numStoresPerSide - 1) * storeSpacing;
             const initialOffset = (HALL_SIZE - totalStoresWidth) / 2;
             let linkIndex = startLinkIndex;
 
-            // Función para verificar si una posición está en una esquina
+            // Funci├│n para verificar si una posici├│n est├í en una esquina
             const isCornerPosition = (index, side) => {
-                // Saltar solo la primera y la última tienda de cada lado
+                // Saltar solo la primera y la ├║ltima tienda de cada lado
                 return index === 0 || index === numStoresPerSide - 1;
             };
 
@@ -1136,7 +1141,7 @@
                 createStore(
                     new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, storeDepth / 2), 
                     new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                    0, // Rotación para mirar hacia el centro (sur)
+                    0, // Rotaci├│n para mirar hacia el centro (sur)
                     currentLinkIndex, 
                     storeDepth, 
                     wallMaterial,
@@ -1154,7 +1159,7 @@
                 createStore(
                         new THREE.Vector3(HALL_SIZE - storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
                     new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        -Math.PI / 2, // Rotación para mirar hacia el centro (oeste)
+                        -Math.PI / 2, // Rotaci├│n para mirar hacia el centro (oeste)
                     currentLinkIndex, 
                     storeDepth, 
                     wallMaterial,
@@ -1172,7 +1177,7 @@
                 createStore(
                         new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, HALL_SIZE - storeDepth / 2), 
                     new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI, // Rotación para mirar hacia el centro (norte)
+                        Math.PI, // Rotaci├│n para mirar hacia el centro (norte)
                     currentLinkIndex, 
                     storeDepth, 
                     wallMaterial,
@@ -1190,7 +1195,7 @@
                 createStore(
                         new THREE.Vector3(storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
                     new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI / 2, // Rotación para mirar hacia el centro (este)
+                        Math.PI / 2, // Rotaci├│n para mirar hacia el centro (este)
                     currentLinkIndex, 
                     storeDepth, 
                     wallMaterial,
@@ -1267,7 +1272,7 @@
                 roughness: 0.8
             });
             
-            // Función para crear suelo de pasillo de la planta baja
+            // Funci├│n para crear suelo de pasillo de la planta baja
             const createPasilloSueloPlantaBaja = (geometry, position) => {
                 const suelo = new THREE.Mesh(geometry, pasilloMaterialPlantaBaja);
                 suelo.position.copy(position);
@@ -1334,16 +1339,16 @@
             const initialOffset = (HALL_SIZE - totalStoresWidth) / 2;
             let linkIndex = startLinkIndex;
 
-            // Función para verificar si una posición está en una esquina
+            // Funci├│n para verificar si una posici├│n est├í en una esquina
             const isCornerPosition = (index, side) => {
-                // Saltar solo la primera y la última tienda de cada lado
+                // Saltar solo la primera y la ├║ltima tienda de cada lado
                 return index === 0 || index === numStoresPerSide - 1;
             };
 
             // --- Crear pasillos con suelo ---
             // Crear materiales para cada cara
             const pasilloMaterialVinotinto = new THREE.MeshStandardMaterial({ 
-                color: 0x4B0000, // Color vinotinto más oscuro
+                color: 0x4B0000, // Color vinotinto m├ís oscuro
                 roughness: 0.8
             });
             
@@ -1366,18 +1371,18 @@
             const oesteX = storeDepth + sueloOffset;
             const esteX = HALL_SIZE - storeDepth - sueloOffset;
             
-            // Función para crear suelo de pasillo con dos colores
+            // Funci├│n para crear suelo de pasillo con dos colores
             const createPasilloSuelo = (geometry, position, materialVinotinto, materialBlanco) => {
                 const grupo = new THREE.Group();
                 
-                // Cara superior (vinotinto) - ligeramente más alta
+                // Cara superior (vinotinto) - ligeramente m├ís alta
                 const caraSuperior = new THREE.Mesh(geometry, materialVinotinto);
-                caraSuperior.position.set(0, 0.001, 0); // Ligeramente más alta
+                caraSuperior.position.set(0, 0.001, 0); // Ligeramente m├ís alta
                 grupo.add(caraSuperior);
                 
-                // Cara inferior (blanca) - ligeramente más baja
+                // Cara inferior (blanca) - ligeramente m├ís baja
                 const caraInferior = new THREE.Mesh(geometry, materialBlanco);
-                caraInferior.position.set(0, -0.001, 0); // Ligeramente más baja
+                caraInferior.position.set(0, -0.001, 0); // Ligeramente m├ís baja
                 caraInferior.rotation.x = Math.PI; // Rotar 180 grados para que mire hacia abajo
                 grupo.add(caraInferior);
                 
@@ -1446,7 +1451,7 @@
             if (currentFloor === 1) { // Segundo piso (piso 1, ya que empezamos desde 0)
                 const ceilingHeight = 0.2;
                 const extendedHeight = HALL_HEIGHT + 1;
-                const ceilingY = yOffset + (extendedHeight / 2 + 2.5); // Mucho más alto que el techo de las tiendas
+                const ceilingY = yOffset + (extendedHeight / 2 + 2.5); // Mucho m├ís alto que el techo de las tiendas
                 const extendedCorridorWidth = corridorWidth + 4; // Reducir el sobresaliente del techo
                 
                 // Norte - techo gris original
@@ -1491,11 +1496,11 @@
                 createCeilingCorner(esteX - 2, surZ - 2); // SE
             }
 
-            // --- Crear techo trapezoidal sobre las tiendas del último piso ---
+            // --- Crear techo trapezoidal sobre las tiendas del ├║ltimo piso ---
             // ELIMINADO: Techos trapezoidales para mejorar rendimiento
             // Ya no se necesitan porque solo tenemos 2 pisos
             /*
-            if (currentFloor === 3) { // Solo para el último piso (piso 3)
+            if (currentFloor === 3) { // Solo para el ├║ltimo piso (piso 3)
                 const trapezoidMaterial = new THREE.MeshStandardMaterial({ 
                     color: 0xA0522D, 
                     roughness: 0.8,
@@ -1504,8 +1509,8 @@
                 });
                 
                 // Crear techo trapezoidal para cada lado
-                const trapezoidHeight = 6; // Más alto y más grande
-                const baseWidth = storeWidth + 2; // Un poco más ancho que la tienda
+                const trapezoidHeight = 6; // M├ís alto y m├ís grande
+                const baseWidth = storeWidth + 2; // Un poco m├ís ancho que la tienda
                 
                 // Norte - techo trapezoidal
                 for (let i = 0; i < numStoresPerSide; i++) {
@@ -1562,7 +1567,7 @@
             const railMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.5, roughness: 0.5 }); // Color negro
             const cornerGap = 2; // Espacio en las esquinas para no bloquear el paso
             const barandaLong = (sueloLong + corridorWidth - cornerGap) / 2; // Longitud de cada tramo
-            const railThickness = 0.3; // Grosor de las barandas para hacerlas sólidas
+            const railThickness = 0.3; // Grosor de las barandas para hacerlas s├│lidas
             
             // Norte - dos tramos separados
             const railN1 = new THREE.Mesh(new THREE.BoxGeometry(barandaLong, railingHeight, railThickness), railMat);
@@ -1596,11 +1601,11 @@
             railE2.position.set(HALL_SIZE - storeDepth - corridorWidth, yOffset + railingHeight / 2 - 0.1, HALL_SIZE - storeDepth - corridorWidth - barandaLong / 2);
             scene.add(railE2);
 
-            // --- Actualizar colisiones de las barandas después de agregarlas a la escena ---
+            // --- Actualizar colisiones de las barandas despu├⌐s de agregarlas a la escena ---
             [railN1, railN2, railS1, railS2, railO1, railO2, railE1, railE2].forEach(rail => {
                 rail.updateMatrixWorld(true);
                 const railBox = new THREE.Box3().setFromObject(rail);
-                // Expandir la caja de colisión para hacer las barandas más efectivas
+                // Expandir la caja de colisi├│n para hacer las barandas m├ís efectivas
                 railBox.expandByScalar(0.2);
                 collisionObjects.push(railBox);
             });
@@ -1765,18 +1770,18 @@
                 roughness: 0.8
             });
             
-            // Función para crear suelo de tienda con dos colores
+            // Funci├│n para crear suelo de tienda con dos colores
             const createStoreFloor = (geometry, position) => {
                 const grupo = new THREE.Group();
                 
-                // Cara superior (negra) - ligeramente más alta
+                // Cara superior (negra) - ligeramente m├ís alta
                 const caraSuperior = new THREE.Mesh(geometry, storeFloorMaterialNegro);
-                caraSuperior.position.set(0, 0.001, 0); // Ligeramente más alta
+                caraSuperior.position.set(0, 0.001, 0); // Ligeramente m├ís alta
                 grupo.add(caraSuperior);
                 
-                // Cara inferior (blanca) - ligeramente más baja
+                // Cara inferior (blanca) - ligeramente m├ís baja
                 const caraInferior = new THREE.Mesh(geometry, storeFloorMaterialBlanco);
-                caraInferior.position.set(0, -0.001, 0); // Ligeramente más baja
+                caraInferior.position.set(0, -0.001, 0); // Ligeramente m├ís baja
                 caraInferior.rotation.x = Math.PI; // Rotar 180 grados para que mire hacia abajo
                 grupo.add(caraInferior);
                 
@@ -1788,13 +1793,13 @@
             // Crear suelo de tienda con negro arriba y blanco abajo
             const storeFloor = createStoreFloor(new THREE.PlaneGeometry(size.x, depth), new THREE.Vector3(0, 0, 0));
             
-            // Ajustar la posición del suelo según el piso
+            // Ajustar la posici├│n del suelo seg├║n el piso
             if (currentFloor === 1) {
                 // Para el segundo piso, subir ligeramente el suelo
                 const floorOffset = -0.05 - HALL_HEIGHT / 2; // Reducido de -0.1 a -0.05
                 storeFloor.position.set(0, floorOffset, 0);
             } else {
-                // Para la planta baja, mantener la posición original
+                // Para la planta baja, mantener la posici├│n original
                 storeFloor.position.set(0, -size.y / 2 + 0.05, 0);
             }
             
@@ -1828,7 +1833,7 @@
                 });
                 const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(size.x, depth), ceilingMaterial);
                 ceiling.rotation.x = Math.PI / 2;
-                ceiling.position.set(0, extendedHeight / 2 + 0.5, 0); // Posicionar más alto que las paredes extendidas
+                ceiling.position.set(0, extendedHeight / 2 + 0.5, 0); // Posicionar m├ís alto que las paredes extendidas
                 // ceiling.receiveShadow = true;
                 // ceiling.castShadow = false; // Desactivar sombras para mejor rendimiento
                 storeGroup.add(ceiling);
@@ -1837,18 +1842,18 @@
             // --- Cartel principal ---
             const mainSign = createImagePlane(url, domain, size.x * 0.9, size.y * 0.8, linkIdx, true);
             mainSign.position.z = -depth / 2 + wallThickness + 0.01;
-            mainSign.position.y = (extendedHeight - size.y) / 2; // Ajustar posición vertical
+            mainSign.position.y = (extendedHeight - size.y) / 2; // Ajustar posici├│n vertical
             storeGroup.add(mainSign);
 
-            // --- Número de tienda ---
+            // --- N├║mero de tienda ---
             const shopNumberSign = createShopNumberSign(shopNumber, size.x * 0.25, size.y * 0.25);
             shopNumberSign.position.z = -depth / 2 + wallThickness + 0.02;
-            shopNumberSign.position.y = (extendedHeight - size.y) / 2 + size.y * 0.4; // Posicionar más abajo
+            shopNumberSign.position.y = (extendedHeight - size.y) / 2 + size.y * 0.4; // Posicionar m├ís abajo
             shopNumberSign.position.x = 0; // Centrar horizontalmente
             storeGroup.add(shopNumberSign);
 
             // --- Carteles laterales (restaurar ambos carteles) ---
-            const sideSignTexts = [ `Ofertas en ${domain}`, `Visítanos ahora`, `Clic para ganar`, `Novedades aquí`];
+            const sideSignTexts = [ `Ofertas en ${domain}`, `Vis├¡tanos ahora`, `Clic para ganar`, `Novedades aqu├¡`];
             const leftSign = createRotatingSign(url, sideSignTexts, 2.5, size.y * 0.6, linkIdx);
             leftSign.position.set(-size.x / 2 + wallThickness + 0.01, (extendedHeight - size.y) / 2, -2);
             leftSign.rotation.y = Math.PI / 2;
@@ -1863,8 +1868,8 @@
             const createVerticalSign = (text, width, height, colorIdx) => {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                const canvasW = 256; // Restaurar tamaño original
-                const canvasH = 512; // Más alto para texto vertical
+                const canvasW = 256; // Restaurar tama├▒o original
+                const canvasH = 512; // M├ís alto para texto vertical
                 canvas.width = canvasW;
                 canvas.height = canvasH;
                 
@@ -1877,13 +1882,13 @@
                 
                 // Texto vertical en blanco
                 context.fillStyle = '#FFFFFF';
-                context.font = `bold ${canvasW * 0.25}px Arial`; // Restaurar tamaño de fuente original
+                context.font = `bold ${canvasW * 0.25}px Arial`; // Restaurar tama├▒o de fuente original
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 
                 // Dividir el texto en caracteres y dibujarlos verticalmente de arriba hacia abajo
                 const chars = text.split('');
-                const charHeight = canvasH * 0.12; // Más espacio entre letras
+                const charHeight = canvasH * 0.12; // M├ís espacio entre letras
                 const totalHeight = chars.length * charHeight;
                 const startY = canvasH / 2 - totalHeight / 2;
                 const centerX = canvasW / 2;
@@ -1904,7 +1909,7 @@
             };
 
             // Crear letreros verticales en los bordes de los pasillos (restaurar ambos)
-            const verticalSignWidth = 0.8; // Restaurar tamaño original
+            const verticalSignWidth = 0.8; // Restaurar tama├▒o original
             const verticalSignHeight = extendedHeight; // Restaurar altura original
             
             // Letrero en el extremo izquierdo del muro (hacia el pasillo)
@@ -1913,7 +1918,7 @@
             leftVerticalSign.rotation.y = Math.PI / 2;
             storeGroup.add(leftVerticalSign);
             
-            // Número de tienda en el extremo izquierdo del muro
+            // N├║mero de tienda en el extremo izquierdo del muro
             const leftNumberSign = createShopNumberSign(shopNumber, 0.8, 0.8);
             leftNumberSign.position.set(-size.x / 2 + wallThickness + 0.02, (extendedHeight - size.y) / 2 + 1.5, depth / 2 - 0.2);
             leftNumberSign.rotation.y = Math.PI / 2;
@@ -1925,7 +1930,7 @@
             rightVerticalSign.rotation.y = -Math.PI / 2;
             storeGroup.add(rightVerticalSign);
             
-            // Número de tienda en el extremo derecho del muro
+            // N├║mero de tienda en el extremo derecho del muro
             const rightNumberSign = createShopNumberSign(shopNumber, 0.8, 0.8);
             rightNumberSign.position.set(size.x / 2 - wallThickness - 0.02, (extendedHeight - size.y) / 2 + 1.5, depth / 2 - 0.2);
             rightNumberSign.rotation.y = -Math.PI / 2;
@@ -1996,6 +2001,7 @@
         function getLogoTexture(domain) {
             const logoFileName = domainToLogoMap[domain];
             if (!logoFileName) {
+                console.warn(`No logo mapping found for domain: ${domain}`);
                 return null;
             }
             
@@ -2018,7 +2024,11 @@
                     },
                     // onError callback
                     function(error) {
-                        console.error(`Error cargando logo ${logoFileName}:`, error);
+                        // Solo loggear una vez por dominio para evitar spam
+                        if (!logoTextureCache.has(domain + '_error')) {
+                            console.warn(`Logo no encontrado: ${logoFileName} - usando fallback`);
+                            logoTextureCache.set(domain + '_error', true);
+                        }
                         // Remover del cache si falla
                         logoTextureCache.delete(domain);
                     }
@@ -2028,7 +2038,7 @@
                 logoTextureCache.set(domain, texture);
                 return texture;
             } catch (error) {
-                console.error(`Error creando textura para ${domain}:`, error);
+                console.warn(`Error creando textura para ${domain}:`, error);
                 return null;
             }
         }
@@ -2052,7 +2062,7 @@
             context.lineWidth = 8;
             context.stroke();
             
-            // Número en blanco
+            // N├║mero en blanco
             context.fillStyle = '#FFFFFF';
             context.font = `bold ${canvasH * 0.6}px Arial`;
             context.textAlign = 'center';
@@ -2229,53 +2239,53 @@
         function setupUIButtons() {
             console.log('Configurando botones de UI...');
             
-            // Verificar que el botón se encontró correctamente
+            // Verificar que el bot├│n se encontr├│ correctamente
             if (changeAliasBtn) {
-                console.log('Botón de personalización encontrado');
+                console.log('Bot├│n de personalizaci├│n encontrado');
                 changeAliasBtn.onclick = () => {
-                    console.log('Botón de personalización clickeado');
-                    // Mostrar el panel de personalización completo
+                    console.log('Bot├│n de personalizaci├│n clickeado');
+                    // Mostrar el panel de personalizaci├│n completo
                     openCustomizationPanel();
                 };
             } else {
-                console.error('No se encontró el botón de personalización');
+                console.error('No se encontr├│ el bot├│n de personalizaci├│n');
             }
             
 
             
-            // Verificar que los elementos de personalización se encontraron correctamente
+            // Verificar que los elementos de personalizaci├│n se encontraron correctamente
             if (customizationPanel) {
-                console.log('Panel de personalización encontrado');
+                console.log('Panel de personalizaci├│n encontrado');
                 console.log('Panel inicial display:', customizationPanel.style.display);
                 console.log('Panel inicial visibility:', customizationPanel.style.visibility);
             } else {
-                console.error('No se encontró el panel de personalización');
+                console.error('No se encontr├│ el panel de personalizaci├│n');
             }
             
             if (customizationCloseBtn) {
-                console.log('Botón de cerrar personalización encontrado');
+                console.log('Bot├│n de cerrar personalizaci├│n encontrado');
                 customizationCloseBtn.onclick = closeCustomizationPanel;
             } else {
-                console.error('No se encontró el botón de cerrar personalización');
+                console.error('No se encontr├│ el bot├│n de cerrar personalizaci├│n');
             }
             
             if (saveCustomizationBtn) {
-                console.log('Botón de guardar personalización encontrado');
+                console.log('Bot├│n de guardar personalizaci├│n encontrado');
                 saveCustomizationBtn.onclick = saveCustomization;
             } else {
-                console.error('No se encontró el botón de guardar personalización');
+                console.error('No se encontr├│ el bot├│n de guardar personalizaci├│n');
             }
             
             if (resetCustomizationBtn) {
-                console.log('Botón de resetear personalización encontrado');
+                console.log('Bot├│n de resetear personalizaci├│n encontrado');
                 resetCustomizationBtn.onclick = resetCustomization;
             } else {
-                console.error('No se encontró el botón de resetear personalización');
+                console.error('No se encontr├│ el bot├│n de resetear personalizaci├│n');
             }
         }
 
         function onKeyDown(event) {
-            // Si el chat está abierto, no procesar controles del juego
+            // Si el chat est├í abierto, no procesar controles del juego
             if (chatOpen) {
                 return;
             }
@@ -2323,12 +2333,12 @@
         }
         
         function onMouseDown(event) {
-            // Si el chat está abierto, no procesar clics del juego
+            // Si el chat est├í abierto, no procesar clics del juego
             if (chatOpen) {
                 return;
             }
             
-            // Si el panel de personalización está abierto, no procesar clics del juego
+            // Si el panel de personalizaci├│n est├í abierto, no procesar clics del juego
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
                 return;
@@ -2342,7 +2352,7 @@
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
                 
-                // Verificar si es un clic en el nombre del avatar para personalización
+                // Verificar si es un clic en el nombre del avatar para personalizaci├│n
                 if (clickedObject.userData && clickedObject.userData.type === 'customization') {
                     openCustomizationPanel();
                     return;
@@ -2356,16 +2366,16 @@
         }
 
         function updateMovement() {
-            // Si el chat está abierto, no actualizar movimiento
+            // Si el chat est├í abierto, no actualizar movimiento
             if (chatOpen) {
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha ---
+            // --- Rotaci├│n con flechas izquierda/derecha ---
             if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
             if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
 
-            // --- Movimiento hacia adelante/atrás con flechas ---
+            // --- Movimiento hacia adelante/atr├ís con flechas ---
             const direction = new THREE.Vector3();
             camera.getWorldDirection(direction);
             direction.y = 0;
@@ -2373,7 +2383,7 @@
             
             const velocity = new THREE.Vector3();
             
-            // Movimiento hacia adelante/atrás con flechas arriba/abajo
+            // Movimiento hacia adelante/atr├ís con flechas arriba/abajo
             if (keys.ArrowUp) velocity.add(direction);
             if (keys.ArrowDown) velocity.sub(direction);
             
@@ -2394,7 +2404,7 @@
                 const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
                 let collision = false;
                 
-                // Optimización: solo verificar colisiones cercanas
+                // Optimizaci├│n: solo verificar colisiones cercanas
                 const nearbyCollisions = collisionObjects.filter(wallBox => {
                     const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
                     return distance < 20; // Solo verificar objetos dentro de 20 unidades
@@ -2417,7 +2427,7 @@
             const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
             targetPosition.y = targetY;
 
-            // --- Interpolación para suavidad ---
+            // --- Interpolaci├│n para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
         }
@@ -2443,7 +2453,7 @@
             updateMovement();
             updateAvatarPositions(); // Actualizar posiciones de avatares
             
-            // Enviar posición del usuario cada 100ms (10 veces por segundo)
+            // Enviar posici├│n del usuario cada 100ms (10 veces por segundo)
             if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
                 sendUserPosition();
             }
@@ -2451,7 +2461,7 @@
             renderer.render(scene, camera);
         }
         
-        // Función para limpiar recursos
+        // Funci├│n para limpiar recursos
         function cleanup() {
             // Limpiar cache de texturas
             logoTextureCache.forEach(texture => {
@@ -2478,7 +2488,7 @@
             textureCache.clear();
         }
         
-        // Limpiar al cerrar la página
+        // Limpiar al cerrar la p├ígina
         window.addEventListener('beforeunload', cleanup);
 
         function lerpAngle(a, b, t) {
@@ -2504,7 +2514,7 @@
         let connectedUsers = [];
         
         chatToggleBtn.onclick = () => {
-            // Cerrar panel de personalización si está abierto
+            // Cerrar panel de personalizaci├│n si est├í abierto
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
                 closeSimplePanel();
@@ -2518,7 +2528,7 @@
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
             }
-            // Enviar alias automáticamente al servidor
+            // Enviar alias autom├íticamente al servidor
             if (isConnected) {
                 sendAlias();
             }
@@ -2536,7 +2546,7 @@
 
 
         // --- Emojis ---
-        const emojis = ['😊', '😂', '❤️', '👍', '🎉', '🔥', '😎', '🤔', '😢', '😡', '👋', '💪', '🎯', '⭐', '💯', '🚀', '💎', '🎮', '🍕', '☕', '🌮', '🍺', '🎵', '🎬', '⚽', '🏀', '🎾', '🏈', '⚡', '🌈', '🌙', '☀️'];
+        const emojis = ['😊', '😄', '😂', '🤣', '❤️', '👍', '👎', '👏', '🙏', '🎉', '🎊', '🎈', '🎁', '⭐', '🌟', '💯', '🔥', '💪', '👀', '🤔', '😎', '🤗', '😍', '🥰', '😘', '😋', '🤤', '😴', '😪', '🤯', '🤪', '😜'];
 
         function createEmojiPanel() {
             emojiPanel.innerHTML = '';
@@ -2575,34 +2585,261 @@
         ];
         const userColorMap = new Map();
 
-        function connectWebSocket() {
+        // Firebase SDK
+        let firebaseApp, firebaseDb;
+        let usersRef, messagesRef, positionsRef;
+        let currentUser = null;
+
+        // Función para probar conectividad a Firebase
+        async function testFirebaseConnectivity() {
             try {
-                ws = new WebSocket('ws://localhost:8000');
+                console.log('🔍 Probando conectividad a Firebase...');
+                console.log('📍 Database URL:', 'https://ccapp-b8301-default-rtdb.firebaseio.com');
                 
-                ws.onopen = () => {
-                    console.log('Conectado al chat');
-                    isConnected = true;
-                    
-                    // Enviar alias automáticamente al conectarse
-                    sendAlias();
-                };
+                // Probar si podemos resolver el dominio
+                const testUrl = 'https://ccapp-b8301-default-rtdb.firebaseio.com/.json';
+                console.log('🌐 Probando URL:', testUrl);
                 
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    handleChatMessage(data);
-                };
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
-                ws.onclose = () => {
-                    console.log('Desconectado del chat');
-                    isConnected = false;
-                };
-                
-                ws.onerror = (error) => {
-                    console.error('Error de WebSocket:', error);
-                    isConnected = false;
-                };
+                if (response.ok) {
+                    console.log('✅ Firebase database es accesible');
+                    return true;
+                } else {
+                    console.error('❌ Firebase database no es accesible. Status:', response.status, response.statusText);
+                    return false;
+                }
             } catch (error) {
-                console.error('Error conectando al WebSocket:', error);
+                console.error('❌ Error de conectividad a Firebase:', error.message);
+                console.error('🔍 Tipo de error:', error.name);
+                console.error('📋 Posibles causas:');
+                console.error('   1. Firebase Realtime Database no está habilitado para este proyecto');
+                console.error('   2. El ID del proyecto es incorrecto');
+                console.error('   3. Problemas de conectividad de red');
+                console.error('   4. Las reglas de seguridad están bloqueando el acceso');
+                console.error('   5. El proyecto ha sido eliminado o deshabilitado');
+                console.error('💡 Solución: Ve a Firebase Console y habilita Realtime Database');
+                return false;
+            }
+        }
+
+        // Inicializar Firebase
+        async function initializeFirebase() {
+            try {
+                console.log('Inicializando Firebase...');
+                
+                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
+                const { getDatabase, ref, connectDatabaseEmulator } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDjPYZJeoLgisI3KZyA6_0OwmH_UESGR14",
+                    authDomain: "ccapp-b8301.firebaseapp.com",
+                    projectId: "ccapp-b8301",
+                    storageBucket: "ccapp-b8301.firebasestorage.app",
+                    messagingSenderId: "622692105172",
+                    appId: "1:622692105172:web:dceecda5e2a54630d4b441",
+                    measurementId: "G-5DW5PB2RB6",
+                    databaseURL: "https://ccapp-b8301-default-rtdb.firebaseio.com"
+                };
+
+                console.log('Configuración Firebase:', firebaseConfig);
+                firebaseApp = initializeApp(firebaseConfig);
+                firebaseDb = getDatabase(firebaseApp);
+                
+                // Verificar conectividad a la base de datos
+                console.log('🔍 Verificando conectividad a Firebase...');
+                try {
+                    // Intentar una operación simple para verificar conectividad
+                    const testRef = ref(firebaseDb, '.info/connected');
+                    console.log('✅ Referencia de prueba creada:', testRef);
+                } catch (dbError) {
+                    console.error('❌ Error al crear referencia de prueba:', dbError);
+                    console.error('🔍 Detalles del error:', {
+                        message: dbError.message,
+                        code: dbError.code,
+                        name: dbError.name
+                    });
+                    throw new Error('No se puede conectar a la base de datos Firebase. Verifica que Realtime Database esté habilitado.');
+                }
+                
+                // Referencias a la base de datos
+                usersRef = ref(firebaseDb, 'users');
+                messagesRef = ref(firebaseDb, 'messages');
+                positionsRef = ref(firebaseDb, 'positions');
+                
+                console.log('Firebase inicializado correctamente');
+                console.log('Referencias creadas:', { usersRef, messagesRef, positionsRef });
+                return true;
+            } catch (error) {
+                console.error('Error inicializando Firebase:', error);
+                console.error('Detalles del error:', {
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                
+                // Mostrar información adicional para debugging
+                if (error.code === 'PERMISSION_DENIED') {
+                    console.error('Error de permisos: Verifica las reglas de seguridad de Firebase');
+                } else if (error.code === 'UNAVAILABLE') {
+                    console.error('Error de conectividad: La base de datos no está disponible');
+                }
+                
+                return false;
+            }
+        }
+
+        async function connectToFirebaseChat() {
+            try {
+                console.log('Conectando al chat de Firebase...');
+                
+                // Verificar que Firebase esté inicializado
+                if (!firebaseDb) {
+                    throw new Error('Firebase no está inicializado');
+                }
+                
+                // Usar el alias guardado en localStorage o crear uno automático
+                let alias = userAlias;
+                if (!alias || alias.length === 0) {
+                    alias = 'Usuario_' + Math.floor(Math.random() * 10000);
+                    userAlias = alias;
+                    localStorage.setItem('userAlias', alias);
+                }
+                
+                // Firebase forbidden characters: . # $ [ ]
+                const forbidden = /[.#$\[\]]/;
+                if (forbidden.test(alias)) {
+                    // Si el alias guardado tiene caracteres prohibidos, crear uno nuevo
+                    alias = 'Usuario_' + Math.floor(Math.random() * 10000);
+                    userAlias = alias;
+                    localStorage.setItem('userAlias', alias);
+                }
+                
+                console.log('Alias a usar:', alias);
+                
+                currentUser = {
+                    alias: alias,
+                    position: { x: 25, y: 1.6, z: 25 },
+                    floor: 0,
+                    rotation: 0,
+                    timestamp: Date.now()
+                };
+                
+                console.log('Usuario actual:', currentUser);
+                
+                // Guardar usuario en Firebase
+                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                console.log('Guardando usuario en Firebase...');
+                
+                try {
+                    await set(ref(firebaseDb, `users/${currentUser.alias}`), currentUser);
+                    console.log('Usuario guardado exitosamente');
+                } catch (setError) {
+                    console.error('Error al guardar usuario:', setError);
+                    if (setError.code === 'PERMISSION_DENIED') {
+                        throw new Error('No tienes permisos para escribir en la base de datos. Verifica las reglas de seguridad de Firebase.');
+                    } else if (setError.code === 'UNAVAILABLE') {
+                        throw new Error('La base de datos no está disponible. Verifica tu conexión a internet.');
+                    } else {
+                        throw setError;
+                    }
+                }
+                
+                // Escuchar cambios en usuarios
+                const { onValue } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                console.log('Configurando listener de usuarios...');
+                onValue(usersRef, (snapshot) => {
+                    const users = snapshot.val() || {};
+                    console.log('Usuarios actualizados:', users);
+                    updateUsersList(Object.values(users));
+                });
+                
+                // Escuchar mensajes
+                const { onChildAdded } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                console.log('🔍 Configurando listener de mensajes...');
+                onChildAdded(messagesRef, (snapshot) => {
+                    const message = snapshot.val();
+                    console.log('📨 Nuevo mensaje recibido:', message);
+                    console.log('👤 Usuario actual:', currentUser.alias);
+                    console.log('📝 Mensaje de:', message.alias);
+                    
+                    if (message && message.alias && message.alias !== currentUser.alias) {
+                        console.log('✅ Agregando mensaje de otro usuario al chat');
+                        addMessageToChat(message.alias, message.message, 'user');
+                    } else if (message && message.alias === currentUser.alias) {
+                        console.log('🔄 Mensaje propio recibido (ignorando para evitar duplicado)');
+                    } else {
+                        console.log('❌ Mensaje inválido o sin alias');
+                    }
+                });
+                
+                // Escuchar posiciones
+                console.log('Configurando listener de posiciones...');
+                onValue(positionsRef, (snapshot) => {
+                    const positions = snapshot.val() || {};
+                    console.log('Posiciones actualizadas:', positions);
+                    Object.keys(positions).forEach(alias => {
+                        if (alias !== currentUser.alias) {
+                            const userData = positions[alias];
+                            updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                        }
+                    });
+                });
+                
+                isConnected = true;
+                const aliasPrompt = document.getElementById('alias-prompt');
+                if (aliasPrompt) {
+                    aliasPrompt.style.display = 'none';
+                }
+                
+                console.log('Conectado al chat como:', currentUser.alias);
+                
+                // Inicializar Three.js ANTES de usar las variables de cámara
+                init();
+                
+                // Ahora que Three.js está inicializado, podemos usar las variables de cámara
+                // Las funciones sendAlias y sendUserPosition usarán camera.position y camera.rotation
+            } catch (error) {
+                console.error('Error conectando al chat de Firebase:', error);
+                console.error('Detalles del error:', {
+                    message: error.message,
+                    code: error.code,
+                    stack: error.stack
+                });
+                alert('Error conectando al chat. Por favor, intenta de nuevo.');
+            }
+        }
+
+        // Reemplazar la función de WebSocket con Firebase
+        async function connectWebSocket() {
+            console.log('Intentando conectar a Firebase...');
+            
+            // Primero probar conectividad básica
+            const isConnectable = await testFirebaseConnectivity();
+            if (!isConnectable) {
+                console.error('❌ No se puede conectar a Firebase database');
+                alert('No se puede conectar a Firebase. Verifica:\n' +
+                    '1. Tu conexión a internet\n' +
+                    '2. Que la base de datos Firebase esté habilitada\n' +
+                    '3. Las reglas de seguridad de Firebase\n\n' +
+                    'Inicializando en modo offline...');
+                init();
+                return;
+            }
+            
+            // Si la conectividad básica funciona, intentar inicializar Firebase
+            const success = await initializeFirebase();
+            if (success) {
+                connectToFirebaseChat();
+            } else {
+                console.error('No se pudo inicializar Firebase');
+                alert('No se pudo inicializar Firebase. Inicializando en modo offline...');
+                init();
             }
         }
 
@@ -2654,13 +2891,13 @@
                 metalness: 0.5
             });
             
-            // CABEZA (caja cuadrada estilo Minecraft/Roblox - más pequeña)
+            // CABEZA (caja cuadrada estilo Minecraft/Roblox - m├ís peque├▒a)
             const headGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
             const head = new THREE.Mesh(headGeometry, skinMaterial);
             head.position.y = 1.5;
             avatarGroup.add(head);
             
-            // OJOS (puntos negros más grandes)
+            // OJOS (puntos negros m├ís grandes)
             const eyeGeometry = new THREE.BoxGeometry(0.12, 0.12, 0.12);
             
             // Ojo izquierdo
@@ -2673,7 +2910,7 @@
             rightEye.position.set(0.15, 1.52, 0.25);
             avatarGroup.add(rightEye);
             
-            // PÁRPADOS (para animación de parpadeo)
+            // P├áRPADOS (para animaci├│n de parpadeo)
             const eyelidGeometry = new THREE.BoxGeometry(0.15, 0.03, 0.15);
             const eyelidMaterial = new THREE.MeshStandardMaterial({ 
                 color: 0xFFE4C4, // Mismo color que la piel
@@ -2681,13 +2918,13 @@
                 metalness: 0.1
             });
             
-            // Párpado izquierdo
+            // P├írpado izquierdo
             const leftEyelid = new THREE.Mesh(eyelidGeometry, eyelidMaterial);
             leftEyelid.position.set(-0.2, 1.62, 0.35);
             leftEyelid.visible = false; // Inicialmente oculto
             avatarGroup.add(leftEyelid);
             
-            // Párpado derecho
+            // P├árpado derecho
             const rightEyelid = new THREE.Mesh(eyelidGeometry, eyelidMaterial);
             rightEyelid.position.set(0.2, 1.62, 0.35);
             rightEyelid.visible = false; // Inicialmente oculto
@@ -2712,7 +2949,7 @@
             rightArm.position.set(0.45, 0.9, 0);
             avatarGroup.add(rightArm);
             
-            // MANOS (cajas pequeñas estilo Minecraft)
+            // MANOS (cajas peque├▒as estilo Minecraft)
             const handGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
             
             // Mano izquierda
@@ -2751,7 +2988,7 @@
             rightCalf.position.set(0.2, -0.05, 0);
             avatarGroup.add(rightCalf);
             
-            // PIES (cajas rectangulares estilo Minecraft - más pequeños)
+            // PIES (cajas rectangulares estilo Minecraft - m├ís peque├▒os)
             const footGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.4);
             
             // Pie izquierdo
@@ -2835,14 +3072,14 @@
             
             avatarGroup.add(namePlane);
             
-            // Posición inicial
+            // Posici├│n inicial
             if (initialPosition) {
-                // Ajustar la posición Y para que esté sobre el piso
+                // Ajustar la posici├│n Y para que est├⌐ sobre el piso
                 const floorStep = HALL_HEIGHT + 1;
                 const targetY = initialFloor * floorStep + 0.4; // Ajustado para las nuevas proporciones
                 avatarGroup.position.set(initialPosition.x, targetY, initialPosition.z);
             } else {
-                // Posición por defecto cerca del centro
+                // Posici├│n por defecto cerca del centro
                 const randomX = (HALL_SIZE / 2) + (Math.random() - 0.5) * 20;
                 const randomZ = (HALL_SIZE / 2) + (Math.random() - 0.5) * 20;
                 const floorStep = HALL_HEIGHT + 1;
@@ -2853,13 +3090,13 @@
             // Agregar a la escena
             scene.add(avatarGroup);
             
-            // Guardar referencia con elementos para animación
+            // Guardar referencia con elementos para animaci├│n
             userAvatars.set(alias, {
                 group: avatarGroup,
                 namePlane: namePlane,
                 targetPosition: avatarGroup.position.clone(),
                 currentFloor: initialFloor,
-                // Elementos para animación de caminar
+                // Elementos para animaci├│n de caminar
                 leftHand: leftHand,
                 rightHand: rightHand,
                 leftThigh: leftThigh,
@@ -2868,16 +3105,16 @@
                 rightCalf: rightCalf,
                 leftFoot: leftFoot,
                 rightFoot: rightFoot,
-                // Elementos para animación de parpadeo
+                // Elementos para animaci├│n de parpadeo
                 leftEye: leftEye,
                 rightEye: rightEye,
                 leftEyelid: leftEyelid,
                 rightEyelid: rightEyelid,
-                // Materiales para personalización
+                // Materiales para personalizaci├│n
                 bodyMaterial: bodyMaterial,
                 pantsMaterial: pantsMaterial,
                 shoeMaterial: shoeMaterial,
-                // Variables de animación
+                // Variables de animaci├│n
                 walkCycle: 0,
                 isMoving: false,
                 lastPosition: avatarGroup.position.clone(),
@@ -2886,7 +3123,7 @@
                 isBlinking: false
             });
             
-            console.log(`Avatar creado para ${alias} en posición:`, avatarGroup.position);
+            console.log(`Avatar creado para ${alias} en posici├│n:`, avatarGroup.position);
             return avatarGroup;
         }
 
@@ -2902,22 +3139,22 @@
 
         function updateAvatarPositions() {
             userAvatars.forEach((avatar, alias) => {
-                // Hacer que el nombre siempre mire hacia la cámara
+                // Hacer que el nombre siempre mire hacia la c├ímara
                 avatar.namePlane.lookAt(camera.position);
                 
-                // Interpolación suave hacia la posición objetivo
+                // Interpolaci├│n suave hacia la posici├│n objetivo
                 avatar.group.position.lerp(avatar.targetPosition, 0.1);
                 
-                // Interpolación suave de la rotación
+                // Interpolaci├│n suave de la rotaci├│n
                 if (avatar.targetRotation !== undefined) {
                     const oldRotation = avatar.group.rotation.y;
-                    // Corregir la rotación: agregar 90 grados (π/2 radianes) para alinear con la dirección de mirada
-                    // Esto es necesario porque el modelo del avatar está orientado de lado por defecto
+                    // Corregir la rotaci├│n: agregar 90 grados (╧Ç/2 radianes) para alinear con la direcci├│n de mirada
+                    // Esto es necesario porque el modelo del avatar est├í orientado de lado por defecto
                     const correctedRotation = avatar.targetRotation + Math.PI / 2;
                     avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, correctedRotation, 0.15);
                     // Debug: solo mostrar cuando hay cambio significativo
                     if (Math.abs(oldRotation - avatar.group.rotation.y) > 0.05) {
-                        console.log(`Avatar ${alias} rotando de ${(oldRotation * 180 / Math.PI).toFixed(1)}° a ${(avatar.group.rotation.y * 180 / Math.PI).toFixed(1)}° (corregido)`);
+                        console.log(`Avatar ${alias} rotando de ${(oldRotation * 180 / Math.PI).toFixed(1)}┬░ a ${(avatar.group.rotation.y * 180 / Math.PI).toFixed(1)}┬░ (corregido)`);
                     }
                 }
                 
@@ -2930,17 +3167,17 @@
         }
 
         function animateAvatarWalk(avatar, alias) {
-            // Calcular si el avatar se está moviendo
+            // Calcular si el avatar se est├í moviendo
             const currentPos = avatar.group.position;
             const distance = currentPos.distanceTo(avatar.lastPosition);
-            const isMoving = distance > 0.01; // Umbral mínimo de movimiento
+            const isMoving = distance > 0.01; // Umbral m├¡nimo de movimiento
             
             if (isMoving) {
-                // Incrementar ciclo de caminar estilo Minecraft (más lento y simple)
+                // Incrementar ciclo de caminar estilo Minecraft (m├ís lento y simple)
                 const speed = Math.min(distance * 10, 1);
                 avatar.walkCycle += 0.4 * speed;
                 
-                // Animar solo los brazos desde los hombros (movimiento simple y rítmico)
+                // Animar solo los brazos desde los hombros (movimiento simple y r├¡tmico)
                 const armSwing = Math.sin(avatar.walkCycle) * 0.25; // Balanceo simple de brazos
                 avatar.leftHand.rotation.z = armSwing;
                 avatar.rightHand.rotation.z = -armSwing;
@@ -2950,35 +3187,35 @@
                 avatar.leftThigh.rotation.z = legSwing;
                 avatar.rightThigh.rotation.z = -legSwing;
                 
-                // Las pantorrillas y pies se mantienen estáticos
+                // Las pantorrillas y pies se mantienen est├íticos
                 avatar.leftCalf.rotation.z = 0;
                 avatar.rightCalf.rotation.z = 0;
                 avatar.leftFoot.position.y = -0.3;
                 avatar.rightFoot.position.y = -0.3;
                 
                 // Sin movimiento vertical del cuerpo
-                // avatar.group.position.y se mantiene estático
+                // avatar.group.position.y se mantiene est├ítico
                 
-                // La cabeza se mantiene estática (sin head bob)
+                // La cabeza se mantiene est├ítica (sin head bob)
                 avatar.group.children.forEach(child => {
                     if (child.geometry && child.geometry.type === 'BoxGeometry' && 
                         child.geometry.parameters.width === 0.6 && 
                         child.geometry.parameters.height === 0.6) {
-                        // Es la cabeza - posición estática
+                        // Es la cabeza - posici├│n est├ítica
                         child.position.y = 1.5;
                         
-                        // Hacer que la cabeza mire en la dirección del movimiento
+                        // Hacer que la cabeza mire en la direcci├│n del movimiento
                         if (avatar.targetRotation !== undefined) {
-                            // Corregir la rotación de la cabeza también
+                            // Corregir la rotaci├│n de la cabeza tambi├⌐n
                             child.rotation.y = avatar.targetRotation + Math.PI / 2;
                         }
                     }
                 });
                 
             } else {
-                // Posición neutral cuando está quieto (sin respiración)
+                // Posici├│n neutral cuando est├í quieto (sin respiraci├│n)
                 
-                // Resetear a posición neutral cuando no se mueve
+                // Resetear a posici├│n neutral cuando no se mueve
                 avatar.leftHand.position.y = 0.55;
                 avatar.leftHand.position.z = 0;
                 avatar.rightHand.position.y = 0.55;
@@ -2996,9 +3233,9 @@
                 avatar.group.rotation.z = 0;
                 
                 // Sin movimiento del torso
-                // avatar.group.position.y se mantiene estático
+                // avatar.group.position.y se mantiene est├ítico
                 
-                // Resetear posición de la cabeza
+                // Resetear posici├│n de la cabeza
                 avatar.group.children.forEach(child => {
                     if (child.geometry && child.geometry.type === 'BoxGeometry' && 
                         child.geometry.parameters.width === 0.6 && 
@@ -3006,9 +3243,9 @@
                         // Es la cabeza
                         child.position.y = 1.5;
                         
-                        // Mantener la rotación de la cabeza
+                        // Mantener la rotaci├│n de la cabeza
                         if (avatar.targetRotation !== undefined) {
-                            // Corregir la rotación de la cabeza también
+                            // Corregir la rotaci├│n de la cabeza tambi├⌐n
                             child.rotation.y = avatar.targetRotation + Math.PI / 2;
                         }
                     }
@@ -3018,7 +3255,7 @@
                 avatar.walkCycle = 0;
             }
             
-            // Actualizar posición anterior
+            // Actualizar posici├│n anterior
             avatar.lastPosition.copy(currentPos);
         }
 
@@ -3032,9 +3269,9 @@
                 if (!avatar.isBlinking) {
                     // Iniciar parpadeo
                     avatar.isBlinking = true;
-                    avatar.blinkTimer = 150; // Duración del parpadeo (150ms)
+                    avatar.blinkTimer = 150; // Duraci├│n del parpadeo (150ms)
                     
-                    // Ocultar ojos y mostrar párpados
+                    // Ocultar ojos y mostrar p├árpados
                     avatar.leftEye.visible = false;
                     avatar.rightEye.visible = false;
                     avatar.leftEyelid.visible = true;
@@ -3044,7 +3281,7 @@
                     avatar.isBlinking = false;
                     avatar.blinkTimer = 2000 + Math.random() * 3000; // Tiempo aleatorio hasta el siguiente parpadeo
                     
-                    // Mostrar ojos y ocultar párpados
+                    // Mostrar ojos y ocultar p├árpados
                     avatar.leftEye.visible = true;
                     avatar.rightEye.visible = true;
                     avatar.leftEyelid.visible = false;
@@ -3052,9 +3289,9 @@
                 }
             }
             
-            // Hacer que los ojos miren en la dirección del avatar
+            // Hacer que los ojos miren en la direcci├│n del avatar
             if (avatar.targetRotation !== undefined) {
-                // Corregir la rotación de los ojos también
+                // Corregir la rotaci├│n de los ojos tambi├⌐n
                 const correctedRotation = avatar.targetRotation + Math.PI / 2;
                 avatar.leftEye.rotation.y = correctedRotation;
                 avatar.rightEye.rotation.y = correctedRotation;
@@ -3083,7 +3320,7 @@
                     addMessageToChat(data.alias, data.message, 'user', data.timestamp);
                     break;
                 case 'userJoined':
-                    addMessageToChat('Sistema', `${data.alias} se unió al chat`, 'system');
+                    addMessageToChat('Sistema', `${data.alias} se uni├│ al chat`, 'system');
                     // No crear avatar para el usuario propio
                     if (data.alias !== userAlias) {
                         createUserAvatar(data.alias); // Crear avatar del usuario
@@ -3094,7 +3331,7 @@
                     }
                     break;
                 case 'userLeft':
-                    addMessageToChat('Sistema', `${data.alias} se desconectó`, 'system');
+                    addMessageToChat('Sistema', `${data.alias} se desconect├│`, 'system');
                     removeUserAvatar(data.alias); // Remover avatar del usuario
                     if (data.users) {
                         connectedUsers = data.users;
@@ -3102,7 +3339,7 @@
                     }
                     break;
                 case 'userPosition':
-                    // Actualizar posición de un avatar específico
+                    // Actualizar posici├│n de un avatar espec├¡fico
                     updateAvatarPosition(data.alias, data.position, data.floor, data.rotation);
                     break;
                 case 'userPositions':
@@ -3140,23 +3377,83 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const message = chatInput.value.trim();
-            if (message.length > 0 && isConnected && userAlias) {
-                ws.send(JSON.stringify({
-                    type: 'message',
-                    message: message
-                }));
-                chatInput.value = '';
+            console.log('🔍 Intentando enviar mensaje:', {
+                message: message,
+                messageLength: message.length,
+                isConnected: isConnected,
+                userAlias: userAlias,
+                messagesRef: messagesRef
+            });
+            
+            if (message.length > 0 && isConnected && userAlias && messagesRef) {
+                try {
+                    console.log('📤 Enviando mensaje a Firebase...');
+                    // Enviar mensaje a Firebase
+                    const { push } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                    const messageData = {
+                        alias: userAlias,
+                        message: message,
+                        timestamp: Date.now()
+                    };
+                    console.log('📋 Datos del mensaje:', messageData);
+                    
+                    await push(messagesRef, messageData);
+                    console.log('✅ Mensaje enviado exitosamente');
+                    
+                    // Agregar el mensaje propio al chat localmente
+                    addMessageToChat(userAlias, message, 'own');
+                    
+                    chatInput.value = '';
+                } catch (error) {
+                    console.error('❌ Error enviando mensaje:', error);
+                    alert('Error enviando mensaje: ' + error.message);
+                }
+            } else {
+                console.log('❌ No se puede enviar mensaje:', {
+                    messageEmpty: message.length === 0,
+                    notConnected: !isConnected,
+                    noAlias: !userAlias,
+                    noMessagesRef: !messagesRef
+                });
             }
         }
 
-        function sendAlias() {
-            if (isConnected && userAlias) {
-                ws.send(JSON.stringify({
-                    type: 'alias',
-                    alias: userAlias
-                }));
+        async function sendAlias() {
+            if (isConnected && userAlias && camera) {
+                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                await set(ref(firebaseDb, `users/${userAlias}`), {
+                    alias: userAlias,
+                    position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+                    floor: currentFloor,
+                    rotation: camera.rotation.y,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        async function sendUserPosition() {
+            if (isConnected && userAlias && camera) {
+                const { set, ref } = await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+                let normalizedRotation = camera.rotation.y;
+                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
+                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
+                await set(ref(firebaseDb, `positions/${userAlias}`), {
+                    position: {
+                        x: camera.position.x,
+                        y: camera.position.y,
+                        z: camera.position.z
+                    },
+                    floor: currentFloor,
+                    rotation: normalizedRotation,
+                    timestamp: Date.now()
+                });
+                // Log para depuración (solo cuando hay cambio significativo)
+                const rotationDegrees = (normalizedRotation * 180 / Math.PI).toFixed(1);
+                if (Math.abs(normalizedRotation) > 0.1) {
+                    console.log(`Enviando rotación: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
+                }
             }
         }
 
@@ -3205,7 +3502,7 @@
         function openCustomizationPanel() {
             console.log('Abriendo panel simple de personalización');
             
-            // Cerrar chat si está abierto
+            // Cerrar chat si est├í abierto
             if (chatOpen) {
                 chatPanel.style.display = 'none';
                 chatOpen = false;
@@ -3279,7 +3576,7 @@
         }
         
         function changePantsColor(color) {
-            console.log('Cambiando color de pantalón a:', color);
+            console.log('Cambiando color de pantal├│n a:', color);
             pantsColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
@@ -3315,13 +3612,13 @@
         }
         
         function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior
+            // Remover selecci├│n anterior
             document.querySelectorAll('.color-btn').forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
             });
             
-            // Marcar el botón seleccionado
+            // Marcar el bot├│n seleccionado
             const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
             if (selectedBtn) {
                 selectedBtn.style.borderColor = '#FFD700';
@@ -3340,7 +3637,7 @@
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
                 aliasPreview.textContent = currentAlias || 'Sin nombre';
                 
-                // Crear una vista previa visual del avatar más detallada
+                // Crear una vista previa visual del avatar m├ís detallada
                 const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
                 const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
@@ -3406,7 +3703,7 @@
                 if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
                 if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
                 
-                // Forzar actualización de materiales
+                // Forzar actualizaci├│n de materiales
                 if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
                 if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
                 if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
@@ -3415,14 +3712,14 @@
             // Actualizar vista previa
             updateAvatarPreview();
             
-            // Limpiar selección de botones
+            // Limpiar selecci├│n de botones
             document.querySelectorAll('.color-btn').forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
                 btn.style.boxShadow = 'none';
             });
             
-            console.log('✅ Personalización restablecida');
+                            console.log('✅ Personalización restablecida');
         }
         
         function saveSimpleCustomization() {
@@ -3453,7 +3750,7 @@
             // Actualizar nombre en el avatar
             updateAvatarName();
             
-            // Enviar alias al servidor si está conectado
+            // Enviar alias al servidor si est├í conectado
             if (isConnected) {
                 sendAlias();
             }
@@ -3461,13 +3758,13 @@
             // Cerrar panel
             closeSimplePanel();
             
-            console.log('✅ Personalización guardada:', customizationData);
+                            console.log('✅ Personalización guardada:', customizationData);
         }
         
         function openCustomizationPanel() {
             console.log('Abriendo panel de personalización mejorado');
             
-            // Cerrar chat si está abierto
+            // Cerrar chat si est├í abierto
             if (chatOpen) {
                 chatPanel.style.display = 'none';
                 chatOpen = false;
@@ -3529,7 +3826,7 @@
             }
         }
         
-        // Event listeners para actualización en tiempo real
+        // Event listeners para actualizaci├│n en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
             const aliasInput = document.getElementById('simple-alias-input');
             if (aliasInput) {
@@ -3586,7 +3883,7 @@
             
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
             closeSimplePanel();
-            alert('¡Personalización guardada!');
+                            alert('¡Personalización guardada!');
         }
         
         function createWorkingColorGrids() {
@@ -3628,7 +3925,7 @@
                 pantsGrid.appendChild(colorOption);
             }
             
-            // Crear opciones de color para zapatos (últimos 18 colores)
+            // Crear opciones de color para zapatos (├║ltimos 18 colores)
             const shoesGrid = document.getElementById('working-shoes-colors');
             for (let i = 36; i < 54; i++) {
                 const colorOption = document.createElement('div');
@@ -3714,6 +4011,13 @@
                 return;
             }
             
+            // Firebase forbidden characters: . # $ [ ]
+            const forbidden = /[.#$\[\]]/;
+            if (forbidden.test(newAlias)) {
+                alert('El alias no puede contener los siguientes caracteres: . # $ [ ]');
+                return;
+            }
+            
             if (newAlias !== userAlias) {
                 userAlias = newAlias;
                 localStorage.setItem('userAlias', userAlias);
@@ -3726,7 +4030,7 @@
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
             closeWorkingPanel();
             
-            alert('Personalización guardada exitosamente');
+            alert('Personalizaci├│n guardada exitosamente');
         }
         
         function resetWorkingCustomization() {
@@ -3763,7 +4067,7 @@
                 pantsColorsGrid.appendChild(colorOption);
             }
 
-            // Crear opciones de color para zapatos (últimos 18 colores)
+            // Crear opciones de color para zapatos (├║ltimos 18 colores)
             for (let i = 36; i < 54; i++) {
                 const colorOption = createColorOption(customizationColors[i], 'shoes');
                 shoesColorsGrid.appendChild(colorOption);
@@ -3785,13 +4089,13 @@
         }
 
         function selectColor(color, type) {
-            // Remover selección previa del mismo tipo
+            // Remover selecci├│n previa del mismo tipo
             const prevSelected = document.querySelector(`.color-option.selected[data-type="${type}"]`);
             if (prevSelected) {
                 prevSelected.classList.remove('selected');
             }
             
-            // Seleccionar nueva opción
+            // Seleccionar nueva opci├│n
             const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
             if (selectedOption) {
                 selectedOption.classList.add('selected');
@@ -3833,7 +4137,7 @@
                 avatar.pantsMaterial.color.setHex(currentCustomization.pantsColor);
                 avatar.shoeMaterial.color.setHex(currentCustomization.shoesColor);
                 
-                // Forzar actualización de materiales
+                // Forzar actualizaci├│n de materiales
                 avatar.bodyMaterial.needsUpdate = true;
                 avatar.pantsMaterial.needsUpdate = true;
                 avatar.shoeMaterial.needsUpdate = true;
@@ -3856,6 +4160,13 @@
                 return;
             }
             
+            // Firebase forbidden characters: . # $ [ ]
+            const forbidden = /[.#$\[\]]/;
+            if (forbidden.test(newAlias)) {
+                addMessageToChat('Sistema', 'El alias no puede contener los siguientes caracteres: . # $ [ ]', 'system');
+                return;
+            }
+            
             // Actualizar el alias si ha cambiado
             if (newAlias !== userAlias) {
                 userAlias = newAlias;
@@ -3867,12 +4178,12 @@
                 }
             }
             
-            // Guardar personalización en localStorage
+            // Guardar personalizaci├│n en localStorage
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
             closeCustomizationPanel();
             
-            // Mostrar mensaje de confirmación
-            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
+            // Mostrar mensaje de confirmaci├│n
+                            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
         }
 
         function resetCustomization() {
@@ -3895,7 +4206,7 @@
                     currentCustomization = JSON.parse(saved);
                     applyCustomizationToAvatar();
                 } catch (error) {
-                    console.error('Error cargando personalización:', error);
+                    console.error('Error cargando personalizaci├│n:', error);
                 }
             }
         }
@@ -3904,7 +4215,7 @@
 
         // Cerrar panel al hacer clic fuera
         document.addEventListener('click', (e) => {
-            // Cerrar chat si está abierto y se hace clic fuera
+            // Cerrar chat si est├í abierto y se hace clic fuera
             if (chatOpen && !chatPanel.contains(e.target) && !chatToggleBtn.contains(e.target)) {
                 chatPanel.style.display = 'none';
                 chatOpen = false;
@@ -3938,83 +4249,17 @@
             });
         }
 
-        // Cargar personalización al iniciar
+        // Cargar personalizaci├│n al iniciar
         loadCustomization();
 
-        function sendUserPosition() {
-            if (isConnected && userAlias) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                
-                // Normalizar la rotación antes de enviar
-                let normalizedRotation = camera.rotation.y;
-                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
-                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                
-                ws.send(JSON.stringify({
-                    type: 'position',
-                    position: position,
-                    floor: currentFloor,
-                    rotation: normalizedRotation
-                }));
-                
-                // Log para depuración (solo cuando hay cambio significativo)
-                const rotationDegrees = (normalizedRotation * 180 / Math.PI).toFixed(1);
-                if (Math.abs(normalizedRotation) > 0.1) {
-                    console.log(`Enviando rotación: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
-                }
-            }
-        }
-
-        function updateAvatarPosition(alias, position, floor, rotation = 0) {
-            // No crear avatar para el usuario propio
-            if (alias === userAlias) {
-                return;
-            }
-            
-            let avatar = userAvatars.get(alias);
-            
-            if (!avatar) {
-                // Si el avatar no existe, crearlo
-                createUserAvatar(alias, position, floor);
-                avatar = userAvatars.get(alias);
-            }
-            
-            if (avatar) {
-                // Actualizar posición objetivo (mantener X y Z del servidor, calcular Y correctamente)
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep + 0.4; // Ajustado para las nuevas proporciones
-                avatar.targetPosition.set(position.x, targetY, position.z);
-                avatar.currentFloor = floor;
-                
-                // Si es un cambio de piso, actualizar inmediatamente la posición Y
-                avatar.group.position.y = targetY;
-                
-                // Actualizar rotación del avatar para que mire hacia donde mira el jugador
-                // Asegurar que la rotación esté en el rango correcto
-                let normalizedRotation = rotation;
-                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
-                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                
-                avatar.targetRotation = normalizedRotation;
-                
-                // Debug: mostrar rotación en grados para mejor comprensión
-                const rotationDegrees = (normalizedRotation * 180 / Math.PI).toFixed(1);
-                console.log(`Avatar ${alias} rotación actualizada a: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
-            }
-        }
-
-        // Asegurar que el DOM esté completamente cargado antes de inicializar
+        // Asegurar que el DOM est├⌐ completamente cargado antes de inicializar
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
             init();
         }
 
-        // Configurar overlay al cargar la página
+        // Configurar overlay al cargar la p├ígina
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
@@ -4026,6 +4271,29 @@
                 });
             }
         });
+
+        // Función de prueba para verificar el chat
+        function testChat() {
+            console.log('🧪 Probando funcionalidad del chat...');
+            console.log('📊 Estado actual:', {
+                isConnected: isConnected,
+                userAlias: userAlias,
+                messagesRef: messagesRef,
+                firebaseDb: firebaseDb,
+                currentUser: currentUser
+            });
+            
+            // Probar agregar un mensaje de prueba
+            if (typeof addMessageToChat === 'function') {
+                console.log('✅ Función addMessageToChat disponible');
+                addMessageToChat('Sistema', 'Prueba del chat - ' + new Date().toLocaleTimeString(), 'system');
+            } else {
+                console.log('❌ Función addMessageToChat no disponible');
+            }
+        }
+
+        connectWebSocket();
+
     </script>
-</body>
+    </body>
 </html>
