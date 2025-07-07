@@ -3356,44 +3356,39 @@
         }
 
         function updateAvatarPosition(alias, position, floor, rotation = 0) {
-            if (!position || typeof position.x === 'undefined' || typeof position.y === 'undefined' || typeof position.z === 'undefined') {
+            if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
+                return;
+            }
+            if (typeof floor !== 'number') {
+                console.warn('Floor inválido para alias:', alias, floor);
+                return;
+            }
+            if (typeof rotation !== 'number') {
+                console.warn('Rotación inválida para alias:', alias, rotation);
                 return;
             }
             // No crear avatar para el usuario propio
             if (alias === userAlias) {
                 return;
             }
-            
             let avatar = userAvatars.get(alias);
-            
             if (!avatar) {
-                // Si el avatar no existe, crearlo
                 createUserAvatar(alias, position, floor);
                 avatar = userAvatars.get(alias);
             }
-            
             if (avatar) {
-                // Actualizar posición objetivo (mantener X y Z del servidor, calcular Y correctamente)
                 const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep + 0.4; // Ajustado para las nuevas proporciones
+                const targetY = floor * floorStep + 0.4;
                 avatar.targetPosition.set(position.x, targetY, position.z);
                 avatar.currentFloor = floor;
-                
-                // Si es un cambio de piso, actualizar inmediatamente la posición Y
                 avatar.group.position.y = targetY;
-                
-                // Actualizar rotación del avatar para que mire hacia donde mira el jugador
-                // Asegurar que la rotación esté en el rango correcto
                 let normalizedRotation = rotation;
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                
                 avatar.targetRotation = normalizedRotation;
-                
-                // Debug: mostrar rotación en grados para mejor comprensión
                 const rotationDegrees = (normalizedRotation * 180 / Math.PI).toFixed(1);
-                console.log(`Avatar ${alias} rotación actualizada a: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
+                // Opcional: console.log(`Avatar ${alias} rotación actualizada a: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
             }
         }
 
