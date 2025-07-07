@@ -4016,25 +4016,7 @@
         // Conectar al chat de Firebase
         connectToChat(userAlias);
 
-        // Enviar mensaje al presionar el botón o Enter
-        const chatSendBtn = document.getElementById('chat-send-btn');
-        const chatInput = document.getElementById('chat-input');
-        chatSendBtn.onclick = () => {
-            const message = chatInput.value.trim();
-            if (message.length > 0) {
-                sendMessage(message);
-                chatInput.value = '';
-            }
-        };
-        chatInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                const message = chatInput.value.trim();
-                if (message.length > 0) {
-                    sendMessage(message);
-                    chatInput.value = '';
-                }
-            }
-        });
+        
 
         // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
         setInterval(() => {
