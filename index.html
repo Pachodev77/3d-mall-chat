@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Mall Chat - Centro Comercial Virtual</title>
+    <title>3D Mall Chat - Firebase Version</title>
     <style>
         body {
             margin: 0;
@@ -47,6 +47,45 @@
         }
         #chat-toggle-btn:hover {
             background: #444;
+        }
+        #customization-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 20px;
+            transition: background 0.2s;
+        }
+        #customization-btn:hover {
+            background: #444;
+        }
+        #connection-status {
+            position: fixed;
+            top: 60px;
+            left: 16px;
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .connected {
+            background: #006400 !important;
+        }
+        .disconnected {
+            background: #8B0000 !important;
         }
         #chat-panel {
             position: fixed;
@@ -106,49 +145,6 @@
             background: #333;
             border-left: 3px solid transparent;
         }
-        #emoji-panel {
-            position: absolute;
-            bottom: 70px;
-            left: 10px;
-            right: 10px;
-            background: rgba(51,51,51,0.95);
-            border-radius: 8px;
-            padding: 10px;
-            display: none;
-            flex-wrap: wrap;
-            gap: 4px;
-            max-height: 140px;
-            overflow-y: auto;
-            backdrop-filter: blur(5px);
-        }
-        .emoji-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .emoji-btn:hover {
-            background: #555;
-        }
-        #emoji-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px;
-            margin-right: 4px;
-        }
-        #chat-close-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-        }
         #chat-messages {
             flex: 1;
             padding: 12px;
@@ -185,6 +181,13 @@
         #chat-send-btn:hover {
             background: #800000;
         }
+        #chat-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
         #alias-prompt {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -206,129 +209,101 @@
         }
         #alias-prompt button {
             padding: 10px 20px;
-            font-size: 16px;
             background: #4B0000;
             color: #fff;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
         }
         #alias-prompt button:hover {
             background: #800000;
         }
         .message {
-            margin-bottom: 8px;
-            padding: 6px 8px;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
         }
-        .message .alias {
-            font-weight: bold;
-            color: #4ECDC4;
+        .message.own {
+            background: #4B0000;
+            margin-left: auto;
         }
-        .message .time {
-            font-size: 12px;
-            color: #888;
-            margin-left: 8px;
+        .message.user {
+            background: #333;
         }
-        .system-message {
-            color: #FFD700;
-            font-style: italic;
-        }
-        .user-joined {
-            color: #90EE90;
-        }
-        .user-left {
-            color: #FFB6C1;
+        .message.system {
+            background: #FFD700;
+            color: #000;
+            text-align: center;
+            max-width: 100%;
         }
         #customization-panel {
             position: fixed;
-            top: 60px;
-            right: 16px;
-            width: 200px;
-            background: rgba(30,30,30,0.85);
-            border-radius: 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            z-index: 1003;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(30,30,30,0.95));
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 1001;
             display: none;
-            padding: 16px;
-            backdrop-filter: blur(10px);
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            margin: 4px;
-            display: inline-block;
-        }
-        .color-option:hover {
-            transform: scale(1.1);
-        }
-        .color-option.selected {
-            border-color: #FFD700;
-        }
-        #customization-toggle {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            background: #222;
-            color: #fff;
+        .color-btn {
+            width: 40px;
+            height: 40px;
             border: none;
             border-radius: 50%;
+            margin: 5px;
             cursor: pointer;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            font-size: 20px;
-            transition: background 0.2s;
+            transition: all 0.3s;
         }
-        #customization-toggle:hover {
-            background: #444;
+        .color-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
-        .customization-section {
-            margin-bottom: 16px;
-        }
-        .customization-section h3 {
-            color: #fff;
-            margin: 0 0 8px 0;
-            font-size: 14px;
-        }
-        #instructions {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            background: rgba(0,0,0,0.7);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            z-index: 1000;
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 15px;
         }
     </style>
 </head>
 <body>
     <div id="crosshair"></div>
     
-    <button id="chat-toggle-btn">💬</button>
-    <button id="customization-toggle">👤</button>
+    <div id="connection-status" class="disconnected">
+        Desconectado
+    </div>
+    
+    <button id="customization-btn" title="Personalizar Avatar">👤</button>
+    <button id="chat-toggle-btn" title="Chat">💬</button>
+    
+    <div id="alias-prompt">
+        <h2 style="color: white; margin-bottom: 20px;">3D Mall Chat</h2>
+        <input type="text" id="alias-input" placeholder="Ingresa tu alias (máx. 18 caracteres)" maxlength="18">
+        <button onclick="connectToChat()">Conectar</button>
+    </div>
     
     <div id="chat-panel">
         <div id="chat-header">
-            <span>Chat del Centro Comercial</span>
-            <button id="chat-close-btn">✕</button>
+            <span>Chat del Mall</span>
+            <button id="chat-close-btn">×</button>
         </div>
         <div id="chat-content">
             <div id="chat-main">
                 <div id="chat-messages"></div>
                 <div id="chat-input-area">
-                    <button id="emoji-toggle">😊</button>
-                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." maxlength="200">
+                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
                     <button id="chat-send-btn">Enviar</button>
                 </div>
             </div>
@@ -337,567 +312,272 @@
                 <div id="users-list"></div>
             </div>
         </div>
-        <div id="emoji-panel">
-            <button class="emoji-btn">😊</button>
-            <button class="emoji-btn">😂</button>
-            <button class="emoji-btn">😍</button>
-            <button class="emoji-btn">🤔</button>
-            <button class="emoji-btn">👍</button>
-            <button class="emoji-btn">👎</button>
-            <button class="emoji-btn">🎉</button>
-            <button class="emoji-btn">🔥</button>
-            <button class="emoji-btn">💯</button>
-            <button class="emoji-btn">❤️</button>
-            <button class="emoji-btn">😎</button>
-            <button class="emoji-btn">🤩</button>
-            <button class="emoji-btn">😴</button>
-            <button class="emoji-btn">🤯</button>
-            <button class="emoji-btn">👀</button>
-            <button class="emoji-btn">💪</button>
-            <button class="emoji-btn">🚀</button>
-            <button class="emoji-btn">⭐</button>
-        </div>
     </div>
     
     <div id="customization-panel">
-        <div class="customization-section">
-            <h3>Color de Camisa</h3>
-            <div id="shirt-colors"></div>
+        <button class="close-btn" onclick="closeCustomization()">×</button>
+        <h2 style="color: white; margin-bottom: 20px;">Personalizar Avatar</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #FFD700;">Color de Camisa</h3>
+            <button class="color-btn" style="background: #FF0000;" onclick="changeShirtColor('#FF0000')"></button>
+            <button class="color-btn" style="background: #00FF00;" onclick="changeShirtColor('#00FF00')"></button>
+            <button class="color-btn" style="background: #0000FF;" onclick="changeShirtColor('#0000FF')"></button>
+            <button class="color-btn" style="background: #FFFF00;" onclick="changeShirtColor('#FFFF00')"></button>
+            <button class="color-btn" style="background: #FF00FF;" onclick="changeShirtColor('#FF00FF')"></button>
+            <button class="color-btn" style="background: #00FFFF;" onclick="changeShirtColor('#00FFFF')"></button>
+            <button class="color-btn" style="background: #FFA500;" onclick="changeShirtColor('#FFA500')"></button>
+            <button class="color-btn" style="background: #800080;" onclick="changeShirtColor('#800080')"></button>
         </div>
-        <div class="customization-section">
-            <h3>Color de Pantalones</h3>
-            <div id="pants-colors"></div>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #FFD700;">Color de Pantalones</h3>
+            <button class="color-btn" style="background: #000000;" onclick="changePantsColor('#000000')"></button>
+            <button class="color-btn" style="background: #8B4513;" onclick="changePantsColor('#8B4513')"></button>
+            <button class="color-btn" style="background: #000080;" onclick="changePantsColor('#000080')"></button>
+            <button class="color-btn" style="background: #228B22;" onclick="changePantsColor('#228B22')"></button>
+            <button class="color-btn" style="background: #FF4500;" onclick="changePantsColor('#FF4500')"></button>
+            <button class="color-btn" style="background: #4B0082;" onclick="changePantsColor('#4B0082')"></button>
+            <button class="color-btn" style="background: #696969;" onclick="changePantsColor('#696969')"></button>
+            <button class="color-btn" style="background: #DC143C;" onclick="changePantsColor('#DC143C')"></button>
         </div>
-        <div class="customization-section">
-            <h3>Color de Zapatos</h3>
-            <div id="shoes-colors"></div>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #FFD700;">Color de Zapatos</h3>
+            <button class="color-btn" style="background: #000000;" onclick="changeShoesColor('#000000')"></button>
+            <button class="color-btn" style="background: #8B4513;" onclick="changeShoesColor('#8B4513')"></button>
+            <button class="color-btn" style="background: #000080;" onclick="changeShoesColor('#000080')"></button>
+            <button class="color-btn" style="background: #228B22;" onclick="changeShoesColor('#228B22')"></button>
+            <button class="color-btn" style="background: #FF4500;" onclick="changeShoesColor('#FF4500')"></button>
+            <button class="color-btn" style="background: #4B0082;" onclick="changeShoesColor('#4B0082')"></button>
+            <button class="color-btn" style="background: #696969;" onclick="changeShoesColor('#696969')"></button>
+            <button class="color-btn" style="background: #DC143C;" onclick="changeShoesColor('#DC143C')"></button>
         </div>
-    </div>
-    
-    <div id="alias-prompt">
-        <h2 style="color: #fff; margin-bottom: 20px;">Bienvenido al Centro Comercial Virtual</h2>
-        <input type="text" id="alias-input" placeholder="Escribe tu alias (máx. 18 caracteres)" maxlength="18">
-        <button id="alias-submit">Comenzar</button>
-    </div>
-    
-    <div id="instructions">
-        WASD: Mover | Click: Interactuar | 💬: Chat | 👤: Personalizar
     </div>
 
     <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, push, onValue, remove, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
+        import { getDatabase, ref, set, push, onValue, onChildAdded, remove } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
 
-        // Firebase configuration
+        // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyBqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqX",
-            authDomain: "3d-mall-chat.firebaseapp.com",
-            databaseURL: "https://3d-mall-chat-default-rtdb.firebaseio.com",
-            projectId: "3d-mall-chat",
-            storageBucket: "3d-mall-chat.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdefghijklmnop"
+            apiKey: "AIzaSyDjPYZJeoLgisI3KZyA6_0OwmH_UESGR14",
+            authDomain: "ccapp-b8301.firebaseapp.com",
+            projectId: "ccapp-b8301",
+            storageBucket: "ccapp-b8301.firebasestorage.app",
+            messagingSenderId: "622692105172",
+            appId: "1:622692105172:web:dceecda5e2a54630d4b441",
+            measurementId: "G-5DW5PB2RB6",
+            databaseURL: "https://ccapp-b8301-default-rtdb.firebaseio.com"
         };
 
-        // Initialize Firebase
+        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        // References
-        const messagesRef = ref(db, 'messages');
-        const usersRef = ref(db, 'users');
-        const positionsRef = ref(db, 'positions');
 
         // Variables globales
         let currentUser = null;
         let isConnected = false;
-        let scene, camera, renderer, controls, avatar;
-        let userAvatars = new Map();
+        let scene, camera, renderer, controls;
+        let avatar;
+        let otherAvatars = new Map();
 
-        // Enlaces de las tiendas
-        const originalStoreLinks = [
-            'https://ipweb.com',
-            'https://ipgold.com',
-            'https://surfe.com',
-            'https://sproutgigs.com',
-            'https://adbtc.com',
-            'https://coinpayu.com',
-            'https://surfio.com',
-            'https://serfclick.com',
-            'https://faucetcrypto.com',
-            'https://earnbitmoon.com',
-            'https://viefaucet.com',
-            'https://simplebits.com',
-            'https://tap-coin.com',
-            'https://btcadspace.com',
-            'https://trustdice.com',
-            'https://cointiply.com',
-            'https://autofaucet.com',
-            'https://freebitco.in',
-            'https://faucetpay.io',
-            'https://honeygain.com',
-            'https://pawns.app',
-            'https://teaserfast.com',
-            'https://addonmoney.com',
-            'https://everve.net',
-            'https://swashapp.com',
-            'https://addslice.com',
-            'https://earnapp.com',
-            'https://optimai.com',
-            'https://teneo.com',
-            'https://nodepay.com',
-            'https://jumptask.com',
-            'https://payeer.com',
-            'https://rollercoin.com',
-            'https://buxmoney.com',
-            'https://swagbucks.com',
-            'https://grass.com',
-            'https://app.getgrass.io',
-            'https://freecash.com',
-            'https://binance.com',
-            'https://paidwork.com',
-            'https://bybit.com',
-            'https://givvymusic.com',
-            'https://givvystream.com',
-            'https://swcapp.com'
-        ];
+        // Referencias a la base de datos
+        const usersRef = ref(db, 'users');
+        const messagesRef = ref(db, 'messages');
+        const positionsRef = ref(db, 'positions');
 
-        // Mapeo de dominios a nombres de archivo de logos
-        const domainToLogoMap = {
-            'ipweb': 'ipweb-logo.png',
-            'ipgold': 'ipgold-logo.png',
-            'surfe': 'surfe-logo.png',
-            'sproutgigs': 'sproutgigs-logo.png',
-            'adbtc': 'adbtc-logo.png',
-            'coinpayu': 'coinpayu-logo.png',
-            'surfio': 'surfio-logo.png',
-            'serfclick': 'serfclick-logo.png',
-            'faucetcrypto': 'faucetcrypto-logo.png',
-            'earnbitmoon': 'earnbitmoon-logo.png',
-            'viefaucet': 'viefaucet-logo.png',
-            'simplebits': 'simplebits-logo.png',
-            'tap-coin': 'tapcoin-logo.png',
-            'btcadspace': 'btcadspace-logo.png',
-            'trustdice': 'trustdice-logo.png',
-            'cointiply': 'cointiply-logo.png',
-            'autofaucet': 'autofaucet-logo.png',
-            'freebitco': 'freebitcoin-logo.png',
-            'faucetpay': 'faucetpay-logo.png',
-            'honeygain': 'honeygain-logo.png',
-            'pawns': 'pawns-logo.png',
-            'teaserfast': 'teaserfast-logo.png',
-            'addon': 'addonmoney-logo.png',
-            'everve': 'everve-logo.png',
-            'swashapp': 'swash-logo.png',
-            'addslice': 'addslice-logo.png',
-            'earnapp': 'earnapp-logo.png',
-            'optimai': 'optimai-logo.png',
-            'teneo': 'teneo-logo.png',
-            'nodepay': 'nodepay-logo.png',
-            'jumptask': 'jumptask-logo.png',
-            'payeer': 'payeer-logo.png',
-            'rollercoin': 'rollercoin-logo.png',
-            'bux': 'buxmoney-logo.png',
-            'swagbucks': 'swagbucks-logo.png',
-            'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png',
-            'freecash': 'freecash-logo.png',
-            'binance': 'binance-logo.png',
-            'paidwork': 'paidwork-logo.png',
-            'bybit': 'bybit-logo.png',
-            'givvyMusic': 'givvymusic-logo.png',
-            'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png',
-            'swcapp': 'swcapp-logo.png',
-            'app-earnings-link': 'givvystream-logo.png'
+        // Función para conectar al chat
+        window.connectToChat = function() {
+            const alias = document.getElementById('alias-input').value.trim();
+            if (!alias || alias.length === 0) {
+                alert('Por favor ingresa un alias válido');
+                return;
+            }
+            
+            currentUser = {
+                alias: alias,
+                position: { x: 25, y: 1.6, z: 25 },
+                floor: 0,
+                rotation: 0,
+                timestamp: Date.now()
+            };
+            
+            // Guardar usuario en Firebase
+            set(ref(db, `users/${currentUser.alias}`), currentUser);
+            
+            // Escuchar cambios en usuarios
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val() || {};
+                updateUsersList(Object.values(users));
+            });
+            
+            // Escuchar mensajes
+            onChildAdded(messagesRef, (snapshot) => {
+                const message = snapshot.val();
+                if (message.alias !== currentUser.alias) {
+                    addMessageToChat(message.alias, message.message, 'user');
+                }
+            });
+            
+            // Escuchar posiciones
+            onValue(positionsRef, (snapshot) => {
+                const positions = snapshot.val() || {};
+                Object.keys(positions).forEach(alias => {
+                    if (alias !== currentUser.alias) {
+                        const userData = positions[alias];
+                        updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                    }
+                });
+            });
+            
+            isConnected = true;
+            document.getElementById('alias-prompt').style.display = 'none';
+            document.getElementById('connection-status').textContent = 'Conectado';
+            document.getElementById('connection-status').className = 'connected';
+            
+            console.log('Conectado al chat como:', currentUser.alias);
+            
+            // Inicializar Three.js
+            initThreeJS();
         };
 
-        // Duplicar los enlaces para asegurar que hay suficientes
-        const storeLinks = [];
-        for (let i = 0; i < 5; i++) {
-            storeLinks.push(...originalStoreLinks);
+        // Función para enviar mensaje
+        window.sendMessage = function() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!isConnected || !currentUser || !message) return;
+            
+            const messageData = {
+                alias: currentUser.alias,
+                message: message,
+                timestamp: Date.now()
+            };
+            
+            push(messagesRef, messageData);
+            addMessageToChat(currentUser.alias, message, 'own');
+            input.value = '';
+        };
+
+        // Función para enviar posición
+        function sendPosition(position, floor, rotation) {
+            if (!isConnected || !currentUser) return;
+            
+            const positionData = {
+                position: position,
+                floor: floor,
+                rotation: rotation,
+                timestamp: Date.now()
+            };
+            
+            set(ref(db, `positions/${currentUser.alias}`), positionData);
         }
 
-        // Cache para texturas de logos
-        const logoTextureCache = new Map();
-        
-        function getLogoTexture(domain) {
-            const logoFileName = domainToLogoMap[domain];
-            if (!logoFileName) {
-                return null;
+        // Función para desconectar
+        function disconnectFromChat() {
+            if (currentUser) {
+                remove(ref(db, `users/${currentUser.alias}`));
+                remove(ref(db, `positions/${currentUser.alias}`));
+                currentUser = null;
             }
-            
-            // Verificar si ya está en cache
-            if (logoTextureCache.has(domain)) {
-                return logoTextureCache.get(domain);
-            }
-            
-            try {
-                const textureLoader = new THREE.TextureLoader();
-                const texture = textureLoader.load(
-                    `assets/images/${logoFileName}`,
-                    // onLoad callback
-                    function(loadedTexture) {
-                        console.log(`Logo cargado exitosamente: ${logoFileName}`);
-                    },
-                    // onProgress callback
-                    function(xhr) {
-                        // Silenciar progreso para evitar spam
-                    },
-                    // onError callback
-                    function(error) {
-                        console.error(`Error cargando logo ${logoFileName}:`, error);
-                        // Remover del cache si falla
-                        logoTextureCache.delete(domain);
+            isConnected = false;
+        }
+
+        // Función para actualizar lista de usuarios
+        function updateUsersList(users) {
+            const usersList = document.getElementById('users-list');
+            if (usersList) {
+                usersList.innerHTML = '';
+                users.forEach(user => {
+                    if (user.alias !== currentUser?.alias) {
+                        const userElement = document.createElement('div');
+                        userElement.className = 'user-item';
+                        userElement.textContent = user.alias;
+                        usersList.appendChild(userElement);
                     }
-                );
-                
-                // Guardar en cache
-                logoTextureCache.set(domain, texture);
-                return texture;
-            } catch (error) {
-                console.error(`Error creando textura para ${domain}:`, error);
-                return null;
+                });
             }
         }
 
-        function updateImagePlane(plane, url, text, colorIdx) {
-            try {
-                let domain = new URL(url).hostname.replace('www.', '');
-                // Extraer el dominio principal (sin subdominios)
-                const domainParts = domain.split('.');
-                if (domainParts.length > 2) {
-                    domain = domainParts[1];
-                } else {
-                    domain = domainParts[0];
-                }
-                
-                const logoTexture = getLogoTexture(domain);
-                
-                if (plane.material.map) {
-                    plane.material.map.dispose();
-                }
-                
-                if (logoTexture) {
-                    plane.material.map = logoTexture;
-                } else {
-                    // Fallback a la textura generada si no hay logo
-                    const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                    plane.material.map = texture;
-                }
-                
-                plane.material.needsUpdate = true;
-            } catch (error) {
-                console.error('Error en updateImagePlane:', error);
-                // Fallback seguro
-                if (plane.material.map) {
-                    plane.material.map.dispose();
-                }
-                const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                plane.material.map = texture;
-                plane.material.needsUpdate = true;
+        // Función para agregar mensaje al chat
+        function addMessageToChat(alias, message, type) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            
+            if (type === 'system') {
+                messageElement.textContent = message;
+            } else {
+                messageElement.textContent = `${alias}: ${message}`;
+            }
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Función para actualizar posición de avatar
+        function updateAvatarPosition(alias, position, floor, rotation) {
+            if (!otherAvatars.has(alias)) {
+                // Crear nuevo avatar
+                const avatarGeometry = new THREE.BoxGeometry(1, 2, 1);
+                const avatarMaterial = new THREE.MeshBasicMaterial({ color: 0x888888 });
+                const newAvatar = new THREE.Mesh(avatarGeometry, avatarMaterial);
+                newAvatar.position.set(position.x, position.y, position.z);
+                scene.add(newAvatar);
+                otherAvatars.set(alias, newAvatar);
+            } else {
+                // Actualizar posición existente
+                const existingAvatar = otherAvatars.get(alias);
+                existingAvatar.position.set(position.x, position.y, position.z);
+                existingAvatar.rotation.y = rotation;
             }
         }
-
-        // Cache de materiales para reutilización
-        const materialCache = new Map();
-        const textureCache = new Map();
-
-        function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
-            const key = `${color}-${roughness}-${metalness}`;
-            if (!materialCache.has(key)) {
-                materialCache.set(key, new THREE.MeshStandardMaterial({ 
-                    color, 
-                    roughness, 
-                    metalness 
-                }));
-            }
-            return materialCache.get(key);
-        }
-
-        function getCachedTexture(text, colorIdx, width, height) {
-            const key = `${text}-${colorIdx}-${width}-${height}`;
-            if (!textureCache.has(key)) {
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                const canvasW = Math.min(512, width * 64);
-                const canvasH = Math.min(512, height * 64);
-                canvas.width = canvasW;
-                canvas.height = canvasH;
-                
-                context.fillStyle = `hsl(${colorIdx * 47 % 360}, 60%, 50%)`;
-                context.fillRect(0, 0, canvasW, canvasH);
-                
-                context.font = `bold ${canvasH * 0.3}px Arial`;
-                context.fillStyle = 'white';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillText(text.charAt(0).toUpperCase() + text.slice(1), canvasW / 2, canvasH / 2);
-
-                const texture = new THREE.CanvasTexture(canvas);
-                textureCache.set(key, texture);
-            }
-            return textureCache.get(key);
-        }
-
-        function createImagePlane(url, text, width, height, colorIdx, solid) {
-            const plane = new THREE.Mesh(
-                new THREE.PlaneGeometry(width, height),
-                new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0.2, transparent: !solid })
-            );
-            plane.userData.URL = url;
-            updateImagePlane(plane, url, text, colorIdx, solid);
-            return plane;
-        }
-
-        // Elementos del DOM
-        const chatToggleBtn = document.getElementById('chat-toggle-btn');
-        const chatPanel = document.getElementById('chat-panel');
-        const chatCloseBtn = document.getElementById('chat-close-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatSendBtn = document.getElementById('chat-send-btn');
-        const aliasPrompt = document.getElementById('alias-prompt');
-        const aliasInput = document.getElementById('alias-input');
-        const aliasSubmit = document.getElementById('alias-submit');
-        const usersList = document.getElementById('users-list');
-        const emojiToggle = document.getElementById('emoji-toggle');
-        const emojiPanel = document.getElementById('emoji-panel');
-        const customizationToggle = document.getElementById('customization-toggle');
-        const customizationPanel = document.getElementById('customization-panel');
 
         // Event listeners
-        chatToggleBtn.addEventListener('click', () => {
-            chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+        document.getElementById('chat-toggle-btn').addEventListener('click', function() {
+            const panel = document.getElementById('chat-panel');
+            panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
         });
 
-        chatCloseBtn.addEventListener('click', () => {
-            chatPanel.style.display = 'none';
+        document.getElementById('chat-close-btn').addEventListener('click', function() {
+            document.getElementById('chat-panel').style.display = 'none';
         });
 
-        aliasSubmit.addEventListener('click', () => {
-            const alias = aliasInput.value.trim();
-            if (alias.length > 0 && alias.length <= 18) {
-                currentUser = alias;
-                aliasPrompt.style.display = 'none';
-                connectToChat();
-                initThreeJS();
-            }
+        document.getElementById('customization-btn').addEventListener('click', function() {
+            document.getElementById('customization-panel').style.display = 'block';
         });
 
-        aliasInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                aliasSubmit.click();
-            }
-        });
-
-        chatInput.addEventListener('keypress', (e) => {
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        chatSendBtn.addEventListener('click', sendMessage);
+        document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
 
-        emojiToggle.addEventListener('click', () => {
-            emojiPanel.style.display = emojiPanel.style.display === 'flex' ? 'none' : 'flex';
-        });
+        // Función para cerrar panel de personalización
+        window.closeCustomization = function() {
+            document.getElementById('customization-panel').style.display = 'none';
+        };
 
-        document.querySelectorAll('.emoji-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                chatInput.value += btn.textContent;
-                emojiPanel.style.display = 'none';
-                chatInput.focus();
-            });
-        });
-
-        customizationToggle.addEventListener('click', () => {
-            customizationPanel.style.display = customizationPanel.style.display === 'block' ? 'none' : 'block';
-        });
-
-        // Funciones de chat
-        function connectToChat() {
-            isConnected = true;
-            
-            // Agregar usuario a la lista
-            set(ref(db, `users/${currentUser}`), {
-                alias: currentUser,
-                timestamp: Date.now()
-            });
-
-            // Escuchar mensajes
-            onValue(messagesRef, (snapshot) => {
-                const messages = snapshot.val();
-                if (messages) {
-                    chatMessages.innerHTML = '';
-                    Object.values(messages).forEach(msg => {
-                        addMessageToChat(msg);
-                    });
-                }
-            });
-
-            // Escuchar usuarios
-            onValue(usersRef, (snapshot) => {
-                const users = snapshot.val();
-                if (users) {
-                    updateUsersList(Object.values(users));
-                }
-            });
-
-            // Escuchar posiciones
-            onValue(positionsRef, (snapshot) => {
-                const positions = snapshot.val();
-                if (positions) {
-                    updateUserPositions(positions);
-                }
-            });
-
-            // Enviar mensaje de bienvenida
-            addMessageToChat({
-                alias: 'Sistema',
-                message: `¡Bienvenido ${currentUser}! Usa WASD para moverte y haz clic en las tiendas para visitarlas.`,
-                timestamp: new Date().toLocaleTimeString(),
-                type: 'system'
-            });
-        }
-
-        function disconnectFromChat() {
-            if (currentUser) {
-                remove(ref(db, `users/${currentUser}`));
-                remove(ref(db, `positions/${currentUser}`));
-            }
-            isConnected = false;
-        }
-
-        function sendMessage() {
-            const message = chatInput.value.trim();
-            if (message.length > 0 && currentUser) {
-                const messageData = {
-                    alias: currentUser,
-                    message: message,
-                    timestamp: new Date().toLocaleTimeString()
-                };
-                
-                push(messagesRef, messageData);
-                chatInput.value = '';
-            }
-        }
-
-        function addMessageToChat(messageData) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            
-            if (messageData.type === 'system') {
-                messageDiv.classList.add('system-message');
-                messageDiv.innerHTML = `<span class="time">${messageData.timestamp}</span> ${messageData.message}`;
-            } else {
-                messageDiv.innerHTML = `
-                    <span class="alias">${messageData.alias}:</span>
-                    <span class="time">${messageData.timestamp}</span>
-                    <br>${messageData.message}
-                `;
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function updateUsersList(users) {
-            usersList.innerHTML = '';
-            users.forEach(user => {
-                if (user.alias !== currentUser) {
-                    const userDiv = document.createElement('div');
-                    userDiv.className = 'user-item';
-                    userDiv.textContent = user.alias;
-                    usersList.appendChild(userDiv);
-                }
-            });
-        }
-
-        function sendPosition(position, floor, rotation) {
-            if (currentUser) {
-                set(ref(db, `positions/${currentUser}`), {
-                    alias: currentUser,
-                    position: {
-                        x: position.x,
-                        y: position.y,
-                        z: position.z
-                    },
-                    floor: floor,
-                    rotation: rotation,
-                    timestamp: Date.now()
-                });
-            }
-        }
-
-        function updateUserPositions(positions) {
-            Object.values(positions).forEach(userData => {
-                if (userData.alias !== currentUser) {
-                    let userAvatar = userAvatars.get(userData.alias);
-                    
-                    if (!userAvatar) {
-                        userAvatar = createUserAvatar(userData.alias);
-                        userAvatars.set(userData.alias, userAvatar);
-                        scene.add(userAvatar);
-                    }
-                    
-                    userAvatar.position.set(userData.position.x, userData.position.y, userData.position.z);
-                    userAvatar.rotation.y = userData.rotation || 0;
-                }
-            });
-        }
-
-        function createUserAvatar(alias) {
-            const avatarGroup = new THREE.Group();
-            
-            // Cabeza
-            const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-            const headMaterial = new THREE.MeshBasicMaterial({ color: 0xFFDBAC });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.y = 1.8;
-            avatarGroup.add(head);
-
-            // Torso
-            const torsoGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
-            const torsoMaterial = new THREE.MeshBasicMaterial({ color: 0x4ECDC4 });
-            const torso = new THREE.Mesh(torsoGeometry, torsoMaterial);
-            torso.position.y = 1.1;
-            avatarGroup.add(torso);
-
-            // Piernas
-            const legsGeometry = new THREE.BoxGeometry(0.8, 1.2, 0.5);
-            const legsMaterial = new THREE.MeshBasicMaterial({ color: 0x2C3E50 });
-            const legs = new THREE.Mesh(legsGeometry, legsMaterial);
-            legs.position.y = 0.2;
-            avatarGroup.add(legs);
-
-            // Pies
-            const feetGeometry = new THREE.BoxGeometry(0.8, 0.3, 1);
-            const feetMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-            const feet = new THREE.Mesh(feetGeometry, feetMaterial);
-            feet.position.y = -0.4;
-            avatarGroup.add(feet);
-
-            return avatarGroup;
-        }
-
-        // Funciones de cambio de color
+        // Funciones de cambio de color (se implementarán con Three.js)
         window.changeShirtColor = function(color) {
+            if (avatar && avatar.children[0]) {
+                avatar.children[0].material.color.setHex(parseInt(color.replace('#', '0x')));
+            }
+        };
+
+        window.changePantsColor = function(color) {
             if (avatar && avatar.children[1]) {
                 avatar.children[1].material.color.setHex(parseInt(color.replace('#', '0x')));
             }
         };
 
-        window.changePantsColor = function(color) {
+        window.changeShoesColor = function(color) {
             if (avatar && avatar.children[2]) {
                 avatar.children[2].material.color.setHex(parseInt(color.replace('#', '0x')));
-            }
-        };
-
-        window.changeShoesColor = function(color) {
-            if (avatar && avatar.children[3]) {
-                avatar.children[3].material.color.setHex(parseInt(color.replace('#', '0x')));
             }
         };
 
@@ -986,10 +666,14 @@
             westWall.position.set(-50, 5, 0);
             scene.add(westWall);
 
-            // Crear tiendas con logos
+            // Tiendas (cubos simples con colores variados)
+            const storeColors = [0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD, 0x98D8C8, 0xF7DC6F];
+            
             for (let i = 0; i < 20; i++) {
                 const storeGeometry = new THREE.BoxGeometry(8, 6, 8);
-                const storeMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+                const storeMaterial = new THREE.MeshBasicMaterial({ 
+                    color: storeColors[i % storeColors.length]
+                });
                 const store = new THREE.Mesh(storeGeometry, storeMaterial);
                 
                 const angle = (i / 20) * Math.PI * 2;
@@ -1000,22 +684,6 @@
                     Math.sin(angle) * radius
                 );
                 scene.add(store);
-
-                // Agregar logo en la parte frontal de la tienda
-                if (i < storeLinks.length) {
-                    const url = storeLinks[i];
-                    const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
-                    const logoPlane = createImagePlane(url, domain, 6, 4, i, false);
-                    
-                    // Posicionar el logo en la parte frontal de la tienda
-                    logoPlane.position.set(
-                        Math.cos(angle) * radius,
-                        3,
-                        Math.sin(angle) * radius + 4.1
-                    );
-                    logoPlane.rotation.y = angle;
-                    scene.add(logoPlane);
-                }
             }
 
             // Cubo central con pantallas
@@ -1065,21 +733,21 @@
 
             // Torso (camisa)
             const torsoGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
-            const torsoMaterial = new THREE.MeshBasicMaterial({ color: 0x4ECDC4 });
+            const torsoMaterial = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
             const torso = new THREE.Mesh(torsoGeometry, torsoMaterial);
             torso.position.y = 1.1;
             avatar.add(torso);
 
             // Piernas (pantalones)
             const legsGeometry = new THREE.BoxGeometry(0.8, 1.2, 0.5);
-            const legsMaterial = new THREE.MeshBasicMaterial({ color: 0x2C3E50 });
+            const legsMaterial = new THREE.MeshBasicMaterial({ color: 0x000080 });
             const legs = new THREE.Mesh(legsGeometry, legsMaterial);
             legs.position.y = 0.2;
             avatar.add(legs);
 
             // Pies (zapatos)
             const feetGeometry = new THREE.BoxGeometry(0.8, 0.3, 1);
-            const feetMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+            const feetMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
             const feet = new THREE.Mesh(feetGeometry, feetMaterial);
             feet.position.y = -0.4;
             avatar.add(feet);
@@ -1117,6 +785,11 @@
         window.addEventListener('beforeunload', function() {
             disconnectFromChat();
         });
+
+        // Limpiar mensajes antiguos cada 5 minutos
+        setInterval(() => {
+            // Implementar limpieza de mensajes antiguos
+        }, 5 * 60 * 1000);
 
         // Limpiar usuarios desconectados cada 10 segundos
         setInterval(() => {
