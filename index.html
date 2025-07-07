@@ -626,11 +626,13 @@
             transform: translate(-50%, -50%);
             cursor: pointer;
             touch-action: none;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .joystick-stick:active {
             background: rgba(255, 215, 0, 1);
+            transform: scale(1.1);
         }
         
         .camera-controls {
@@ -951,14 +953,14 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
             'bybit': 'bybit-logo.png',
             'givvyMusic': 'givvymusic-logo.png',
             'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png', // Usar givvystream como fallback
+            'givvyScratchCardNew': 'givvystream-logo.png", // Usar givvystream como fallback
             'swcapp': 'swcapp-logo.png',
             'app-earnings-link': 'givvystream-logo.png' // Agregar alias para app-earnings-link.com
         };
@@ -2662,6 +2664,12 @@
             }
             
             updateMovement();
+            
+            // Actualizar movimiento móvil si está activo
+            if (isMobile()) {
+                updateMobileMovement();
+            }
+            
             updateAvatarPositions(); // Actualizar posiciones de avatares
             
             // Enviar posición del usuario cada 100ms (10 veces por segundo)
@@ -4105,7 +4113,13 @@
             const joystickStick = document.getElementById('joystick-stick');
             const cameraArea = document.getElementById('camera-area');
             
-            if (!joystickContainer || !joystickStick || !cameraArea) return;
+            if (!joystickContainer || !joystickStick || !cameraArea) {
+                console.log('Controles móviles no encontrados, reintentando...');
+                setTimeout(initMobileControls, 100);
+                return;
+            }
+            
+            console.log('Inicializando controles móviles...');
             
             // Configurar joystick
             joystickContainer.addEventListener('touchstart', handleJoystickStart, { passive: false });
@@ -4121,13 +4135,16 @@
             const rect = joystickContainer.getBoundingClientRect();
             joystickCenter.x = rect.width / 2;
             joystickCenter.y = rect.height / 2;
+            
+            console.log('Controles móviles inicializados correctamente');
         }
         
         function handleJoystickStart(e) {
             e.preventDefault();
             joystickActive = true;
             const touch = e.touches[0];
-            const rect = e.target.getBoundingClientRect();
+            const joystickContainer = document.getElementById('joystick-container');
+            const rect = joystickContainer.getBoundingClientRect();
             joystickPosition.x = touch.clientX - rect.left;
             joystickPosition.y = touch.clientY - rect.top;
             updateJoystickPosition();
@@ -4137,7 +4154,8 @@
             if (!joystickActive) return;
             e.preventDefault();
             const touch = e.touches[0];
-            const rect = e.target.getBoundingClientRect();
+            const joystickContainer = document.getElementById('joystick-container');
+            const rect = joystickContainer.getBoundingClientRect();
             joystickPosition.x = touch.clientX - rect.left;
             joystickPosition.y = touch.clientY - rect.top;
             updateJoystickPosition();
@@ -4166,8 +4184,19 @@
                 joystickPosition.y = joystickCenter.y + Math.sin(angle) * joystickMaxDistance;
             }
             
-            // Actualizar posición visual del stick
-            joystickStick.style.transform = `translate(${joystickPosition.x - 25}px, ${joystickPosition.y - 25}px)`;
+            // Actualizar posición visual del stick (centrado en el stick de 50px)
+            const stickX = joystickPosition.x - 25;
+            const stickY = joystickPosition.y - 25;
+            joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+            
+            // Efecto visual cuando está activo
+            if (joystickActive && distance > 5) {
+                joystickStick.style.background = 'rgba(255, 215, 0, 1)';
+                joystickStick.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.4)';
+            } else {
+                joystickStick.style.background = 'rgba(255, 215, 0, 0.8)';
+                joystickStick.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+            }
         }
         
         function handleCameraStart(e) {
@@ -4185,13 +4214,13 @@
             const dx = touch.clientX - cameraLastX;
             const dy = touch.clientY - cameraLastY;
             
-            // Rotar cámara horizontalmente
-            targetRotationY -= dx * 0.01;
+            // Rotar cámara horizontalmente (más suave)
+            targetRotationY -= dx * 0.005;
             
-            // Inclinar cámara verticalmente (limitado)
+            // Inclinar cámara verticalmente (limitado y más suave)
             const currentPitch = camera.rotation.x;
-            const newPitch = currentPitch - dy * 0.005;
-            camera.rotation.x = Math.max(-0.5, Math.min(0.5, newPitch));
+            const newPitch = currentPitch - dy * 0.003;
+            camera.rotation.x = Math.max(-0.3, Math.min(0.3, newPitch));
             
             cameraLastX = touch.clientX;
             cameraLastY = touch.clientY;
@@ -4241,7 +4270,13 @@
                 // Verificar colisiones
                 const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
                 let collision = false;
-                const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
+                
+                // Solo verificar colisiones cercanas para mejor rendimiento
+                const nearbyCollisions = collisionObjects.filter(wallBox => {
+                    const wallCenter = wallBox.getCenter(new THREE.Vector3());
+                    return wallCenter.distanceTo(newPosition) < 20;
+                });
+                
                 for (const wallBox of nearbyCollisions) {
                     if (playerBox.intersectsBox(wallBox)) {
                         collision = true;
@@ -4261,15 +4296,9 @@
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initMobileControls);
             } else {
-                initMobileControls();
+                // Pequeño delay para asegurar que los elementos estén disponibles
+                setTimeout(initMobileControls, 100);
             }
-            
-            // Modificar la función de animación para incluir movimiento móvil
-            const originalAnimate = animate;
-            animate = function() {
-                updateMobileMovement();
-                originalAnimate();
-            };
         }
     </script>
 </body>
