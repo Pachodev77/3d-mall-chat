@@ -834,14 +834,14 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
             'bybit': 'bybit-logo.png',
             'givvyMusic': 'givvymusic-logo.png',
             'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png', // Usar givvystream como fallback
+            'givvyScratchCardNew': 'givvystream-logo.png", // Usar givvystream como fallback
             'swcapp': 'swcapp-logo.png',
             'app-earnings-link': 'givvystream-logo.png' // Agregar alias para app-earnings-link.com
         };
@@ -2760,7 +2760,15 @@
             console.log('Cambiando color de camisa a:', color);
             shirtColor = color;
             currentCustomization.shirtColor = color;
-            updateAvatarPreview();
+            
+            // Actualizar el avatar en tiempo real
+            const avatar = userAvatars.get(userAlias);
+            if (avatar && avatar.bodyMaterial) {
+                avatar.bodyMaterial.color.setHex(color);
+                avatar.bodyMaterial.needsUpdate = true;
+            }
+            
+            // Actualizar selección visual en los botones
             updateColorButtonSelection('shirt', color);
         }
         
@@ -2801,14 +2809,30 @@
         }
         
         function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior
-            document.querySelectorAll('.color-btn').forEach(btn => {
+            // Remover selección anterior del tipo específico
+            let selector = '';
+            switch (type) {
+                case 'shirt':
+                    selector = '#shirt-colors .color-btn';
+                    break;
+                case 'pants':
+                    selector = '#pants-colors .color-btn';
+                    break;
+                case 'shoes':
+                    selector = '#shoes-colors .color-btn';
+                    break;
+                default:
+                    return;
+            }
+            
+            document.querySelectorAll(selector).forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
             });
             
             // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
+            const selectedBtn = document.querySelector(`${selector}[data-color="${selectedColor}"]`);
             if (selectedBtn) {
                 selectedBtn.style.borderColor = '#FFD700';
                 selectedBtn.style.transform = 'scale(1.1)';
@@ -2950,8 +2974,107 @@
             console.log('✅ Personalización guardada:', customizationData);
         }
         
+        function populateColorGrids() {
+            console.log('Poblando grids de colores...');
+            
+            // Poblar colores de camisas (primeros 18 colores)
+            const shirtGrid = document.getElementById('shirt-colors');
+            if (shirtGrid) {
+                shirtGrid.innerHTML = '';
+                for (let i = 0; i < 18; i++) {
+                    const colorBtn = document.createElement('div');
+                    colorBtn.className = 'color-btn';
+                    colorBtn.style.cssText = `
+                        width: 30px;
+                        height: 30px;
+                        border: 2px solid transparent;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                        margin: 2px;
+                        transition: all 0.2s ease;
+                    `;
+                    colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.onclick = () => changeShirtColor(customizationColors[i]);
+                    
+                    // Marcar color actual
+                    if (customizationColors[i] === currentCustomization.shirtColor) {
+                        colorBtn.style.borderColor = '#FFD700';
+                        colorBtn.style.transform = 'scale(1.1)';
+                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                    }
+                    
+                    shirtGrid.appendChild(colorBtn);
+                }
+            }
+            
+            // Poblar colores de pantalones (siguientes 18 colores)
+            const pantsGrid = document.getElementById('pants-colors');
+            if (pantsGrid) {
+                pantsGrid.innerHTML = '';
+                for (let i = 18; i < 36; i++) {
+                    const colorBtn = document.createElement('div');
+                    colorBtn.className = 'color-btn';
+                    colorBtn.style.cssText = `
+                        width: 30px;
+                        height: 30px;
+                        border: 2px solid transparent;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                        margin: 2px;
+                        transition: all 0.2s ease;
+                    `;
+                    colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.onclick = () => changePantsColor(customizationColors[i]);
+                    
+                    // Marcar color actual
+                    if (customizationColors[i] === currentCustomization.pantsColor) {
+                        colorBtn.style.borderColor = '#FFD700';
+                        colorBtn.style.transform = 'scale(1.1)';
+                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                    }
+                    
+                    pantsGrid.appendChild(colorBtn);
+                }
+            }
+            
+            // Poblar colores de zapatos (últimos 18 colores)
+            const shoesGrid = document.getElementById('shoes-colors');
+            if (shoesGrid) {
+                shoesGrid.innerHTML = '';
+                for (let i = 36; i < 54; i++) {
+                    const colorBtn = document.createElement('div');
+                    colorBtn.className = 'color-btn';
+                    colorBtn.style.cssText = `
+                        width: 30px;
+                        height: 30px;
+                        border: 2px solid transparent;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                        margin: 2px;
+                        transition: all 0.2s ease;
+                    `;
+                    colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.onclick = () => changeShoesColor(customizationColors[i]);
+                    
+                    // Marcar color actual
+                    if (customizationColors[i] === currentCustomization.shoesColor) {
+                        colorBtn.style.borderColor = '#FFD700';
+                        colorBtn.style.transform = 'scale(1.1)';
+                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                    }
+                    
+                    shoesGrid.appendChild(colorBtn);
+                }
+            }
+            
+            console.log('✅ Grids de colores poblados');
+        }
+
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorado');
+            console.log('Abriendo panel de personalización completo');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2959,33 +3082,22 @@
                 chatOpen = false;
             }
             
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
+            const customizationPanel = document.getElementById('customization-panel');
+            if (customizationPanel) {
                 // Actualizar el alias actual
-                const currentAliasElement = document.getElementById('current-alias');
-                const aliasInput = document.getElementById('simple-alias-input');
-                
-                if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin nombre';
-                }
-                
+                const aliasInput = document.getElementById('customization-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
                 }
                 
+                // Poblar los grids de colores
+                populateColorGrids();
+                
                 // Mostrar el panel
-                simplePanel.style.display = 'flex';
+                customizationPanel.style.display = 'block';
                 customizationPanelOpen = true;
                 
-                // Inicializar vista previa del avatar
-                updateAvatarPreview();
-                
-                // Marcar colores actuales en los botones
-                updateColorButtonSelection('shirt', shirtColor);
-                updateColorButtonSelection('pants', pantsColor);
-                updateColorButtonSelection('shoes', shoesColor);
-                
-                console.log('✅ Panel de personalización mejorado mostrado');
+                console.log('✅ Panel de personalización completo mostrado');
                 
                 // Mostrar overlay
                 const overlay = document.getElementById('ui-overlay');
@@ -2994,7 +3106,98 @@
                     overlay.style.pointerEvents = 'auto';
                     overlay.style.zIndex = '1002';
                 }
+            } else {
+                console.log('❌ Panel de personalización no encontrado');
             }
+        }
+        
+        function closeCustomizationPanel() {
+            const panel = document.getElementById('customization-panel');
+            if (panel) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                
+                // Ocultar overlay
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.pointerEvents = 'none';
+                    overlay.style.zIndex = '999';
+                }
+                
+                console.log('Panel de personalización completo cerrado');
+            }
+        }
+        
+        function saveCustomization() {
+            const aliasInput = document.getElementById('customization-alias-input');
+            const newAlias = aliasInput.value.trim();
+            
+            if (newAlias.length > 0) {
+                userAlias = newAlias;
+                localStorage.setItem('userAlias', userAlias);
+                
+                if (isConnected) {
+                    sendAlias();
+                }
+                
+                console.log('Alias guardado:', newAlias);
+            }
+            
+            // Guardar personalización en localStorage
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            
+            // Aplicar cambios al avatar actual
+            applyCustomizationToAvatar();
+            
+            closeCustomizationPanel();
+            alert('¡Personalización guardada!');
+        }
+        
+        function resetCustomization() {
+            // Restablecer colores por defecto
+            currentCustomization.shirtColor = 0x4ECDC4;
+            currentCustomization.pantsColor = 0x2C3E50;
+            currentCustomization.shoesColor = 0x8B4513;
+            
+            // Restablecer alias
+            userAlias = '';
+            const aliasInput = document.getElementById('customization-alias-input');
+            if (aliasInput) {
+                aliasInput.value = '';
+            }
+            
+            // Aplicar cambios al avatar
+            applyCustomizationToAvatar();
+            
+            // Repoblar grids de colores con selección actualizada
+            populateColorGrids();
+            
+            console.log('Personalización restablecida');
+        }
+        
+        function applyCustomizationToAvatar() {
+            // Aplicar colores al avatar actual
+            const avatar = userAvatars.get(userAlias);
+            if (avatar) {
+                if (avatar.bodyMaterial) {
+                    avatar.bodyMaterial.color.setHex(currentCustomization.shirtColor);
+                    avatar.bodyMaterial.needsUpdate = true;
+                }
+                if (avatar.pantsMaterial) {
+                    avatar.pantsMaterial.color.setHex(currentCustomization.pantsColor);
+                    avatar.pantsMaterial.needsUpdate = true;
+                }
+                if (avatar.shoeMaterial) {
+                    avatar.shoeMaterial.color.setHex(currentCustomization.shoesColor);
+                    avatar.shoeMaterial.needsUpdate = true;
+                }
+            }
+            
+            // Actualizar variables globales
+            shirtColor = currentCustomization.shirtColor;
+            pantsColor = currentCustomization.pantsColor;
+            shoesColor = currentCustomization.shoesColor;
         }
         
         function closeSimplePanel() {
@@ -3488,6 +3691,23 @@
                     e.preventDefault();
                     return false;
                 });
+            }
+            
+            // Configurar event listeners para el panel de personalización completo
+            const customizationCloseBtn = document.getElementById('customization-close-btn');
+            const saveCustomizationBtn = document.getElementById('save-customization-btn');
+            const resetCustomizationBtn = document.getElementById('reset-customization-btn');
+            
+            if (customizationCloseBtn) {
+                customizationCloseBtn.addEventListener('click', closeCustomizationPanel);
+            }
+            
+            if (saveCustomizationBtn) {
+                saveCustomizationBtn.addEventListener('click', saveCustomization);
+            }
+            
+            if (resetCustomizationBtn) {
+                resetCustomizationBtn.addEventListener('click', resetCustomization);
             }
         });
 
