@@ -2807,9 +2807,15 @@
             userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
             localStorage.setItem('userAlias', userAlias);
         }
-        if (userAlias) {
+        
+        // Mostrar el botón de personalización
+        if (changeAliasBtn && userAlias) {
             changeAliasBtn.style.display = 'flex';
+            console.log('Botón de personalización mostrado');
+        } else {
+            console.error('No se pudo mostrar el botón de personalización');
         }
+        
         connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
@@ -3330,23 +3336,7 @@
             shoesColor = currentCustomization.shoesColor;
         }
         
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            if (panel) {
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                
-                // Ocultar overlay
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.style.pointerEvents = 'none';
-                    overlay.style.zIndex = '999';
-                }
-                
-                console.log('Panel de personalización cerrado');
-            }
-        }
+
         
         // Event listeners para actualización en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
@@ -3371,13 +3361,14 @@
             if (panel) {
                 panel.style.display = 'none';
                 customizationPanelOpen = false;
-                            // Ocultar overlay y permitir clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.zIndex = '999';
-            }
+                
+                // Ocultar overlay y permitir clics
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.pointerEvents = 'none';
+                    overlay.style.zIndex = '999';
+                }
                 console.log('Panel simple cerrado');
             }
         }
@@ -4299,6 +4290,46 @@
                 // Pequeño delay para asegurar que los elementos estén disponibles
                 setTimeout(initMobileControls, 100);
             }
+        }
+
+        // --- Inicialización mejorada del panel de personalización ---
+        function initializeCustomizationPanel() {
+            console.log('Inicializando panel de personalización...');
+            
+            // Asegurar que el botón esté visible
+            if (changeAliasBtn) {
+                changeAliasBtn.style.display = 'flex';
+                console.log('✅ Botón de personalización visible');
+            } else {
+                console.error('❌ Botón de personalización no encontrado');
+            }
+            
+            // Verificar que el panel existe
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel) {
+                console.log('✅ Panel simple encontrado');
+                // Asegurar que esté oculto inicialmente
+                simplePanel.style.display = 'none';
+            } else {
+                console.error('❌ Panel simple no encontrado');
+            }
+            
+            // Verificar que el overlay existe
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                console.log('✅ Overlay encontrado');
+                overlay.style.display = 'none';
+            } else {
+                console.error('❌ Overlay no encontrado');
+            }
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeCustomizationPanel);
+        } else {
+            // Si el DOM ya está listo, inicializar inmediatamente
+            setTimeout(initializeCustomizationPanel, 100);
         }
     </script>
 </body>
