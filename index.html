@@ -199,11 +199,9 @@
         #alias-prompt input {
             padding: 10px;
             font-size: 16px;
+            border-radius: 6px;
             border: none;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            width: 200px;
-            text-align: center;
+            margin-bottom: 12px;
         }
         #alias-prompt button {
             padding: 8px 18px;
@@ -584,143 +582,6 @@
           padding: 4px 0 !important;
           margin: 4px 0 !important;
         }
-        
-        /* Estilos para controles móviles */
-        .mobile-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .joystick-container {
-            width: 120px;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            position: relative;
-            touch-action: none;
-        }
-        
-        .joystick-base {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.3) 70%);
-        }
-        
-        .joystick-stick {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 215, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            touch-action: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .joystick-stick:active {
-            background: rgba(255, 215, 0, 1);
-            transform: scale(1.1);
-        }
-        
-        .camera-joystick-container {
-            width: 120px;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            position: relative;
-            touch-action: none;
-        }
-        
-        .camera-joystick-base {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.3) 70%);
-        }
-        
-        .camera-joystick-stick {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 150, 255, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            touch-action: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .camera-joystick-stick:active {
-            background: rgba(0, 150, 255, 1);
-            transform: scale(1.1);
-        }
-        
-        .camera-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .camera-label {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #FFD700;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        .joystick-label {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #FFD700;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        
-        /* Mostrar controles solo en móviles */
-        @media (max-width: 768px) {
-            .mobile-controls {
-                display: block;
-            }
-            .camera-controls {
-                display: block;
-            }
-        }
     </style>
 </head>
 <body>
@@ -906,24 +767,6 @@
 
         </div>
     </div>
-    
-    <!-- Controles móviles -->
-    <div class="mobile-controls">
-        <div class="joystick-label">Movimiento</div>
-        <div class="joystick-container" id="joystick-container">
-            <div class="joystick-base"></div>
-            <div class="joystick-stick" id="joystick-stick"></div>
-        </div>
-    </div>
-    
-    <div class="camera-controls">
-        <div class="camera-label">Cámara</div>
-        <div class="camera-joystick-container" id="camera-joystick-container">
-            <div class="camera-joystick-base"></div>
-            <div class="camera-joystick-stick" id="camera-joystick-stick"></div>
-        </div>
-    </div>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -987,18 +830,17 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png',
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
             'bybit': 'bybit-logo.png',
             'givvyMusic': 'givvymusic-logo.png',
             'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png',
+            'givvyScratchCardNew': 'givvystream-logo.png", // Usar givvystream como fallback
             'swcapp': 'swcapp-logo.png',
-            'app-earnings-link': 'givvystream-logo.png'
+            'app-earnings-link': 'givvystream-logo.png' // Agregar alias para app-earnings-link.com
         };
-        // Alias para app.getgrass.io y app-earnings-link.com, fallback para givvyScratchCardNew, etc.
 
         // Duplicar los enlaces 5 veces para asegurar que hay suficientes para todos los pisos
         const storeLinks = [];
@@ -2699,13 +2541,6 @@
             }
             
             updateMovement();
-            
-            // Actualizar movimiento móvil si está activo
-            if (isMobile()) {
-                updateMobileMovement();
-                updateCameraRotation();
-            }
-            
             updateAvatarPositions(); // Actualizar posiciones de avatares
             
             // Enviar posición del usuario cada 100ms (10 veces por segundo)
@@ -2843,15 +2678,9 @@
             userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
             localStorage.setItem('userAlias', userAlias);
         }
-        
-        // Mostrar el botón de personalización
-        if (changeAliasBtn && userAlias) {
+        if (userAlias) {
             changeAliasBtn.style.display = 'flex';
-            console.log('Botón de personalización mostrado');
-        } else {
-            console.error('No se pudo mostrar el botón de personalización');
         }
-        
         connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
@@ -3244,7 +3073,7 @@
             
             console.log('✅ Grids de colores poblados');
         }
-
+        
         function openCustomizationPanel() {
             console.log('Abriendo panel de personalización completo');
             
@@ -3372,7 +3201,23 @@
             shoesColor = currentCustomization.shoesColor;
         }
         
-
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                
+                // Ocultar overlay
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.pointerEvents = 'none';
+                    overlay.style.zIndex = '999';
+                }
+                
+                console.log('Panel de personalización cerrado');
+            }
+        }
         
         // Event listeners para actualización en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
@@ -3397,14 +3242,13 @@
             if (panel) {
                 panel.style.display = 'none';
                 customizationPanelOpen = false;
-                
-                // Ocultar overlay y permitir clics
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.style.pointerEvents = 'none';
-                    overlay.style.zIndex = '999';
-                }
+                            // Ocultar overlay y permitir clics
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '999';
+            }
                 console.log('Panel simple cerrado');
             }
         }
@@ -4122,313 +3966,294 @@
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
         }
 
-        // --- Variables para controles móviles ---
-        let joystickActive = false;
-        let joystickCenter = { x: 0, y: 0 };
-        let joystickPosition = { x: 0, y: 0 };
-        let joystickMaxDistance = 35;
-        
-        let cameraJoystickActive = false;
-        let cameraJoystickCenter = { x: 0, y: 0 };
-        let cameraJoystickPosition = { x: 0, y: 0 };
-        let cameraJoystickMaxDistance = 35;
+        // --- Joysticks para móvil ---
+        if (isMobile()) {
+            // Variables para los joysticks
+            let moveJoystick = null;
+            let cameraJoystick = null;
+            let moveJoystickActive = false;
+            let cameraJoystickActive = false;
+            let moveJoystickValue = { x: 0, y: 0 };
+            let cameraJoystickValue = { x: 0, y: 0 };
 
-        // --- Sistema de Joystick Virtual ---
-        function initMobileControls() {
-            if (!isMobile()) return;
-            
-            const joystickContainer = document.getElementById('joystick-container');
-            const joystickStick = document.getElementById('joystick-stick');
-            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
-            const cameraJoystickStick = document.getElementById('camera-joystick-stick');
-            
-            if (!joystickContainer || !joystickStick || !cameraJoystickContainer || !cameraJoystickStick) {
-                console.log('Controles móviles no encontrados, reintentando...');
-                setTimeout(initMobileControls, 100);
-                return;
+            // Crear joystick de movimiento
+            function createMoveJoystick() {
+                const joystickContainer = document.createElement('div');
+                joystickContainer.id = 'move-joystick';
+                joystickContainer.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    width: 80px;
+                    height: 80px;
+                    background: rgba(0, 0, 0, 0.5);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    z-index: 1000;
+                    touch-action: none;
+                    user-select: none;
+                `;
+
+                const joystickHandle = document.createElement('div');
+                joystickHandle.id = 'move-joystick-handle';
+                joystickHandle.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 30px;
+                    height: 30px;
+                    background: rgba(255, 255, 255, 0.8);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    cursor: pointer;
+                    transition: background 0.2s;
+                `;
+
+                joystickContainer.appendChild(joystickHandle);
+                document.body.appendChild(joystickContainer);
+
+                // Event listeners para el joystick de movimiento
+                let isDragging = false;
+                let startPos = { x: 0, y: 0 };
+
+                joystickContainer.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    moveJoystickActive = true;
+                    const rect = joystickContainer.getBoundingClientRect();
+                    startPos = {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                }, { passive: false });
+
+                joystickContainer.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    if (!isDragging) return;
+                    
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - startPos.x;
+                    const deltaY = touch.clientY - startPos.y;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    const maxDistance = 25; // Radio máximo del joystick
+                    
+                    if (distance > maxDistance) {
+                        const angle = Math.atan2(deltaY, deltaX);
+                        const clampedX = Math.cos(angle) * maxDistance;
+                        const clampedY = Math.sin(angle) * maxDistance;
+                        joystickHandle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+                        moveJoystickValue = {
+                            x: clampedX / maxDistance,
+                            y: clampedY / maxDistance
+                        };
+                    } else {
+                        joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                        moveJoystickValue = {
+                            x: deltaX / maxDistance,
+                            y: deltaY / maxDistance
+                        };
+                    }
+                }, { passive: false });
+
+                joystickContainer.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    isDragging = false;
+                    moveJoystickActive = false;
+                    joystickHandle.style.transform = 'translate(-50%, -50%)';
+                    moveJoystickValue = { x: 0, y: 0 };
+                }, { passive: false });
+
+                return joystickContainer;
             }
-            
-            console.log('Inicializando controles móviles...');
-            
-            // Configurar joystick de movimiento
-            joystickContainer.addEventListener('touchstart', handleJoystickStart, { passive: false });
-            joystickContainer.addEventListener('touchmove', handleJoystickMove, { passive: false });
-            joystickContainer.addEventListener('touchend', handleJoystickEnd, { passive: false });
-            
-            // Configurar joystick de cámara
-            cameraJoystickContainer.addEventListener('touchstart', handleCameraJoystickStart, { passive: false });
-            cameraJoystickContainer.addEventListener('touchmove', handleCameraJoystickMove, { passive: false });
-            cameraJoystickContainer.addEventListener('touchend', handleCameraJoystickEnd, { passive: false });
-            
-            // Obtener posición inicial del joystick de movimiento
-            const rect = joystickContainer.getBoundingClientRect();
-            joystickCenter.x = rect.width / 2;
-            joystickCenter.y = rect.height / 2;
-            
-            // Obtener posición inicial del joystick de cámara
-            const cameraRect = cameraJoystickContainer.getBoundingClientRect();
-            cameraJoystickCenter.x = cameraRect.width / 2;
-            cameraJoystickCenter.y = cameraRect.height / 2;
-            
-            console.log('Controles móviles inicializados correctamente');
-        }
-        
-        function handleJoystickStart(e) {
-            e.preventDefault();
-            joystickActive = true;
-            const touch = e.touches[0];
-            const joystickContainer = document.getElementById('joystick-container');
-            const rect = joystickContainer.getBoundingClientRect();
-            joystickPosition.x = touch.clientX - rect.left;
-            joystickPosition.y = touch.clientY - rect.top;
-            updateJoystickPosition();
-        }
-        
-        function handleJoystickMove(e) {
-            if (!joystickActive) return;
-            e.preventDefault();
-            const touch = e.touches[0];
-            const joystickContainer = document.getElementById('joystick-container');
-            const rect = joystickContainer.getBoundingClientRect();
-            joystickPosition.x = touch.clientX - rect.left;
-            joystickPosition.y = touch.clientY - rect.top;
-            updateJoystickPosition();
-        }
-        
-        function handleJoystickEnd(e) {
-            joystickActive = false;
-            joystickPosition.x = joystickCenter.x;
-            joystickPosition.y = joystickCenter.y;
-            updateJoystickPosition();
-        }
-        
-        function updateJoystickPosition() {
-            const joystickStick = document.getElementById('joystick-stick');
-            if (!joystickStick) return;
-            
-            // Calcular distancia desde el centro
-            const dx = joystickPosition.x - joystickCenter.x;
-            const dy = joystickPosition.y - joystickCenter.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            // Limitar distancia máxima
-            if (distance > joystickMaxDistance) {
-                const angle = Math.atan2(dy, dx);
-                joystickPosition.x = joystickCenter.x + Math.cos(angle) * joystickMaxDistance;
-                joystickPosition.y = joystickCenter.y + Math.sin(angle) * joystickMaxDistance;
+
+            // Crear joystick de cámara
+            function createCameraJoystick() {
+                const joystickContainer = document.createElement('div');
+                joystickContainer.id = 'camera-joystick';
+                joystickContainer.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    width: 80px;
+                    height: 80px;
+                    background: rgba(0, 0, 0, 0.5);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    z-index: 1000;
+                    touch-action: none;
+                    user-select: none;
+                `;
+
+                const joystickHandle = document.createElement('div');
+                joystickHandle.id = 'camera-joystick-handle';
+                joystickHandle.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 30px;
+                    height: 30px;
+                    background: rgba(255, 255, 255, 0.8);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    cursor: pointer;
+                    transition: background 0.2s;
+                `;
+
+                joystickContainer.appendChild(joystickHandle);
+                document.body.appendChild(joystickContainer);
+
+                // Event listeners para el joystick de cámara
+                let isDragging = false;
+                let startPos = { x: 0, y: 0 };
+
+                joystickContainer.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    cameraJoystickActive = true;
+                    const rect = joystickContainer.getBoundingClientRect();
+                    startPos = {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                }, { passive: false });
+
+                joystickContainer.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    if (!isDragging) return;
+                    
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - startPos.x;
+                    const deltaY = touch.clientY - startPos.y;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    const maxDistance = 25; // Radio máximo del joystick
+                    
+                    if (distance > maxDistance) {
+                        const angle = Math.atan2(deltaY, deltaX);
+                        const clampedX = Math.cos(angle) * maxDistance;
+                        const clampedY = Math.sin(angle) * maxDistance;
+                        joystickHandle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+                        cameraJoystickValue = {
+                            x: clampedX / maxDistance,
+                            y: clampedY / maxDistance
+                        };
+                    } else {
+                        joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                        cameraJoystickValue = {
+                            x: deltaX / maxDistance,
+                            y: deltaY / maxDistance
+                        };
+                    }
+                }, { passive: false });
+
+                joystickContainer.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    isDragging = false;
+                    cameraJoystickActive = false;
+                    joystickHandle.style.transform = 'translate(-50%, -50%)';
+                    cameraJoystickValue = { x: 0, y: 0 };
+                }, { passive: false });
+
+                return joystickContainer;
             }
-            
-            // Actualizar posición visual del stick (centrado en el stick de 50px)
-            const stickX = joystickPosition.x - 25;
-            const stickY = joystickPosition.y - 25;
-            joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
-            
-            // Efecto visual cuando está activo
-            if (joystickActive && distance > 5) {
-                joystickStick.style.background = 'rgba(255, 215, 0, 1)';
-                joystickStick.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.4)';
-            } else {
-                joystickStick.style.background = 'rgba(255, 215, 0, 0.8)';
-                joystickStick.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-            }
-        }
-        
-        function handleCameraJoystickStart(e) {
-            e.preventDefault();
-            cameraJoystickActive = true;
-            const touch = e.touches[0];
-            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
-            const rect = cameraJoystickContainer.getBoundingClientRect();
-            cameraJoystickPosition.x = touch.clientX - rect.left;
-            cameraJoystickPosition.y = touch.clientY - rect.top;
-            updateCameraJoystickPosition();
-        }
-        
-        function handleCameraJoystickMove(e) {
-            if (!cameraJoystickActive) return;
-            e.preventDefault();
-            const touch = e.touches[0];
-            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
-            const rect = cameraJoystickContainer.getBoundingClientRect();
-            cameraJoystickPosition.x = touch.clientX - rect.left;
-            cameraJoystickPosition.y = touch.clientY - rect.top;
-            updateCameraJoystickPosition();
-        }
-        
-        function handleCameraJoystickEnd(e) {
-            cameraJoystickActive = false;
-            cameraJoystickPosition.x = cameraJoystickCenter.x;
-            cameraJoystickPosition.y = cameraJoystickCenter.y;
-            updateCameraJoystickPosition();
-        }
-        
-        function updateCameraJoystickPosition() {
-            const cameraJoystickStick = document.getElementById('camera-joystick-stick');
-            if (!cameraJoystickStick) return;
-            
-            // Calcular distancia desde el centro
-            const dx = cameraJoystickPosition.x - cameraJoystickCenter.x;
-            const dy = cameraJoystickPosition.y - cameraJoystickCenter.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            // Limitar distancia máxima
-            if (distance > cameraJoystickMaxDistance) {
-                const angle = Math.atan2(dy, dx);
-                cameraJoystickPosition.x = cameraJoystickCenter.x + Math.cos(angle) * cameraJoystickMaxDistance;
-                cameraJoystickPosition.y = cameraJoystickCenter.y + Math.sin(angle) * cameraJoystickMaxDistance;
-            }
-            
-            // Actualizar posición visual del stick (centrado en el stick de 50px)
-            const stickX = cameraJoystickPosition.x - 25;
-            const stickY = cameraJoystickPosition.y - 25;
-            cameraJoystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
-            
-            // Efecto visual cuando está activo
-            if (cameraJoystickActive && distance > 5) {
-                cameraJoystickStick.style.background = 'rgba(0, 150, 255, 1)';
-                cameraJoystickStick.style.boxShadow = '0 4px 12px rgba(0, 150, 255, 0.4)';
-            } else {
-                cameraJoystickStick.style.background = 'rgba(0, 150, 255, 0.8)';
-                cameraJoystickStick.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-            }
-        }
-        
-        // --- Función de movimiento actualizada para móvil ---
-        function updateMobileMovement() {
-            if (!isMobile() || !joystickActive) return;
-            
-            // Calcular dirección del joystick
-            const dx = joystickPosition.x - joystickCenter.x;
-            const dy = joystickPosition.y - joystickCenter.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance > 5) { // Umbral mínimo para movimiento
-                // Normalizar dirección
-                const normalizedDx = dx / distance;
-                const normalizedDy = dy / distance;
-                
-                // Calcular velocidad basada en distancia
-                const speed = Math.min(distance / joystickMaxDistance, 1.0) * MOVE_SPEED;
-                
-                // Obtener dirección de la cámara
-                const cameraDirection = new THREE.Vector3();
-                camera.getWorldDirection(cameraDirection);
-                cameraDirection.y = 0;
-                cameraDirection.normalize();
-                
-                // Calcular dirección derecha de la cámara
-                const cameraRight = new THREE.Vector3();
-                cameraRight.crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0));
-                
-                // Calcular movimiento
-                const moveDirection = new THREE.Vector3();
-                moveDirection.addScaledVector(cameraDirection, -normalizedDy); // Adelante/atrás
-                moveDirection.addScaledVector(cameraRight, normalizedDx); // Izquierda/derecha
-                moveDirection.normalize();
-                
-                // Aplicar movimiento
-                const velocity = moveDirection.multiplyScalar(speed);
-                const newPosition = targetPosition.clone().add(velocity);
-                
-                // Verificar colisiones
-                const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
-                let collision = false;
-                
-                // Solo verificar colisiones cercanas para mejor rendimiento
-                const nearbyCollisions = collisionObjects.filter(wallBox => {
-                    const wallCenter = wallBox.getCenter(new THREE.Vector3());
-                    return wallCenter.distanceTo(newPosition) < 20;
-                });
-                
-                for (const wallBox of nearbyCollisions) {
-                    if (playerBox.intersectsBox(wallBox)) {
-                        collision = true;
-                        break;
+
+            // Crear los joysticks
+            moveJoystick = createMoveJoystick();
+            cameraJoystick = createCameraJoystick();
+
+            // Deshabilitar controles de teclado y mouse en móvil
+            const originalSetupEventListeners = setupEventListeners;
+            setupEventListeners = function() {
+                // Solo agregar resize listener en móvil
+                window.addEventListener('resize', onWindowResize);
+            };
+
+            // Modificar updateMovement para usar joysticks
+            const originalUpdateMovement = updateMovement;
+            updateMovement = function() {
+                if (chatOpen) return;
+
+                // Rotación de cámara con joystick derecho
+                if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
+                    targetRotationY -= cameraJoystickValue.x * ROTATE_SPEED * 2;
+                }
+
+                // Movimiento con joystick izquierdo
+                if (moveJoystickActive && (Math.abs(moveJoystickValue.x) > 0.1 || Math.abs(moveJoystickValue.y) > 0.1)) {
+                    const direction = new THREE.Vector3();
+                    camera.getWorldDirection(direction);
+                    direction.y = 0;
+                    direction.normalize();
+                    
+                    const rightDirection = new THREE.Vector3();
+                    rightDirection.setFromMatrixColumn(camera.matrix, 0);
+                    rightDirection.y = 0;
+                    rightDirection.normalize();
+                    
+                    const velocity = new THREE.Vector3();
+                    
+                    // Movimiento hacia adelante/atrás (eje Y del joystick)
+                    if (Math.abs(moveJoystickValue.y) > 0.1) {
+                        velocity.add(direction.clone().multiplyScalar(moveJoystickValue.y));
+                    }
+                    
+                    // Movimiento lateral (eje X del joystick)
+                    if (Math.abs(moveJoystickValue.x) > 0.1) {
+                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x));
+                    }
+                    
+                    if (velocity.length() > 0) {
+                        velocity.normalize().multiplyScalar(MOVE_SPEED);
+                        const newPosition = targetPosition.clone().add(velocity);
+                        
+                        // Colisiones
+                        const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
+                        let collision = false;
+                        const nearbyCollisions = collisionObjects.filter(wallBox => {
+                            const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
+                            return distance < 20;
+                        });
+                        
+                        for (const wallBox of nearbyCollisions) {
+                            if (playerBox.intersectsBox(wallBox)) {
+                                collision = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!collision) {
+                            targetPosition.copy(newPosition);
+                        }
                     }
                 }
-                
-                if (!collision) {
-                    targetPosition.copy(newPosition);
-                }
-            }
-        }
-        
-        // --- Función de rotación de cámara para móvil ---
-        function updateCameraRotation() {
-            if (!isMobile() || !cameraJoystickActive) return;
-            
-            // Calcular dirección del joystick de cámara
-            const dx = cameraJoystickPosition.x - cameraJoystickCenter.x;
-            const dy = cameraJoystickPosition.y - cameraJoystickCenter.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance > 5) { // Umbral mínimo para rotación
-                // Normalizar dirección
-                const normalizedDx = dx / distance;
-                const normalizedDy = dy / distance;
-                
-                // Calcular velocidad de rotación basada en distancia
-                const rotationSpeed = Math.min(distance / cameraJoystickMaxDistance, 1.0) * ROTATE_SPEED;
-                
-                // Rotar cámara horizontalmente
-                targetRotationY -= normalizedDx * rotationSpeed;
-                
-                // Inclinar cámara verticalmente (limitado)
-                const currentPitch = camera.rotation.x;
-                const newPitch = currentPitch - normalizedDy * rotationSpeed * 0.5;
-                camera.rotation.x = Math.max(-0.3, Math.min(0.3, newPitch));
-            }
-        }
-        
-        // --- Inicializar controles móviles ---
-        if (isMobile()) {
-            // Esperar a que el DOM esté listo
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initMobileControls);
-            } else {
-                // Pequeño delay para asegurar que los elementos estén disponibles
-                setTimeout(initMobileControls, 100);
-            }
-        }
 
-        // --- Inicialización mejorada del panel de personalización ---
-        function initializeCustomizationPanel() {
-            console.log('Inicializando panel de personalización...');
-            
-            // Asegurar que el botón esté visible
-            if (changeAliasBtn) {
-                changeAliasBtn.style.display = 'flex';
-                console.log('✅ Botón de personalización visible');
-            } else {
-                console.error('❌ Botón de personalización no encontrado');
-            }
-            
-            // Verificar que el panel existe
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
-                console.log('✅ Panel simple encontrado');
-                // Asegurar que esté oculto inicialmente
-                simplePanel.style.display = 'none';
-            } else {
-                console.error('❌ Panel simple no encontrado');
-            }
-            
-            // Verificar que el overlay existe
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                console.log('✅ Overlay encontrado');
-                overlay.style.display = 'none';
-            } else {
-                console.error('❌ Overlay no encontrado');
-            }
-        }
-        
-        // Inicializar cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeCustomizationPanel);
-        } else {
-            // Si el DOM ya está listo, inicializar inmediatamente
-            setTimeout(initializeCustomizationPanel, 100);
+                // Cambio de piso (mantener funcionalidad)
+                const floorStep = HALL_HEIGHT + 1;
+                const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
+                targetPosition.y = targetY;
+
+                // Interpolación
+                camera.position.lerp(targetPosition, 0.2);
+                camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            };
+
+            // Overlay de ayuda para joysticks
+            const help = document.createElement('div');
+            help.style.cssText = `
+                position: fixed;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.7);
+                color: #FFD700;
+                font-family: monospace;
+                font-size: 12px;
+                padding: 8px 16px;
+                border-radius: 8px;
+                z-index: 9999;
+                text-align: center;
+            `;
+            help.innerHTML = 'Joystick izquierdo: Movimiento<br>Joystick derecho: Rotar cámara';
+            document.body.appendChild(help);
         }
     </script>
 </body>
