@@ -4212,31 +4212,18 @@
 
                     if (!collision) {
                         targetPosition.copy(newPosition);
-                        position.lerp(targetPosition, 0.2);
                     }
-                }
-            };
-        }     for (const wallBox of nearbyCollisions) {
-                        if (playerBox.intersectsBox(wallBox)) {
-                            collision = true;
-                            break;
-                        }
-                    }
-                    if (!collision) {
-                        targetPosition.copy(newPosition);
-                    }
-                }
 
-                // Cambio de piso
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
-                targetPosition.y = targetY;
+                    // Cambio de piso
+                    const floorStep = HALL_HEIGHT + 1;
+                    const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
+                    targetPosition.y = targetY;
 
-                // Interpolación
-                camera.position.lerp(targetPosition, 0.2);
-                camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
-            };
-        }
+                    // Interpolación
+                    camera.position.lerp(targetPosition, 0.2);
+                    camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+                };
+            }
     </script>
 </body>
 </html>
