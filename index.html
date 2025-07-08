@@ -901,6 +901,7 @@
         const mouse = new THREE.Vector2();
         let targetPosition;
         let targetRotationY;
+        let targetRotationX = 0; // Agregar rotación vertical para móvil
         let currentFloor = 0;
         let keyA = false;
         let keyD = false;
@@ -4172,9 +4173,19 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho (reducida velocidad y corregida dirección)
-                if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5; // Invertido y reducida velocidad
+                // Rotación de cámara con joystick derecho
+                if (cameraJoystickActive) {
+                    // Rotación horizontal (eje X)
+                    if (Math.abs(cameraJoystickValue.x) > 0.1) {
+                        targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
+                    }
+                    
+                    // Rotación vertical (eje Y) - mirar arriba/abajo
+                    if (Math.abs(cameraJoystickValue.y) > 0.1) {
+                        targetRotationX -= cameraJoystickValue.y * ROTATE_SPEED * 0.3; // Velocidad reducida para vertical
+                        // Limitar la rotación vertical para evitar que la cámara se dé la vuelta
+                        targetRotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotationX)); // Limitar a ±60 grados
+                    }
                 }
 
                 // Movimiento con joystick izquierdo (corregidas direcciones)
@@ -4196,9 +4207,9 @@
                         velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
                     }
                     
-                    // Movimiento lateral (eje X del joystick) - invertido para ser más natural
+                    // Movimiento lateral (eje X del joystick) - corregido para ser natural
                     if (Math.abs(moveJoystickValue.x) > 0.1) {
-                        velocity.add(rightDirection.clone().multiplyScalar(-moveJoystickValue.x)); // Invertido
+                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x)); // Quitado el signo negativo
                     }
                     
                     if (velocity.length() > 0) {
@@ -4234,6 +4245,7 @@
                 // Interpolación
                 camera.position.lerp(targetPosition, 0.2);
                 camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+                camera.rotation.x = lerpAngle(camera.rotation.x, targetRotationX, 0.2); // Agregar interpolación vertical
             };
 
             // Overlay de ayuda para joysticks
@@ -4252,7 +4264,7 @@
                 z-index: 9999;
                 text-align: center;
             `;
-            help.innerHTML = 'Joystick izquierdo: Movimiento<br>Joystick derecho: Rotar cámara';
+            help.innerHTML = 'Joystick izquierdo: Movimiento<br>Joystick derecho: Rotar cámara (X) y mirar arriba/abajo (Y)';
             document.body.appendChild(help);
         }
     </script>
