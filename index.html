@@ -593,6 +593,7 @@
           border-radius: 0 !important;
           box-shadow: none !important;
         }
+        /* COLOR BUTTONS - NO PIXEL ART OVERRIDE */
         .color-btn {
           width: 45px !important;
           height: 45px !important;
@@ -603,9 +604,11 @@
           transition: all 0.3s !important;
           cursor: pointer !important;
           position: relative !important;
+          /* IMPORTANT: Keep original background colors */
+          background-color: inherit !important;
         }
         .color-btn.selected, .color-btn:focus, .color-btn:hover {
-          border: 2px solid #FFD700 !important;
+          border: 3px solid #FFD700 !important;
           transform: scale(1.1) !important;
           box-shadow: 0 0 8px rgba(255, 215, 0, 0.5) !important;
         }
