@@ -4279,24 +4279,15 @@
                     targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
 
-                // Movimiento con joystick izquierdo (adelante/atrás + rotación lateral)
-                if (moveJoystickActive) {
+                // Movimiento con joystick izquierdo (SOLO adelante/atrás)
+                if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
                     
                     const velocity = new THREE.Vector3();
-                    
-                    // Movimiento adelante/atrás (eje Y)
-                    if (Math.abs(moveJoystickValue.y) > 0.1) {
-                        velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
-                    }
-                    
-                    // Rotación lateral mientras se mueve (eje X)
-                    if (Math.abs(moveJoystickValue.x) > 0.1) {
-                        targetRotationY += moveJoystickValue.x * ROTATE_SPEED * 0.2;
-                    }
+                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
                     
                     if (velocity.length() > 0) {
                         velocity.normalize().multiplyScalar(MOVE_SPEED * 0.2);
