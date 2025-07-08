@@ -3033,7 +3033,7 @@
                 align-items: center;
                 justify-content: center;
             `;
-
+            
             // Función auxiliar para crear botón de color
             const createColorButton = (color, type, onClick) => {
                 const colorBtn = document.createElement('button');
@@ -3046,7 +3046,7 @@
                 colorBtn.onclick = onClick;
                 return colorBtn;
             };
-
+            
             // Poblar colores de camisas (primeros 18 colores)
             const shirtGrid = document.getElementById('shirt-colors');
             if (shirtGrid) {
@@ -3066,7 +3066,7 @@
                     shirtGrid.appendChild(colorBtn);
                 }
             }
-
+            
             // Poblar colores de pantalones (siguientes 18 colores)
             const pantsGrid = document.getElementById('pants-colors');
             if (pantsGrid) {
@@ -3086,7 +3086,7 @@
                     pantsGrid.appendChild(colorBtn);
                 }
             }
-
+            
             // Poblar colores de zapatos (últimos 18 colores)
             const shoesGrid = document.getElementById('shoes-colors');
             if (shoesGrid) {
@@ -3106,7 +3106,7 @@
                     shoesGrid.appendChild(colorBtn);
                 }
             }
-
+            
             console.log('✅ Grids de colores poblados');
         }
         
@@ -3317,7 +3317,7 @@
                 });
             }
         });
-
+        
         function closeWorkingPanel() {
             const panel = document.getElementById('working-customization-panel');
             if (panel) {
@@ -3528,37 +3528,37 @@
             applyCustomizationToAvatar();
             updateWorkingColorSelections();
         }
-
+        
         function closeCustomizationPanel() {
             customizationPanel.style.display = 'none';
             customizationPanelOpen = false;
         }
-
+        
         function createColorGrids() {
             // Limpiar grids existentes
             shirtColorsGrid.innerHTML = '';
             pantsColorsGrid.innerHTML = '';
             shoesColorsGrid.innerHTML = '';
-
+            
             // Crear opciones de color para camisas (primeros 18 colores)
             for (let i = 0; i < 18; i++) {
                 const colorOption = createColorOption(customizationColors[i], 'shirt');
                 shirtColorsGrid.appendChild(colorOption);
             }
-
+            
             // Crear opciones de color para pantalones (siguientes 18 colores)
             for (let i = 18; i < 36; i++) {
                 const colorOption = createColorOption(customizationColors[i], 'pants');
                 pantsColorsGrid.appendChild(colorOption);
             }
-
+            
             // Crear opciones de color para zapatos (últimos 18 colores)
             for (let i = 36; i < 54; i++) {
                 const colorOption = createColorOption(customizationColors[i], 'shoes');
                 shoesColorsGrid.appendChild(colorOption);
             }
         }
-
+        
         function createColorOption(color, type) {
             const option = document.createElement('div');
             option.className = 'color-option';
@@ -3572,7 +3572,7 @@
             
             return option;
         }
-
+        
         function selectColor(color, type) {
             // Remover selección previa del mismo tipo
             const prevSelected = document.querySelector(`.color-option.selected[data-type="${type}"]`);
@@ -3602,7 +3602,7 @@
             // Aplicar cambios inmediatamente al avatar
             applyCustomizationToAvatar();
         }
-
+        
         function updateSelectedColors() {
             // Actualizar selecciones visuales
             const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
@@ -3613,7 +3613,7 @@
             if (pantsOption) pantsOption.classList.add('selected');
             if (shoesOption) shoesOption.classList.add('selected');
         }
-
+        
         function applyCustomizationToAvatar() {
             const avatar = userAvatars.get(userAlias);
             if (avatar) {
@@ -3628,7 +3628,7 @@
                 avatar.shoeMaterial.needsUpdate = true;
             }
         }
-
+        
         function saveCustomization() {
             // Obtener el nuevo alias del input
             const aliasInput = document.getElementById('customization-alias-input');
@@ -3663,7 +3663,7 @@
             // Mostrar mensaje de confirmación
             addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
         }
-
+        
         function resetCustomization() {
             // Restablecer a colores por defecto
             currentCustomization = {
@@ -3676,7 +3676,7 @@
             applyCustomizationToAvatar();
             updateSelectedColors();
         }
-
+        
         function loadCustomization() {
             const saved = localStorage.getItem('avatarCustomization');
             if (saved) {
@@ -3688,9 +3688,7 @@
                 }
             }
         }
-
-
-
+        
         // Cerrar panel al hacer clic fuera
         document.addEventListener('click', (e) => {
             // Cerrar chat si está abierto y se hace clic fuera
@@ -3715,7 +3713,7 @@
                 closeWorkingPanel();
             }
         });
-
+        
         // Agregar event listener al overlay para bloquear clics
         const overlay = document.getElementById('ui-overlay');
         if (overlay) {
@@ -3726,17 +3724,17 @@
                 return false;
             });
         }
-
+        
         // Cargar personalización al iniciar
         loadCustomization();
-
+        
         function sendUserPosition() {
             if (userAlias) {
                 // TODO: Enviar posición a Firebase
                 // firebase.database().ref('positions').child(userAlias).set({ ... })
             }
         }
-
+        
         function updateAvatarPosition(alias, position, floor, rotation = 0) {
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
@@ -3773,14 +3771,14 @@
                 // Opcional: console.log(`Avatar ${alias} rotación actualizada a: ${rotationDegrees}° (${normalizedRotation.toFixed(3)} rad)`);
             }
         }
-
+        
         // Asegurar que el DOM esté completamente cargado antes de inicializar
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
             init();
         }
-
+        
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('ui-overlay');
@@ -3816,10 +3814,7 @@
                 });
             }
         });
-
         
-       
-
         // Mostrar prompt de alias si no existe
         if (!userAlias) {
             userAlias = prompt('Ingresa tu alias:');
@@ -3830,12 +3825,10 @@
                 localStorage.setItem('userAlias', userAlias);
             }
         }
-
+        
         // Conectar al chat de Firebase
         connectToChat(userAlias);
-
         
-
         // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
         setInterval(() => {
             if (
@@ -3858,7 +3851,7 @@
                 console.warn('Cámara o posición no definida:', camera);
             }
         }, 500);
-
+        
         // Función mejorada para mostrar mensajes en el chat
         function addMessageToChat(alias, message, type = 'user', timestamp = null) {
             const chatMessages = document.getElementById('chat-messages');
@@ -3881,13 +3874,13 @@
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
+        
         // Listener de mensajes de Firebase
         messagesRef.on('child_added', (snapshot) => {
             const msg = snapshot.val();
             addMessageToChat(msg.alias, msg.message, msg.alias === userAlias ? 'own' : 'user', msg.timestamp);
         });
-
+        
         // Listener de posiciones de avatares en Firebase
         positionsRef.on('value', (snapshot) => {
             const positions = snapshot.val() || {};
@@ -3904,7 +3897,7 @@
                 }
             });
         });
-
+        
         // --- Función para crear un avatar de usuario ---
         function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
             if (userAvatars.has(alias)) return;
@@ -3980,7 +3973,7 @@
                 avatar.lastPosition.copy(pos);
             });
         }
-
+        
         function openSimplePanel() {
             const panel = document.getElementById('simple-panel');
             if (panel) {
@@ -3991,12 +3984,12 @@
                 updateAvatarPreview();
             }
         }
-
+        
         // Inicialización robusta de colores de avatar
         if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
         if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
-
+        
         function fillColorGrids() {
             // Llenar grid de camisas
             const shirtGrid = document.getElementById('shirt-colors');
@@ -4059,12 +4052,12 @@
                 }
             }
         }
-
+        
         // --- Detección de móvil ---
         function isMobile() {
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
         }
-
+        
         // --- Controles móviles simples ---
         if (isMobile()) {
             // Variables para controles móviles
@@ -4074,7 +4067,7 @@
             let cameraJoystickActive = false;
             let moveJoystickValue = { x: 0, y: 0 };
             let cameraJoystickValue = { x: 0, y: 0 };
-
+            
             // Crear joystick de movimiento (izquierdo)
             function createMoveJoystick() {
                 const container = document.createElement('div');
@@ -4092,7 +4085,7 @@
                     touch-action: none;
                     user-select: none;
                 `;
-
+                
                 const handle = document.createElement('div');
                 handle.id = 'move-joystick-handle';
                 handle.style.cssText = `
@@ -4106,13 +4099,13 @@
                     transform: translate(-50%, -50%);
                     transition: background 0.2s;
                 `;
-
+                
                 container.appendChild(handle);
                 document.body.appendChild(container);
-
+                
                 let isDragging = false;
                 let startPos = { x: 0, y: 0 };
-
+                
                 container.addEventListener('touchstart', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4124,7 +4117,7 @@
                         y: rect.top + rect.height / 2
                     };
                 }, { passive: false });
-
+                
                 container.addEventListener('touchmove', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4153,7 +4146,7 @@
                         };
                     }
                 }, { passive: false });
-
+                
                 container.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4162,10 +4155,10 @@
                     handle.style.transform = 'translate(-50%, -50%)';
                     moveJoystickValue = { x: 0, y: 0 };
                 }, { passive: false });
-
+                
                 return container;
             }
-
+            
             // Crear joystick de cámara (derecho)
             function createCameraJoystick() {
                 const container = document.createElement('div');
@@ -4183,7 +4176,7 @@
                     touch-action: none;
                     user-select: none;
                 `;
-
+                
                 const handle = document.createElement('div');
                 handle.id = 'camera-joystick-handle';
                 handle.style.cssText = `
@@ -4197,13 +4190,13 @@
                     transform: translate(-50%, -50%);
                     transition: background 0.2s;
                 `;
-
+                
                 container.appendChild(handle);
                 document.body.appendChild(container);
-
+                
                 let isDragging = false;
                 let startPos = { x: 0, y: 0 };
-
+                
                 container.addEventListener('touchstart', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4215,7 +4208,7 @@
                         y: rect.top + rect.height / 2
                     };
                 }, { passive: false });
-
+                
                 container.addEventListener('touchmove', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4244,7 +4237,7 @@
                         };
                     }
                 }, { passive: false });
-
+                
                 container.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -4253,40 +4246,37 @@
                     handle.style.transform = 'translate(-50%, -50%)';
                     cameraJoystickValue = { x: 0, y: 0 };
                 }, { passive: false });
-
+                
                 return container;
             }
-
+            
             // Crear los joysticks
             moveJoystick = createMoveJoystick();
             cameraJoystick = createCameraJoystick();
-
+            
             // Deshabilitar controles de teclado y mouse en móvil
             const originalSetupEventListeners = setupEventListeners;
             setupEventListeners = function() {
                 window.addEventListener('resize', onWindowResize);
             };
-
+            
             // Modificar updateMovement para controles móviles
             const originalUpdateMovement = updateMovement;
             updateMovement = function updateMovement() {
                 if (chatOpen) return;
-
+                
                 // Rotación de cámara con joystick derecho
                 if (Math.abs(cameraJoystickValue.x) > 0.1) {
-                    // Invertir la dirección del joystick para que gire hacia la derecha correctamente
-                    targetRotationY += -cameraJoystickValue.x * ROTATE_SPEED * 0.3;
+                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
-
+                
                 // Movimiento con joystick izquierdo (SOLO adelante/atrás)
                 if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
-                    // Crear dirección de movimiento basada solo en el eje Y del joystick izquierdo
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
                     
-                    // Ajustar dirección según el eje Y (adelante/atrás)
                     const moveDirection = new THREE.Vector3(direction.x, 0, direction.z);
                     moveDirection.multiplyScalar(moveJoystickValue.y * MOVE_SPEED);
                     velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
