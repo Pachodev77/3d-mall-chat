@@ -1025,6 +1025,7 @@
         const mouse = new THREE.Vector2();
         let targetPosition;
         let targetRotationY;
+        let targetPitch;
         let currentFloor = 0;
         let keyA = false;
         let keyD = false;
@@ -1137,6 +1138,7 @@
 
             targetPosition = camera.position.clone();
             targetRotationY = camera.rotation.y;
+            targetPitch = camera.rotation.x; // Sincronizar targetPitch con la rotación inicial de la cámara
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -4097,7 +4099,6 @@
         let cameraControlActive = false;
         let cameraStartX = 0, cameraStartY = 0;
         let cameraLastX = 0, cameraLastY = 0;
-        let targetPitch = 0; // Nueva variable para el pitch objetivo
 
         // --- Sistema de Joystick Virtual ---
         function initMobileControls() {
