@@ -2857,6 +2857,22 @@
                     break;
                 case 'pants':
                     selector = '.color-btn[onclick*="changePantsColor"]';
+                    break;
+                case 'shoes':
+                    selector = '.color-btn[onclick*="changeShoesColor"]';
+                    break;
+                default:
+                    return;
+            }
+
+            const grid = document.querySelector(`#${type}-colors`);
+            if (!grid) return;
+
+            // Desmarcar todos los botones
+            const buttons = grid.querySelectorAll('.color-btn');
+            buttons.forEach(btn => {
+                const overlay = btn.querySelector('.selection-overlay');
+                if (overlay) overlay.style.opacity = '0';
             });
 
             // Marcar el botón seleccionado
