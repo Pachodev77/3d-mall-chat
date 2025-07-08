@@ -4206,20 +4206,9 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho
-                if (cameraJoystickActive) {
-                    // Rotación horizontal (eje X)
-                    if (Math.abs(cameraJoystickValue.x) > 0.1) {
-                        targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
-                    }
-                    
-                    // Rotación vertical DESHABILITADA en móviles para evitar pantalla invertida
-                    // Solo rotación horizontal funciona correctamente
-                    // if (Math.abs(cameraJoystickValue.y) > 0.1) {
-                    //     const verticalRotation = cameraJoystickValue.y * ROTATE_SPEED * 0.3;
-                    //     targetRotationX += verticalRotation;
-                    //     targetRotationX = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, targetRotationX));
-                    // }
+                // Rotación de cámara con joystick derecho (SIEMPRE activa independientemente del movimiento)
+                if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
+                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
                 }
 
                 // Movimiento con joystick izquierdo (solo adelante/atrás)
@@ -4267,8 +4256,6 @@
                 // Interpolación
                 camera.position.lerp(targetPosition, 0.2);
                 camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
-                // Rotación vertical deshabilitada para evitar pantalla invertida en móviles
-                // camera.rotation.x = lerpAngle(camera.rotation.x, targetRotationX, 0.2);
             };
 
             // Overlay de ayuda para joysticks eliminado
