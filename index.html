@@ -2673,19 +2673,6 @@
             }
         }
         
-            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
-            
-            // Actualizar nombre en el avatar
-            updateAvatarName();
-            
-            // Enviar alias al servidor si está conectado
-            if (isConnected) {
-                sendAlias();
-            }
-            
-            console.log('✅ Personalización guardada:', customizationData);
-        }
-        
         function populateColorGrids() {
             console.log('Poblando grids de colores...');
             
