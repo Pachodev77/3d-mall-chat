@@ -3437,26 +3437,6 @@
         //     updateMovement = function() {
         //         if (chatOpen) return;
         //         // Rotación ya se maneja por touch
-        //         // Movimiento adelante/atrás
-        //         if (moveDir !== 0) {
-        //             const direction = new THREE.Vector3();
-        //             camera.getWorldDirection(direction);
-        //             direction.y = 0;
-        //             direction.normalize();
-        //             const velocity = direction.multiplyScalar(MOVE_SPEED * moveDir);
-        //             const newPosition = targetPosition.clone().add(velocity);
-        //             // Colisiones (igual que original)
-        //             const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
-        //             let collision = false;
-        //             const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
-        //             for (const wallBox of nearbyCollisions) {
-        //                 if (playerBox.intersectsBox(wallBox)) {
-        //                     collision = true;
-        //                     break;
-        //                 }
-        //             }
-        //             if (!collision) {
-        //                 targetPosition.copy(newPosition);
     </script>
 </body>
 </html>
