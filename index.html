@@ -4061,9 +4061,9 @@
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
         }
 
-        // --- Joysticks para móvil ---
+        // --- Controles móviles simples ---
         if (isMobile()) {
-            // Variables para los joysticks
+            // Variables para controles móviles
             let moveJoystick = null;
             let cameraJoystick = null;
             let moveJoystickActive = false;
@@ -4071,59 +4071,57 @@
             let moveJoystickValue = { x: 0, y: 0 };
             let cameraJoystickValue = { x: 0, y: 0 };
 
-            // Crear joystick de movimiento
+            // Crear joystick de movimiento (izquierdo)
             function createMoveJoystick() {
-                const joystickContainer = document.createElement('div');
-                joystickContainer.id = 'move-joystick';
-                joystickContainer.style.cssText = `
+                const container = document.createElement('div');
+                container.id = 'move-joystick';
+                container.style.cssText = `
                     position: fixed;
                     bottom: 20px;
                     left: 20px;
                     width: 80px;
                     height: 80px;
-                    background: rgba(0, 0, 0, 0.5);
-                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    background: rgba(0, 0, 0, 0.6);
+                    border: 2px solid rgba(255, 255, 255, 0.4);
                     border-radius: 50%;
                     z-index: 1000;
                     touch-action: none;
                     user-select: none;
                 `;
 
-                const joystickHandle = document.createElement('div');
-                joystickHandle.id = 'move-joystick-handle';
-                joystickHandle.style.cssText = `
+                const handle = document.createElement('div');
+                handle.id = 'move-joystick-handle';
+                handle.style.cssText = `
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     width: 30px;
                     height: 30px;
-                    background: rgba(255, 255, 255, 0.8);
+                    background: rgba(255, 255, 255, 0.9);
                     border-radius: 50%;
                     transform: translate(-50%, -50%);
-                    cursor: pointer;
                     transition: background 0.2s;
                 `;
 
-                joystickContainer.appendChild(joystickHandle);
-                document.body.appendChild(joystickContainer);
+                container.appendChild(handle);
+                document.body.appendChild(container);
 
-                // Event listeners para el joystick de movimiento
                 let isDragging = false;
                 let startPos = { x: 0, y: 0 };
 
-                joystickContainer.addEventListener('touchstart', function(e) {
+                container.addEventListener('touchstart', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     isDragging = true;
                     moveJoystickActive = true;
-                    const rect = joystickContainer.getBoundingClientRect();
+                    const rect = container.getBoundingClientRect();
                     startPos = {
                         x: rect.left + rect.width / 2,
                         y: rect.top + rect.height / 2
                     };
                 }, { passive: false });
 
-                joystickContainer.addEventListener('touchmove', function(e) {
+                container.addEventListener('touchmove', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     if (!isDragging) return;
@@ -4132,19 +4130,19 @@
                     const deltaX = touch.clientX - startPos.x;
                     const deltaY = touch.clientY - startPos.y;
                     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    const maxDistance = 25; // Radio máximo del joystick
+                    const maxDistance = 25;
                     
                     if (distance > maxDistance) {
                         const angle = Math.atan2(deltaY, deltaX);
                         const clampedX = Math.cos(angle) * maxDistance;
                         const clampedY = Math.sin(angle) * maxDistance;
-                        joystickHandle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+                        handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
                         moveJoystickValue = {
                             x: clampedX / maxDistance,
                             y: clampedY / maxDistance
                         };
                     } else {
-                        joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                        handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
                         moveJoystickValue = {
                             x: deltaX / maxDistance,
                             y: deltaY / maxDistance
@@ -4152,71 +4150,69 @@
                     }
                 }, { passive: false });
 
-                joystickContainer.addEventListener('touchend', function(e) {
+                container.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     isDragging = false;
                     moveJoystickActive = false;
-                    joystickHandle.style.transform = 'translate(-50%, -50%)';
+                    handle.style.transform = 'translate(-50%, -50%)';
                     moveJoystickValue = { x: 0, y: 0 };
                 }, { passive: false });
 
-                return joystickContainer;
+                return container;
             }
 
-            // Crear joystick de cámara
+            // Crear joystick de cámara (derecho)
             function createCameraJoystick() {
-                const joystickContainer = document.createElement('div');
-                joystickContainer.id = 'camera-joystick';
-                joystickContainer.style.cssText = `
+                const container = document.createElement('div');
+                container.id = 'camera-joystick';
+                container.style.cssText = `
                     position: fixed;
                     bottom: 20px;
                     right: 20px;
                     width: 80px;
                     height: 80px;
-                    background: rgba(0, 0, 0, 0.5);
-                    border: 2px solid rgba(255, 255, 255, 0.3);
+                    background: rgba(0, 0, 0, 0.6);
+                    border: 2px solid rgba(255, 255, 255, 0.4);
                     border-radius: 50%;
                     z-index: 1000;
                     touch-action: none;
                     user-select: none;
                 `;
 
-                const joystickHandle = document.createElement('div');
-                joystickHandle.id = 'camera-joystick-handle';
-                joystickHandle.style.cssText = `
+                const handle = document.createElement('div');
+                handle.id = 'camera-joystick-handle';
+                handle.style.cssText = `
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     width: 30px;
                     height: 30px;
-                    background: rgba(255, 255, 255, 0.8);
+                    background: rgba(255, 255, 255, 0.9);
                     border-radius: 50%;
                     transform: translate(-50%, -50%);
-                    cursor: pointer;
                     transition: background 0.2s;
                 `;
 
-                joystickContainer.appendChild(joystickHandle);
-                document.body.appendChild(joystickContainer);
+                container.appendChild(handle);
+                document.body.appendChild(container);
 
-                // Event listeners para el joystick de cámara
                 let isDragging = false;
                 let startPos = { x: 0, y: 0 };
 
-                joystickContainer.addEventListener('touchstart', function(e) {
+                container.addEventListener('touchstart', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     isDragging = true;
                     cameraJoystickActive = true;
-                    const rect = joystickContainer.getBoundingClientRect();
+                    const rect = container.getBoundingClientRect();
                     startPos = {
                         x: rect.left + rect.width / 2,
                         y: rect.top + rect.height / 2
                     };
                 }, { passive: false });
 
-                joystickContainer.addEventListener('touchmove', function(e) {
+                container.addEventListener('touchmove', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     if (!isDragging) return;
@@ -4225,19 +4221,19 @@
                     const deltaX = touch.clientX - startPos.x;
                     const deltaY = touch.clientY - startPos.y;
                     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    const maxDistance = 25; // Radio máximo del joystick
+                    const maxDistance = 25;
                     
                     if (distance > maxDistance) {
                         const angle = Math.atan2(deltaY, deltaX);
                         const clampedX = Math.cos(angle) * maxDistance;
                         const clampedY = Math.sin(angle) * maxDistance;
-                        joystickHandle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+                        handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
                         cameraJoystickValue = {
                             x: clampedX / maxDistance,
                             y: clampedY / maxDistance
                         };
                     } else {
-                        joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                        handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
                         cameraJoystickValue = {
                             x: deltaX / maxDistance,
                             y: deltaY / maxDistance
@@ -4245,16 +4241,16 @@
                     }
                 }, { passive: false });
 
-                joystickContainer.addEventListener('touchend', function(e) {
+                container.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     isDragging = false;
                     cameraJoystickActive = false;
-                    joystickHandle.style.transform = 'translate(-50%, -50%)';
+                    handle.style.transform = 'translate(-50%, -50%)';
                     cameraJoystickValue = { x: 0, y: 0 };
                 }, { passive: false });
 
-                return joystickContainer;
+                return container;
             }
 
             // Crear los joysticks
@@ -4264,18 +4260,17 @@
             // Deshabilitar controles de teclado y mouse en móvil
             const originalSetupEventListeners = setupEventListeners;
             setupEventListeners = function() {
-                // Solo agregar resize listener en móvil
                 window.addEventListener('resize', onWindowResize);
             };
 
-            // Modificar updateMovement para usar joysticks
+            // Modificar updateMovement para controles móviles
             const originalUpdateMovement = updateMovement;
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho (SIEMPRE activa independientemente del movimiento)
+                // Rotación de cámara con joystick derecho
                 if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
+                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
 
                 // Movimiento con joystick izquierdo (solo adelante/atrás)
@@ -4286,12 +4281,10 @@
                     direction.normalize();
                     
                     const velocity = new THREE.Vector3();
-                    
-                    // Movimiento hacia adelante/atrás (eje Y del joystick) - invertido para ser más natural
-                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
+                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
                     
                     if (velocity.length() > 0) {
-                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.3); // Velocidad reducida aún más para movimiento más lento
+                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.2);
                         const newPosition = targetPosition.clone().add(velocity);
                         
                         // Colisiones
@@ -4315,7 +4308,7 @@
                     }
                 }
 
-                // Cambio de piso (mantener funcionalidad)
+                // Cambio de piso
                 const floorStep = HALL_HEIGHT + 1;
                 const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
                 targetPosition.y = targetY;
@@ -4324,37 +4317,6 @@
                 camera.position.lerp(targetPosition, 0.2);
                 camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
             };
-
-            // Overlay de ayuda para joysticks eliminado
-            
-            // Manejar orientación de pantalla en móviles
-            function handleScreenOrientation() {
-                if (window.innerWidth <= 768) {
-                    // Forzar orientación portrait en móviles
-                    if (window.screen && window.screen.orientation) {
-                        try {
-                            window.screen.orientation.lock('portrait').catch(() => {
-                                // Si no se puede bloquear, al menos intentar corregir la orientación
-                                console.log('No se pudo bloquear la orientación');
-                            });
-                        } catch (e) {
-                            console.log('Error al manejar orientación:', e);
-                        }
-                    }
-                    
-                    // Corregir transformación si es necesario
-                    const body = document.body;
-                    const currentTransform = window.getComputedStyle(body).transform;
-                    if (currentTransform !== 'none' && currentTransform !== 'matrix(1, 0, 0, 1, 0, 0)') {
-                        body.style.transform = 'rotate(0deg)';
-                    }
-                }
-            }
-            
-            // Ejecutar al cargar y cuando cambie la orientación
-            handleScreenOrientation();
-            window.addEventListener('orientationchange', handleScreenOrientation);
-            window.addEventListener('resize', handleScreenOrientation);
         }
     </script>
 </body>
