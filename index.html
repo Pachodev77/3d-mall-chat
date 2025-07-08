@@ -2359,8 +2359,8 @@
                 console.log('Botón de personalización encontrado');
                 changeAliasBtn.onclick = () => {
                     console.log('Botón de personalización clickeado');
-                    // Mostrar el panel de personalización completo
-                    openCustomizationPanel();
+                    // Mostrar el panel de personalización simple (el que funciona)
+                    openSimplePanel();
                 };
             } else {
                 console.error('No se encontró el botón de personalización');
@@ -3233,6 +3233,50 @@
             shirtColor = currentCustomization.shirtColor;
             pantsColor = currentCustomization.pantsColor;
             shoesColor = currentCustomization.shoesColor;
+        }
+        
+        function openSimplePanel() {
+            console.log('Abriendo panel simple de personalización');
+            
+            // Cerrar chat si está abierto
+            if (chatOpen) {
+                chatPanel.style.display = 'none';
+                chatOpen = false;
+            }
+            
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel) {
+                // Actualizar el alias actual
+                const aliasInput = document.getElementById('simple-alias-input');
+                const currentAliasElement = document.getElementById('current-alias');
+                const previewAliasElement = document.getElementById('preview-alias');
+                
+                if (aliasInput) {
+                    aliasInput.value = userAlias || '';
+                }
+                if (currentAliasElement) {
+                    currentAliasElement.textContent = userAlias || 'Sin nombre';
+                }
+                if (previewAliasElement) {
+                    previewAliasElement.textContent = userAlias || 'Sin nombre';
+                }
+                
+                // Mostrar el panel
+                simplePanel.style.display = 'flex';
+                customizationPanelOpen = true;
+                
+                console.log('✅ Panel simple de personalización mostrado');
+                
+                // Mostrar overlay
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.style.pointerEvents = 'auto';
+                    overlay.style.zIndex = '1002';
+                }
+            } else {
+                console.log('❌ Panel simple no encontrado');
+            }
         }
         
         function closeSimplePanel() {
