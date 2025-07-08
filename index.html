@@ -4210,8 +4210,9 @@
             const dx = touch.clientX - cameraLastX;
             const dy = touch.clientY - cameraLastY;
             
-            // Rotar cámara horizontalmente (invertido para sentir natural)
-            targetRotationY -= dx * 0.005;
+            // Rotar cámara horizontalmente (corregido para dirección natural)
+            // Deslizar hacia la derecha = girar hacia la derecha
+            targetRotationY += dx * 0.005;
             
             // Inclinar cámara verticalmente usando targetPitch (corregido para dirección natural)
             // Deslizar hacia arriba = mirar hacia arriba
