@@ -3046,7 +3046,7 @@
                 colorBtn.onclick = onClick;
                 return colorBtn;
             };
-            
+
             // Poblar colores de camisas (primeros 18 colores)
             const shirtGrid = document.getElementById('shirt-colors');
             if (shirtGrid) {
@@ -3054,19 +3054,18 @@
                 for (let i = 0; i < 18; i++) {
                     const colorBtn = createColorButton(customizationColors[i], 'shirt', () => {
                         changeShirtColor(customizationColors[i]);
+                        updateColorButtonSelection('shirt', customizationColors[i]);
                     });
                     
-                    // Marcar color actual
+                    // Marcar color actual usando la función centralizada
                     if (customizationColors[i] === currentCustomization.shirtColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
+                        updateColorButtonSelection('shirt', customizationColors[i]);
                     }
                     
                     shirtGrid.appendChild(colorBtn);
                 }
             }
-            
+
             // Poblar colores de pantalones (siguientes 18 colores)
             const pantsGrid = document.getElementById('pants-colors');
             if (pantsGrid) {
@@ -3074,19 +3073,18 @@
                 for (let i = 18; i < 36; i++) {
                     const colorBtn = createColorButton(customizationColors[i], 'pants', () => {
                         changePantsColor(customizationColors[i]);
+                        updateColorButtonSelection('pants', customizationColors[i]);
                     });
                     
-                    // Marcar color actual
+                    // Marcar color actual usando la función centralizada
                     if (customizationColors[i] === currentCustomization.pantsColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
+                        updateColorButtonSelection('pants', customizationColors[i]);
                     }
                     
                     pantsGrid.appendChild(colorBtn);
                 }
             }
-            
+
             // Poblar colores de zapatos (últimos 18 colores)
             const shoesGrid = document.getElementById('shoes-colors');
             if (shoesGrid) {
@@ -3094,20 +3092,20 @@
                 for (let i = 36; i < 54; i++) {
                     const colorBtn = createColorButton(customizationColors[i], 'shoes', () => {
                         changeShoesColor(customizationColors[i]);
+                        updateColorButtonSelection('shoes', customizationColors[i]);
                     });
                     
-                    // Marcar color actual
+                    // Marcar color actual usando la función centralizada
                     if (customizationColors[i] === currentCustomization.shoesColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
+                        updateColorButtonSelection('shoes', customizationColors[i]);
                     }
                     
                     shoesGrid.appendChild(colorBtn);
                 }
             }
-            
+
             console.log('✅ Grids de colores poblados');
+        }
         }
         
         function openCustomizationPanel() {
@@ -3985,324 +3983,225 @@
             }
         }
         
-        // Inicialización robusta de colores de avatar
-        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
-        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
-        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
-        
-        function fillColorGrids() {
-            // Llenar grid de camisas
-            const shirtGrid = document.getElementById('shirt-colors');
-            if (shirtGrid) {
-                shirtGrid.innerHTML = '';
-                for (let i = 0; i < 18; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShirtColor(color);
-                    shirtGrid.appendChild(btn);
-                }
-            }
-            // Llenar grid de pantalones
-            const pantsGrid = document.getElementById('pants-colors');
-            if (pantsGrid) {
-                pantsGrid.innerHTML = '';
-                for (let i = 18; i < 36; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => changePantsColor(color);
-                    pantsGrid.appendChild(btn);
-                }
-            }
-            // Llenar grid de zapatos
-            const shoesGrid = document.getElementById('shoes-colors');
-            if (shoesGrid) {
-                shoesGrid.innerHTML = '';
-                for (let i = 36; i < 54; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShoesColor(color);
-                    shoesGrid.appendChild(btn);
-                }
-            }
-        }
-        
-        // --- Detección de móvil ---
+        // Función de detección de dispositivos móviles
         function isMobile() {
             return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
         }
-        
-        // --- Controles móviles simples ---
+
+        // --- Funciones de personalización del avatar ---
+        function initializeAvatarColors() {
+            // Inicializar colores de avatar
+            populateColorGrids();
+            updateAvatarPreview();
+        }
+
+        // --- Controles móviles ---
         if (isMobile()) {
             // Variables para controles móviles
-            let moveJoystick = null;
-            let cameraJoystick = null;
+            let moveJoystick = { x: 0, y: 0 };
+            let cameraJoystick = { x: 0, y: 0 };
             let moveJoystickActive = false;
             let cameraJoystickActive = false;
-            let moveJoystickValue = { x: 0, y: 0 };
-            let cameraJoystickValue = { x: 0, y: 0 };
-            
-            // Crear joystick de movimiento (izquierdo)
-            function createMoveJoystick() {
-                const container = document.createElement('div');
-                container.id = 'move-joystick';
-                container.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    left: 20px;
-                    width: 80px;
-                    height: 80px;
-                    background: rgba(0, 0, 0, 0.6);
-                    border: 2px solid rgba(255, 255, 255, 0.4);
-                    border-radius: 50%;
-                    z-index: 1000;
-                    touch-action: none;
-                    user-select: none;
-                `;
-                
-                const handle = document.createElement('div');
-                handle.id = 'move-joystick-handle';
-                handle.style.cssText = `
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 30px;
-                    height: 30px;
-                    background: rgba(255, 255, 255, 0.9);
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    transition: background 0.2s;
-                `;
-                
-                container.appendChild(handle);
-                document.body.appendChild(container);
-                
-                let isDragging = false;
-                let startPos = { x: 0, y: 0 };
-                
-                container.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    isDragging = true;
+
+            // Crear joysticks
+            const moveJoystickContainer = document.createElement('div');
+            moveJoystickContainer.id = 'move-joystick';
+            moveJoystickContainer.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                width: 80px;
+                height: 80px;
+                background: rgba(0, 0, 0, 0.6);
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                border-radius: 50%;
+                z-index: 1000;
+                touch-action: none;
+                user-select: none;
+            `;
+
+            const moveJoystickHandle = document.createElement('div');
+            moveJoystickHandle.id = 'move-joystick-handle';
+            moveJoystickHandle.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 30px;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: background 0.2s;
+            `;
+
+            moveJoystickContainer.appendChild(moveJoystickHandle);
+            document.body.appendChild(moveJoystickContainer);
+
+            const cameraJoystickContainer = document.createElement('div');
+            cameraJoystickContainer.id = 'camera-joystick';
+            cameraJoystickContainer.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 80px;
+                height: 80px;
+                background: rgba(0, 0, 0, 0.6);
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                border-radius: 50%;
+                z-index: 1000;
+                touch-action: none;
+                user-select: none;
+            `;
+
+            const cameraJoystickHandle = document.createElement('div');
+            cameraJoystickHandle.id = 'camera-joystick-handle';
+            cameraJoystickHandle.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 30px;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: background 0.2s;
+            `;
+
+            cameraJoystickContainer.appendChild(cameraJoystickHandle);
+            document.body.appendChild(cameraJoystickContainer);
+
+            // Eventos para joystick de movimiento
+            moveJoystickContainer.addEventListener('touchstart', handleTouchStart.bind(null, 'move'));
+            moveJoystickContainer.addEventListener('touchmove', handleTouchMove.bind(null, 'move'));
+            moveJoystickContainer.addEventListener('touchend', handleTouchEnd.bind(null, 'move'));
+
+            // Eventos para joystick de cámara
+            cameraJoystickContainer.addEventListener('touchstart', handleTouchStart.bind(null, 'camera'));
+            cameraJoystickContainer.addEventListener('touchmove', handleTouchMove.bind(null, 'camera'));
+            cameraJoystickContainer.addEventListener('touchend', handleTouchEnd.bind(null, 'camera'));
+
+            // Funciones de manejo de eventos
+            function handleTouchStart(type, e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (type === 'move') {
                     moveJoystickActive = true;
-                    const rect = container.getBoundingClientRect();
-                    startPos = {
-                        x: rect.left + rect.width / 2,
-                        y: rect.top + rect.height / 2
-                    };
-                }, { passive: false });
-                
-                container.addEventListener('touchmove', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!isDragging) return;
-                    
-                    const touch = e.touches[0];
-                    const deltaX = touch.clientX - startPos.x;
-                    const deltaY = touch.clientY - startPos.y;
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    const maxDistance = 25;
-                    
-                    if (distance > maxDistance) {
-                        const angle = Math.atan2(deltaY, deltaX);
-                        const clampedX = Math.cos(angle) * maxDistance;
-                        const clampedY = Math.sin(angle) * maxDistance;
-                        handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
-                        moveJoystickValue = {
-                            x: clampedX / maxDistance,
-                            y: clampedY / maxDistance
-                        };
-                    } else {
-                        handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
-                        moveJoystickValue = {
-                            x: deltaX / maxDistance,
-                            y: deltaY / maxDistance
-                        };
-                    }
-                }, { passive: false });
-                
-                container.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    isDragging = false;
-                    moveJoystickActive = false;
-                    handle.style.transform = 'translate(-50%, -50%)';
-                    moveJoystickValue = { x: 0, y: 0 };
-                }, { passive: false });
-                
-                return container;
-            }
-            
-            // Crear joystick de cámara (derecho)
-            function createCameraJoystick() {
-                const container = document.createElement('div');
-                container.id = 'camera-joystick';
-                container.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    width: 80px;
-                    height: 80px;
-                    background: rgba(0, 0, 0, 0.6);
-                    border: 2px solid rgba(255, 255, 255, 0.4);
-                    border-radius: 50%;
-                    z-index: 1000;
-                    touch-action: none;
-                    user-select: none;
-                `;
-                
-                const handle = document.createElement('div');
-                handle.id = 'camera-joystick-handle';
-                handle.style.cssText = `
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 30px;
-                    height: 30px;
-                    background: rgba(255, 255, 255, 0.9);
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    transition: background 0.2s;
-                `;
-                
-                container.appendChild(handle);
-                document.body.appendChild(container);
-                
-                let isDragging = false;
-                let startPos = { x: 0, y: 0 };
-                
-                container.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    isDragging = true;
+                } else {
                     cameraJoystickActive = true;
-                    const rect = container.getBoundingClientRect();
-                    startPos = {
-                        x: rect.left + rect.width / 2,
-                        y: rect.top + rect.height / 2
-                    };
-                }, { passive: false });
-                
-                container.addEventListener('touchmove', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!isDragging) return;
-                    
-                    const touch = e.touches[0];
-                    const deltaX = touch.clientX - startPos.x;
-                    const deltaY = touch.clientY - startPos.y;
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    const maxDistance = 25;
-                    
-                    if (distance > maxDistance) {
-                        const angle = Math.atan2(deltaY, deltaX);
-                        const clampedX = Math.cos(angle) * maxDistance;
-                        const clampedY = Math.sin(angle) * maxDistance;
-                        handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
-                        cameraJoystickValue = {
-                            x: clampedX / maxDistance,
-                            y: clampedY / maxDistance
-                        };
-                    } else {
-                        handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
-                        cameraJoystickValue = {
-                            x: deltaX / maxDistance,
-                            y: deltaY / maxDistance
-                        };
-                    }
-                }, { passive: false });
-                
-                container.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    isDragging = false;
-                    cameraJoystickActive = false;
-                    handle.style.transform = 'translate(-50%, -50%)';
-                    cameraJoystickValue = { x: 0, y: 0 };
-                }, { passive: false });
-                
-                return container;
+                }
             }
-            
-            // Crear los joysticks
-            moveJoystick = createMoveJoystick();
-            cameraJoystick = createCameraJoystick();
-            
-            // Deshabilitar controles de teclado y mouse en móvil
+
+            function handleTouchMove(type, e) {
+                if (!e.touches.length) return;
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const touch = e.touches[0];
+                const container = document.getElementById(type === 'move' ? 'move-joystick' : 'camera-joystick');
+                const rect = container.getBoundingClientRect();
+                const deltaX = touch.clientX - (rect.left + rect.width / 2);
+                const deltaY = touch.clientY - (rect.top + rect.height / 2);
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const maxDistance = 25;
+                
+                const handle = document.getElementById(`${type}-joystick-handle`);
+                
+                if (distance > maxDistance) {
+                    const angle = Math.atan2(deltaY, deltaX);
+                    const clampedX = Math.cos(angle) * maxDistance;
+                    const clampedY = Math.sin(angle) * maxDistance;
+                    handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
+                    
+                    if (type === 'move') {
+                        moveJoystick = { x: clampedX / maxDistance, y: clampedY / maxDistance };
+                    } else {
+                        cameraJoystick = { x: clampedX / maxDistance, y: clampedY / maxDistance };
+                    }
+                } else {
+                    handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                    
+                    if (type === 'move') {
+                        moveJoystick = { x: deltaX / maxDistance, y: deltaY / maxDistance };
+                    } else {
+                        cameraJoystick = { x: deltaX / maxDistance, y: deltaY / maxDistance };
+                    }
+                }
+            }
+
+            function handleTouchEnd(type, e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const handle = document.getElementById(`${type}-joystick-handle`);
+                handle.style.transform = 'translate(-50%, -50%)';
+                
+                if (type === 'move') {
+                    moveJoystickActive = false;
+                    moveJoystick = { x: 0, y: 0 };
+                } else {
+                    cameraJoystickActive = false;
+                    cameraJoystick = { x: 0, y: 0 };
+                }
+            }
+
+            // Modificar setupEventListeners para móvil
             const originalSetupEventListeners = setupEventListeners;
             setupEventListeners = function() {
                 window.addEventListener('resize', onWindowResize);
             };
-            
+
             // Modificar updateMovement para controles móviles
             const originalUpdateMovement = updateMovement;
-            updateMovement = function updateMovement() {
+            updateMovement = function() {
                 if (chatOpen) return;
-                
-                // Rotación de cámara con joystick derecho
-                if (Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
+
+                // Rotación de cámara
+                if (Math.abs(cameraJoystick.x) > 0.1) {
+                    targetRotationY += cameraJoystick.x * ROTATE_SPEED * 0.3;
                 }
-                
-                // Movimiento con joystick izquierdo (SOLO adelante/atrás)
-                if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
-                    const direction = new THREE.Vector3();
-                    camera.getWorldDirection(direction);
-                    direction.y = 0;
-                    direction.normalize();
-                    
-                    const moveDirection = new THREE.Vector3(direction.x, 0, direction.z);
-                    moveDirection.multiplyScalar(moveJoystickValue.y * MOVE_SPEED);
-                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
-                    
-                    if (velocity.length() > 0) {
-                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.2);
-                        const newPosition = targetPosition.clone().add(velocity);
-                        
-                        // Colisiones
-                        const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
-                        let collision = false;
-                        const nearbyCollisions = collisionObjects.filter(wallBox => {
-                            const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
-                            return distance < 20;
-                        });
-                        
-                        for (const wallBox of nearbyCollisions) {
-                            if (playerBox.intersectsBox(wallBox)) {
-                                collision = true;
-                                break;
-                            }
+
+                // Movimiento
+                if (moveJoystickActive && (Math.abs(moveJoystick.x) > 0.1 || Math.abs(moveJoystick.y) > 0.1)) {
+                    const moveDirection = new THREE.Vector3(
+                        moveJoystick.x,
+                        0,
+                        -moveJoystick.y
+                    );
+
+                    const rotationMatrix = new THREE.Matrix4().makeRotationY(targetRotationY);
+                    moveDirection.applyMatrix4(rotationMatrix);
+
+                    moveDirection.normalize().multiplyScalar(MOVE_SPEED * 0.5);
+
+                    const newPosition = targetPosition.clone().add(moveDirection);
+                    const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
+                    let collision = false;
+
+                    const nearbyCollisions = collisionObjects.filter(wallBox => {
+                        const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
+                        return distance < 20;
+                    });
+
+                    for (const wallBox of nearbyCollisions) {
+                        if (playerBox.intersectsBox(wallBox)) {
+                            collision = true;
+                            break;
                         }
-                        
-                        if (!collision) {
-                            targetPosition.copy(newPosition);
+                    }
+
+                    if (!collision) {
+                        targetPosition.copy(newPosition);
+                        position.lerp(targetPosition, 0.2);
+                    }
+                }
+            };
+        }     for (const wallBox of nearbyCollisions) {
+                        if (playerBox.intersectsBox(wallBox)) {
+                            collision = true;
+                            break;
                         }
+                    }
+                    if (!collision) {
+                        targetPosition.copy(newPosition);
                     }
                 }
 
