@@ -4096,6 +4096,7 @@
 
                 joystickContainer.addEventListener('touchstart', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     isDragging = true;
                     moveJoystickActive = true;
                     const rect = joystickContainer.getBoundingClientRect();
@@ -4107,6 +4108,7 @@
 
                 joystickContainer.addEventListener('touchmove', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (!isDragging) return;
                     
                     const touch = e.touches[0];
@@ -4135,6 +4137,7 @@
 
                 joystickContainer.addEventListener('touchend', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     isDragging = false;
                     moveJoystickActive = false;
                     joystickHandle.style.transform = 'translate(-50%, -50%)';
@@ -4186,6 +4189,7 @@
 
                 joystickContainer.addEventListener('touchstart', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     isDragging = true;
                     cameraJoystickActive = true;
                     const rect = joystickContainer.getBoundingClientRect();
@@ -4197,6 +4201,7 @@
 
                 joystickContainer.addEventListener('touchmove', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (!isDragging) return;
                     
                     const touch = e.touches[0];
@@ -4225,6 +4230,7 @@
 
                 joystickContainer.addEventListener('touchend', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     isDragging = false;
                     cameraJoystickActive = false;
                     joystickHandle.style.transform = 'translate(-50%, -50%)';
@@ -4250,16 +4256,9 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Debug: mostrar valores de joysticks
-                if (cameraJoystickActive || moveJoystickActive) {
-                    console.log('Camera joystick:', cameraJoystickValue.x.toFixed(2), 'Move joystick:', moveJoystickValue.y.toFixed(2));
-                }
-
                 // Rotación de cámara con joystick derecho (SIEMPRE activa independientemente del movimiento)
                 if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
-                    const rotationAmount = cameraJoystickValue.x * ROTATE_SPEED * 0.5;
-                    targetRotationY += rotationAmount;
-                    console.log('Rotando cámara:', rotationAmount.toFixed(3), 'Dirección:', cameraJoystickValue.x > 0 ? 'derecha' : 'izquierda');
+                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
                 }
 
                 // Movimiento con joystick izquierdo (solo adelante/atrás)
