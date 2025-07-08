@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -463,12 +463,25 @@
             }
         }
         
+        #simple-panel {
+            animation: slideIn 0.3s ease-out;
+        }
+        
         /* Estilos para el input de alias */
         #simple-alias-input:focus {
             border-color: #FFD700 !important;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
         }
         
+        /* Estilos para los botones del footer */
+        #simple-panel button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+        }
+        
+        #simple-panel button:active {
+            transform: translateY(0);
+        }
         .chat-message {
             padding: 6px 10px;
             border-radius: 8px;
@@ -482,7 +495,7 @@
             background: linear-gradient(90deg, #FFD70033, #FFD70011);
         }
         /* --- PIXEL ART STYLES FOR CUSTOMIZATION PANEL --- */
-        #customization-panel {
+        #simple-panel, #customization-panel {
           font-family: 'Press Start 2P', 'VT323', 'Courier New', monospace !important;
           font-size: 12px !important;
           border-radius: 0 !important;
@@ -490,14 +503,14 @@
           border: 4px solid #222 !important;
           background: #181818 !important;
         }
-        #customization-panel h3 {
+        #simple-panel h3, #customization-panel h3 {
           font-size: 13px !important;
           letter-spacing: 1px;
           margin: 0 0 10px 0 !important;
           color: #FFD700 !important;
           text-shadow: none !important;
         }
-        #customization-panel input {
+        #simple-panel input, #customization-panel input {
           font-family: inherit !important;
           font-size: 12px !important;
           padding: 6px 8px !important;
@@ -508,7 +521,7 @@
           box-shadow: none !important;
           outline: none !important;
         }
-        #customization-panel button {
+        #simple-panel button, #customization-panel button {
           font-family: inherit !important;
           font-size: 12px !important;
           padding: 6px 12px !important;
@@ -521,7 +534,7 @@
           margin: 2px 0;
           transition: background 0.1s, color 0.1s;
         }
-        #customization-panel button:hover {
+        #simple-panel button:hover, #customization-panel button:hover {
           background: #FFD700 !important;
           color: #222 !important;
         }
@@ -578,6 +591,146 @@
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
     
     <!-- Panel de personalización completamente rediseñado -->
+    <div id="simple-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 900px; max-width: 95vw; height: 650px; background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98)); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1004; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); border: 2px solid #4B0000;">
+        <!-- Header elegante -->
+        <div style="background: linear-gradient(135deg, #4B0000, #800000); color: #fff; padding: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #FFD700;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">👤</span>
+                <span style="font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">Personalizar Avatar</span>
+            </div>
+            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">✖</button>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div style="flex: 1; padding: 30px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
+            <!-- Columna izquierda - Opciones -->
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <!-- Sección de Alias -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">📝</span>
+                        Nombre del Avatar
+                    </h3>
+                    <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 16px;">Sin nombre</strong></p>
+                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 15px; font-size: 16px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
+                </div>
+                
+                <!-- Sección de Colores de Camisa -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">👕</span>
+                        Color de Camisa
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="width: 45px; height: 45px; background: #FF6B6B; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="width: 45px; height: 45px; background: #4ECDC4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="width: 45px; height: 45px; background: #45B7D1; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" style="width: 45px; height: 45px; background: #96CEB4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" style="width: 45px; height: 45px; background: #FFEAA7; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" style="width: 45px; height: 45px; background: #DDA0DD; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" style="width: 45px; height: 45px; background: #98D8C8; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xF7DC6F)" class="color-btn" data-color="0xF7DC6F" style="width: 45px; height: 45px; background: #F7DC6F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xBB8FCE)" class="color-btn" data-color="0xBB8FCE" style="width: 45px; height: 45px; background: #BB8FCE; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x85C1E9)" class="color-btn" data-color="0x85C1E9" style="width: 45px; height: 45px; background: #85C1E9; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xF8C471)" class="color-btn" data-color="0xF8C471" style="width: 45px; height: 45px; background: #F8C471; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x82E0AA)" class="color-btn" data-color="0x82E0AA" style="width: 45px; height: 45px; background: #82E0AA; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
+                </div>
+                
+                <!-- Sección de Colores de Pantalón -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">👖</span>
+                        Color de Pantalón
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changePantsColor(0x2C3E50)" class="color-btn" data-color="0x2C3E50" style="width: 45px; height: 45px; background: #2C3E50; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x34495E)" class="color-btn" data-color="0x34495E" style="width: 45px; height: 45px; background: #34495E; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x556B2F)" class="color-btn" data-color="0x556B2F" style="width: 45px; height: 45px; background: #556B2F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x006400)" class="color-btn" data-color="0x006400" style="width: 45px; height: 45px; background: #006400; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
+                </div>
+                
+                <!-- Sección de Colores de Zapatos -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">👞</span>
+                        Color de Zapatos
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changeShoesColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Columna derecha - Vista previa -->
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                <!-- Vista previa del avatar -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span style="font-size: 20px;">👤</span>
+                        Vista Previa
+                    </h3>
+                    <div id="avatar-preview" style="width: 150px; height: 200px; margin: 0 auto; position: relative; background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(30,30,30,0.5)); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 2px solid #333;">
+                        <div style="color: #ccc; font-size: 14px;">Avatar en tiempo real</div>
+                    </div>
+                </div>
+                
+                <!-- Información del alias -->
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
+                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span style="font-size: 20px;">📝</span>
+                        Nombre Actual
+                    </h3>
+                    <div id="preview-alias" style="color: #fff; font-size: 18px; font-weight: bold; padding: 15px; background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(20,20,20,0.5)); border-radius: 8px; border: 2px solid #FFD700; min-height: 20px;">Sin nombre</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer con botones -->
+        <div style="padding: 20px 30px; background: linear-gradient(135deg, rgba(34,34,34,0.95), rgba(44,44,44,0.95)); border-top: 2px solid #333; display: flex; gap: 15px; justify-content: flex-end;">
+            <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
+            <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
+        </div>
+    </div>
+    <div id="chat-panel">
+        <div id="chat-header">
+            Chat
+            <button id="chat-close-btn" title="Cerrar">✖</button>
+        </div>
+        <div id="chat-content">
+            <div id="chat-main">
+                <div id="chat-messages"></div>
+                <div id="chat-input-area">
+                    <button id="emoji-toggle" title="Emojis">😊</button>
+                    <input id="chat-input" type="text" placeholder="Escribe un mensaje..." autocomplete="off" />
+                    <button id="chat-send-btn">Enviar</button>
+                </div>
+                <div id="emoji-panel"></div>
+            </div>
+            <div id="users-sidebar">
+                <div id="users-title">Usuarios</div>
+                <div id="users-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel de personalización de avatar -->
     <div id="customization-panel">
         <div id="customization-header">
             Personalizar Avatar
@@ -613,6 +766,10 @@
             </div>
 
         </div>
+        <div id="customization-actions">
+            <button id="reset-customization-btn" class="customization-btn">Restablecer</button>
+            <button id="save-customization-btn" class="customization-btn">Guardar</button>
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -621,7 +778,6 @@
     <script src="/firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
-        (function() {
         const originalStoreLinks = [
             "https://www.ipweb.pro/en/?Davincho88", "https://ipgold.biz/?r=meramente42@gmail.com", "https://surfe.be/ext/2837287",
             "https://sproutgigs.com/?a=0675642e", "https://r.adbtc.top/2847448", "https://www.coinpayu.com/?r=everest101",
@@ -661,33 +817,33 @@
             'autofaucet': 'autofaucet-logo.png',
             'freebitco': 'freebitcoin-logo.png',
             'faucetpay': 'faucetpay-logo.png',
-            'r.honeygain': 'honeygain-logo.png',
+            'honeygain': 'honeygain-logo.png',
             'pawns': 'pawns-logo.png',
             'teaserfast': 'teaserfast-logo.png',
-            'addon.money': 'addon-money-logo.png',
+            'addon': 'addonmoney-logo.png',
             'everve': 'everve-logo.png',
-            'swash': 'swash-logo.png',
+            'swashapp': 'swash-logo.png',
             'addslice': 'addslice-logo.png',
             'earnapp': 'earnapp-logo.png',
-            'node.optimai': 'optimai-logo.png',
+            'optimai': 'optimai-logo.png',
             'teneo': 'teneo-logo.png',
-            'nodepay.ai': 'nodepay-logo.png',
+            'nodepay': 'nodepay-logo.png',
             'jumptask': 'jumptask-logo.png',
             'payeer': 'payeer-logo.png',
             'rollercoin': 'rollercoin-logo.png',
-            'bux.money': 'bux-money-logo.png',
+            'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
-            'getgrass': 'grass-logo.png',
+            'grass': 'grass-logo.png',
+            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
-            'freebitco.in': 'freebitco-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
             'bybit': 'bybit-logo.png',
             'givvyMusic': 'givvymusic-logo.png',
             'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png',
+            'givvyScratchCardNew': 'givvystream-logo.png', // Usar givvystream como fallback
             'swcapp': 'swcapp-logo.png',
-            'app-earnings-link': 'givvystream-logo.png'
+            'app-earnings-link': 'givvystream-logo.png' // Agregar alias para app-earnings-link.com
         };
 
         // Duplicar los enlaces 5 veces para asegurar que hay suficientes para todos los pisos
@@ -2276,6 +2432,12 @@
                 return;
             }
             
+            // Si el panel de personalización está abierto, no procesar clics del juego
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel && simplePanel.style.display === 'block') {
+                return;
+            }
+            
             if (event.button !== 0) return; // Solo clic izquierdo
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -2446,7 +2608,10 @@
         let connectedUsers = [];
         
         chatToggleBtn.onclick = () => {
-
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel && simplePanel.style.display === 'block') {
+                closeSimplePanel();
+            }
             chatPanel.style.display = 'flex';
             chatOpen = true;
             chatInput.focus();
@@ -2533,29 +2698,75 @@
         
 
 
+        function openCustomizationPanel() {
+            console.log('Abriendo panel simple de personalización');
+            
+            // Cerrar chat si está abierto
+            if (chatOpen) {
+                chatPanel.style.display = 'none';
+                chatOpen = false;
+            }
+            
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel) {
+                // Actualizar el alias actual
+                const currentAliasElement = document.getElementById('current-alias');
+                if (currentAliasElement) {
+                    currentAliasElement.textContent = userAlias || 'Sin alias';
+                }
+                
+                // Actualizar la vista previa del alias
+                const previewAliasElement = document.getElementById('preview-alias');
+                if (previewAliasElement) {
+                    previewAliasElement.textContent = userAlias || 'Sin alias';
+                }
+                
+                // Poblar el input con el alias actual
+                const aliasInput = document.getElementById('simple-alias-input');
+                if (aliasInput) {
+                    aliasInput.value = userAlias || '';
+                    // Agregar event listener para actualizar vista previa en tiempo real
+                    aliasInput.addEventListener('input', function() {
+                        const previewAliasElement = document.getElementById('preview-alias');
+                        if (previewAliasElement) {
+                            previewAliasElement.textContent = this.value || 'Sin alias';
+                        }
+                    });
+                }
+                
+                // Mostrar el panel
+                simplePanel.style.display = 'block';
+                customizationPanelOpen = true;
+                
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+                
+                console.log('✅ Panel simple mostrado');
+                            // Mostrar overlay y bloquear clics
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                overlay.style.display = 'block';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '1002';
+            }
+            } else {
+                console.log('❌ Panel simple no encontrado');
+            }
+        }
+        
+
+        
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
             shirtColor = color;
             currentCustomization.shirtColor = color;
-            
-            // Actualizar el avatar en tiempo real
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.bodyMaterial) {
-                avatar.bodyMaterial.color.setHex(color);
-                avatar.bodyMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar selección visual en los botones
+            updateAvatarPreview();
             updateColorButtonSelection('shirt', color);
-            
-            // Guardar automáticamente en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         }
         
         function changePantsColor(color) {
             console.log('Cambiando color de pantalón a:', color);
             pantsColor = color;
-            currentCustomization.pantsColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
             const avatar = userAvatars.get(userAlias);
@@ -2564,17 +2775,16 @@
                 avatar.pantsMaterial.needsUpdate = true;
             }
             
-            // Actualizar selección visual en los botones
-            updateColorButtonSelection('pants', color);
+            // Actualizar vista previa
+            updateAvatarPreview();
             
-            // Guardar automáticamente en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            // Feedback visual en los botones
+            updateColorButtonSelection('pants', color);
         }
         
         function changeShoesColor(color) {
             console.log('Cambiando color de zapatos a:', color);
             shoesColor = color;
-            currentCustomization.shoesColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
             const avatar = userAvatars.get(userAlias);
@@ -2583,38 +2793,22 @@
                 avatar.shoeMaterial.needsUpdate = true;
             }
             
-            // Actualizar selección visual en los botones
-            updateColorButtonSelection('shoes', color);
+            // Actualizar vista previa
+            updateAvatarPreview();
             
-            // Guardar automáticamente en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            // Feedback visual en los botones
+            updateColorButtonSelection('shoes', color);
         }
         
         function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior del tipo específico
-            let selector = '';
-            switch (type) {
-                case 'shirt':
-                    selector = '#shirt-colors .color-btn';
-                    break;
-                case 'pants':
-                    selector = '#pants-colors .color-btn';
-                    break;
-                case 'shoes':
-                    selector = '#shoes-colors .color-btn';
-                    break;
-                default:
-                    return;
-            }
-            
-            document.querySelectorAll(selector).forEach(btn => {
+            // Remover selección anterior
+            document.querySelectorAll('.color-btn').forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
-                btn.style.boxShadow = 'none';
             });
             
             // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`${selector}[data-color="${selectedColor}"]`);
+            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
             if (selectedBtn) {
                 selectedBtn.style.borderColor = '#FFD700';
                 selectedBtn.style.transform = 'scale(1.1)';
@@ -2625,10 +2819,12 @@
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
             const aliasPreview = document.getElementById('preview-alias');
+            const aliasInput = document.getElementById('simple-alias-input');
             
             if (previewDiv && aliasPreview) {
                 // Actualizar el alias en la vista previa
-                aliasPreview.textContent = userAlias || 'Sin nombre';
+                const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
+                aliasPreview.textContent = currentAlias || 'Sin nombre';
                 
                 // Crear una vista previa visual del avatar más detallada
                 const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
@@ -2668,113 +2864,94 @@
                         </div>
                         
                         <!-- Nombre del avatar -->
-                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${userAlias || 'Sin nombre'}</div>
+                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${currentAlias || 'Sin nombre'}</div>
                     </div>
                 `;
             }
         }
         
-        function populateColorGrids() {
-            console.log('Poblando grids de colores...');
+        function resetSimpleCustomization() {
+            console.log('Restableciendo personalización');
             
-            // Poblar colores de camisas (primeros 18 colores)
-            const shirtGrid = document.getElementById('shirt-colors');
-            if (shirtGrid) {
-                shirtGrid.innerHTML = '';
-                for (let i = 0; i < 18; i++) {
-                    const colorBtn = document.createElement('div');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.onclick = () => changeShirtColor(customizationColors[i]);
-                    
-                    // Marcar color actual
-                    if (customizationColors[i] === currentCustomization.shirtColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-                    }
-                    
-                    shirtGrid.appendChild(colorBtn);
-                }
+            // Restablecer colores por defecto
+            shirtColor = 0xFF6B6B;
+            pantsColor = 0x2C3E50;
+            shoesColor = 0x8B4513;
+            
+            // Restablecer alias
+            userAlias = '';
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.value = '';
             }
             
-            // Poblar colores de pantalones (siguientes 18 colores)
-            const pantsGrid = document.getElementById('pants-colors');
-            if (pantsGrid) {
-                pantsGrid.innerHTML = '';
-                for (let i = 18; i < 36; i++) {
-                    const colorBtn = document.createElement('div');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.onclick = () => changePantsColor(customizationColors[i]);
-                    
-                    // Marcar color actual
-                    if (customizationColors[i] === currentCustomization.pantsColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-                    }
-                    
-                    pantsGrid.appendChild(colorBtn);
-                }
+            // Actualizar avatar en tiempo real usando el sistema correcto
+            const avatar = userAvatars.get(userAlias);
+            if (avatar) {
+                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
+                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
+                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
+                
+                // Forzar actualización de materiales
+                if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
+                if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
+                if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
             }
             
-            // Poblar colores de zapatos (últimos 18 colores)
-            const shoesGrid = document.getElementById('shoes-colors');
-            if (shoesGrid) {
-                shoesGrid.innerHTML = '';
-                for (let i = 36; i < 54; i++) {
-                    const colorBtn = document.createElement('div');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.onclick = () => changeShoesColor(customizationColors[i]);
-                    
-                    // Marcar color actual
-                    if (customizationColors[i] === currentCustomization.shoesColor) {
-                        colorBtn.style.borderColor = '#FFD700';
-                        colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-                    }
-                    
-                    shoesGrid.appendChild(colorBtn);
-                }
+            // Actualizar vista previa
+            updateAvatarPreview();
+            
+            // Limpiar selección de botones
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.style.borderColor = 'transparent';
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+            });
+            
+            console.log('✅ Personalización restablecida');
+        }
+        
+        function saveSimpleCustomization() {
+            console.log('Guardando personalización');
+            
+            const aliasInput = document.getElementById('simple-alias-input');
+            const newAlias = aliasInput ? aliasInput.value.trim() : '';
+            
+            // Validar alias
+            if (newAlias.length > 20) {
+                alert('El nombre no puede tener más de 20 caracteres');
+                return;
             }
             
-            console.log('✅ Grids de colores poblados');
+            // Guardar alias
+            userAlias = newAlias;
+            
+            // Guardar en localStorage
+            const customizationData = {
+                alias: userAlias,
+                shirtColor: shirtColor,
+                pantsColor: pantsColor,
+                shoesColor: shoesColor
+            };
+            
+            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
+            
+            // Actualizar nombre en el avatar
+            updateAvatarName();
+            
+            // Enviar alias al servidor si está conectado
+            if (isConnected) {
+                sendAlias();
+            }
+            
+            // Cerrar panel
+            closeSimplePanel();
+            
+            console.log('✅ Personalización guardada:', customizationData);
         }
         
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización completo');
+            console.log('Abriendo panel de personalización mejorado');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2782,22 +2959,33 @@
                 chatOpen = false;
             }
             
-            const customizationPanel = document.getElementById('customization-panel');
-            if (customizationPanel) {
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel) {
                 // Actualizar el alias actual
-                const aliasInput = document.getElementById('customization-alias-input');
+                const currentAliasElement = document.getElementById('current-alias');
+                const aliasInput = document.getElementById('simple-alias-input');
+                
+                if (currentAliasElement) {
+                    currentAliasElement.textContent = userAlias || 'Sin nombre';
+                }
+                
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
                 }
                 
-                // Poblar los grids de colores
-                populateColorGrids();
-                
                 // Mostrar el panel
-                customizationPanel.style.display = 'block';
+                simplePanel.style.display = 'flex';
                 customizationPanelOpen = true;
                 
-                console.log('✅ Panel de personalización completo mostrado');
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+                
+                // Marcar colores actuales en los botones
+                updateColorButtonSelection('shirt', shirtColor);
+                updateColorButtonSelection('pants', pantsColor);
+                updateColorButtonSelection('shoes', shoesColor);
+                
+                console.log('✅ Panel de personalización mejorado mostrado');
                 
                 // Mostrar overlay
                 const overlay = document.getElementById('ui-overlay');
@@ -2806,13 +2994,11 @@
                     overlay.style.pointerEvents = 'auto';
                     overlay.style.zIndex = '1002';
                 }
-            } else {
-                console.log('❌ Panel de personalización no encontrado');
             }
         }
         
-        function closeCustomizationPanel() {
-            const panel = document.getElementById('customization-panel');
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
                 customizationPanelOpen = false;
@@ -2825,12 +3011,52 @@
                     overlay.style.zIndex = '999';
                 }
                 
-                console.log('Panel de personalización completo cerrado');
+                console.log('Panel de personalización cerrado');
             }
         }
         
-        function saveCustomization() {
-            const aliasInput = document.getElementById('customization-alias-input');
+        // Event listeners para actualización en tiempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', function() {
+                    updateAvatarPreview();
+                });
+            }
+        });
+
+        function closeWorkingPanel() {
+            const panel = document.getElementById('working-customization-panel');
+            if (panel) {
+                panel.remove();
+            }
+            customizationPanelOpen = false;
+        }
+        
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                            // Ocultar overlay y permitir clics
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '999';
+            }
+                console.log('Panel simple cerrado');
+            }
+        }
+        
+        function changeShirtColor(color) {
+            currentCustomization.shirtColor = color;
+            applyCustomizationToAvatar();
+            console.log('Color de camisa cambiado a:', color);
+        }
+        
+        function saveSimpleCustomization() {
+            const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput.value.trim();
             
             if (newAlias.length > 0) {
@@ -2844,70 +3070,167 @@
                 console.log('Alias guardado:', newAlias);
             }
             
-            // Guardar personalización en localStorage
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            
-            // Aplicar cambios al avatar actual
-            applyCustomizationToAvatar();
-            
-            closeCustomizationPanel();
+            closeSimplePanel();
             alert('¡Personalización guardada!');
         }
         
-        function resetCustomization() {
-            // Restablecer colores por defecto
-            currentCustomization.shirtColor = 0x4ECDC4;
-            currentCustomization.pantsColor = 0x2C3E50;
-            currentCustomization.shoesColor = 0x8B4513;
-            
-            // Restablecer alias
-            userAlias = '';
-            const aliasInput = document.getElementById('customization-alias-input');
-            if (aliasInput) {
-                aliasInput.value = '';
+        function createWorkingColorGrids() {
+            // Crear opciones de color para camisas (primeros 18 colores)
+            const shirtGrid = document.getElementById('working-shirt-colors');
+            for (let i = 0; i < 18; i++) {
+                const colorOption = document.createElement('div');
+                colorOption.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                `;
+                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
+                if (customizationColors[i] === currentCustomization.shirtColor) {
+                    colorOption.style.borderColor = '#FFD700';
+                }
+                shirtGrid.appendChild(colorOption);
             }
             
-            // Aplicar cambios al avatar
+            // Crear opciones de color para pantalones (siguientes 18 colores)
+            const pantsGrid = document.getElementById('working-pants-colors');
+            for (let i = 18; i < 36; i++) {
+                const colorOption = document.createElement('div');
+                colorOption.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                `;
+                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'pants');
+                if (customizationColors[i] === currentCustomization.pantsColor) {
+                    colorOption.style.borderColor = '#FFD700';
+                }
+                pantsGrid.appendChild(colorOption);
+            }
+            
+            // Crear opciones de color para zapatos (últimos 18 colores)
+            const shoesGrid = document.getElementById('working-shoes-colors');
+            for (let i = 36; i < 54; i++) {
+                const colorOption = document.createElement('div');
+                colorOption.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                `;
+                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shoes');
+                if (customizationColors[i] === currentCustomization.shoesColor) {
+                    colorOption.style.borderColor = '#FFD700';
+                }
+                shoesGrid.appendChild(colorOption);
+            }
+        }
+        
+        function selectWorkingColor(color, type) {
+            // Actualizar color actual
+            switch (type) {
+                case 'shirt':
+                    currentCustomization.shirtColor = color;
+                    break;
+                case 'pants':
+                    currentCustomization.pantsColor = color;
+                    break;
+                case 'shoes':
+                    currentCustomization.shoesColor = color;
+                    break;
+            }
+            
+            // Aplicar cambios inmediatamente al avatar
             applyCustomizationToAvatar();
             
-            // Repoblar grids de colores con selección actualizada
-            populateColorGrids();
-            
-            console.log('Personalización restablecida');
+            // Actualizar selecciones visuales
+            updateWorkingColorSelections();
         }
         
-        function applyCustomizationToAvatar() {
-            // Aplicar colores al avatar actual
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                if (avatar.bodyMaterial) {
-                    avatar.bodyMaterial.color.setHex(currentCustomization.shirtColor);
-                    avatar.bodyMaterial.needsUpdate = true;
+        function updateWorkingColorSelections() {
+            // Actualizar todas las opciones de color
+            const allOptions = document.querySelectorAll('#working-shirt-colors div, #working-pants-colors div, #working-shoes-colors div');
+            allOptions.forEach(option => {
+                option.style.borderColor = 'transparent';
+            });
+            
+            // Marcar las seleccionadas
+            const shirtOptions = document.querySelectorAll('#working-shirt-colors div');
+            const pantsOptions = document.querySelectorAll('#working-pants-colors div');
+            const shoesOptions = document.querySelectorAll('#working-shoes-colors div');
+            
+            shirtOptions.forEach((option, index) => {
+                if (customizationColors[index] === currentCustomization.shirtColor) {
+                    option.style.borderColor = '#FFD700';
                 }
-                if (avatar.pantsMaterial) {
-                    avatar.pantsMaterial.color.setHex(currentCustomization.pantsColor);
-                    avatar.pantsMaterial.needsUpdate = true;
+            });
+            
+            pantsOptions.forEach((option, index) => {
+                if (customizationColors[index + 18] === currentCustomization.pantsColor) {
+                    option.style.borderColor = '#FFD700';
                 }
-                if (avatar.shoeMaterial) {
-                    avatar.shoeMaterial.color.setHex(currentCustomization.shoesColor);
-                    avatar.shoeMaterial.needsUpdate = true;
+            });
+            
+            shoesOptions.forEach((option, index) => {
+                if (customizationColors[index + 36] === currentCustomization.shoesColor) {
+                    option.style.borderColor = '#FFD700';
+                }
+            });
+        }
+        
+        function saveWorkingCustomization() {
+            const aliasInput = document.getElementById('working-alias-input');
+            const newAlias = aliasInput.value.trim();
+            
+            if (newAlias.length === 0) {
+                alert('El alias no puede estar vacío');
+                return;
+            }
+            
+            if (newAlias.length > 18) {
+                alert('El alias no puede tener más de 18 caracteres');
+                return;
+            }
+            
+            if (newAlias !== userAlias) {
+                userAlias = newAlias;
+                localStorage.setItem('userAlias', userAlias);
+                
+                if (isConnected) {
+                    sendAlias();
                 }
             }
             
-            // Actualizar variables globales
-            shirtColor = currentCustomization.shirtColor;
-            pantsColor = currentCustomization.pantsColor;
-            shoesColor = currentCustomization.shoesColor;
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            closeWorkingPanel();
+            
+            alert('Personalización guardada exitosamente');
         }
         
-        function closeWorkingPanel() {
-            const panel = document.getElementById('working-customization-panel');
-            if (panel) {
-                panel.remove();
-            }
+        function resetWorkingCustomization() {
+            currentCustomization = {
+                shirtColor: 0x4ECDC4,
+                pantsColor: 0x2C3E50,
+                shoesColor: 0x8B4513
+            };
+            
+            applyCustomizationToAvatar();
+            updateWorkingColorSelections();
+        }
+
+        function closeCustomizationPanel() {
+            customizationPanel.style.display = 'none';
             customizationPanelOpen = false;
         }
-        
+
         function createColorGrids() {
             // Limpiar grids existentes
             shirtColorsGrid.innerHTML = '';
@@ -3063,6 +3386,8 @@
             }
         }
 
+
+
         // Cerrar panel al hacer clic fuera
         document.addEventListener('click', (e) => {
             // Cerrar chat si está abierto y se hace clic fuera
@@ -3162,31 +3487,6 @@
                     e.stopPropagation();
                     e.preventDefault();
                     return false;
-                });
-            }
-            
-            // Configurar event listener para el botón de cerrar del panel de personalización
-            const customizationCloseBtn = document.getElementById('customization-close-btn');
-            if (customizationCloseBtn) {
-                customizationCloseBtn.addEventListener('click', () => {
-                    customizationPanel.style.display = 'none';
-                });
-            }
-            
-            // Configurar event listener para el input de alias para guardar automáticamente
-            const aliasInput = document.getElementById('customization-alias-input');
-            if (aliasInput) {
-                aliasInput.addEventListener('input', function() {
-                    const newAlias = this.value.trim();
-                    if (newAlias.length > 0 && newAlias.length <= 20) {
-                        userAlias = newAlias;
-                        localStorage.setItem('userAlias', userAlias);
-                        
-                        // Enviar alias al servidor si está conectado
-                        if (isConnected) {
-                            sendAlias();
-                        }
-                    }
                 });
             }
         });
@@ -3355,10 +3655,182 @@
             });
         }
 
+        function openSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'block';
+                customizationPanelOpen = true;
+                fillColorGrids(); // Llenar los grids de colores al abrir el panel
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+            }
+        }
+
         // Inicialización robusta de colores de avatar
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
         if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
-        })
+
+        function fillColorGrids() {
+            // Llenar grid de camisas
+            const shirtGrid = document.getElementById('shirt-colors');
+            if (shirtGrid) {
+                shirtGrid.innerHTML = '';
+                for (let i = 0; i < 18; i++) {
+                    const color = customizationColors[i];
+                    const btn = document.createElement('div');
+                    btn.className = 'color-btn';
+                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
+                    btn.style.width = '24px';
+                    btn.style.height = '24px';
+                    btn.style.display = 'inline-block';
+                    btn.style.margin = '2px';
+                    btn.style.border = '2px solid transparent';
+                    btn.style.cursor = 'pointer';
+                    btn.setAttribute('data-color', color);
+                    btn.onclick = () => changeShirtColor(color);
+                    shirtGrid.appendChild(btn);
+                }
+            }
+            // Llenar grid de pantalones
+            const pantsGrid = document.getElementById('pants-colors');
+            if (pantsGrid) {
+                pantsGrid.innerHTML = '';
+                for (let i = 18; i < 36; i++) {
+                    const color = customizationColors[i];
+                    const btn = document.createElement('div');
+                    btn.className = 'color-btn';
+                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
+                    btn.style.width = '24px';
+                    btn.style.height = '24px';
+                    btn.style.display = 'inline-block';
+                    btn.style.margin = '2px';
+                    btn.style.border = '2px solid transparent';
+                    btn.style.cursor = 'pointer';
+                    btn.setAttribute('data-color', color);
+                    btn.onclick = () => changePantsColor(color);
+                    pantsGrid.appendChild(btn);
+                }
+            }
+            // Llenar grid de zapatos
+            const shoesGrid = document.getElementById('shoes-colors');
+            if (shoesGrid) {
+                shoesGrid.innerHTML = '';
+                for (let i = 36; i < 54; i++) {
+                    const color = customizationColors[i];
+                    const btn = document.createElement('div');
+                    btn.className = 'color-btn';
+                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
+                    btn.style.width = '24px';
+                    btn.style.height = '24px';
+                    btn.style.display = 'inline-block';
+                    btn.style.margin = '2px';
+                    btn.style.border = '2px solid transparent';
+                    btn.style.cursor = 'pointer';
+                    btn.setAttribute('data-color', color);
+                    btn.onclick = () => changeShoesColor(color);
+                    shoesGrid.appendChild(btn);
+                }
+            }
+        }
+
+        // --- Detección de móvil ---
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+        }
+
+        // --- Controles táctiles para móvil ---
+        if (isMobile()) {
+            let touchStartX = 0, touchStartY = 0;
+            let lastTouchX = 0, lastTouchY = 0;
+            let rotating = false;
+            let moving = false;
+            let moveDir = 0;
+            let touchMoved = false;
+            const minSwipe = 10;
+
+            renderer.domElement.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1) {
+                    touchStartX = lastTouchX = e.touches[0].clientX;
+                    touchStartY = lastTouchY = e.touches[0].clientY;
+                    rotating = true;
+                    moving = true;
+                    moveDir = 0;
+                    touchMoved = false;
+                }
+            }, { passive: false });
+            renderer.domElement.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 1) {
+                    const dx = e.touches[0].clientX - lastTouchX;
+                    const dy = e.touches[0].clientY - lastTouchY;
+                    // Horizontal: rotar cámara
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        targetRotationY -= dx * 0.01;
+                    }
+                    // Vertical: mover adelante/atrás
+                    else if (Math.abs(dy) > minSwipe) {
+                        moveDir = dy < 0 ? 1 : -1;
+                        touchMoved = true;
+                    }
+                    lastTouchX = e.touches[0].clientX;
+                    lastTouchY = e.touches[0].clientY;
+                }
+                e.preventDefault();
+            }, { passive: false });
+            renderer.domElement.addEventListener('touchend', function(e) {
+                rotating = false;
+                moving = false;
+                moveDir = 0;
+            }, { passive: false });
+
+            // Modificar updateMovement para móvil
+            const originalUpdateMovement = updateMovement;
+            updateMovement = function() {
+                if (chatOpen) return;
+                // Rotación ya se maneja por touch
+                // Movimiento adelante/atrás
+                if (moveDir !== 0) {
+                    const direction = new THREE.Vector3();
+                    camera.getWorldDirection(direction);
+                    direction.y = 0;
+                    direction.normalize();
+                    const velocity = direction.multiplyScalar(MOVE_SPEED * moveDir);
+                    const newPosition = targetPosition.clone().add(velocity);
+                    // Colisiones (igual que original)
+                    const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
+                    let collision = false;
+                    const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
+                    for (const wallBox of nearbyCollisions) {
+                        if (playerBox.intersectsBox(wallBox)) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                    if (!collision) {
+                        targetPosition.copy(newPosition);
+                    }
+                }
+                // Interpolación
+                camera.position.lerp(targetPosition, 0.2);
+                camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            };
+
+            // Overlay de ayuda para controles móviles
+            const help = document.createElement('div');
+            help.style.position = 'fixed';
+            help.style.bottom = '10px';
+            help.style.left = '50%';
+            help.style.transform = 'translateX(-50%)';
+            help.style.background = 'rgba(0,0,0,0.7)';
+            help.style.color = '#FFD700';
+            help.style.fontFamily = 'monospace';
+            help.style.fontSize = '13px';
+            help.style.padding = '10px 18px';
+            help.style.borderRadius = '8px';
+            help.style.zIndex = '9999';
+            help.innerHTML = 'Desliza horizontal para mirar<br>Desliza vertical para avanzar/retroceder';
+            document.body.appendChild(help);
+        }
     </script>
 </body>
 </html>
