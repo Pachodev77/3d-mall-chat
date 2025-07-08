@@ -4232,9 +4232,13 @@
                         velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
                     }
                     
-                    // Movimiento lateral (eje X del joystick) - corregido para ser natural
+                    // Movimiento lateral (eje X del joystick) - ahora también rota la cámara
                     if (Math.abs(moveJoystickValue.x) > 0.1) {
-                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x)); // Quitado el signo negativo
+                        // Movimiento lateral
+                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x));
+                        
+                        // Rotación horizontal mientras te mueves (más suave que el joystick de cámara)
+                        targetRotationY += moveJoystickValue.x * ROTATE_SPEED * 0.3;
                     }
                     
                     if (velocity.length() > 0) {
