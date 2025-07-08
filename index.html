@@ -2644,6 +2644,7 @@
             // --- Interpolación para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            camera.rotation.x = lerpAngle(camera.rotation.x, targetPitch, 0.2);
         }
 
         function animate(currentTime) {
@@ -4096,6 +4097,7 @@
         let cameraControlActive = false;
         let cameraStartX = 0, cameraStartY = 0;
         let cameraLastX = 0, cameraLastY = 0;
+        let targetPitch = 0; // Nueva variable para el pitch objetivo
 
         // --- Sistema de Joystick Virtual ---
         function initMobileControls() {
@@ -4197,6 +4199,8 @@
             const touch = e.touches[0];
             cameraStartX = cameraLastX = touch.clientX;
             cameraStartY = cameraLastY = touch.clientY;
+            // Sincronizar targetPitch con la cámara al tocar
+            targetPitch = camera.rotation.x;
         }
         
         function handleCameraMove(e) {
@@ -4207,14 +4211,12 @@
             const dy = touch.clientY - cameraLastY;
             
             // Rotar cámara horizontalmente (invertido para sentir natural)
-            // Deslizar hacia la derecha = girar hacia la izquierda (como mover la cabeza)
             targetRotationY -= dx * 0.005;
             
-            // Inclinar cámara verticalmente (invertido para sentir natural)
-            // Deslizar hacia arriba = mirar hacia abajo (como mover la cabeza)
-            const currentPitch = camera.rotation.x;
-            const newPitch = currentPitch - dy * 0.003;
-            camera.rotation.x = Math.max(-0.3, Math.min(0.3, newPitch));
+            // Inclinar cámara verticalmente usando targetPitch (invertido para sentir natural)
+            // Si sigue invertido, cambia el signo de dy
+            targetPitch -= dy * 0.003;
+            targetPitch = Math.max(-0.3, Math.min(0.3, targetPitch));
             
             cameraLastX = touch.clientX;
             cameraLastY = touch.clientY;
