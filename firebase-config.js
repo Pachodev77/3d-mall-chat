@@ -41,7 +41,18 @@ function connectToChat(alias) {
         Object.keys(positions).forEach(alias => {
             if (alias !== currentUser.alias) {
                 const userData = positions[alias];
-                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                // Defensive check: skip if any required field is missing or invalid
+                if (
+                    userData &&
+                    userData.position &&
+                    typeof userData.position.x === 'number' &&
+                    typeof userData.position.y === 'number' &&
+                    typeof userData.position.z === 'number' &&
+                    typeof userData.floor === 'number' &&
+                    typeof userData.rotation === 'number'
+                ) {
+                    updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                }
             }
         });
     });
