@@ -579,6 +579,9 @@
           padding: 4px 0 !important;
           margin: 4px 0 !important;
         }
+        .color-grid { display: grid !important; grid-template-columns: repeat(8, 1fr) !important; gap: 4px !important; margin: 8px 0 !important; }
+        .color-btn { width: 28px !important; height: 28px !important; border: 2px solid #444 !important; border-radius: 4px !important; background: transparent !important; cursor: pointer; transition: border 0.1s, transform 0.1s; }
+        .color-btn.selected { border: 2px solid #FFD700 !important; transform: scale(1.1); box-shadow: 0 0 8px #FFD70088; }
     </style>
 </head>
 <body>
@@ -3453,12 +3456,12 @@
         }
 
         // Inicialización robusta de colores de avatar
-        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
-        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
-        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = currentCustomization.shirtColor;
+        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = currentCustomization.pantsColor;
+        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = currentCustomization.shoesColor;
 
         function fillColorGrids() {
-            // Llenar grid de camisas
+            // Camisa
             const shirtGrid = document.getElementById('shirt-colors');
             if (shirtGrid) {
                 shirtGrid.innerHTML = '';
@@ -3468,12 +3471,12 @@
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
                     btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShirtColor(color);
+                    btn.onclick = () => { shirtColor = color; currentCustomization.shirtColor = color; updateAvatarPreview(); updateColorButtonSelection('shirt', color); };
                     if (color === shirtColor) btn.classList.add('selected');
                     shirtGrid.appendChild(btn);
                 }
             }
-            // Llenar grid de pantalones
+            // Pantalón
             const pantsGrid = document.getElementById('pants-colors');
             if (pantsGrid) {
                 pantsGrid.innerHTML = '';
@@ -3483,12 +3486,12 @@
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
                     btn.setAttribute('data-color', color);
-                    btn.onclick = () => changePantsColor(color);
+                    btn.onclick = () => { pantsColor = color; currentCustomization.pantsColor = color; updateAvatarPreview(); updateColorButtonSelection('pants', color); };
                     if (color === pantsColor) btn.classList.add('selected');
                     pantsGrid.appendChild(btn);
                 }
             }
-            // Llenar grid de zapatos
+            // Zapatos
             const shoesGrid = document.getElementById('shoes-colors');
             if (shoesGrid) {
                 shoesGrid.innerHTML = '';
@@ -3498,7 +3501,7 @@
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
                     btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShoesColor(color);
+                    btn.onclick = () => { shoesColor = color; currentCustomization.shoesColor = color; updateAvatarPreview(); updateColorButtonSelection('shoes', color); };
                     if (color === shoesColor) btn.classList.add('selected');
                     shoesGrid.appendChild(btn);
                 }
