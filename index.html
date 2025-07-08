@@ -4248,24 +4248,7 @@
                 camera.rotation.x = lerpAngle(camera.rotation.x, targetRotationX, 0.2); // Agregar interpolación vertical
             };
 
-            // Overlay de ayuda para joysticks
-            const help = document.createElement('div');
-            help.style.cssText = `
-                position: fixed;
-                bottom: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.7);
-                color: #FFD700;
-                font-family: monospace;
-                font-size: 12px;
-                padding: 8px 16px;
-                border-radius: 8px;
-                z-index: 9999;
-                text-align: center;
-            `;
-            help.innerHTML = 'Joystick izquierdo: Movimiento<br>Joystick derecho: Rotar cámara (X) y mirar arriba/abajo (Y)';
-            document.body.appendChild(help);
+            // Overlay de ayuda para joysticks eliminado
         }
     </script>
 </body>
