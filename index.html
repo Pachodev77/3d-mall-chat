@@ -2532,33 +2532,6 @@
         
 
 
-        function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización');
-            
-            // Cerrar chat si está abierto
-            if (chatOpen) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-            }
-            
-            // Mostrar el panel principal de personalización
-            customizationPanel.style.display = 'block';
-            customizationPanelOpen = true;
-            
-            // Inicializar vista previa del avatar
-            updateAvatarPreview();
-            
-            // Mostrar overlay y bloquear clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '1002';
-            }
-        }
-        
-
-        
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
             shirtColor = color;
