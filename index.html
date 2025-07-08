@@ -3461,8 +3461,10 @@
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = currentCustomization.shoesColor;
 
         function fillColorGrids() {
+            console.log('Llenando grids de colores...');
             // Camisa
             const shirtGrid = document.getElementById('shirt-colors');
+            let shirtCount = 0;
             if (shirtGrid) {
                 shirtGrid.innerHTML = '';
                 for (let i = 0; i < 18; i++) {
@@ -3474,10 +3476,17 @@
                     btn.onclick = () => { shirtColor = color; currentCustomization.shirtColor = color; updateAvatarPreview(); updateColorButtonSelection('shirt', color); };
                     if (color === shirtColor) btn.classList.add('selected');
                     shirtGrid.appendChild(btn);
+                    shirtCount++;
                 }
+                // Fuerza el display y height
+                shirtGrid.style.display = 'grid';
+                shirtGrid.style.height = 'auto';
+                shirtGrid.style.overflow = 'visible';
+                console.log('Botones de camisa:', shirtCount);
             }
             // Pantalón
             const pantsGrid = document.getElementById('pants-colors');
+            let pantsCount = 0;
             if (pantsGrid) {
                 pantsGrid.innerHTML = '';
                 for (let i = 18; i < 36; i++) {
@@ -3489,10 +3498,16 @@
                     btn.onclick = () => { pantsColor = color; currentCustomization.pantsColor = color; updateAvatarPreview(); updateColorButtonSelection('pants', color); };
                     if (color === pantsColor) btn.classList.add('selected');
                     pantsGrid.appendChild(btn);
+                    pantsCount++;
                 }
+                pantsGrid.style.display = 'grid';
+                pantsGrid.style.height = 'auto';
+                pantsGrid.style.overflow = 'visible';
+                console.log('Botones de pantalón:', pantsCount);
             }
             // Zapatos
             const shoesGrid = document.getElementById('shoes-colors');
+            let shoesCount = 0;
             if (shoesGrid) {
                 shoesGrid.innerHTML = '';
                 for (let i = 36; i < 54; i++) {
@@ -3504,8 +3519,41 @@
                     btn.onclick = () => { shoesColor = color; currentCustomization.shoesColor = color; updateAvatarPreview(); updateColorButtonSelection('shoes', color); };
                     if (color === shoesColor) btn.classList.add('selected');
                     shoesGrid.appendChild(btn);
+                    shoesCount++;
                 }
+                shoesGrid.style.display = 'grid';
+                shoesGrid.style.height = 'auto';
+                shoesGrid.style.overflow = 'visible';
+                console.log('Botones de zapatos:', shoesCount);
             }
+            // Si algún grid está vacío, muestra error en el panel
+            let errorMsg = '';
+            if (shirtCount === 0) errorMsg += 'No se pudo llenar el grid de camisa. ';
+            if (pantsCount === 0) errorMsg += 'No se pudo llenar el grid de pantalón. ';
+            if (shoesCount === 0) errorMsg += 'No se pudo llenar el grid de zapatos. ';
+            if (errorMsg) {
+                let panel = document.getElementById('simple-panel-content');
+                if (panel) {
+                    let err = document.getElementById('color-grid-error');
+                    if (!err) {
+                        err = document.createElement('div');
+                        err.id = 'color-grid-error';
+                        err.style.color = 'red';
+                        err.style.fontWeight = 'bold';
+                        err.style.margin = '10px 0';
+                        panel.prepend(err);
+                    }
+                    err.textContent = errorMsg;
+                }
+            } else {
+                let err = document.getElementById('color-grid-error');
+                if (err) err.remove();
+            }
+            // Scroll automático para mostrar los grids
+            setTimeout(() => {
+                const panel = document.getElementById('simple-panel-content');
+                if (panel) panel.scrollTop = 0;
+            }, 100);
         }
 
         // --- Detección de móvil ---
