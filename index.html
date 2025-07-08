@@ -3019,27 +3019,42 @@
         function populateColorGrids() {
             console.log('Poblando grids de colores...');
             
+            // Estilos base para todos los botones de color
+            const baseStyles = `
+                width: 45px;
+                height: 45px;
+                border: 3px solid transparent;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s;
+                position: relative;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            // Función auxiliar para crear botón de color
+            const createColorButton = (color, type, onClick) => {
+                const colorBtn = document.createElement('button');
+                colorBtn.className = 'color-btn';
+                colorBtn.style.cssText = baseStyles + `
+                    background-color: #${color.toString(16).padStart(6, '0')};
+                `;
+                colorBtn.setAttribute('data-color', color);
+                colorBtn.setAttribute('data-type', type);
+                colorBtn.onclick = onClick;
+                return colorBtn;
+            };
+
             // Poblar colores de camisas (primeros 18 colores)
             const shirtGrid = document.getElementById('shirt-colors');
             if (shirtGrid) {
                 shirtGrid.innerHTML = '';
                 for (let i = 0; i < 18; i++) {
-                    const colorBtn = document.createElement('button');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 45px;
-                        height: 45px;
-                        border: 3px solid transparent;
-                        border-radius: 10px;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                        position: relative;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.setAttribute('data-type', 'shirt');
-                    colorBtn.onclick = () => changeShirtColor(customizationColors[i]);
+                    const colorBtn = createColorButton(customizationColors[i], 'shirt', () => {
+                        changeShirtColor(customizationColors[i]);
+                    });
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.shirtColor) {
@@ -3051,28 +3066,15 @@
                     shirtGrid.appendChild(colorBtn);
                 }
             }
-            
+
             // Poblar colores de pantalones (siguientes 18 colores)
             const pantsGrid = document.getElementById('pants-colors');
             if (pantsGrid) {
                 pantsGrid.innerHTML = '';
                 for (let i = 18; i < 36; i++) {
-                    const colorBtn = document.createElement('button');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 45px;
-                        height: 45px;
-                        border: 3px solid transparent;
-                        border-radius: 10px;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                        position: relative;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.setAttribute('data-type', 'pants');
-                    colorBtn.onclick = () => changePantsColor(customizationColors[i]);
+                    const colorBtn = createColorButton(customizationColors[i], 'pants', () => {
+                        changePantsColor(customizationColors[i]);
+                    });
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.pantsColor) {
@@ -3084,28 +3086,15 @@
                     pantsGrid.appendChild(colorBtn);
                 }
             }
-            
+
             // Poblar colores de zapatos (últimos 18 colores)
             const shoesGrid = document.getElementById('shoes-colors');
             if (shoesGrid) {
                 shoesGrid.innerHTML = '';
                 for (let i = 36; i < 54; i++) {
-                    const colorBtn = document.createElement('button');
-                    colorBtn.className = 'color-btn';
-                    colorBtn.style.cssText = `
-                        width: 45px;
-                        height: 45px;
-                        border: 3px solid transparent;
-                        border-radius: 10px;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                        position: relative;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                        background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                    `;
-                    colorBtn.setAttribute('data-color', customizationColors[i]);
-                    colorBtn.setAttribute('data-type', 'shoes');
-                    colorBtn.onclick = () => changeShoesColor(customizationColors[i]);
+                    const colorBtn = createColorButton(customizationColors[i], 'shoes', () => {
+                        changeShoesColor(customizationColors[i]);
+                    });
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.shoesColor) {
@@ -3117,7 +3106,7 @@
                     shoesGrid.appendChild(colorBtn);
                 }
             }
-            
+
             console.log('✅ Grids de colores poblados');
         }
         
@@ -4280,26 +4269,26 @@
 
             // Modificar updateMovement para controles móviles
             const originalUpdateMovement = updateMovement;
-            updateMovement = function() {
+            updateMovement = function updateMovement() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho (SIEMPRE activa, aunque se esté moviendo)
+                // Rotación de cámara con joystick derecho
                 if (Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
+                    // Invertir la dirección del joystick para que gire hacia la derecha correctamente
+                    targetRotationY += -cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
 
                 // Movimiento con joystick izquierdo (SOLO adelante/atrás)
                 if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
-                    // Asegurarse de que la rotación no se bloquee durante el movimiento
-                    if (Math.abs(cameraJoystickValue.x) > 0.1) {
-                        targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
-                    }
+                    // Crear dirección de movimiento basada solo en el eje Y del joystick izquierdo
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
                     
-                    const velocity = new THREE.Vector3();
+                    // Ajustar dirección según el eje Y (adelante/atrás)
+                    const moveDirection = new THREE.Vector3(direction.x, 0, direction.z);
+                    moveDirection.multiplyScalar(moveJoystickValue.y * MOVE_SPEED);
                     velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
                     
                     if (velocity.length() > 0) {
