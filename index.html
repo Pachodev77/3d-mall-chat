@@ -635,22 +635,53 @@
             transform: scale(1.1);
         }
         
+        .camera-joystick-container {
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: relative;
+            touch-action: none;
+        }
+        
+        .camera-joystick-base {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.3) 70%);
+        }
+        
+        .camera-joystick-stick {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 150, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            touch-action: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .camera-joystick-stick:active {
+            background: rgba(0, 150, 255, 1);
+            transform: scale(1.1);
+        }
+        
         .camera-controls {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 1000;
             display: none;
-        }
-        
-        .camera-area {
-            width: 200px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            position: relative;
-            touch-action: none;
         }
         
         .camera-label {
@@ -887,7 +918,10 @@
     
     <div class="camera-controls">
         <div class="camera-label">Cámara</div>
-        <div class="camera-area" id="camera-area"></div>
+        <div class="camera-joystick-container" id="camera-joystick-container">
+            <div class="camera-joystick-base"></div>
+            <div class="camera-joystick-stick" id="camera-joystick-stick"></div>
+        </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1025,7 +1059,6 @@
         const mouse = new THREE.Vector2();
         let targetPosition;
         let targetRotationY;
-        let targetPitch;
         let currentFloor = 0;
         let keyA = false;
         let keyD = false;
@@ -1138,7 +1171,6 @@
 
             targetPosition = camera.position.clone();
             targetRotationY = camera.rotation.y;
-            targetPitch = camera.rotation.x; // Sincronizar targetPitch con la rotación inicial de la cámara
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -2646,8 +2678,6 @@
             // --- Interpolación para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
-            // MANTENER LA ROTACIÓN X FIJA PARA EVITAR VOLTEO
-            camera.rotation.x = 0;
         }
 
         function animate(currentTime) {
@@ -2673,6 +2703,7 @@
             // Actualizar movimiento móvil si está activo
             if (isMobile()) {
                 updateMobileMovement();
+                updateCameraRotation();
             }
             
             updateAvatarPositions(); // Actualizar posiciones de avatares
@@ -4097,9 +4128,10 @@
         let joystickPosition = { x: 0, y: 0 };
         let joystickMaxDistance = 35;
         
-        let cameraControlActive = false;
-        let cameraStartX = 0, cameraStartY = 0;
-        let cameraLastX = 0, cameraLastY = 0;
+        let cameraJoystickActive = false;
+        let cameraJoystickCenter = { x: 0, y: 0 };
+        let cameraJoystickPosition = { x: 0, y: 0 };
+        let cameraJoystickMaxDistance = 35;
 
         // --- Sistema de Joystick Virtual ---
         function initMobileControls() {
@@ -4107,9 +4139,10 @@
             
             const joystickContainer = document.getElementById('joystick-container');
             const joystickStick = document.getElementById('joystick-stick');
-            const cameraArea = document.getElementById('camera-area');
+            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
+            const cameraJoystickStick = document.getElementById('camera-joystick-stick');
             
-            if (!joystickContainer || !joystickStick || !cameraArea) {
+            if (!joystickContainer || !joystickStick || !cameraJoystickContainer || !cameraJoystickStick) {
                 console.log('Controles móviles no encontrados, reintentando...');
                 setTimeout(initMobileControls, 100);
                 return;
@@ -4117,20 +4150,25 @@
             
             console.log('Inicializando controles móviles...');
             
-            // Configurar joystick
+            // Configurar joystick de movimiento
             joystickContainer.addEventListener('touchstart', handleJoystickStart, { passive: false });
             joystickContainer.addEventListener('touchmove', handleJoystickMove, { passive: false });
             joystickContainer.addEventListener('touchend', handleJoystickEnd, { passive: false });
             
-            // Configurar controles de cámara
-            cameraArea.addEventListener('touchstart', handleCameraStart, { passive: false });
-            cameraArea.addEventListener('touchmove', handleCameraMove, { passive: false });
-            cameraArea.addEventListener('touchend', handleCameraEnd, { passive: false });
+            // Configurar joystick de cámara
+            cameraJoystickContainer.addEventListener('touchstart', handleCameraJoystickStart, { passive: false });
+            cameraJoystickContainer.addEventListener('touchmove', handleCameraJoystickMove, { passive: false });
+            cameraJoystickContainer.addEventListener('touchend', handleCameraJoystickEnd, { passive: false });
             
-            // Obtener posición inicial del joystick
+            // Obtener posición inicial del joystick de movimiento
             const rect = joystickContainer.getBoundingClientRect();
             joystickCenter.x = rect.width / 2;
             joystickCenter.y = rect.height / 2;
+            
+            // Obtener posición inicial del joystick de cámara
+            const cameraRect = cameraJoystickContainer.getBoundingClientRect();
+            cameraJoystickCenter.x = cameraRect.width / 2;
+            cameraJoystickCenter.y = cameraRect.height / 2;
             
             console.log('Controles móviles inicializados correctamente');
         }
@@ -4195,41 +4233,64 @@
             }
         }
         
-        function handleCameraStart(e) {
+        function handleCameraJoystickStart(e) {
             e.preventDefault();
-            cameraControlActive = true;
+            cameraJoystickActive = true;
             const touch = e.touches[0];
-            cameraStartX = cameraLastX = touch.clientX;
-            cameraStartY = cameraLastY = touch.clientY;
-            // Sincronizar targetPitch con la cámara al tocar
-            targetPitch = camera.rotation.x;
-            console.log('Camera control started - Initial pitch:', targetPitch);
+            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
+            const rect = cameraJoystickContainer.getBoundingClientRect();
+            cameraJoystickPosition.x = touch.clientX - rect.left;
+            cameraJoystickPosition.y = touch.clientY - rect.top;
+            updateCameraJoystickPosition();
         }
         
-        function handleCameraMove(e) {
-            if (!cameraControlActive) return;
+        function handleCameraJoystickMove(e) {
+            if (!cameraJoystickActive) return;
             e.preventDefault();
             const touch = e.touches[0];
-            const dx = touch.clientX - cameraLastX;
-            const dy = touch.clientY - cameraLastY;
-            
-            // Rotar cámara horizontalmente (corregido para dirección natural)
-            // Deslizar hacia la derecha = girar hacia la derecha
-            targetRotationY += dx * 0.002; // Reducir sensibilidad horizontal
-            
-            // TEMPORALMENTE DESHABILITAR ROTACIÓN VERTICAL PARA EVITAR VOLTEO
-            // targetPitch -= dy * 0.001;
-            // targetPitch = Math.max(-0.1, Math.min(0.1, targetPitch));
-            
-            // Mantener targetPitch en 0 para evitar volteo
-            targetPitch = 0;
-            
-            cameraLastX = touch.clientX;
-            cameraLastY = touch.clientY;
+            const cameraJoystickContainer = document.getElementById('camera-joystick-container');
+            const rect = cameraJoystickContainer.getBoundingClientRect();
+            cameraJoystickPosition.x = touch.clientX - rect.left;
+            cameraJoystickPosition.y = touch.clientY - rect.top;
+            updateCameraJoystickPosition();
         }
         
-        function handleCameraEnd(e) {
-            cameraControlActive = false;
+        function handleCameraJoystickEnd(e) {
+            cameraJoystickActive = false;
+            cameraJoystickPosition.x = cameraJoystickCenter.x;
+            cameraJoystickPosition.y = cameraJoystickCenter.y;
+            updateCameraJoystickPosition();
+        }
+        
+        function updateCameraJoystickPosition() {
+            const cameraJoystickStick = document.getElementById('camera-joystick-stick');
+            if (!cameraJoystickStick) return;
+            
+            // Calcular distancia desde el centro
+            const dx = cameraJoystickPosition.x - cameraJoystickCenter.x;
+            const dy = cameraJoystickPosition.y - cameraJoystickCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Limitar distancia máxima
+            if (distance > cameraJoystickMaxDistance) {
+                const angle = Math.atan2(dy, dx);
+                cameraJoystickPosition.x = cameraJoystickCenter.x + Math.cos(angle) * cameraJoystickMaxDistance;
+                cameraJoystickPosition.y = cameraJoystickCenter.y + Math.sin(angle) * cameraJoystickMaxDistance;
+            }
+            
+            // Actualizar posición visual del stick (centrado en el stick de 50px)
+            const stickX = cameraJoystickPosition.x - 25;
+            const stickY = cameraJoystickPosition.y - 25;
+            cameraJoystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+            
+            // Efecto visual cuando está activo
+            if (cameraJoystickActive && distance > 5) {
+                cameraJoystickStick.style.background = 'rgba(0, 150, 255, 1)';
+                cameraJoystickStick.style.boxShadow = '0 4px 12px rgba(0, 150, 255, 0.4)';
+            } else {
+                cameraJoystickStick.style.background = 'rgba(0, 150, 255, 0.8)';
+                cameraJoystickStick.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+            }
         }
         
         // --- Función de movimiento actualizada para móvil ---
@@ -4289,6 +4350,33 @@
                 if (!collision) {
                     targetPosition.copy(newPosition);
                 }
+            }
+        }
+        
+        // --- Función de rotación de cámara para móvil ---
+        function updateCameraRotation() {
+            if (!isMobile() || !cameraJoystickActive) return;
+            
+            // Calcular dirección del joystick de cámara
+            const dx = cameraJoystickPosition.x - cameraJoystickCenter.x;
+            const dy = cameraJoystickPosition.y - cameraJoystickCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 5) { // Umbral mínimo para rotación
+                // Normalizar dirección
+                const normalizedDx = dx / distance;
+                const normalizedDy = dy / distance;
+                
+                // Calcular velocidad de rotación basada en distancia
+                const rotationSpeed = Math.min(distance / cameraJoystickMaxDistance, 1.0) * ROTATE_SPEED;
+                
+                // Rotar cámara horizontalmente
+                targetRotationY -= normalizedDx * rotationSpeed;
+                
+                // Inclinar cámara verticalmente (limitado)
+                const currentPitch = camera.rotation.x;
+                const newPitch = currentPitch - normalizedDy * rotationSpeed * 0.5;
+                camera.rotation.x = Math.max(-0.3, Math.min(0.3, newPitch));
             }
         }
         
