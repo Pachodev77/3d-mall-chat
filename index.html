@@ -2617,22 +2617,13 @@
                     currentAliasElement.textContent = userAlias || 'Sin alias';
                 }
                 
-                // Actualizar la vista previa del alias
-                const previewAliasElement = document.getElementById('preview-alias');
-                if (previewAliasElement) {
-                    previewAliasElement.textContent = userAlias || 'Sin alias';
-                }
-                
                 // Poblar el input con el alias actual
                 const aliasInput = document.getElementById('simple-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
                     // Agregar event listener para actualizar vista previa en tiempo real
                     aliasInput.addEventListener('input', function() {
-                        const previewAliasElement = document.getElementById('preview-alias');
-                        if (previewAliasElement) {
-                            previewAliasElement.textContent = this.value || 'Sin alias';
-                        }
+                        updateAvatarPreview();
                     });
                 }
                 
@@ -2720,19 +2711,15 @@
         
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
-            const aliasPreview = document.getElementById('preview-alias');
             const aliasInput = document.getElementById('simple-alias-input');
-            
-            if (previewDiv && aliasPreview) {
+            // Eliminar referencia a preview-alias
+            if (previewDiv) {
                 // Actualizar el alias en la vista previa
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                aliasPreview.textContent = currentAlias || 'Sin nombre';
-                
                 // Crear una vista previa visual del avatar más detallada
                 const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
                 const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
-                
                 previewDiv.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative;">
                         <!-- Cabeza -->
@@ -2741,30 +2728,18 @@
                             <div style="position: absolute; top: 8px; left: 8px; width: 6px; height: 6px; background: #000; border-radius: 50%;"></div>
                             <div style="position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; background: #000; border-radius: 50%;"></div>
                         </div>
-                        
-                        <!-- Torso (camisa) -->
-                        <div style="width: 50px; height: 60px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 4px; position: relative;">
-                            <!-- Brazos -->
-                            <div style="position: absolute; top: 10px; left: -8px; width: 12px; height: 40px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
-                            <div style="position: absolute; top: 10px; right: -8px; width: 12px; height: 40px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
-                            <!-- Manos -->
-                            <div style="position: absolute; bottom: -8px; left: -8px; width: 12px; height: 12px; background: #FFE4C4; border: 2px solid #333; border-radius: 4px;"></div>
-                            <div style="position: absolute; bottom: -8px; right: -8px; width: 12px; height: 12px; background: #FFE4C4; border: 2px solid #333; border-radius: 4px;"></div>
-                        </div>
-                        
-                        <!-- Pantalones -->
+                        <!-- Cuerpo -->
+                        <div style="width: 32px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 6px; margin-top: 2px;"></div>
+                        <!-- Piernas -->
                         <div style="width: 50px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 4px; position: relative;">
-                            <!-- Piernas -->
                             <div style="position: absolute; bottom: -8px; left: 8px; width: 12px; height: 30px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
                             <div style="position: absolute; bottom: -8px; right: 8px; width: 12px; height: 30px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
                         </div>
-                        
                         <!-- Zapatos -->
                         <div style="display: flex; gap: 4px; justify-content: center;">
                             <div style="width: 16px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 2px;"></div>
                             <div style="width: 16px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 2px;"></div>
                         </div>
-                        
                         <!-- Nombre del avatar -->
                         <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${currentAlias || 'Sin nombre'}</div>
                     </div>
