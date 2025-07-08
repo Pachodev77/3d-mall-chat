@@ -234,77 +234,89 @@
             background: #555;
         }
         
-        /* Estilos para el panel de personalización */
-        #customization-panel {
+        /* Estilos para el panel de personalización simple */
+        #simple-panel.customization-panel {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 450px;
-            min-width: 450px;
-            height: 600px;
-            background: rgba(30,30,30,0.95);
-            border-radius: 12px;
+            width: 1100px;
+            max-width: 99vw;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 1003;
+            z-index: 1004;
             display: none;
+            flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
             border: 2px solid #4B0000;
-            visibility: visible;
-            opacity: 1;
-            box-sizing: border-box;
         }
         
-        #customization-header {
+        #simple-panel .panel-header {
             background: linear-gradient(135deg, #4B0000, #800000);
             color: #fff;
-            padding: 16px;
+            padding: 24px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 2px solid #FFD700;
-            width: 100%;
-            min-height: 60px;
-            box-sizing: border-box;
         }
         
-        #customization-close-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
+        #simple-panel .panel-header > div {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
         
-        #customization-close-btn:hover {
-            background: rgba(255,255,255,0.2);
+        #simple-panel .panel-header > div span:first-child {
+            font-size: 28px;
         }
         
-        #customization-content {
-            padding: 20px;
-            color: #fff;
+        #simple-panel .panel-header > div span:last-child {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        #simple-panel .panel-content {
             flex: 1;
-            min-height: 400px;
+            padding: 20px;
             overflow-y: auto;
+            color: #eee;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            min-height: 0;
+            min-width: 0;
         }
         
-        .customization-section {
-            margin-bottom: 25px;
-            padding: 15px;
-            background: rgba(40,40,40,0.5);
+        #simple-panel .options-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        #simple-panel .preview-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        #simple-panel .option-section {
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8));
             border-radius: 8px;
-            border-left: 4px solid #FFD700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            margin-bottom: 8px;
         }
         
-        .customization-section h3 {
-            margin: 0 0 15px 0;
+        #simple-panel .section-title {
+            margin: 0 0 16px 0;
             color: #FFD700;
-            font-size: 16px;
+            font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 1px;
             display: flex;
@@ -312,84 +324,58 @@
             gap: 8px;
         }
         
-        .section-icon {
-            font-size: 18px;
+        #simple-panel .section-title span:first-child {
+            font-size: 22px;
         }
         
-        .alias-input-section {
-            margin-bottom: 20px;
-        }
-        
-        .alias-input-section input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: 2px solid #333;
-            background: #222;
-            color: #fff;
-            transition: border-color 0.2s;
-        }
-        
-        .alias-input-section input:focus {
-            outline: none;
-            border-color: #FFD700;
-        }
-        
-        .color-section {
-            margin-bottom: 20px;
-        }
-        
-        .color-section h4 {
-            margin: 0 0 12px 0;
-            color: #ccc;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .color-grid {
+        #simple-panel .color-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(8, 1fr);
             gap: 8px;
         }
         
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border: 3px solid transparent;
+        #simple-panel .preview-section {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8));
             border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        #simple-panel .avatar-preview {
+            width: 150px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(30,30,30,0.5));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #333;
+        }
+        
+        #simple-panel .panel-footer {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(34,34,34,0.95), rgba(44,44,44,0.95));
+            border-top: 2px solid #333;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        #simple-panel .color-btn {
+            width: 45px;
+            height: 45px;
+            border: 3px solid transparent;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             position: relative;
         }
         
-        .color-option:hover {
-            transform: scale(1.1);
+        #simple-panel .color-btn:hover {
             border-color: #FFD700;
-        }
-        
-        .color-option.selected {
-            border-color: #FFD700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        
-        .color-option::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .color-option.selected::after {
-            opacity: 1;
         }
         
         #customization-actions {
@@ -502,23 +488,23 @@
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
     
     <!-- Panel de personalización completamente rediseñado -->
-    <div id="simple-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1100px; max-width: 99vw; height: 700px; background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98)); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1004; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); border: 2px solid #4B0000;">
+    <div id="simple-panel" class="customization-panel">
         <!-- Header elegante -->
-        <div style="background: linear-gradient(135deg, #4B0000, #800000); color: #fff; padding: 24px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #FFD700;">
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <span style="font-size: 28px;">👤</span>
-                <span style="font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Personalizar Avatar</span>
+        <div class="panel-header">
+            <div>
+                <span>👤</span>
+                <span>Personalizar Avatar</span>
             </div>
             <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.3s; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">✖</button>
         </div>
         
         <!-- Contenido principal -->
-        <div style="flex: 1; padding: 20px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 350px; gap: 20px; min-height: 0; min-width: 0;">
+        <div class="panel-content">
             <!-- Columna izquierda - Opciones -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="options-column">
                 <!-- Sección de Alias -->
-                <div style="padding: 12px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-bottom: 8px;">
-                    <h3 style="margin: 0 0 16px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <div class="option-section">
+                    <h3 class="section-title">
                         <span style="font-size: 22px;">📝</span>
                         Nombre del Avatar
                     </h3>
@@ -526,12 +512,12 @@
                 </div>
                 
                 <!-- Sección de Colores de Camisa -->
-                <div style="padding: 12px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-bottom: 8px;">
-                    <h3 style="margin: 0 0 16px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <div class="option-section">
+                    <h3 class="section-title">
                         <span style="font-size: 20px;">👕</span>
                         Color de Camisa
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
+                    <div class="color-grid">
                         <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="width: 45px; height: 45px; background: #FF6B6B; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="width: 45px; height: 45px; background: #4ECDC4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="width: 45px; height: 45px; background: #45B7D1; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
@@ -548,12 +534,12 @@
                 </div>
                 
                 <!-- Sección de Colores de Pantalón -->
-                <div style="padding: 12px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-bottom: 8px;">
-                    <h3 style="margin: 0 0 16px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <div class="option-section">
+                    <h3 class="section-title">
                         <span style="font-size: 20px;">👖</span>
                         Color de Pantalón
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
+                    <div class="color-grid">
                         <button onclick="changePantsColor(0x2C3E50)" class="color-btn" data-color="0x2C3E50" style="width: 45px; height: 45px; background: #2C3E50; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changePantsColor(0x34495E)" class="color-btn" data-color="0x34495E" style="width: 45px; height: 45px; background: #34495E; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changePantsColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
@@ -570,12 +556,12 @@
                 </div>
                 
                 <!-- Sección de Colores de Zapatos -->
-                <div style="padding: 12px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-bottom: 8px;">
-                    <h3 style="margin: 0 0 16px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <div class="option-section">
+                    <h3 class="section-title">
                         <span style="font-size: 20px;">👞</span>
                         Color de Zapatos
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
+                    <div class="color-grid">
                         <button onclick="changeShoesColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShoesColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShoesColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
@@ -589,14 +575,14 @@
             </div>
             
             <!-- Columna derecha - Vista previa -->
-            <div style="display: flex; flex-direction: column; gap: 25px;">
+            <div class="preview-column">
                 <!-- Vista previa del avatar -->
-                <div style="padding: 20px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center;">
+                <div class="preview-section">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                         <span style="font-size: 20px;">👤</span>
                         Vista Previa
                     </h3>
-                    <div id="avatar-preview" style="width: 150px; height: 200px; margin: 0 auto; position: relative; background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(30,30,30,0.5)); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid #333;">
+                    <div id="avatar-preview" class="avatar-preview">
                         <div style="color: #ccc; font-size: 14px;">Avatar en tiempo real</div>
                     </div>
                 </div>
@@ -605,7 +591,7 @@
         </div>
         
         <!-- Footer con botones -->
-        <div style="padding: 15px 20px; background: linear-gradient(135deg, rgba(34,34,34,0.95), rgba(44,44,44,0.95)); border-top: 2px solid #333; display: flex; gap: 10px; justify-content: flex-end;">
+        <div class="panel-footer">
             <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
             <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
         </div>
