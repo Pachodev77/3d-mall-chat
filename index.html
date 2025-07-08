@@ -621,6 +621,7 @@
     <script src="/firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
+        (function() {
         const originalStoreLinks = [
             "https://www.ipweb.pro/en/?Davincho88", "https://ipgold.biz/?r=meramente42@gmail.com", "https://surfe.be/ext/2837287",
             "https://sproutgigs.com/?a=0675642e", "https://r.adbtc.top/2847448", "https://www.coinpayu.com/?r=everest101",
@@ -3151,6 +3152,7 @@
         } else {
             init();
         }
+        }
 
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
@@ -3167,7 +3169,9 @@
             // Configurar event listener para el botón de cerrar del panel de personalización
             const customizationCloseBtn = document.getElementById('customization-close-btn');
             if (customizationCloseBtn) {
-                customizationCloseBtn.addEventListener('click', closeCustomizationPanel);
+                customizationCloseBtn.addEventListener('click', () => {
+                    customizationPanel.style.display = 'none';
+                });
             }
             
             // Configurar event listener para el input de alias para guardar automáticamente
@@ -3352,11 +3356,10 @@
             });
         }
 
-        }
-
         // Inicialización robusta de colores de avatar
         if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
+        })();
     </script>
 </body>
 </html>
