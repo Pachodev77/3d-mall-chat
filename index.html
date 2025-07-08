@@ -240,24 +240,24 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 1100px;
-            max-width: 99vw;
-            height: 700px;
+            width: 800px;
+            max-width: 95vw;
+            height: 500px;
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
             z-index: 1004;
             display: none;
             flex-direction: column;
             overflow: hidden;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(15px);
             border: 2px solid #4B0000;
         }
         
         #simple-panel .panel-header {
             background: linear-gradient(135deg, #4B0000, #800000);
             color: #fff;
-            padding: 24px;
+            padding: 16px;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -268,27 +268,27 @@
         #simple-panel .panel-header > div {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
         
         #simple-panel .panel-header > div span:first-child {
-            font-size: 28px;
+            font-size: 24px;
         }
         
         #simple-panel .panel-header > div span:last-child {
-            font-size: 24px;
+            font-size: 20px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         #simple-panel .panel-content {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
             color: #eee;
             display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
+            grid-template-columns: 1fr 250px;
+            gap: 15px;
             min-height: 0;
             min-width: 0;
         }
@@ -296,59 +296,59 @@
         #simple-panel .options-column {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         
         #simple-panel .preview-column {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
         }
         
         #simple-panel .option-section {
-            padding: 12px;
+            padding: 10px;
             background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8));
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            margin-bottom: 8px;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            margin-bottom: 6px;
         }
         
         #simple-panel .section-title {
-            margin: 0 0 16px 0;
+            margin: 0 0 12px 0;
             color: #FFD700;
-            font-size: 18px;
+            font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         #simple-panel .section-title span:first-child {
-            font-size: 22px;
+            font-size: 20px;
         }
         
         #simple-panel .color-grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
         }
         
         #simple-panel .preview-section {
-            padding: 20px;
+            padding: 15px;
             background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8));
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
             text-align: center;
         }
         
         #simple-panel .avatar-preview {
-            width: 150px;
-            height: 200px;
+            width: 120px;
+            height: 160px;
             margin: 0 auto;
             position: relative;
             background: linear-gradient(135deg, rgba(20,20,20,0.5), rgba(30,30,30,0.5));
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -356,19 +356,19 @@
         }
         
         #simple-panel .panel-footer {
-            padding: 15px 20px;
+            padding: 12px 15px;
             background: linear-gradient(135deg, rgba(34,34,34,0.95), rgba(44,44,44,0.95));
-            border-top: 2px solid #333;
+            border-top: 1px solid #333;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
         }
         
         #simple-panel .color-btn {
-            width: 45px;
-            height: 45px;
-            border: 3px solid transparent;
-            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            border: 2px solid transparent;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
@@ -378,6 +378,54 @@
             border-color: #FFD700;
         }
         
+        /* Estilos adicionales para elementos específicos */
+        #simple-panel .close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #simple-panel .section-icon {
+            font-size: 18px;
+        }
+
+        #simple-panel #simple-alias-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 2px solid #333;
+            background: rgba(20,20,20,0.8);
+            color: #fff;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        #simple-panel #simple-alias-input:focus {
+            border-color: #FFD700;
+        }
+
+        #simple-panel .color-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
         #customization-actions {
             padding: 16px 20px;
             background: rgba(34,34,34,0.9);
@@ -486,8 +534,7 @@
     <div id="crosshair"></div>
     <button id="chat-toggle-btn" title="Abrir chat">💬</button>
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
-    
-    <!-- Panel de personalización completamente rediseñado -->
+        <!-- Panel de personalización completamente rediseñado -->
     <div id="simple-panel" class="customization-panel">
         <!-- Header elegante -->
         <div class="panel-header">
@@ -495,7 +542,7 @@
                 <span>👤</span>
                 <span>Personalizar Avatar</span>
             </div>
-            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.3s; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">✖</button>
+            <button onclick="closeSimplePanel()" class="close-btn">✖</button>
         </div>
         
         <!-- Contenido principal -->
@@ -505,23 +552,23 @@
                 <!-- Sección de Alias -->
                 <div class="option-section">
                     <h3 class="section-title">
-                        <span style="font-size: 22px;">📝</span>
+                        <span class="section-icon">📝</span>
                         Nombre del Avatar
                     </h3>
-                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 18px; font-size: 18px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
+                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20">
                 </div>
                 
                 <!-- Sección de Colores de Camisa -->
                 <div class="option-section">
                     <h3 class="section-title">
-                        <span style="font-size: 20px;">👕</span>
+                        <span class="section-icon">👕</span>
                         Color de Camisa
                     </h3>
                     <div class="color-grid">
-                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="width: 45px; height: 45px; background: #FF6B6B; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="width: 45px; height: 45px; background: #4ECDC4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="width: 45px; height: 45px; background: #45B7D1; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" style="width: 45px; height: 45px; background: #96CEB4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B"></button>
+                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4"></button>
+                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1"></button>
+                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4"></button>
                         <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" style="width: 45px; height: 45px; background: #FFEAA7; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" style="width: 45px; height: 45px; background: #DDA0DD; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
                         <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" style="width: 45px; height: 45px; background: #98D8C8; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
