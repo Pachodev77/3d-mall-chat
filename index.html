@@ -2857,28 +2857,13 @@
                     break;
                 case 'pants':
                     selector = '.color-btn[onclick*="changePantsColor"]';
-                    break;
-                case 'shoes':
-                    selector = '.color-btn[onclick*="changeShoesColor"]';
-                    break;
-                default:
-                    return;
-            }
-            
-            document.querySelectorAll(selector).forEach(btn => {
-                btn.classList.remove('selected');
-                btn.style.borderColor = '#444';
-                btn.style.transform = 'scale(1)';
-                btn.style.boxShadow = 'none';
             });
-            
+
             // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`${selector}[data-color="${selectedColor}"]`);
+            const selectedBtn = grid.querySelector(`[data-color="${selectedColor}"]`);
             if (selectedBtn) {
-                selectedBtn.classList.add('selected');
-                selectedBtn.style.borderColor = '#FFD700';
-                selectedBtn.style.transform = 'scale(1.1)';
-                selectedBtn.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.5)';
+                const overlay = selectedBtn.querySelector('.selection-overlay');
+                if (overlay) overlay.style.opacity = '1';
             }
         }
         
@@ -3036,7 +3021,7 @@
             
             // Función auxiliar para crear botón de color
             const createColorButton = (color, type, onClick) => {
-                const colorBtn = document.createElement('button');
+                const colorBtn = document.createElement('div');
                 colorBtn.className = 'color-btn';
                 colorBtn.style.cssText = baseStyles + `
                     background-color: #${color.toString(16).padStart(6, '0')};
@@ -3044,6 +3029,24 @@
                 colorBtn.setAttribute('data-color', color);
                 colorBtn.setAttribute('data-type', type);
                 colorBtn.onclick = onClick;
+                
+                // Agregar efecto de selección
+                const selectionOverlay = document.createElement('div');
+                selectionOverlay.className = 'selection-overlay';
+                selectionOverlay.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 10px;
+                    border: 3px solid #FFD700;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                `;
+                colorBtn.appendChild(selectionOverlay);
+                
                 return colorBtn;
             };
 
@@ -3059,7 +3062,11 @@
                     
                     // Marcar color actual usando la función centralizada
                     if (customizationColors[i] === currentCustomization.shirtColor) {
-                        updateColorButtonSelection('shirt', customizationColors[i]);
+                        const btn = shirtGrid.children[i];
+                        if (btn) {
+                            const overlay = btn.querySelector('.selection-overlay');
+                            if (overlay) overlay.style.opacity = '1';
+                        }
                     }
                     
                     shirtGrid.appendChild(colorBtn);
@@ -4113,17 +4120,17 @@
                     handle.style.transform = `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
                     
                     if (type === 'move') {
-                        moveJoystick = { x: clampedX / maxDistance, y: clampedY / maxDistance };
+                        moveJoystick = { x: clampedX / maxDistance, y: -clampedY / maxDistance };
                     } else {
-                        cameraJoystick = { x: clampedX / maxDistance, y: clampedY / maxDistance };
+                        cameraJoystick = { x: -clampedX / maxDistance, y: clampedY / maxDistance };
                     }
                 } else {
                     handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
                     
                     if (type === 'move') {
-                        moveJoystick = { x: deltaX / maxDistance, y: deltaY / maxDistance };
+                        moveJoystick = { x: deltaX / maxDistance, y: -deltaY / maxDistance };
                     } else {
-                        cameraJoystick = { x: deltaX / maxDistance, y: deltaY / maxDistance };
+                        cameraJoystick = { x: -deltaX / maxDistance, y: deltaY / maxDistance };
                     }
                 }
             }
@@ -4164,7 +4171,7 @@
                     const moveDirection = new THREE.Vector3(
                         moveJoystick.x,
                         0,
-                        -moveJoystick.y
+                        moveJoystick.y
                     );
 
                     const rotationMatrix = new THREE.Matrix4().makeRotationY(targetRotationY);
