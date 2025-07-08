@@ -731,46 +731,7 @@
     </div>
     
     <!-- Panel de personalización de avatar -->
-    <div id="customization-panel">
-        <div id="customization-header">
-            Personalizar Avatar
-            <button id="customization-close-btn" title="Cerrar">✖</button>
-        </div>
-        <div id="customization-content">
-            <div class="customization-section">
-                <h3><span class="section-icon">👤</span> Alias</h3>
-                <div class="alias-input-section">
-                    <input type="text" id="customization-alias-input" placeholder="Alias" required />
-                </div>
-            </div>
-            <div class="customization-section">
-                <h3><span class="section-icon">👕</span> Color de Camisa</h3>
-                <div class="color-section">
-                    <h4>Camisas</h4>
-                    <div class="color-grid" id="shirt-colors"></div>
-                </div>
-            </div>
-            <div class="customization-section">
-                <h3><span class="section-icon">👖</span> Color de Pantalón</h3>
-                <div class="color-section">
-                    <h4>Pantalones</h4>
-                    <div class="color-grid" id="pants-colors"></div>
-                </div>
-            </div>
-            <div class="customization-section">
-                <h3><span class="section-icon">👞</span> Color de Zapatos</h3>
-                <div class="color-section">
-                    <h4>Zapatos</h4>
-                    <div class="color-grid" id="shoes-colors"></div>
-                </div>
-            </div>
-
-        </div>
-        <div id="customization-actions">
-            <button id="reset-customization-btn" class="customization-btn">Restablecer</button>
-            <button id="save-customization-btn" class="customization-btn">Guardar</button>
-        </div>
-    </div>
+    <!-- (Eliminado: <div id="customization-panel"> ... </div>) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -898,9 +859,6 @@
             shoesColor: 0x8B4513  // Color por defecto
         };
         
-        let customizationPanelOpen = false;
-        const customizationPanel = document.getElementById('customization-panel');
-
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
@@ -2701,7 +2659,6 @@
                 
                 // Mostrar el panel
                 simplePanel.style.display = 'block';
-                customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
@@ -2940,7 +2897,6 @@
                 
                 // Mostrar el panel
                 simplePanel.style.display = 'flex';
-                customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
@@ -2966,7 +2922,6 @@
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
-                customizationPanelOpen = false;
                 
                 // Ocultar overlay
                 const overlay = document.getElementById('ui-overlay');
@@ -2995,14 +2950,12 @@
             if (panel) {
                 panel.remove();
             }
-            customizationPanelOpen = false;
         }
         
         function closeSimplePanel() {
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
-                customizationPanelOpen = false;
                             // Ocultar overlay y permitir clics
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
@@ -3192,88 +3145,6 @@
         }
 
         function closeCustomizationPanel() {
-            customizationPanel.style.display = 'none';
-            customizationPanelOpen = false;
-        }
-
-        function createColorGrids() {
-            // Limpiar grids existentes
-            shirtColorsGrid.innerHTML = '';
-            pantsColorsGrid.innerHTML = '';
-            shoesColorsGrid.innerHTML = '';
-
-            // Crear opciones de color para camisas (primeros 18 colores)
-            for (let i = 0; i < 18; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'shirt');
-                shirtColorsGrid.appendChild(colorOption);
-            }
-
-            // Crear opciones de color para pantalones (siguientes 18 colores)
-            for (let i = 18; i < 36; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'pants');
-                pantsColorsGrid.appendChild(colorOption);
-            }
-
-            // Crear opciones de color para zapatos (últimos 18 colores)
-            for (let i = 36; i < 54; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'shoes');
-                shoesColorsGrid.appendChild(colorOption);
-            }
-        }
-
-        function createColorOption(color, type) {
-            const option = document.createElement('div');
-            option.className = 'color-option';
-            option.style.backgroundColor = `#${color.toString(16).padStart(6, '0')}`;
-            option.dataset.color = color;
-            option.dataset.type = type;
-            
-            option.addEventListener('click', () => {
-                selectColor(color, type);
-            });
-            
-            return option;
-        }
-
-        function selectColor(color, type) {
-            // Remover selección previa del mismo tipo
-            const prevSelected = document.querySelector(`.color-option.selected[data-type="${type}"]`);
-            if (prevSelected) {
-                prevSelected.classList.remove('selected');
-            }
-            
-            // Seleccionar nueva opción
-            const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
-            
-            // Actualizar color actual
-            switch (type) {
-                case 'shirt':
-                    currentCustomization.shirtColor = color;
-                    break;
-                case 'pants':
-                    currentCustomization.pantsColor = color;
-                    break;
-                case 'shoes':
-                    currentCustomization.shoesColor = color;
-                    break;
-            }
-            
-            // Aplicar cambios inmediatamente al avatar
-            applyCustomizationToAvatar();
-        }
-
-        function updateSelectedColors() {
-            // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
-            
-            if (shirtOption) shirtOption.classList.add('selected');
-            if (pantsOption) pantsOption.classList.add('selected');
-            if (shoesOption) shoesOption.classList.add('selected');
         }
 
         function applyCustomizationToAvatar() {
@@ -3336,7 +3207,6 @@
             
             // Aplicar cambios
             applyCustomizationToAvatar();
-            updateSelectedColors();
         }
 
         function loadCustomization() {
@@ -3635,7 +3505,6 @@
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'block';
-                customizationPanelOpen = true;
                 fillColorGrids(); // Llenar los grids de colores al abrir el panel
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
