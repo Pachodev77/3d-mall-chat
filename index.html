@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paseo Virtual por Centro Comercial</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -349,27 +348,30 @@
             letter-spacing: 0.5px;
         }
         
-        /* --- SOLO UNA DEFINICIÓN PARA GRIDS DE COLORES --- */
         .color-grid {
-          display: grid !important;
-          grid-template-columns: repeat(8, 1fr) !important;
-          gap: 8px !important;
-          margin: 12px 0 !important;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
         }
-        .color-btn {
-          width: 32px !important;
-          height: 32px !important;
-          border: 2px solid #444 !important;
-          border-radius: 6px !important;
-          background: #fff !important;
-          cursor: pointer;
-          transition: border 0.1s, transform 0.1s;
-          margin: 0 !important;
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
-        .color-btn.selected {
-          border: 2px solid #FFD700 !important;
-          transform: scale(1.1);
-          box-shadow: 0 0 8px #FFD70088;
+        
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: #FFD700;
+        }
+        
+        .color-option.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
         
         .color-option::after {
@@ -491,97 +493,6 @@
         .chat-message.own {
             background: linear-gradient(90deg, #FFD70033, #FFD70011);
         }
-        /* --- PIXEL ART STYLES FOR CUSTOMIZATION PANEL --- */
-        #simple-panel, #customization-panel {
-          font-family: 'Press Start 2P', 'VT323', 'Courier New', monospace !important;
-          font-size: 12px !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-          border: 4px solid #222 !important;
-          background: #181818 !important;
-        }
-        #simple-panel h3, #customization-panel h3 {
-          font-size: 13px !important;
-          letter-spacing: 1px;
-          margin: 0 0 10px 0 !important;
-          color: #FFD700 !important;
-          text-shadow: none !important;
-        }
-        #simple-panel input, #customization-panel input {
-          font-family: inherit !important;
-          font-size: 12px !important;
-          padding: 6px 8px !important;
-          border: 2px solid #444 !important;
-          border-radius: 0 !important;
-          background: #222 !important;
-          color: #fff !important;
-          box-shadow: none !important;
-          outline: none !important;
-        }
-        #simple-panel button, #customization-panel button {
-          font-family: inherit !important;
-          font-size: 12px !important;
-          padding: 6px 12px !important;
-          border: 2px solid #FFD700 !important;
-          border-radius: 0 !important;
-          background: #222 !important;
-          color: #FFD700 !important;
-          box-shadow: none !important;
-          cursor: pointer;
-          margin: 2px 0;
-          transition: background 0.1s, color 0.1s;
-        }
-        #simple-panel button:hover, #customization-panel button:hover {
-          background: #FFD700 !important;
-          color: #222 !important;
-        }
-        #avatar-preview {
-          width: 80px !important;
-          height: 110px !important;
-          border: 2px solid #FFD700 !important;
-          background: #111 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          margin: 0 auto !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-        }
-        #avatar-preview * {
-          font-family: inherit !important;
-          font-size: 10px !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-        }
-        .color-btn {
-          width: 22px !important;
-          height: 22px !important;
-          border: 2px solid #444 !important;
-          border-radius: 0 !important;
-          margin: 2px !important;
-          box-shadow: none !important;
-          transition: border 0.1s;
-        }
-        .color-btn.selected, .color-btn:focus, .color-btn:hover {
-          border: 2px solid #FFD700 !important;
-        }
-        .color-grid {
-          display: grid !important;
-          grid-template-columns: repeat(8, 1fr) !important;
-          gap: 2px !important;
-        }
-        #preview-alias {
-          font-size: 10px !important;
-          color: #FFD700 !important;
-          background: #111 !important;
-          border: 2px solid #FFD700 !important;
-          border-radius: 0 !important;
-          padding: 4px 0 !important;
-          margin: 4px 0 !important;
-        }
-        .color-grid { display: grid !important; grid-template-columns: repeat(8, 1fr) !important; gap: 4px !important; margin: 8px 0 !important; }
-        .color-btn { width: 28px !important; height: 28px !important; border: 2px solid #444 !important; border-radius: 4px !important; background: transparent !important; cursor: pointer; transition: border 0.1s, transform 0.1s; }
-        .color-btn.selected { border: 2px solid #FFD700 !important; transform: scale(1.1); box-shadow: 0 0 8px #FFD70088; }
     </style>
 </head>
 <body>
@@ -602,9 +513,9 @@
         </div>
         
         <!-- Contenido principal -->
-        <div id="simple-panel-content" style="display: grid; grid-template-columns: 1fr 300px; gap: 30px; padding: 30px; overflow-y: auto; color: #eee; flex: 1;">
+        <div style="flex: 1; padding: 30px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
             <!-- Columna izquierda - Opciones -->
-            <div>
+            <div style="display: flex; flex-direction: column; gap: 25px;">
                 <!-- Sección de Alias -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
@@ -614,33 +525,72 @@
                     <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 16px;">Sin nombre</strong></p>
                     <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 15px; font-size: 16px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
                 </div>
+                
                 <!-- Sección de Colores de Camisa -->
-                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin-top: 20px;">
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">👕</span>
                         Color de Camisa
                     </h3>
-                    <div id="shirt-colors" class="color-grid"></div>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="width: 45px; height: 45px; background: #FF6B6B; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="width: 45px; height: 45px; background: #4ECDC4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="width: 45px; height: 45px; background: #45B7D1; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" style="width: 45px; height: 45px; background: #96CEB4; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" style="width: 45px; height: 45px; background: #FFEAA7; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" style="width: 45px; height: 45px; background: #DDA0DD; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" style="width: 45px; height: 45px; background: #98D8C8; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xF7DC6F)" class="color-btn" data-color="0xF7DC6F" style="width: 45px; height: 45px; background: #F7DC6F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xBB8FCE)" class="color-btn" data-color="0xBB8FCE" style="width: 45px; height: 45px; background: #BB8FCE; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x85C1E9)" class="color-btn" data-color="0x85C1E9" style="width: 45px; height: 45px; background: #85C1E9; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0xF8C471)" class="color-btn" data-color="0xF8C471" style="width: 45px; height: 45px; background: #F8C471; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShirtColor(0x82E0AA)" class="color-btn" data-color="0x82E0AA" style="width: 45px; height: 45px; background: #82E0AA; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
                 </div>
+                
                 <!-- Sección de Colores de Pantalón -->
-                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin-top: 20px;">
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">👖</span>
                         Color de Pantalón
                     </h3>
-                    <div id="pants-colors" class="color-grid"></div>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changePantsColor(0x2C3E50)" class="color-btn" data-color="0x2C3E50" style="width: 45px; height: 45px; background: #2C3E50; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x34495E)" class="color-btn" data-color="0x34495E" style="width: 45px; height: 45px; background: #34495E; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x556B2F)" class="color-btn" data-color="0x556B2F" style="width: 45px; height: 45px; background: #556B2F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x006400)" class="color-btn" data-color="0x006400" style="width: 45px; height: 45px; background: #006400; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changePantsColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
                 </div>
+                
                 <!-- Sección de Colores de Zapatos -->
-                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin-top: 20px;">
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">👞</span>
                         Color de Zapatos
                     </h3>
-                    <div id="shoes-colors" class="color-grid"></div>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;">
+                        <button onclick="changeShoesColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                        <button onclick="changeShoesColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    </div>
                 </div>
             </div>
+            
             <!-- Columna derecha - Vista previa -->
-            <div>
+            <div style="display: flex; flex-direction: column; gap: 25px;">
                 <!-- Vista previa del avatar -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -651,8 +601,9 @@
                         <div style="color: #ccc; font-size: 14px;">Avatar en tiempo real</div>
                     </div>
                 </div>
+                
                 <!-- Información del alias -->
-                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center; margin-top: 20px;">
+                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                         <span style="font-size: 20px;">📝</span>
                         Nombre Actual
@@ -691,7 +642,46 @@
     </div>
     
     <!-- Panel de personalización de avatar -->
-    <!-- (Eliminado: <div id="customization-panel"> ... </div>) -->
+    <div id="customization-panel">
+        <div id="customization-header">
+            Personalizar Avatar
+            <button id="customization-close-btn" title="Cerrar">✖</button>
+        </div>
+        <div id="customization-content">
+            <div class="customization-section">
+                <h3><span class="section-icon">👤</span> Alias</h3>
+                <div class="alias-input-section">
+                    <input type="text" id="customization-alias-input" placeholder="Alias" required />
+                </div>
+            </div>
+            <div class="customization-section">
+                <h3><span class="section-icon">👕</span> Color de Camisa</h3>
+                <div class="color-section">
+                    <h4>Camisas</h4>
+                    <div class="color-grid" id="shirt-colors"></div>
+                </div>
+            </div>
+            <div class="customization-section">
+                <h3><span class="section-icon">👖</span> Color de Pantalón</h3>
+                <div class="color-section">
+                    <h4>Pantalones</h4>
+                    <div class="color-grid" id="pants-colors"></div>
+                </div>
+            </div>
+            <div class="customization-section">
+                <h3><span class="section-icon">👞</span> Color de Zapatos</h3>
+                <div class="color-section">
+                    <h4>Zapatos</h4>
+                    <div class="color-grid" id="shoes-colors"></div>
+                </div>
+            </div>
+
+        </div>
+        <div id="customization-actions">
+            <button id="reset-customization-btn" class="customization-btn">Restablecer</button>
+            <button id="save-customization-btn" class="customization-btn">Guardar</button>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -818,6 +808,8 @@
             pantsColor: 0x2C3E50, // Color por defecto
             shoesColor: 0x8B4513  // Color por defecto
         };
+        
+        let customizationPanelOpen = false;
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -2251,6 +2243,7 @@
         
         function setupUIButtons() {
             console.log('Configurando botones de UI...');
+            
             // Verificar que el botón se encontró correctamente
             if (changeAliasBtn) {
                 console.log('Botón de personalización encontrado');
@@ -2262,7 +2255,38 @@
             } else {
                 console.error('No se encontró el botón de personalización');
             }
-            // Eliminar toda la lógica de comprobación de customizationPanel, customizationCloseBtn, saveCustomizationBtn, resetCustomizationBtn
+            
+
+            
+            // Verificar que los elementos de personalización se encontraron correctamente
+            if (customizationPanel) {
+                console.log('Panel de personalización encontrado');
+                console.log('Panel inicial display:', customizationPanel.style.display);
+                console.log('Panel inicial visibility:', customizationPanel.style.visibility);
+            } else {
+                console.error('No se encontró el panel de personalización');
+            }
+            
+            if (customizationCloseBtn) {
+                console.log('Botón de cerrar personalización encontrado');
+                customizationCloseBtn.onclick = closeCustomizationPanel;
+            } else {
+                console.error('No se encontró el botón de cerrar personalización');
+            }
+            
+            if (saveCustomizationBtn) {
+                console.log('Botón de guardar personalización encontrado');
+                saveCustomizationBtn.onclick = saveCustomization;
+            } else {
+                console.error('No se encontró el botón de guardar personalización');
+            }
+            
+            if (resetCustomizationBtn) {
+                console.log('Botón de resetear personalización encontrado');
+                resetCustomizationBtn.onclick = resetCustomization;
+            } else {
+                console.error('No se encontró el botón de resetear personalización');
+            }
         }
 
         function onKeyDown(event) {
@@ -2575,6 +2599,10 @@
         connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
+        const customizationPanel = document.getElementById('customization-panel');
+        const customizationCloseBtn = document.getElementById('customization-close-btn');
+        const saveCustomizationBtn = document.getElementById('save-customization-btn');
+        const resetCustomizationBtn = document.getElementById('reset-customization-btn');
         const shirtColorsGrid = document.getElementById('shirt-colors');
         const pantsColorsGrid = document.getElementById('pants-colors');
         const shoesColorsGrid = document.getElementById('shoes-colors');
@@ -2582,41 +2610,58 @@
 
 
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorado');
+            console.log('Abriendo panel simple de personalización');
+            
             // Cerrar chat si está abierto
             if (chatOpen) {
                 chatPanel.style.display = 'none';
                 chatOpen = false;
             }
+            
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel) {
                 // Actualizar el alias actual
                 const currentAliasElement = document.getElementById('current-alias');
-                const aliasInput = document.getElementById('simple-alias-input');
                 if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin nombre';
+                    currentAliasElement.textContent = userAlias || 'Sin alias';
                 }
+                
+                // Actualizar la vista previa del alias
+                const previewAliasElement = document.getElementById('preview-alias');
+                if (previewAliasElement) {
+                    previewAliasElement.textContent = userAlias || 'Sin alias';
+                }
+                
+                // Poblar el input con el alias actual
+                const aliasInput = document.getElementById('simple-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
+                    // Agregar event listener para actualizar vista previa en tiempo real
+                    aliasInput.addEventListener('input', function() {
+                        const previewAliasElement = document.getElementById('preview-alias');
+                        if (previewAliasElement) {
+                            previewAliasElement.textContent = this.value || 'Sin alias';
                         }
+                    });
+                }
+                
                 // Mostrar el panel
-                simplePanel.style.display = 'flex';
-                // Llenar los grids de colores
-                fillColorGrids();
+                simplePanel.style.display = 'block';
+                customizationPanelOpen = true;
+                
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
-                // Marcar colores actuales en los botones
-                updateColorButtonSelection('shirt', shirtColor);
-                updateColorButtonSelection('pants', pantsColor);
-                updateColorButtonSelection('shoes', shoesColor);
-                console.log('✅ Panel de personalización mejorado mostrado');
-                // Mostrar overlay
+                
+                console.log('✅ Panel simple mostrado');
+                            // Mostrar overlay y bloquear clics
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
                 overlay.style.zIndex = '1002';
             }
+            } else {
+                console.log('❌ Panel simple no encontrado');
             }
         }
         
@@ -2841,6 +2886,7 @@
                 
                 // Mostrar el panel
                 simplePanel.style.display = 'flex';
+                customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
@@ -2866,6 +2912,7 @@
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
+                customizationPanelOpen = false;
                 
                 // Ocultar overlay
                 const overlay = document.getElementById('ui-overlay');
@@ -2894,12 +2941,14 @@
             if (panel) {
                 panel.remove();
             }
+            customizationPanelOpen = false;
         }
         
         function closeSimplePanel() {
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
+                customizationPanelOpen = false;
                             // Ocultar overlay y permitir clics
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
@@ -3089,6 +3138,88 @@
         }
 
         function closeCustomizationPanel() {
+            customizationPanel.style.display = 'none';
+            customizationPanelOpen = false;
+        }
+
+        function createColorGrids() {
+            // Limpiar grids existentes
+            shirtColorsGrid.innerHTML = '';
+            pantsColorsGrid.innerHTML = '';
+            shoesColorsGrid.innerHTML = '';
+
+            // Crear opciones de color para camisas (primeros 18 colores)
+            for (let i = 0; i < 18; i++) {
+                const colorOption = createColorOption(customizationColors[i], 'shirt');
+                shirtColorsGrid.appendChild(colorOption);
+            }
+
+            // Crear opciones de color para pantalones (siguientes 18 colores)
+            for (let i = 18; i < 36; i++) {
+                const colorOption = createColorOption(customizationColors[i], 'pants');
+                pantsColorsGrid.appendChild(colorOption);
+            }
+
+            // Crear opciones de color para zapatos (últimos 18 colores)
+            for (let i = 36; i < 54; i++) {
+                const colorOption = createColorOption(customizationColors[i], 'shoes');
+                shoesColorsGrid.appendChild(colorOption);
+            }
+        }
+
+        function createColorOption(color, type) {
+            const option = document.createElement('div');
+            option.className = 'color-option';
+            option.style.backgroundColor = `#${color.toString(16).padStart(6, '0')}`;
+            option.dataset.color = color;
+            option.dataset.type = type;
+            
+            option.addEventListener('click', () => {
+                selectColor(color, type);
+            });
+            
+            return option;
+        }
+
+        function selectColor(color, type) {
+            // Remover selección previa del mismo tipo
+            const prevSelected = document.querySelector(`.color-option.selected[data-type="${type}"]`);
+            if (prevSelected) {
+                prevSelected.classList.remove('selected');
+            }
+            
+            // Seleccionar nueva opción
+            const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Actualizar color actual
+            switch (type) {
+                case 'shirt':
+                    currentCustomization.shirtColor = color;
+                    break;
+                case 'pants':
+                    currentCustomization.pantsColor = color;
+                    break;
+                case 'shoes':
+                    currentCustomization.shoesColor = color;
+                    break;
+            }
+            
+            // Aplicar cambios inmediatamente al avatar
+            applyCustomizationToAvatar();
+        }
+
+        function updateSelectedColors() {
+            // Actualizar selecciones visuales
+            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
+            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
+            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
+            
+            if (shirtOption) shirtOption.classList.add('selected');
+            if (pantsOption) pantsOption.classList.add('selected');
+            if (shoesOption) shoesOption.classList.add('selected');
         }
 
         function applyCustomizationToAvatar() {
@@ -3151,6 +3282,7 @@
             
             // Aplicar cambios
             applyCustomizationToAvatar();
+            updateSelectedColors();
         }
 
         function loadCustomization() {
@@ -3180,11 +3312,11 @@
                     overlay.style.pointerEvents = 'none';
                 }
             }
-            // Cerrar simple-panel si se hace clic fuera
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel && simplePanel.style.display !== 'none' && !simplePanel.contains(e.target) && !changeAliasBtn.contains(e.target)) {
-                closeSimplePanel();
+            
+            if (customizationPanelOpen && !customizationPanel.contains(e.target)) {
+                closeCustomizationPanel();
             }
+            
             // Cerrar panel de trabajo al hacer clic fuera
             const workingPanel = document.getElementById('working-customization-panel');
             if (workingPanel && !workingPanel.contains(e.target)) {
@@ -3347,18 +3479,7 @@
             Object.keys(positions).forEach(alias => {
                 if (alias !== userAlias) {
                     const userData = positions[alias];
-                    // Defensive check: skip if any required field is missing or invalid
-                    if (
-                        userData &&
-                        userData.position &&
-                        typeof userData.position.x === 'number' &&
-                        typeof userData.position.y === 'number' &&
-                        typeof userData.position.z === 'number' &&
-                        typeof userData.floor === 'number' &&
-                        typeof userData.rotation === 'number'
-                    ) {
                     updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
-                    }
                 }
             });
             // Eliminar avatares de usuarios que ya no están
@@ -3371,47 +3492,17 @@
 
         // --- Función para crear un avatar de usuario ---
         function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
+            // Solo crear si no existe
             if (userAvatars.has(alias)) return;
+            // Aquí deberías crear el avatar 3D y añadirlo a la escena
+            // Ejemplo básico (ajusta según tu lógica 3D):
             const avatarGroup = new THREE.Group();
             avatarGroup.position.set(position.x, position.y, position.z);
-            // Cuerpo (cubo)
-            const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x4ECDC4 });
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.3), bodyMaterial); // Altura menor
-            body.position.y = 0.725; // Más arriba sobre las piernas
-            avatarGroup.add(body);
-            // Cabeza (cubo)
-            const headMaterial = new THREE.MeshStandardMaterial({ color: 0xFFE4C4 });
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), headMaterial);
-            head.position.y = 1.15; // Encima del torso
-            avatarGroup.add(head);
-            // Piernas (cilindros)
-            const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2C3E50 });
-            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
-            leftLeg.position.set(-0.13, 0.225, 0); // Ajuste: pies al nivel del suelo
-            avatarGroup.add(leftLeg);
-            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), legMaterial);
-            rightLeg.position.set(0.13, 0.225, 0); // Ajuste: pies al nivel del suelo
-            avatarGroup.add(rightLeg);
-            // Brazos (cilindros)
-            const armMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
-            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.42, 0.13), armMaterial);
-            leftArm.position.set(-0.34, 0.85, 0);
-            avatarGroup.add(leftArm);
-            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.42, 0.13), armMaterial);
-            rightArm.position.set(0.34, 0.85, 0);
-            avatarGroup.add(rightArm);
+            // Puedes añadir más geometría/materiales aquí
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
-                body,
-                head,
-                leftLeg,
-                rightLeg,
-                leftArm,
-                rightArm,
                 targetPosition: new THREE.Vector3(position.x, position.y, position.z),
-                lastPosition: new THREE.Vector3(position.x, position.y, position.z),
-                walkTime: 0,
                 targetRotation: 0,
                 currentFloor: floor
             });
@@ -3423,25 +3514,6 @@
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 // Interpolación suave de rotación
                 avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-                // --- Animación de caminar tipo Roblox ---
-                const pos = avatar.group.position;
-                const last = avatar.lastPosition;
-                const speed = pos.distanceTo(last);
-                // Si se mueve, animar
-                if (speed > 0.001) {
-                    avatar.walkTime += speed * 18; // Factor de velocidad de animación
-                } else {
-                    avatar.walkTime *= 0.8; // Suavizar al detenerse
-                }
-                // Fase de caminata
-                const phase = avatar.walkTime;
-                if (avatar.leftArm && avatar.rightArm && avatar.leftLeg && avatar.rightLeg) {
-                    avatar.leftArm.rotation.x = Math.sin(phase) * 0.5;
-                    avatar.rightArm.rotation.x = -Math.sin(phase) * 0.5;
-                    avatar.leftLeg.rotation.x = -Math.sin(phase) * 0.5;
-                    avatar.rightLeg.rotation.x = Math.sin(phase) * 0.5;
-                }
-                avatar.lastPosition.copy(pos);
             });
         }
 
@@ -3449,210 +3521,16 @@
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'block';
-                fillColorGrids(); // Llenar los grids de colores al abrir el panel
+                customizationPanelOpen = true;
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
             }
         }
 
         // Inicialización robusta de colores de avatar
-        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = currentCustomization.shirtColor;
-        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = currentCustomization.pantsColor;
-        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = currentCustomization.shoesColor;
-
-        function fillColorGrids() {
-            console.log('Llenando grids de colores (ejecutando fillColorGrids)');
-            // Camisa
-            const shirtGrid = document.getElementById('shirt-colors');
-            let shirtCount = 0;
-            if (shirtGrid) {
-                shirtGrid.innerHTML = '';
-                for (let i = 0; i < 18; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => { shirtColor = color; currentCustomization.shirtColor = color; updateAvatarPreview(); updateColorButtonSelection('shirt', color); };
-                    if (color === shirtColor) btn.classList.add('selected');
-                    shirtGrid.appendChild(btn);
-                    shirtCount++;
-                }
-                // Fuerza el display y height
-                shirtGrid.style.display = 'grid';
-                shirtGrid.style.height = 'auto';
-                shirtGrid.style.overflow = 'visible';
-                console.log('Botones de camisa:', shirtCount);
-            }
-            // Pantalón
-            const pantsGrid = document.getElementById('pants-colors');
-            let pantsCount = 0;
-            if (pantsGrid) {
-                pantsGrid.innerHTML = '';
-                for (let i = 18; i < 36; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => { pantsColor = color; currentCustomization.pantsColor = color; updateAvatarPreview(); updateColorButtonSelection('pants', color); };
-                    if (color === pantsColor) btn.classList.add('selected');
-                    pantsGrid.appendChild(btn);
-                    pantsCount++;
-                }
-                pantsGrid.style.display = 'grid';
-                pantsGrid.style.height = 'auto';
-                pantsGrid.style.overflow = 'visible';
-                console.log('Botones de pantalón:', pantsCount);
-            }
-            // Zapatos
-            const shoesGrid = document.getElementById('shoes-colors');
-            let shoesCount = 0;
-            if (shoesGrid) {
-                shoesGrid.innerHTML = '';
-                for (let i = 36; i < 54; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => { shoesColor = color; currentCustomization.shoesColor = color; updateAvatarPreview(); updateColorButtonSelection('shoes', color); };
-                    if (color === shoesColor) btn.classList.add('selected');
-                    shoesGrid.appendChild(btn);
-                    shoesCount++;
-                }
-                shoesGrid.style.display = 'grid';
-                shoesGrid.style.height = 'auto';
-                shoesGrid.style.overflow = 'visible';
-                console.log('Botones de zapatos:', shoesCount);
-            }
-            // Si algún grid está vacío, muestra error en el panel
-            let errorMsg = '';
-            if (shirtCount === 0) errorMsg += 'No se pudo llenar el grid de camisa. ';
-            if (pantsCount === 0) errorMsg += 'No se pudo llenar el grid de pantalón. ';
-            if (shoesCount === 0) errorMsg += 'No se pudo llenar el grid de zapatos. ';
-            if (errorMsg) {
-                let panel = document.getElementById('simple-panel-content');
-                if (panel) {
-                    let err = document.getElementById('color-grid-error');
-                    if (!err) {
-                        err = document.createElement('div');
-                        err.id = 'color-grid-error';
-                        err.style.color = 'red';
-                        err.style.fontWeight = 'bold';
-                        err.style.margin = '10px 0';
-                        panel.prepend(err);
-                    }
-                    err.textContent = errorMsg;
-                }
-            } else {
-                let err = document.getElementById('color-grid-error');
-                if (err) err.remove();
-            }
-            // Scroll automático para mostrar los grids
-            setTimeout(() => {
-                const panel = document.getElementById('simple-panel-content');
-                if (panel) panel.scrollTop = 0;
-            }, 100);
-        }
-
-        // --- Detección de móvil ---
-        function isMobile() {
-            return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-        }
-
-        // --- Controles táctiles para móvil ---
-        if (isMobile()) {
-            let touchStartX = 0, touchStartY = 0;
-            let lastTouchX = 0, lastTouchY = 0;
-            let rotating = false;
-            let moving = false;
-            let moveDir = 0;
-            let touchMoved = false;
-            const minSwipe = 10;
-
-            renderer.domElement.addEventListener('touchstart', function(e) {
-                if (e.touches.length === 1) {
-                    touchStartX = lastTouchX = e.touches[0].clientX;
-                    touchStartY = lastTouchY = e.touches[0].clientY;
-                    rotating = true;
-                    moving = true;
-                    moveDir = 0;
-                    touchMoved = false;
-                }
-            }, { passive: false });
-            renderer.domElement.addEventListener('touchmove', function(e) {
-                if (e.touches.length === 1) {
-                    const dx = e.touches[0].clientX - lastTouchX;
-                    const dy = e.touches[0].clientY - lastTouchY;
-                    // Horizontal: rotar cámara
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        targetRotationY -= dx * 0.01;
-                    }
-                    // Vertical: mover adelante/atrás
-                    else if (Math.abs(dy) > minSwipe) {
-                        moveDir = dy < 0 ? 1 : -1;
-                        touchMoved = true;
-                    }
-                    lastTouchX = e.touches[0].clientX;
-                    lastTouchY = e.touches[0].clientY;
-                }
-                e.preventDefault();
-            }, { passive: false });
-            renderer.domElement.addEventListener('touchend', function(e) {
-                rotating = false;
-                moving = false;
-                moveDir = 0;
-            }, { passive: false });
-
-            // Modificar updateMovement para móvil
-            const originalUpdateMovement = updateMovement;
-            updateMovement = function() {
-                if (chatOpen) return;
-                // Rotación ya se maneja por touch
-                // Movimiento adelante/atrás
-                if (moveDir !== 0) {
-                    const direction = new THREE.Vector3();
-                    camera.getWorldDirection(direction);
-                    direction.y = 0;
-                    direction.normalize();
-                    const velocity = direction.multiplyScalar(MOVE_SPEED * moveDir);
-                    const newPosition = targetPosition.clone().add(velocity);
-                    // Colisiones (igual que original)
-                    const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
-                    let collision = false;
-                    const nearbyCollisions = collisionObjects.filter(wallBox => wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition) < 20);
-                    for (const wallBox of nearbyCollisions) {
-                        if (playerBox.intersectsBox(wallBox)) {
-                            collision = true;
-                            break;
-                        }
-                    }
-                    if (!collision) {
-                        targetPosition.copy(newPosition);
-                    }
-                }
-                // Interpolación
-                camera.position.lerp(targetPosition, 0.2);
-                camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
-            };
-
-            // Overlay de ayuda para controles móviles
-            const help = document.createElement('div');
-            help.style.position = 'fixed';
-            help.style.bottom = '10px';
-            help.style.left = '50%';
-            help.style.transform = 'translateX(-50%)';
-            help.style.background = 'rgba(0,0,0,0.7)';
-            help.style.color = '#FFD700';
-            help.style.fontFamily = 'monospace';
-            help.style.fontSize = '13px';
-            help.style.padding = '10px 18px';
-            help.style.borderRadius = '8px';
-            help.style.zIndex = '9999';
-            help.innerHTML = 'Desliza horizontal para mirar<br>Desliza vertical para avanzar/retroceder';
-            document.body.appendChild(help);
-        }
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
+        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
+        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
     </script>
 </body>
 </html>
