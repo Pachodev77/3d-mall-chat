@@ -594,14 +594,15 @@
           box-shadow: none !important;
         }
         .color-btn {
-          width: 22px !important;
-          height: 22px !important;
-          border: 2px solid #444 !important;
-          border-radius: 0 !important;
+          width: 45px !important;
+          height: 45px !important;
+          border: 3px solid #444 !important;
+          border-radius: 10px !important;
           margin: 2px !important;
-          box-shadow: none !important;
-          transition: all 0.2s !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+          transition: all 0.3s !important;
           cursor: pointer !important;
+          position: relative !important;
         }
         .color-btn.selected, .color-btn:focus, .color-btn:hover {
           border: 2px solid #FFD700 !important;
@@ -4273,20 +4274,29 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho
+                // Rotación de cámara con joystick derecho (SIEMPRE activa)
                 if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
                     targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
 
-                // Movimiento con joystick izquierdo (solo adelante/atrás)
-                if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
+                // Movimiento con joystick izquierdo (adelante/atrás + rotación lateral)
+                if (moveJoystickActive) {
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
                     
                     const velocity = new THREE.Vector3();
-                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
+                    
+                    // Movimiento adelante/atrás (eje Y)
+                    if (Math.abs(moveJoystickValue.y) > 0.1) {
+                        velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y));
+                    }
+                    
+                    // Rotación lateral mientras se mueve (eje X)
+                    if (Math.abs(moveJoystickValue.x) > 0.1) {
+                        targetRotationY += moveJoystickValue.x * ROTATE_SPEED * 0.2;
+                    }
                     
                     if (velocity.length() > 0) {
                         velocity.normalize().multiplyScalar(MOVE_SPEED * 0.2);
