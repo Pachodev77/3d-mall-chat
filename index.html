@@ -3355,49 +3355,6 @@
         // Inicialización robusta de colores de avatar
         if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
-
-        function fillColorGrids() {
-            // Llenar grid de camisas
-            const shirtGrid = document.getElementById('shirt-colors');
-            if (shirtGrid) {
-                shirtGrid.innerHTML = '';
-                for (let i = 0; i < 36; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShirtColor(color);
-                    shirtGrid.appendChild(btn);
-                }
-            }
-            // Llenar grid de zapatos
-            const shoesGrid = document.getElementById('shoes-colors');
-            if (shoesGrid) {
-                shoesGrid.innerHTML = '';
-                for (let i = 36; i < 54; i++) {
-                    const color = customizationColors[i];
-                    const btn = document.createElement('div');
-                    btn.className = 'color-btn';
-                    btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
-                    btn.setAttribute('data-color', color);
-                    btn.onclick = () => changeShoesColor(color);
-                    shoesGrid.appendChild(btn);
-                }
-            }
-        }
     </script>
 </body>
 </html>
