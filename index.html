@@ -502,28 +502,28 @@
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
     
     <!-- Panel de personalización completamente rediseñado -->
-    <div id="simple-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 900px; max-width: 95vw; height: 650px; background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98)); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1004; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); border: 2px solid #4B0000;">
+    <div id="simple-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1100px; max-width: 99vw; height: 800px; background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98)); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1004; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); border: 2px solid #4B0000;">
         <!-- Header elegante -->
-        <div style="background: linear-gradient(135deg, #4B0000, #800000); color: #fff; padding: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #FFD700;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">👤</span>
-                <span style="font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">Personalizar Avatar</span>
+        <div style="background: linear-gradient(135deg, #4B0000, #800000); color: #fff; padding: 24px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #FFD700;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-size: 28px;">👤</span>
+                <span style="font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Personalizar Avatar</span>
             </div>
-            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">✖</button>
+            <button onclick="closeSimplePanel()" style="background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 10px; border-radius: 8px; transition: all 0.3s; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">✖</button>
         </div>
         
         <!-- Contenido principal -->
-        <div style="flex: 1; padding: 30px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
+        <div style="flex: 1; padding: 40px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 350px; gap: 40px; min-height: 0; min-width: 0;">
             <!-- Columna izquierda - Opciones -->
-            <div style="display: flex; flex-direction: column; gap: 25px;">
+            <div style="display: flex; flex-direction: column; gap: 35px;">
                 <!-- Sección de Alias -->
-                <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
-                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">📝</span>
+                <div style="padding: 30px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                    <h3 style="margin: 0 0 24px 0; color: #FFD700; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 22px;">📝</span>
                         Nombre del Avatar
                     </h3>
-                    <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 16px;">Sin nombre</strong></p>
-                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 15px; font-size: 16px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
+                    <p style="margin-bottom: 18px; color: #ccc; font-size: 15px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 18px;">Sin nombre</strong></p>
+                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 18px; font-size: 18px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
                 </div>
                 
                 <!-- Sección de Colores de Camisa -->
