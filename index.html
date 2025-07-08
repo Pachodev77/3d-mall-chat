@@ -2332,7 +2332,6 @@
         
         function setupUIButtons() {
             console.log('Configurando botones de UI...');
-            
             // Verificar que el botón se encontró correctamente
             if (changeAliasBtn) {
                 console.log('Botón de personalización encontrado');
@@ -2344,38 +2343,7 @@
             } else {
                 console.error('No se encontró el botón de personalización');
             }
-            
-
-            
-            // Verificar que los elementos de personalización se encontraron correctamente
-            if (customizationPanel) {
-                console.log('Panel de personalización encontrado');
-                console.log('Panel inicial display:', customizationPanel.style.display);
-                console.log('Panel inicial visibility:', customizationPanel.style.visibility);
-            } else {
-                console.error('No se encontró el panel de personalización');
-            }
-            
-            if (customizationCloseBtn) {
-                console.log('Botón de cerrar personalización encontrado');
-                customizationCloseBtn.onclick = closeCustomizationPanel;
-            } else {
-                console.error('No se encontró el botón de cerrar personalización');
-            }
-            
-            if (saveCustomizationBtn) {
-                console.log('Botón de guardar personalización encontrado');
-                saveCustomizationBtn.onclick = saveCustomization;
-            } else {
-                console.error('No se encontró el botón de guardar personalización');
-            }
-            
-            if (resetCustomizationBtn) {
-                console.log('Botón de resetear personalización encontrado');
-                resetCustomizationBtn.onclick = resetCustomization;
-            } else {
-                console.error('No se encontró el botón de resetear personalización');
-            }
+            // Eliminar toda la lógica de comprobación de customizationPanel, customizationCloseBtn, saveCustomizationBtn, resetCustomizationBtn
         }
 
         function onKeyDown(event) {
