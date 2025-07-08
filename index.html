@@ -3024,26 +3024,28 @@
             if (shirtGrid) {
                 shirtGrid.innerHTML = '';
                 for (let i = 0; i < 18; i++) {
-                    const colorBtn = document.createElement('div');
+                    const colorBtn = document.createElement('button');
                     colorBtn.className = 'color-btn';
                     colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
+                        width: 45px;
+                        height: 45px;
+                        border: 3px solid transparent;
+                        border-radius: 10px;
                         cursor: pointer;
+                        transition: all 0.3s;
+                        position: relative;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                         background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
                     `;
                     colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.setAttribute('data-type', 'shirt');
                     colorBtn.onclick = () => changeShirtColor(customizationColors[i]);
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.shirtColor) {
                         colorBtn.style.borderColor = '#FFD700';
                         colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
                     }
                     
                     shirtGrid.appendChild(colorBtn);
@@ -3055,26 +3057,28 @@
             if (pantsGrid) {
                 pantsGrid.innerHTML = '';
                 for (let i = 18; i < 36; i++) {
-                    const colorBtn = document.createElement('div');
+                    const colorBtn = document.createElement('button');
                     colorBtn.className = 'color-btn';
                     colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
+                        width: 45px;
+                        height: 45px;
+                        border: 3px solid transparent;
+                        border-radius: 10px;
                         cursor: pointer;
+                        transition: all 0.3s;
+                        position: relative;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                         background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
                     `;
                     colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.setAttribute('data-type', 'pants');
                     colorBtn.onclick = () => changePantsColor(customizationColors[i]);
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.pantsColor) {
                         colorBtn.style.borderColor = '#FFD700';
                         colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
                     }
                     
                     pantsGrid.appendChild(colorBtn);
@@ -3086,26 +3090,28 @@
             if (shoesGrid) {
                 shoesGrid.innerHTML = '';
                 for (let i = 36; i < 54; i++) {
-                    const colorBtn = document.createElement('div');
+                    const colorBtn = document.createElement('button');
                     colorBtn.className = 'color-btn';
                     colorBtn.style.cssText = `
-                        width: 30px;
-                        height: 30px;
-                        border: 2px solid transparent;
-                        border-radius: 6px;
+                        width: 45px;
+                        height: 45px;
+                        border: 3px solid transparent;
+                        border-radius: 10px;
                         cursor: pointer;
+                        transition: all 0.3s;
+                        position: relative;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                         background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                        margin: 2px;
-                        transition: all 0.2s ease;
                     `;
                     colorBtn.setAttribute('data-color', customizationColors[i]);
+                    colorBtn.setAttribute('data-type', 'shoes');
                     colorBtn.onclick = () => changeShoesColor(customizationColors[i]);
                     
                     // Marcar color actual
                     if (customizationColors[i] === currentCustomization.shoesColor) {
                         colorBtn.style.borderColor = '#FFD700';
                         colorBtn.style.transform = 'scale(1.1)';
-                        colorBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                        colorBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3), 0 0 10px rgba(255, 215, 0, 0.5)';
                     }
                     
                     shoesGrid.appendChild(colorBtn);
