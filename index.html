@@ -4202,6 +4202,7 @@
             cameraStartY = cameraLastY = touch.clientY;
             // Sincronizar targetPitch con la cámara al tocar
             targetPitch = camera.rotation.x;
+            console.log('Camera control started - Initial pitch:', targetPitch);
         }
         
         function handleCameraMove(e) {
@@ -4217,8 +4218,13 @@
             
             // Inclinar cámara verticalmente usando targetPitch (corregido para dirección natural)
             // Deslizar hacia arriba = mirar hacia arriba
-            targetPitch -= dy * 0.003;
-            targetPitch = Math.max(-0.3, Math.min(0.3, targetPitch));
+            targetPitch -= dy * 0.001; // Reducir sensibilidad
+            targetPitch = Math.max(-0.1, Math.min(0.1, targetPitch)); // Reducir límites drásticamente
+            
+            // Debug: verificar si la cámara se está invirtiendo
+            if (Math.abs(targetPitch) > 0.25) {
+                console.log('Warning: Camera pitch getting extreme:', targetPitch);
+            }
             
             cameraLastX = touch.clientX;
             cameraLastY = touch.clientY;
