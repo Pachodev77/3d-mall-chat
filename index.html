@@ -2624,12 +2624,10 @@
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
             const aliasPreview = document.getElementById('preview-alias');
-            const aliasInput = document.getElementById('simple-alias-input');
             
             if (previewDiv && aliasPreview) {
                 // Actualizar el alias en la vista previa
-                const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                aliasPreview.textContent = currentAlias || 'Sin nombre';
+                aliasPreview.textContent = userAlias || 'Sin nombre';
                 
                 // Crear una vista previa visual del avatar más detallada
                 const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
@@ -2669,7 +2667,7 @@
                         </div>
                         
                         <!-- Nombre del avatar -->
-                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${currentAlias || 'Sin nombre'}</div>
+                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${userAlias || 'Sin nombre'}</div>
                     </div>
                 `;
             }
