@@ -2,7 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="full-screen" content="yes">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="browsermode" content="application">
+    <meta name="x5-page-mode" content="app">
     <title>Paseo Virtual por Centro Comercial</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
@@ -11,6 +17,24 @@
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #000;
+            /* Forzar orientación correcta en móviles */
+            transform: rotate(0deg);
+            transform-origin: center center;
+        }
+        
+        /* Corregir orientación en dispositivos móviles */
+        @media screen and (orientation: landscape) and (max-width: 768px) {
+            body {
+                transform: rotate(0deg);
+            }
+        }
+        
+        /* Forzar orientación portrait en móviles */
+        @media screen and (max-width: 768px) {
+            html, body {
+                transform: rotate(0deg);
+                transform-origin: center center;
+            }
         }
         canvas {
             display: block;
@@ -4249,6 +4273,35 @@
             };
 
             // Overlay de ayuda para joysticks eliminado
+            
+            // Manejar orientación de pantalla en móviles
+            function handleScreenOrientation() {
+                if (window.innerWidth <= 768) {
+                    // Forzar orientación portrait en móviles
+                    if (window.screen && window.screen.orientation) {
+                        try {
+                            window.screen.orientation.lock('portrait').catch(() => {
+                                // Si no se puede bloquear, al menos intentar corregir la orientación
+                                console.log('No se pudo bloquear la orientación');
+                            });
+                        } catch (e) {
+                            console.log('Error al manejar orientación:', e);
+                        }
+                    }
+                    
+                    // Corregir transformación si es necesario
+                    const body = document.body;
+                    const currentTransform = window.getComputedStyle(body).transform;
+                    if (currentTransform !== 'none' && currentTransform !== 'matrix(1, 0, 0, 1, 0, 0)') {
+                        body.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+            
+            // Ejecutar al cargar y cuando cambie la orientación
+            handleScreenOrientation();
+            window.addEventListener('orientationchange', handleScreenOrientation);
+            window.addEventListener('resize', handleScreenOrientation);
         }
     </script>
 </body>
