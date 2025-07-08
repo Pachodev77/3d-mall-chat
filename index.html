@@ -874,14 +874,14 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
             'bybit': 'bybit-logo.png',
             'givvyMusic': 'givvymusic-logo.png',
             'givvyStream': 'givvystream-logo.png',
-            'givvyScratchCardNew': 'givvystream-logo.png', // Usar givvystream como fallback
+            'givvyScratchCardNew': 'givvystream-logo.png", // Usar givvystream como fallback
             'swcapp': 'swcapp-logo.png',
             'app-earnings-link': 'givvystream-logo.png' // Agregar alias para app-earnings-link.com
         };
@@ -4277,8 +4277,8 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho (SIEMPRE activa)
-                if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
+                // Rotación de cámara con joystick derecho (SIEMPRE activa, aunque se esté moviendo)
+                if (Math.abs(cameraJoystickValue.x) > 0.1) {
                     targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
                 }
 
