@@ -600,10 +600,13 @@
           border-radius: 0 !important;
           margin: 2px !important;
           box-shadow: none !important;
-          transition: border 0.1s;
+          transition: all 0.2s !important;
+          cursor: pointer !important;
         }
         .color-btn.selected, .color-btn:focus, .color-btn:hover {
           border: 2px solid #FFD700 !important;
+          transform: scale(1.1) !important;
+          box-shadow: 0 0 8px rgba(255, 215, 0, 0.5) !important;
         }
         .color-grid {
           display: grid !important;
@@ -2846,20 +2849,21 @@
             let selector = '';
             switch (type) {
                 case 'shirt':
-                    selector = '#shirt-colors .color-btn';
+                    selector = '.color-btn[onclick*="changeShirtColor"]';
                     break;
                 case 'pants':
-                    selector = '#pants-colors .color-btn';
+                    selector = '.color-btn[onclick*="changePantsColor"]';
                     break;
                 case 'shoes':
-                    selector = '#shoes-colors .color-btn';
+                    selector = '.color-btn[onclick*="changeShoesColor"]';
                     break;
                 default:
                     return;
             }
             
             document.querySelectorAll(selector).forEach(btn => {
-                btn.style.borderColor = 'transparent';
+                btn.classList.remove('selected');
+                btn.style.borderColor = '#444';
                 btn.style.transform = 'scale(1)';
                 btn.style.boxShadow = 'none';
             });
@@ -2867,9 +2871,10 @@
             // Marcar el botón seleccionado
             const selectedBtn = document.querySelector(`${selector}[data-color="${selectedColor}"]`);
             if (selectedBtn) {
+                selectedBtn.classList.add('selected');
                 selectedBtn.style.borderColor = '#FFD700';
                 selectedBtn.style.transform = 'scale(1.1)';
-                selectedBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+                selectedBtn.style.boxShadow = '0 0 8px rgba(255, 215, 0, 0.5)';
             }
         }
         
