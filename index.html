@@ -4250,9 +4250,16 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
+                // Debug: mostrar valores de joysticks
+                if (cameraJoystickActive || moveJoystickActive) {
+                    console.log('Camera joystick:', cameraJoystickValue.x.toFixed(2), 'Move joystick:', moveJoystickValue.y.toFixed(2));
+                }
+
                 // Rotación de cámara con joystick derecho (SIEMPRE activa independientemente del movimiento)
                 if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5;
+                    const rotationAmount = cameraJoystickValue.x * ROTATE_SPEED * 0.5;
+                    targetRotationY += rotationAmount;
+                    console.log('Rotando cámara:', rotationAmount.toFixed(3), 'Dirección:', cameraJoystickValue.x > 0 ? 'derecha' : 'izquierda');
                 }
 
                 // Movimiento con joystick izquierdo (solo adelante/atrás)
