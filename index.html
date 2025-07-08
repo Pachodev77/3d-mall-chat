@@ -4217,7 +4217,7 @@
             
             // Inclinar cámara verticalmente usando targetPitch (corregido para dirección natural)
             // Deslizar hacia arriba = mirar hacia arriba
-            targetPitch += dy * 0.003;
+            targetPitch -= dy * 0.003;
             targetPitch = Math.max(-0.3, Math.min(0.3, targetPitch));
             
             cameraLastX = touch.clientX;
