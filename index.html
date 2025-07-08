@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -4284,6 +4284,10 @@
 
                 // Movimiento con joystick izquierdo (SOLO adelante/atrás)
                 if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
+                    // Asegurarse de que la rotación no se bloquee durante el movimiento
+                    if (Math.abs(cameraJoystickValue.x) > 0.1) {
+                        targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.3;
+                    }
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
