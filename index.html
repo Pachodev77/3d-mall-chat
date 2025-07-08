@@ -2646,7 +2646,8 @@
             // --- Interpolación para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
             camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
-            camera.rotation.x = lerpAngle(camera.rotation.x, targetPitch, 0.2);
+            // MANTENER LA ROTACIÓN X FIJA PARA EVITAR VOLTEO
+            camera.rotation.x = 0;
         }
 
         function animate(currentTime) {
