@@ -4214,17 +4214,14 @@
             
             // Rotar cámara horizontalmente (corregido para dirección natural)
             // Deslizar hacia la derecha = girar hacia la derecha
-            targetRotationY += dx * 0.005;
+            targetRotationY += dx * 0.002; // Reducir sensibilidad horizontal
             
-            // Inclinar cámara verticalmente usando targetPitch (corregido para dirección natural)
-            // Deslizar hacia arriba = mirar hacia arriba
-            targetPitch -= dy * 0.001; // Reducir sensibilidad
-            targetPitch = Math.max(-0.1, Math.min(0.1, targetPitch)); // Reducir límites drásticamente
+            // TEMPORALMENTE DESHABILITAR ROTACIÓN VERTICAL PARA EVITAR VOLTEO
+            // targetPitch -= dy * 0.001;
+            // targetPitch = Math.max(-0.1, Math.min(0.1, targetPitch));
             
-            // Debug: verificar si la cámara se está invirtiendo
-            if (Math.abs(targetPitch) > 0.25) {
-                console.log('Warning: Camera pitch getting extreme:', targetPitch);
-            }
+            // Mantener targetPitch en 0 para evitar volteo
+            targetPitch = 0;
             
             cameraLastX = touch.clientX;
             cameraLastY = touch.clientY;
