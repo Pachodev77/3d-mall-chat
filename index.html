@@ -349,27 +349,27 @@
             letter-spacing: 0.5px;
         }
         
+        /* --- SOLO UNA DEFINICIÓN PARA GRIDS DE COLORES --- */
         .color-grid {
-            display: grid !important;
-            grid-template-columns: repeat(8, 1fr) !important;
-            gap: 6px !important;
-            margin-top: 6px;
-            margin-bottom: 6px;
+          display: grid !important;
+          grid-template-columns: repeat(8, 1fr) !important;
+          gap: 8px !important;
+          margin: 12px 0 !important;
         }
         .color-btn {
-            width: 32px !important;
-            height: 32px !important;
-            border: 2px solid #444 !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            background: transparent !important;
-            cursor: pointer;
-            transition: border 0.1s;
-            display: block !important;
+          width: 32px !important;
+          height: 32px !important;
+          border: 2px solid #444 !important;
+          border-radius: 6px !important;
+          background: #fff !important;
+          cursor: pointer;
+          transition: border 0.1s, transform 0.1s;
+          margin: 0 !important;
         }
         .color-btn.selected {
-            border: 2px solid #FFD700 !important;
+          border: 2px solid #FFD700 !important;
+          transform: scale(1.1);
+          box-shadow: 0 0 8px #FFD70088;
         }
         
         .color-option::after {
