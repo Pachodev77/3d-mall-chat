@@ -4213,33 +4213,17 @@
                     // }
                 }
 
-                // Movimiento con joystick izquierdo (corregidas direcciones)
-                if (moveJoystickActive && (Math.abs(moveJoystickValue.x) > 0.1 || Math.abs(moveJoystickValue.y) > 0.1)) {
+                // Movimiento con joystick izquierdo (solo adelante/atrás)
+                if (moveJoystickActive && Math.abs(moveJoystickValue.y) > 0.1) {
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
                     
-                    const rightDirection = new THREE.Vector3();
-                    rightDirection.setFromMatrixColumn(camera.matrix, 0);
-                    rightDirection.y = 0;
-                    rightDirection.normalize();
-                    
                     const velocity = new THREE.Vector3();
                     
                     // Movimiento hacia adelante/atrás (eje Y del joystick) - invertido para ser más natural
-                    if (Math.abs(moveJoystickValue.y) > 0.1) {
-                        velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
-                    }
-                    
-                    // Movimiento lateral (eje X del joystick) - ahora también rota la cámara
-                    if (Math.abs(moveJoystickValue.x) > 0.1) {
-                        // Movimiento lateral
-                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x));
-                        
-                        // Rotación horizontal mientras te mueves (más suave que el joystick de cámara)
-                        targetRotationY += moveJoystickValue.x * ROTATE_SPEED * 0.3;
-                    }
+                    velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
                     
                     if (velocity.length() > 0) {
                         velocity.normalize().multiplyScalar(MOVE_SPEED * 0.3); // Velocidad reducida aún más para movimiento más lento
