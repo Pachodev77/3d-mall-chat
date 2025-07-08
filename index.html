@@ -3109,11 +3109,16 @@
             }
             
             const customizationPanel = document.getElementById('customization-panel');
+            console.log('Panel encontrado:', customizationPanel);
+            
             if (customizationPanel) {
+                console.log('Estado inicial del panel:', customizationPanel.style.display);
+                
                 // Actualizar el alias actual
                 const aliasInput = document.getElementById('customization-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
+                    console.log('Alias input actualizado:', aliasInput.value);
                 }
                 
                 // Poblar los grids de colores
@@ -3121,8 +3126,11 @@
                 
                 // Mostrar el panel
                 customizationPanel.style.display = 'block';
+                customizationPanel.style.visibility = 'visible';
+                customizationPanel.style.opacity = '1';
                 customizationPanelOpen = true;
                 
+                console.log('Estado final del panel:', customizationPanel.style.display);
                 console.log('✅ Panel de personalización completo mostrado');
                 
                 // Mostrar overlay
@@ -3131,6 +3139,7 @@
                     overlay.style.display = 'block';
                     overlay.style.pointerEvents = 'auto';
                     overlay.style.zIndex = '1002';
+                    console.log('Overlay mostrado');
                 }
             } else {
                 console.log('❌ Panel de personalización no encontrado');
