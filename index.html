@@ -350,29 +350,26 @@
         }
         
         .color-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
+            display: grid !important;
+            grid-template-columns: repeat(8, 1fr) !important;
+            gap: 6px !important;
+            margin-top: 6px;
+            margin-bottom: 6px;
         }
-        
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border: 3px solid transparent;
-            border-radius: 8px;
+        .color-btn {
+            width: 32px !important;
+            height: 32px !important;
+            border: 2px solid #444 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
             cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
+            transition: border 0.1s;
+            display: block !important;
         }
-        
-        .color-option:hover {
-            transform: scale(1.1);
-            border-color: #FFD700;
-        }
-        
-        .color-option.selected {
-            border-color: #FFD700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        .color-btn.selected {
+            border: 2px solid #FFD700 !important;
         }
         
         .color-option::after {
@@ -3475,14 +3472,9 @@
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
                     btn.setAttribute('data-color', color);
                     btn.onclick = () => changeShirtColor(color);
+                    if (color === shirtColor) btn.classList.add('selected');
                     shirtGrid.appendChild(btn);
                 }
             }
@@ -3495,14 +3487,9 @@
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
                     btn.setAttribute('data-color', color);
                     btn.onclick = () => changePantsColor(color);
+                    if (color === pantsColor) btn.classList.add('selected');
                     pantsGrid.appendChild(btn);
                 }
             }
@@ -3515,14 +3502,9 @@
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
                     btn.style.background = `#${color.toString(16).padStart(6, '0')}`;
-                    btn.style.width = '24px';
-                    btn.style.height = '24px';
-                    btn.style.display = 'inline-block';
-                    btn.style.margin = '2px';
-                    btn.style.border = '2px solid transparent';
-                    btn.style.cursor = 'pointer';
                     btn.setAttribute('data-color', color);
                     btn.onclick = () => changeShoesColor(color);
+                    if (color === shoesColor) btn.classList.add('selected');
                     shoesGrid.appendChild(btn);
                 }
             }
