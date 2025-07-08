@@ -36,12 +36,6 @@ function connectToChat(alias) {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
     });
-    messagesRef.on('child_added', (snapshot) => {
-        const message = snapshot.val();
-        if (message.alias !== currentUser.alias) {
-            addMessageToChat(message.alias, message.message, 'user');
-        }
-    });
     positionsRef.on('value', (snapshot) => {
         const positions = snapshot.val() || {};
         Object.keys(positions).forEach(alias => {
