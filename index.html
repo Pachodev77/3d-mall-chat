@@ -3180,11 +3180,11 @@
                     overlay.style.pointerEvents = 'none';
                 }
             }
-            
-            if (customizationPanelOpen && !customizationPanel.contains(e.target)) {
-                closeCustomizationPanel();
+            // Cerrar simple-panel si se hace clic fuera
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel && simplePanel.style.display !== 'none' && !simplePanel.contains(e.target) && !changeAliasBtn.contains(e.target)) {
+                closeSimplePanel();
             }
-            
             // Cerrar panel de trabajo al hacer clic fuera
             const workingPanel = document.getElementById('working-customization-panel');
             if (workingPanel && !workingPanel.contains(e.target)) {
