@@ -4213,7 +4213,7 @@
                     }
                     
                     if (velocity.length() > 0) {
-                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.6); // Reducida velocidad de movimiento
+                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.3); // Velocidad reducida aún más para movimiento más lento
                         const newPosition = targetPosition.clone().add(velocity);
                         
                         // Colisiones
