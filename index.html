@@ -3398,35 +3398,6 @@
         //     let touchMoved = false;
         //     const minSwipe = 10;
 
-        //     renderer.domElement.addEventListener('touchstart', function(e) {
-        //         if (e.touches.length === 1) {
-        //             touchStartX = lastTouchX = e.touches[0].clientX;
-        //             touchStartY = lastTouchY = e.touches[0].clientY;
-        //             rotating = true;
-        //             moving = true;
-        //             moveDir = 0;
-        //             touchMoved = false;
-        //         }
-        //     }, { passive: false });
-        //     renderer.domElement.addEventListener('touchmove', function(e) {
-        //         if (e.touches.length === 1) {
-        //             const dx = e.touches[0].clientX - lastTouchX;
-        //             const dy = e.touches[0].clientY - lastTouchY;
-        //             // Horizontal: rotar cámara
-        //             if (Math.abs(dx) > Math.abs(dy)) {
-        //                 targetRotationY -= dx * 0.01;
-        //             }
-        //             // Vertical: mover adelante/atrás
-        //             else if (Math.abs(dy) > minSwipe) {
-        //                 moveDir = dy < 0 ? 1 : -1;
-        //                 touchMoved = true;
-        //             }
-        //             lastTouchX = e.touches[0].clientX;
-        //             lastTouchY = e.touches[0].clientY;
-        //         }
-        //         e.preventDefault();
-        //     }, { passive: false });
-        //     renderer.domElement.addEventListener('touchend', function(e) {
     </script>
 </body>
 </html>
