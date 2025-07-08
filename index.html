@@ -599,7 +599,7 @@
         </div>
         
         <!-- Contenido principal -->
-        <div style="flex: 1; padding: 30px; overflow-y: auto; color: #eee; display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
+        <div id="simple-panel-content">
             <!-- Columna izquierda - Opciones -->
             <div style="display: flex; flex-direction: column; gap: 25px;">
                 <!-- Sección de Alias -->
@@ -611,7 +611,6 @@
                     <p style="margin-bottom: 15px; color: #ccc; font-size: 14px;">Nombre actual: <strong id="current-alias" style="color: #FFD700; font-size: 16px;">Sin nombre</strong></p>
                     <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 15px; font-size: 16px; border-radius: 8px; border: 2px solid #333; background: rgba(20,20,20,0.8); color: #fff; box-sizing: border-box; transition: all 0.3s; outline: none;" onfocus="this.style.borderColor='#FFD700'" onblur="this.style.borderColor='#333'">
                 </div>
-                
                 <!-- Sección de Colores de Camisa -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
@@ -620,7 +619,6 @@
                     </h3>
                     <div id="shirt-colors" class="color-grid"></div>
                 </div>
-                
                 <!-- Sección de Colores de Pantalón -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
@@ -629,7 +627,6 @@
                     </h3>
                     <div id="pants-colors" class="color-grid"></div>
                 </div>
-                
                 <!-- Sección de Colores de Zapatos -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
@@ -639,7 +636,6 @@
                     <div id="shoes-colors" class="color-grid"></div>
                 </div>
             </div>
-            
             <!-- Columna derecha - Vista previa -->
             <div style="display: flex; flex-direction: column; gap: 25px;">
                 <!-- Vista previa del avatar -->
@@ -652,7 +648,6 @@
                         <div style="color: #ccc; font-size: 14px;">Avatar en tiempo real</div>
                     </div>
                 </div>
-                
                 <!-- Información del alias -->
                 <div style="padding: 25px; background: linear-gradient(135deg, rgba(40,40,40,0.8), rgba(50,50,50,0.8)); border-radius: 12px; border-left: 5px solid #FFD700; box-shadow: 0 4px 16px rgba(0,0,0,0.3); text-align: center;">
                     <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
