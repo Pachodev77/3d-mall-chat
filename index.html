@@ -4172,12 +4172,12 @@
             updateMovement = function() {
                 if (chatOpen) return;
 
-                // Rotación de cámara con joystick derecho
+                // Rotación de cámara con joystick derecho (reducida velocidad y corregida dirección)
                 if (cameraJoystickActive && Math.abs(cameraJoystickValue.x) > 0.1) {
-                    targetRotationY -= cameraJoystickValue.x * ROTATE_SPEED * 2;
+                    targetRotationY += cameraJoystickValue.x * ROTATE_SPEED * 0.5; // Invertido y reducida velocidad
                 }
 
-                // Movimiento con joystick izquierdo
+                // Movimiento con joystick izquierdo (corregidas direcciones)
                 if (moveJoystickActive && (Math.abs(moveJoystickValue.x) > 0.1 || Math.abs(moveJoystickValue.y) > 0.1)) {
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
@@ -4191,18 +4191,18 @@
                     
                     const velocity = new THREE.Vector3();
                     
-                    // Movimiento hacia adelante/atrás (eje Y del joystick)
+                    // Movimiento hacia adelante/atrás (eje Y del joystick) - invertido para ser más natural
                     if (Math.abs(moveJoystickValue.y) > 0.1) {
-                        velocity.add(direction.clone().multiplyScalar(moveJoystickValue.y));
+                        velocity.add(direction.clone().multiplyScalar(-moveJoystickValue.y)); // Invertido
                     }
                     
-                    // Movimiento lateral (eje X del joystick)
+                    // Movimiento lateral (eje X del joystick) - invertido para ser más natural
                     if (Math.abs(moveJoystickValue.x) > 0.1) {
-                        velocity.add(rightDirection.clone().multiplyScalar(moveJoystickValue.x));
+                        velocity.add(rightDirection.clone().multiplyScalar(-moveJoystickValue.x)); // Invertido
                     }
                     
                     if (velocity.length() > 0) {
-                        velocity.normalize().multiplyScalar(MOVE_SPEED);
+                        velocity.normalize().multiplyScalar(MOVE_SPEED * 0.6); // Reducida velocidad de movimiento
                         const newPosition = targetPosition.clone().add(velocity);
                         
                         // Colisiones
