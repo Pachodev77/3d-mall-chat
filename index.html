@@ -70,7 +70,7 @@
             background: rgba(30,30,30,0.85);
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            z-index: 1003;
+            z-index: 1001;
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -247,7 +247,7 @@
         }
         
         /* Estilos para el panel de personalización simple */
-        #simple-panel.customization-panel {
+        #simple-panel {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -2954,22 +2954,6 @@
                 panel.remove();
             }
             customizationPanelOpen = false;
-        }
-        
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            if (panel) {
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                            // Ocultar overlay y permitir clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.zIndex = '999';
-            }
-                console.log('Panel simple cerrado');
-            }
         }
         
         function changeShirtColor(color) {
