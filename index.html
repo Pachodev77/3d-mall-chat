@@ -908,6 +908,15 @@
 
             // Crear avatar propio al inicializar la escena
             // (Eliminado: no crear el avatar propio, solo los de los demás usuarios)
+
+            if (!labelRenderer) {
+                labelRenderer = new THREE.CSS2DRenderer();
+                labelRenderer.setSize(window.innerWidth, window.innerHeight);
+                labelRenderer.domElement.style.position = 'absolute';
+                labelRenderer.domElement.style.top = '0px';
+                labelRenderer.domElement.style.pointerEvents = 'none';
+                document.body.appendChild(labelRenderer.domElement);
+            }
         }
 
         function setupLighting() {
@@ -3503,7 +3512,7 @@
             disconnectFromChat();
         });
 
-        let labelRenderer;
+        let labelRenderer = null;
         document.addEventListener('DOMContentLoaded', () => {
             // ... existing code ...
             // Inicializar CSS2DRenderer para los labels de los avatares
@@ -3518,7 +3527,6 @@
         // ... existing code ...
         function animate() {
             requestAnimationFrame(animate);
-            // ... existing code ...
             renderer.render(scene, camera);
             if (labelRenderer) labelRenderer.render(scene, camera);
         }
