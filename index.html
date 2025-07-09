@@ -24,7 +24,8 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
             mix-blend-mode: difference;
-            z-index: 5;
+            z-index: 10;
+            pointer-events: none;
         }
         #chat-toggle-btn {
             position: fixed;
@@ -902,6 +903,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar pixel ratio
             renderer.shadowMap.enabled = false; // Desactivar sombras completamente
+            renderer.domElement.style.zIndex = '1'; // Asegurar que el canvas esté por debajo de la UI
             document.body.appendChild(renderer.domElement);
         }
 
