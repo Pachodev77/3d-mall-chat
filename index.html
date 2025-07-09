@@ -656,6 +656,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="/firebase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
         const originalStoreLinks = [
@@ -903,6 +904,17 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar pixel ratio
             renderer.shadowMap.enabled = false; // Desactivar sombras completamente
             document.body.appendChild(renderer.domElement);
+
+            // Crear avatar propio al inicializar la escena
+            if (typeof userAlias !== 'undefined' && userAlias) {
+                // Obtener personalización guardada o usar por defecto
+                let custom = {};
+                try {
+                    const saved = JSON.parse(localStorage.getItem('avatarCustomization'));
+                    if (saved) custom = saved;
+                } catch(e) {}
+                createUserAvatar(userAlias, {x: camera.position.x, y: 0, z: camera.position.z}, currentFloor, custom);
+            }
         }
 
         function setupLighting() {
@@ -2419,6 +2431,7 @@
             }
             
             renderer.render(scene, camera);
+            if (labelRenderer) labelRenderer.render(scene, camera);
         }
         
         // Función para limpiar recursos
@@ -3496,6 +3509,28 @@
             stopPositionUpdates();
             disconnectFromChat();
         });
+
+        let labelRenderer;
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... existing code ...
+            // Inicializar CSS2DRenderer para los labels de los avatares
+            labelRenderer = new THREE.CSS2DRenderer();
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none';
+            document.body.appendChild(labelRenderer.domElement);
+            // ... existing code ...
+        });
+        // ... existing code ...
+        function animate() {
+            requestAnimationFrame(animate);
+            // ... existing code ...
+            renderer.render(scene, camera);
+            if (labelRenderer) labelRenderer.render(scene, camera);
+        }
+        animate();
+        // ... existing code ...
     </script>
 </body>
 </html>
