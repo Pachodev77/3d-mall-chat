@@ -2698,6 +2698,83 @@
                 console.log('Panel de personalización cerrado');
             }
         }
+
+        // Event listeners para actualización en tiempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', function() {
+                    updateAvatarPreview();
+                });
+            }
+        });
+
+        function closeWorkingPanel() {
+            const panel = document.getElementById('working-customization-panel');
+            if (panel) {
+                panel.remove();
+            }
+            customizationPanelOpen = false;
+        }
+
+        function changeShirtColor(color) {
+            currentCustomization.shirtColor = color;
+            applyCustomizationToAvatar();
+            console.log('Color de camisa cambiado a:', color);
+        }
+
+        function saveSimpleCustomization() {
+            const aliasInput = document.getElementById('simple-alias-input');
+            const newAlias = aliasInput.value.trim();
+            
+            if (newAlias.length > 0) {
+                userAlias = newAlias;
+                localStorage.setItem('userAlias', userAlias);
+                
+                if (isConnected) {
+                    sendAlias();
+                }
+                
+                console.log('Alias guardado:', newAlias);
+            }
+            
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            closeSimplePanel();
+            alert('¡Personalización guardada!');
+        }
+
+        function createWorkingColorGrids() {
+            // Crear opciones de color para camisas (primeros 18 colores)
+            const shirtGrid = document.getElementById('working-shirt-colors');
+            for (let i = 0; i < 18; i++) {
+                const colorOption = document.createElement('div');
+                colorOption.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid transparent;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                `;
+                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
+                if (customizationColors[i] === currentCustomization.shirtColor) {
+                    colorOption.style.borderColor = '#FFD700';
+                }
+                shirtGrid.appendChild(colorOption);
+            }
+        }
+
+        function closeCustomizationPanel() {
+            customizationPanel.style.display = 'none';
+            customizationPanelOpen = false;
+        }
+
+        function createColorGrids() {
+            // Limpiar grids existentes
+            const shirtColorsGrid = document.getElementById('shirt-colors');
+            const pantsColorsGrid = document.getElementById('pants-colors');
+            const shoesColorsGrid = document.getElementById('shoes-colors');
+        }
         
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
@@ -2899,18 +2976,6 @@
                 chatOpen = false;
             }
             
-        
-        // Actualizar el alias actual
-        const currentAliasElement = document.getElementById('current-alias');
-        const aliasInput = document.getElementById('simple-alias-input');
-                // Ocultar overlay
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.zIndex = '999';
-                
-                console.log('Panel de personalización cerrado');
-            }
-        }
         
         // Event listeners para actualización en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
