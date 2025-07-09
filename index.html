@@ -3099,9 +3099,8 @@
                 // Agregar título al pasar el mouse
                 option.title = colorObj.name;
                 
-                option.addEventListener('click', () => {
-                    selectColor(colorObj.color, type);
-                });
+                // Agregar evento click
+                option.onclick = () => selectColor(colorObj.color, type);
                 
                 return option;
             };
@@ -3118,19 +3117,7 @@
         // Inicializar los grids de colores al cargar
         document.addEventListener('DOMContentLoaded', createColorGrids);
 
-        function createColorOption(color, type) {
-            const option = document.createElement('div');
-            option.className = 'color-option';
-            option.style.setProperty('--color', `#${color.toString(16).padStart(6, '0')}`);
-            option.dataset.color = color;
-            option.dataset.type = type;
-            
-            option.addEventListener('click', () => {
-                selectColor(color, type);
-            });
-            
-            return option;
-        }
+
 
         function selectColor(color, type) {
             // Remover selección previa del mismo tipo
