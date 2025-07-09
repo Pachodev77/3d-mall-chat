@@ -578,7 +578,7 @@
     </style>
 </head>
 <body>
-    <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1002; pointer-events:auto;"></div>
+    <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:11000; pointer-events:none;"></div>
     <div id="crosshair"></div>
     <button id="chat-toggle-btn" title="Abrir chat">💬</button>
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
@@ -2653,7 +2653,7 @@
             if (overlay) {
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '1002';
+                overlay.style.zIndex = '11000';
             }
             } else {
                 console.log('❌ Panel simple no encontrado');
@@ -2895,7 +2895,7 @@
                 if (overlay) {
                     overlay.style.display = 'block';
                     overlay.style.pointerEvents = 'auto';
-                    overlay.style.zIndex = '1002';
+                    overlay.style.zIndex = '11000';
                 }
             }
         }
