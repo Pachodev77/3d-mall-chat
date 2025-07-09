@@ -131,4 +131,10 @@ function cleanupDisconnectedUsers() {
         }
     });
 }
-setInterval(cleanupDisconnectedUsers, 10000); 
+setInterval(cleanupDisconnectedUsers, 10000);
+
+window.connectToChat = connectToChat;
+window.sendMessage = sendMessage;
+window.sendPosition = sendPosition;
+window.disconnectFromChat = disconnectFromChat;
+window.updateUsersList = updateUsersList; 
