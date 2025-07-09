@@ -177,6 +177,13 @@ window.updateUsersList = updateUsersList;
 window.sendPrivateMessage = sendPrivateMessage;
 window.listenToPrivateMessages = listenToPrivateMessages;
 
+// Mantener actualizado el timestamp del usuario conectado
+setInterval(() => {
+    if (isConnected && currentUser) {
+        usersRef.child(currentUser.alias).update({ timestamp: Date.now() });
+    }
+}, 10000);
+
 // Llama a listenToPrivateMessages al conectar
 const oldConnectToChat = connectToChat;
 connectToChat = function(alias) {
