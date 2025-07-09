@@ -3389,6 +3389,10 @@
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
+        // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
+        window.addMessageToChat = addMessageToChat;
     </script>
 </body>
 </html>
