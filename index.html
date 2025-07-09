@@ -1428,7 +1428,6 @@
             scene.add(railE2);
 
             // --- Tiendas ---
-            const storeWidth = 8;
             const storeSpacing = 1.5;
             const numStoresPerSide = Math.floor(HALL_SIZE / (storeWidth + storeSpacing));
             const totalStoresWidth = numStoresPerSide * storeWidth + (numStoresPerSide - 1) * storeSpacing;
@@ -1443,11 +1442,10 @@
 
             // Crear tiendas en sentido horario usando la función centralizada
             createClockwiseStores(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, wallMaterial, linkIndex, getNextShopNumber);
-            return linkIndex;
-
+            
             // Crear muros separadores usando la función centralizada
             createSeparatorWalls(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, separatorMaterial);
-
+            
             return linkIndex;
         }
 
