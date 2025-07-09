@@ -252,6 +252,7 @@
             overflow: hidden;
             backdrop-filter: blur(20px);
             border: 2px solid #4B0000;
+            pointer-events: auto;
         }
         
         #simple-panel .panel-header {
@@ -2655,6 +2656,9 @@
                 overlay.style.pointerEvents = 'auto';
                 overlay.style.zIndex = '11000';
             }
+            // Asegurar que el panel esté por encima
+            simplePanel.style.zIndex = '11001';
+            simplePanel.style.pointerEvents = 'auto';
             } else {
                 console.log('❌ Panel simple no encontrado');
             }
@@ -2905,16 +2909,16 @@
             if (panel) {
                 panel.style.display = 'none';
                 customizationPanelOpen = false;
-                
-                // Ocultar overlay
+                // Ocultar overlay y permitir clics
                 const overlay = document.getElementById('ui-overlay');
                 if (overlay) {
                     overlay.style.display = 'none';
                     overlay.style.pointerEvents = 'none';
-                    overlay.style.zIndex = '999';
+                    overlay.style.zIndex = '11000';
                 }
-                
-                console.log('Panel de personalización cerrado');
+                panel.style.zIndex = '11001';
+                panel.style.pointerEvents = 'auto';
+                console.log('Panel simple cerrado');
             }
         }
         
@@ -2934,22 +2938,6 @@
                 panel.remove();
             }
             customizationPanelOpen = false;
-        }
-        
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            if (panel) {
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                            // Ocultar overlay y permitir clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.zIndex = '999';
-            }
-                console.log('Panel simple cerrado');
-            }
         }
         
         function changeShirtColor(color) {
