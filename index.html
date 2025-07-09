@@ -2267,13 +2267,6 @@
                 console.error('No se encontró el panel de personalización');
             }
             
-            if (customizationCloseBtn) {
-                console.log('Botón de cerrar personalización encontrado');
-                customizationCloseBtn.onclick = closeCustomizationPanel;
-            } else {
-                console.error('No se encontró el botón de cerrar personalización');
-            }
-            
             if (saveCustomizationBtn) {
                 console.log('Botón de guardar personalización encontrado');
                 saveCustomizationBtn.onclick = saveCustomization;
@@ -2595,8 +2588,6 @@
         connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
-        const customizationPanel = document.getElementById('customization-panel');
-        const customizationCloseBtn = document.getElementById('customization-close-btn');
         const saveCustomizationBtn = document.getElementById('save-customization-btn');
         const resetCustomizationBtn = document.getElementById('reset-customization-btn');
         const shirtColorsGrid = document.getElementById('shirt-colors');
@@ -2846,53 +2837,6 @@
             closeSimplePanel();
             
             console.log('✅ Personalización guardada:', customizationData);
-        }
-        
-        function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorado');
-            
-            // Cerrar chat si está abierto
-            if (chatOpen) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-            }
-            
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
-                // Actualizar el alias actual
-                const currentAliasElement = document.getElementById('current-alias');
-                const aliasInput = document.getElementById('simple-alias-input');
-                
-                if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin nombre';
-                }
-                
-                if (aliasInput) {
-                    aliasInput.value = userAlias || '';
-                }
-                
-                // Mostrar el panel
-                simplePanel.style.display = 'flex';
-                customizationPanelOpen = true;
-                
-                // Inicializar vista previa del avatar
-                updateAvatarPreview();
-                
-                // Marcar colores actuales en los botones
-                updateColorButtonSelection('shirt', shirtColor);
-                updateColorButtonSelection('pants', pantsColor);
-                updateColorButtonSelection('shoes', shoesColor);
-                
-                console.log('✅ Panel de personalización mejorado mostrado');
-                
-                // Mostrar overlay
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'block';
-                    overlay.style.pointerEvents = 'auto';
-                    overlay.style.zIndex = '20000';
-                }
-            }
         }
         
         function closeSimplePanel() {
