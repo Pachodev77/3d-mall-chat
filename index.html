@@ -2375,11 +2375,15 @@
         }
         
         function onMouseDown(event) {
-            // Si el chat está abierto, no procesar clics del juego
+            // Si el overlay está activo, no procesar ningún clic del juego
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
+                return;
+            }
+            // Si el chat está abierto, no procesar controles del juego
             if (chatOpen) {
                 return;
             }
-            
             // Si el panel de personalización está abierto, no procesar clics del juego
             const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
