@@ -3101,8 +3101,19 @@
 
 
 
-        // Cerrar panel al hacer clic fuera
+        // Cerrar panel al hacer clic fuera - VERSIÓN MEJORADA
         document.addEventListener('click', (e) => {
+            // Verificar si el clic es en un botón de UI - NO cerrar en ese caso
+            const isUIButton = e.target.closest('#chat-toggle-btn') || 
+                              e.target.closest('#change-alias-btn') || 
+                              e.target.closest('#chat-panel') || 
+                              e.target.closest('#simple-panel') ||
+                              e.target.closest('#ui-overlay');
+            
+            if (isUIButton) {
+                return; // No hacer nada si el clic es en un elemento de UI
+            }
+            
             // Cerrar chat si está abierto y se hace clic fuera
             if (chatOpen && !chatPanel.contains(e.target) && !chatToggleBtn.contains(e.target)) {
                 chatPanel.style.display = 'none';
@@ -3126,14 +3137,21 @@
             }
         });
 
-        // Agregar event listener al overlay para bloquear clics
+        // Agregar event listener al overlay para bloquear clics - VERSIÓN MEJORADA
         const overlay = document.getElementById('ui-overlay');
         if (overlay) {
             overlay.addEventListener('click', (e) => {
-                // Bloquear TODOS los clics que pasen por el overlay
-                e.stopPropagation();
-                e.preventDefault();
-                return false;
+                // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
+                const isUIButton = e.target.closest('#chat-toggle-btn') || 
+                                  e.target.closest('#change-alias-btn') || 
+                                  e.target.closest('#chat-panel') || 
+                                  e.target.closest('#simple-panel');
+                
+                if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
+                }
             });
         }
 
@@ -3191,15 +3209,23 @@
             init();
         }
 
-        // Configurar overlay al cargar la página
+        // Configurar overlay al cargar la página - VERSIÓN MEJORADA
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
                 overlay.style.pointerEvents = 'auto';
                 overlay.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
+                    // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
+                    const isUIButton = e.target.closest('#chat-toggle-btn') || 
+                                      e.target.closest('#change-alias-btn') || 
+                                      e.target.closest('#chat-panel') || 
+                                      e.target.closest('#simple-panel');
+                    
+                    if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return false;
+                    }
                 });
             }
         });
