@@ -364,23 +364,7 @@
             justify-content: flex-end;
         }
         
-        /* Estilos para botones de color del sistema simple */
-        #simple-panel .color-btn {
-            width: 30px !important;
-            height: 30px !important;
-            border: 2px solid transparent !important;
-            border-radius: 5px !important;
-            cursor: pointer !important;
-            transition: all 0.3s !important;
-            position: relative !important;
-            background: #333 !important;
-        }
-
-        #simple-panel .color-btn[data-color] {
-            border: 2px solid #333 !important;
-        }
-
-        /* Estilos para botones de color del sistema dinámico */
+        /* Estilos para botones de color (sistema dinámico) */
         .color-option {
             width: 30px !important;
             height: 30px !important;
@@ -389,14 +373,23 @@
             cursor: pointer !important;
             transition: all 0.3s !important;
             position: relative !important;
-            background: #333 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            background: var(--color, #333) !important;
         }
 
         .color-option[data-color] {
             border: 2px solid #333 !important;
+        }
+
+        .color-option.selected {
+            border-color: #FFD700 !important;
+            transform: scale(1.1) !important;
+        }
+
+        .color-option:hover {
+            border-color: #FFD700 !important;
         }
 
         /* Estilos para mostrar colores en ambos sistemas */
@@ -623,18 +616,9 @@
                         Color de Camisa
                     </h3>
                     <div class="color-grid">
-                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="background-color: #FF6B6B"></button>
-                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="background-color: #4ECDC4"></button>
-                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="background-color: #45B7D1"></button>
-                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" style="background-color: #96CEB4"></button>
-                        <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" style="background-color: #FFEAA7"></button>
-                        <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" style="background-color: #DDA0DD"></button>
-                        <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" style="background-color: #98D8C8"></button>
-                        <button onclick="changeShirtColor(0xF7DC6F)" class="color-btn" data-color="0xF7DC6F" style="background-color: #F7DC6F"></button>
-                        <button onclick="changeShirtColor(0xBB8FCE)" class="color-btn" data-color="0xBB8FCE" style="background-color: #BB8FCE"></button>
-                        <button onclick="changeShirtColor(0x85C1E9)" class="color-btn" data-color="0x85C1E9" style="background-color: #85C1E9"></button>
-                        <button onclick="changeShirtColor(0xF8C471)" class="color-btn" data-color="0xF8C471" style="background-color: #F8C471"></button>
-                        <button onclick="changeShirtColor(0x82E0AA)" class="color-btn" data-color="0x82E0AA" style="background-color: #82E0AA"></button>
+                        <div id="shirt-colors" class="color-grid">
+                            <!-- Los colores se agregarán dinámicamente -->
+                        </div>
                     </div>
                 </div>
                 
@@ -3175,28 +3159,59 @@
 
         function createColorGrids() {
             // Limpiar grids existentes
+            const shirtColorsGrid = document.getElementById('shirt-colors');
+            const pantsColorsGrid = document.getElementById('pants-colors');
+            const shoesColorsGrid = document.getElementById('shoes-colors');
+
             shirtColorsGrid.innerHTML = '';
             pantsColorsGrid.innerHTML = '';
             shoesColorsGrid.innerHTML = '';
 
-            // Crear opciones de color para camisas (primeros 18 colores)
-            for (let i = 0; i < 18; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'shirt');
-                shirtColorsGrid.appendChild(colorOption);
-            }
+            // Definir los colores disponibles para cada tipo
+            const shirtColors = [
+                0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
+                0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
+                0xF8C471, 0x82E0AA, 0x2C3E50, 0x3498DB, 0xE74C3C,
+                0x9B59B6, 0x34495E, 0x2ECC71
+            ];
 
-            // Crear opciones de color para pantalones (siguientes 18 colores)
-            for (let i = 18; i < 36; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'pants');
-                pantsColorsGrid.appendChild(colorOption);
-            }
+            const pantsColors = [
+                0x2C3E50, 0x3498DB, 0xE74C3C, 0x9B59B6, 0x34495E,
+                0x2ECC71, 0x16A085, 0x2980B9, 0x8E44AD, 0x2C3E50,
+                0x3498DB, 0xE74C3C, 0x9B59B6, 0x34495E, 0x2ECC71,
+                0x16A085, 0x2980B9, 0x8E44AD
+            ];
 
-            // Crear opciones de color para zapatos (últimos 18 colores)
-            for (let i = 36; i < 54; i++) {
-                const colorOption = createColorOption(customizationColors[i], 'shoes');
-                shoesColorsGrid.appendChild(colorOption);
-            }
+            const shoesColors = [
+                0x8B4513, 0x6E2C00, 0x1A5276, 0x154360, 0x1A5276,
+                0x154360, 0x1A5276, 0x154360, 0x1A5276, 0x154360,
+                0x1A5276, 0x154360, 0x1A5276, 0x154360, 0x1A5276,
+                0x154360, 0x1A5276, 0x154360
+            ];
+
+            // Crear opciones de color para cada tipo
+            const createOption = (color, type) => {
+                const option = document.createElement('div');
+                option.className = 'color-option';
+                option.style.setProperty('--color', '#' + color.toString(16).padStart(6, '0'));
+                option.dataset.color = color;
+                option.dataset.type = type;
+                
+                option.addEventListener('click', () => {
+                    selectColor(color, type);
+                });
+                
+                return option;
+            };
+
+            // Crear botones para cada tipo
+            shirtColors.forEach(color => shirtColorsGrid.appendChild(createOption(color, 'shirt')));
+            pantsColors.forEach(color => pantsColorsGrid.appendChild(createOption(color, 'pants')));
+            shoesColors.forEach(color => shoesColorsGrid.appendChild(createOption(color, 'shoes')));
         }
+
+        // Inicializar los grids de colores al cargar
+        document.addEventListener('DOMContentLoaded', createColorGrids);
 
         function createColorOption(color, type) {
             const option = document.createElement('div');
