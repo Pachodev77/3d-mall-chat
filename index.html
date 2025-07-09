@@ -3378,11 +3378,24 @@
         function addMessageToChat(alias, message, type = 'user', timestamp = null) {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
+
+            // Verificar si el mensaje ya existe
+            const existingMessage = Array.from(chatMessages.children).find(msg => {
+                const text = msg.textContent || msg.innerText;
+                return text.includes(`${alias}: ${message}`);
+            });
+
+            if (existingMessage) {
+                console.log('Mensaje duplicado ignorado:', message);
+                return;
+            }
+
             let timeStr = '';
             if (timestamp) {
                 const date = new Date(timestamp);
                 timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
             }
+
             const isOwn = (alias === userAlias || type === 'own');
             const msgDiv = document.createElement('div');
             msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
