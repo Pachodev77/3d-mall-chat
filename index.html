@@ -246,7 +246,7 @@
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 11001;
+            z-index: 21000; /* Siempre por encima del overlay */
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -576,10 +576,42 @@
         .chat-message.own {
             background: linear-gradient(90deg, #FFD70033, #FFD70011);
         }
+        /* Overlay para bloquear clics al fondo cuando el panel de personalización está abierto */
+        #ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 20000; /* Debe estar debajo del panel de personalización */
+            pointer-events: none; /* Solo se activa cuando el panel está abierto */
+            display: none; /* Solo se muestra cuando el panel está abierto */
+        }
+        /* Panel de personalización siempre por encima del overlay */
+        #simple-panel.customization-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1100px;
+            max-width: 99vw;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 21000; /* Siempre por encima del overlay */
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid #4B0000;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
-    <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:11000; pointer-events:none;"></div>
+    <div id="ui-overlay"></div>
     <div id="crosshair"></div>
     <button id="chat-toggle-btn" title="Abrir chat">💬</button>
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
@@ -2654,10 +2686,10 @@
             if (overlay) {
                 overlay.style.display = 'block';
                 overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '11000';
+                overlay.style.zIndex = '20000';
             }
             // Asegurar que el panel esté por encima
-            simplePanel.style.zIndex = '11001';
+            simplePanel.style.zIndex = '21000';
             simplePanel.style.pointerEvents = 'auto';
             } else {
                 console.log('❌ Panel simple no encontrado');
@@ -2899,7 +2931,7 @@
                 if (overlay) {
                     overlay.style.display = 'block';
                     overlay.style.pointerEvents = 'auto';
-                    overlay.style.zIndex = '11000';
+                    overlay.style.zIndex = '20000';
                 }
             }
         }
@@ -2914,9 +2946,8 @@
                 if (overlay) {
                     overlay.style.display = 'none';
                     overlay.style.pointerEvents = 'none';
-                    overlay.style.zIndex = '11000';
                 }
-                panel.style.zIndex = '11001';
+                panel.style.zIndex = '21000';
                 panel.style.pointerEvents = 'auto';
                 console.log('Panel simple cerrado');
             }
