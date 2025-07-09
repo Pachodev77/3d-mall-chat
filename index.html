@@ -2567,20 +2567,12 @@
             chatPanel.style.display = 'flex';
             chatOpen = true;
             chatInput.focus();
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'auto';
-            }
+            // El overlay NO debe mostrarse al abrir el chat
         };
         chatCloseBtn.onclick = () => {
             chatPanel.style.display = 'none';
             chatOpen = false;
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-            }
+            // El overlay NO debe ocultarse al cerrar el chat
         };
 
         // --- Emojis ---
