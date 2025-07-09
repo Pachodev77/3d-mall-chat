@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3453,43 +3453,44 @@
             const shoesColor = options.shoesColor || 0x8B4513;
             const skinColor = 0xFFE4C4;
             // Cabeza
+            // Ajustar las posiciones para que el avatar esté sobre el suelo
             const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
             const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.set(0, 1.7, 0);
+            head.position.set(0, 1.2, 0); // Ajustado para que la cabeza esté sobre el cuerpo
             group.add(head);
             // Torso
             const bodyGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
             const bodyMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.position.set(0, 0.9, 0);
+            body.position.set(0, 0.4, 0); // Ajustado para que el cuerpo esté sobre las piernas
             group.add(body);
             // Brazos
             const armGeometry = new THREE.BoxGeometry(0.35, 1, 0.35);
             const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-            leftArm.position.set(-0.7, 1.1, 0);
+            leftArm.position.set(-0.7, 0.6, 0); // Ajustado para que los brazos estén sobre el cuerpo
             group.add(leftArm);
             const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-            rightArm.position.set(0.7, 1.1, 0);
+            rightArm.position.set(0.7, 0.6, 0);
             group.add(rightArm);
             // Piernas
             const legGeometry = new THREE.BoxGeometry(0.38, 1, 0.38);
             const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
             const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-            leftLeg.position.set(-0.25, 0.0, 0);
+            leftLeg.position.set(-0.25, -0.4, 0); // Ajustado para que las piernas estén sobre los zapatos
             group.add(leftLeg);
             const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-            rightLeg.position.set(0.25, 0.0, 0);
+            rightLeg.position.set(0.25, -0.4, 0);
             group.add(rightLeg);
             // Zapatos
             const shoeGeometry = new THREE.BoxGeometry(0.38, 0.18, 0.38);
             const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
             const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            leftShoe.position.set(-0.25, -0.5, 0);
+            leftShoe.position.set(-0.25, -0.91, 0); // Ajustado para que los zapatos estén sobre el suelo
             group.add(leftShoe);
             const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            rightShoe.position.set(0.25, -0.5, 0);
+            rightShoe.position.set(0.25, -0.91, 0);
             group.add(rightShoe);
             // Materiales para personalización en tiempo real
             group.bodyMaterial = bodyMaterial;
