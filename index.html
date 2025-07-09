@@ -35,7 +35,8 @@
             background: rgba(0,0,0,0.5);
             z-index: 1005;
             display: none;
-            pointer-events: auto;
+            pointer-events: all;
+            cursor: default;
         }
         #chat-toggle-btn {
             position: fixed;
@@ -590,7 +591,7 @@
     </style>
 </head>
 <body>
-    <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1005; pointer-events:auto;"></div>
+    <div id="ui-overlay"></div>
     <div id="crosshair"></div>
     <button id="chat-toggle-btn" title="Abrir chat">💬</button>
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
@@ -2866,7 +2867,7 @@
         }
         
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorado');
+            console.log('Abriendo panel de personalización mejorada');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2900,14 +2901,21 @@
                 updateColorButtonSelection('pants', pantsColor);
                 updateColorButtonSelection('shoes', shoesColor);
                 
-                console.log('✅ Panel de personalización mejorado mostrado');
+                console.log('✅ Panel de personalización mejorada mostrada');
                 
                 // Mostrar overlay
                 const overlay = document.getElementById('ui-overlay');
                 if (overlay) {
                     overlay.style.display = 'block';
-                    overlay.style.pointerEvents = 'auto';
-                    overlay.style.zIndex = '1002';
+                    overlay.style.pointerEvents = 'all';
+                    overlay.style.zIndex = '1005';
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.right = '0';
+                    overlay.style.bottom = '0';
+                    overlay.style.background = 'rgba(0,0,0,0.5)';
+                    overlay.style.cursor = 'default';
                 }
             }
         }
@@ -3378,24 +3386,11 @@
         function addMessageToChat(alias, message, type = 'user', timestamp = null) {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
-
-            // Verificar si el mensaje ya existe
-            const existingMessage = Array.from(chatMessages.children).find(msg => {
-                const text = msg.textContent || msg.innerText;
-                return text.includes(`${alias}: ${message}`);
-            });
-
-            if (existingMessage) {
-                console.log('Mensaje duplicado ignorado:', message);
-                return;
-            }
-
             let timeStr = '';
             if (timestamp) {
                 const date = new Date(timestamp);
                 timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
             }
-
             const isOwn = (alias === userAlias || type === 'own');
             const msgDiv = document.createElement('div');
             msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
