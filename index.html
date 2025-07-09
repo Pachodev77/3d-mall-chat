@@ -3401,6 +3401,44 @@
         // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
         // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
         window.addMessageToChat = addMessageToChat;
+
+        // --- Enviar posición del usuario periódicamente SOLO si está conectado y sin duplicados ---
+        let positionInterval = null;
+        function startPositionUpdates() {
+            if (positionInterval) clearInterval(positionInterval);
+            positionInterval = setInterval(() => {
+                if (
+                    typeof camera !== 'undefined' &&
+                    camera.position &&
+                    typeof camera.position.x !== 'undefined' &&
+                    typeof camera.position.y !== 'undefined' &&
+                    typeof camera.position.z !== 'undefined'
+                ) {
+                    const position = {
+                        x: camera.position.x,
+                        y: camera.position.y,
+                        z: camera.position.z
+                    };
+                    const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
+                    const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
+                    sendPosition(position, floor, rotation);
+                }
+            }, 500);
+        }
+        function stopPositionUpdates() {
+            if (positionInterval) clearInterval(positionInterval);
+            positionInterval = null;
+        }
+        // Iniciar al conectar
+        document.addEventListener('DOMContentLoaded', () => {
+            connectToChat(userAlias);
+            startPositionUpdates();
+        });
+        // Limpiar al cerrar la página
+        window.addEventListener('beforeunload', () => {
+            stopPositionUpdates();
+            disconnectFromChat();
+        });
     </script>
 </body>
 </html>
