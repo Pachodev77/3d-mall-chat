@@ -131,8 +131,56 @@ function cleanupDisconnectedUsers() {
 }
 setInterval(cleanupDisconnectedUsers, 10000);
 
+function getPrivateChatId(aliasA, aliasB) {
+    return [aliasA, aliasB].sort().join('_');
+}
+
+function sendPrivateMessage(toAlias, message) {
+    if (!isConnected || !currentUser) return;
+    const chatId = getPrivateChatId(currentUser.alias, toAlias);
+    const privateRef = db.ref('privateMessages').child(chatId);
+    const messageData = {
+        from: currentUser.alias,
+        to: toAlias,
+        message: message,
+        timestamp: Date.now()
+    };
+    privateRef.push(messageData);
+}
+
+function listenToPrivateMessages() {
+    if (!currentUser) return;
+    const privateRef = db.ref('privateMessages');
+    privateRef.on('child_added', (snapshot) => {
+        const chatId = snapshot.key;
+        // Escuchar solo los chats donde participa el usuario actual
+        if (chatId.includes(currentUser.alias)) {
+            privateRef.child(chatId).on('child_added', (msgSnap) => {
+                const msg = msgSnap.val();
+                // Solo mostrar si el mensaje es para el usuario actual o lo envió el usuario actual
+                if (msg.to === currentUser.alias || msg.from === currentUser.alias) {
+                    // Llama a la función global si existe
+                    if (typeof window.addMessageToChat === 'function') {
+                        window.addMessageToChat(msg.from, msg.message, msg.from === currentUser.alias ? 'own' : 'user', msg.timestamp, true, msg.to);
+                    }
+                }
+            });
+        }
+    });
+}
+
 window.connectToChat = connectToChat;
 window.sendMessage = sendMessage;
 window.sendPosition = sendPosition;
 window.disconnectFromChat = disconnectFromChat;
-window.updateUsersList = updateUsersList; 
+window.updateUsersList = updateUsersList;
+window.sendPrivateMessage = sendPrivateMessage;
+window.listenToPrivateMessages = listenToPrivateMessages;
+
+// Llama a listenToPrivateMessages al conectar
+const oldConnectToChat = connectToChat;
+connectToChat = function(alias) {
+    oldConnectToChat(alias);
+    listenToPrivateMessages();
+};
+window.connectToChat = connectToChat; 

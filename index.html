@@ -2524,7 +2524,11 @@
         function handleSendMessage() {
             const message = chatInput.value.trim();
             if (message.length > 0 && userAlias) {
-                sendMessage(message); // Provided by firebase-config.js
+                if (privateRecipient) {
+                    sendPrivateMessage(privateRecipient, message);
+                } else {
+                    sendMessage(message);
+                }
                 chatInput.value = '';
             }
         }
@@ -3332,6 +3336,59 @@
         if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
         if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
         if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
+
+        let privateRecipient = null;
+        
+        // UI: Al hacer clic en un usuario, activar modo privado
+        usersList.addEventListener('click', function(e) {
+            const userItem = e.target.closest('.user-item');
+            if (userItem && !userItem.classList.contains('own')) {
+                privateRecipient = userItem.textContent.replace(' (Tú)', '').trim();
+                chatInput.placeholder = `Mensaje privado a: ${privateRecipient}`;
+                chatInput.focus();
+                document.getElementById('private-mode-indicator')?.remove();
+                const indicator = document.createElement('div');
+                indicator.id = 'private-mode-indicator';
+                indicator.textContent = `Modo privado con: ${privateRecipient}`;
+                indicator.style = 'background:#FFD700;color:#222;padding:4px 10px;border-radius:6px;margin-bottom:4px;font-weight:bold;text-align:center;';
+                chatInput.parentElement.insertBefore(indicator, chatInput);
+                // Botón para salir del modo privado
+                const exitBtn = document.createElement('button');
+                exitBtn.textContent = 'Volver a chat público';
+                exitBtn.style = 'margin-left:10px;padding:2px 8px;border-radius:4px;border:none;background:#800000;color:#fff;cursor:pointer;font-size:12px;';
+                exitBtn.onclick = function() {
+                    privateRecipient = null;
+                    chatInput.placeholder = 'Escribe un mensaje...';
+                    indicator.remove();
+                };
+                indicator.appendChild(exitBtn);
+            }
+        });
+        
+        // Diferenciar mensajes privados en el chat
+        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            let timeStr = '';
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+            }
+            const isOwn = (alias === userAlias || type === 'own');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
+            msgDiv.style.margin = '6px 0';
+            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+            if (isPrivate) {
+                msgDiv.style.background = 'rgba(255,215,0,0.12)';
+                msgDiv.style.border = '1px solid #FFD700';
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            } else {
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            }
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     </script>
 </body>
 </html>
