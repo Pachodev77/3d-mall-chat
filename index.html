@@ -3110,10 +3110,8 @@
 
         function selectColor(color, type) {
             // Remover selección previa del mismo tipo
-            const prevSelected = document.querySelector(`.color-option.selected[data-type="${type}"]`);
-            if (prevSelected) {
-                prevSelected.classList.remove('selected');
-            }
+            const allSelected = document.querySelectorAll(`.color-option.selected[data-type="${type}"]`);
+            allSelected.forEach(btn => btn.classList.remove('selected'));
             
             // Seleccionar nueva opción
             const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
