@@ -3001,136 +3001,16 @@
                 shirtGrid.appendChild(colorOption);
             }
             
-            // Crear opciones de color para pantalones (siguientes 18 colores)
-            const pantsGrid = document.getElementById('working-pants-colors');
-            for (let i = 18; i < 36; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'pants');
-                if (customizationColors[i] === currentCustomization.pantsColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                pantsGrid.appendChild(colorOption);
-            }
-            
-            // Crear opciones de color para zapatos (últimos 18 colores)
-            const shoesGrid = document.getElementById('working-shoes-colors');
-            for (let i = 36; i < 54; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shoes');
-                if (customizationColors[i] === currentCustomization.shoesColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                shoesGrid.appendChild(colorOption);
-            }
+
         }
         
-        function selectWorkingColor(color, type) {
-            // Actualizar color actual
-            switch (type) {
-                case 'shirt':
-                    currentCustomization.shirtColor = color;
-                    break;
-                case 'pants':
-                    currentCustomization.pantsColor = color;
-                    break;
-                case 'shoes':
-                    currentCustomization.shoesColor = color;
-                    break;
-            }
-            
-            // Aplicar cambios inmediatamente al avatar
-            applyCustomizationToAvatar();
-            
-            // Actualizar selecciones visuales
-            updateWorkingColorSelections();
-        }
+
         
-        function updateWorkingColorSelections() {
-            // Actualizar todas las opciones de color
-            const allOptions = document.querySelectorAll('#working-shirt-colors div, #working-pants-colors div, #working-shoes-colors div');
-            allOptions.forEach(option => {
-                option.style.borderColor = 'transparent';
-            });
-            
-            // Marcar las seleccionadas
-            const shirtOptions = document.querySelectorAll('#working-shirt-colors div');
-            const pantsOptions = document.querySelectorAll('#working-pants-colors div');
-            const shoesOptions = document.querySelectorAll('#working-shoes-colors div');
-            
-            shirtOptions.forEach((option, index) => {
-                if (customizationColors[index] === currentCustomization.shirtColor) {
-                    option.style.borderColor = '#FFD700';
-                }
-            });
-            
-            pantsOptions.forEach((option, index) => {
-                if (customizationColors[index + 18] === currentCustomization.pantsColor) {
-                    option.style.borderColor = '#FFD700';
-                }
-            });
-            
-            shoesOptions.forEach((option, index) => {
-                if (customizationColors[index + 36] === currentCustomization.shoesColor) {
-                    option.style.borderColor = '#FFD700';
-                }
-            });
-        }
+
         
-        function saveWorkingCustomization() {
-            const aliasInput = document.getElementById('working-alias-input');
-            const newAlias = aliasInput.value.trim();
-            
-            if (newAlias.length === 0) {
-                alert('El alias no puede estar vacío');
-                return;
-            }
-            
-            if (newAlias.length > 18) {
-                alert('El alias no puede tener más de 18 caracteres');
-                return;
-            }
-            
-            if (newAlias !== userAlias) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                if (isConnected) {
-                    sendAlias();
-                }
-            }
-            
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeWorkingPanel();
-            
-            alert('Personalización guardada exitosamente');
-        }
+
         
-        function resetWorkingCustomization() {
-            currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513
-            };
-            
-            applyCustomizationToAvatar();
-            updateWorkingColorSelections();
-        }
+
 
         function closeCustomizationPanel() {
             customizationPanel.style.display = 'none';
@@ -3149,36 +3029,81 @@
 
             // Definir los colores disponibles para cada tipo
             const shirtColors = [
-                0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
-                0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
-                0xF8C471, 0x82E0AA, 0x2C3E50, 0x3498DB, 0xE74C3C,
-                0x9B59B6, 0x34495E, 0x2ECC71
+                { color: 0xFF6B6B, name: 'Rosado' },
+                { color: 0x4ECDC4, name: 'Turquesa' },
+                { color: 0x45B7D1, name: 'Azul Marino' },
+                { color: 0x96CEB4, name: 'Verde Claro' },
+                { color: 0xFFEAA7, name: 'Amarillo' },
+                { color: 0xDDA0DD, name: 'Lila' },
+                { color: 0x98D8C8, name: 'Verde Agua' },
+                { color: 0xF7DC6F, name: 'Amarillo Dorado' },
+                { color: 0xBB8FCE, name: 'Morado' },
+                { color: 0x85C1E9, name: 'Azul Cielo' },
+                { color: 0xF8C471, name: 'Naranja' },
+                { color: 0x82E0AA, name: 'Verde Hoja' },
+                { color: 0x2C3E50, name: 'Gris Oscuro' },
+                { color: 0x3498DB, name: 'Azul' },
+                { color: 0xE74C3C, name: 'Rojo' },
+                { color: 0x9B59B6, name: 'Violeta' },
+                { color: 0x34495E, name: 'Azul Oscuro' },
+                { color: 0x2ECC71, name: 'Verde' }
             ];
 
             const pantsColors = [
-                0x2C3E50, 0x3498DB, 0xE74C3C, 0x9B59B6, 0x34495E,
-                0x2ECC71, 0x16A085, 0x2980B9, 0x8E44AD, 0x2C3E50,
-                0x3498DB, 0xE74C3C, 0x9B59B6, 0x34495E, 0x2ECC71,
-                0x16A085, 0x2980B9, 0x8E44AD
+                { color: 0x2C3E50, name: 'Gris Oscuro' },
+                { color: 0x3498DB, name: 'Azul' },
+                { color: 0xE74C3C, name: 'Rojo' },
+                { color: 0x9B59B6, name: 'Violeta' },
+                { color: 0x34495E, name: 'Azul Oscuro' },
+                { color: 0x2ECC71, name: 'Verde' },
+                { color: 0x16A085, name: 'Verde Agua' },
+                { color: 0x2980B9, name: 'Azul Marino' },
+                { color: 0x8E44AD, name: 'Morado' },
+                { color: 0x2C3E50, name: 'Gris Oscuro' },
+                { color: 0x3498DB, name: 'Azul' },
+                { color: 0xE74C3C, name: 'Rojo' },
+                { color: 0x9B59B6, name: 'Violeta' },
+                { color: 0x34495E, name: 'Azul Oscuro' },
+                { color: 0x2ECC71, name: 'Verde' },
+                { color: 0x16A085, name: 'Verde Agua' },
+                { color: 0x2980B9, name: 'Azul Marino' },
+                { color: 0x8E44AD, name: 'Morado' }
             ];
 
             const shoesColors = [
-                0x8B4513, 0x6E2C00, 0x1A5276, 0x154360, 0x1A5276,
-                0x154360, 0x1A5276, 0x154360, 0x1A5276, 0x154360,
-                0x1A5276, 0x154360, 0x1A5276, 0x154360, 0x1A5276,
-                0x154360, 0x1A5276, 0x154360
+                { color: 0x8B4513, name: 'Marrón' },
+                { color: 0x6E2C00, name: 'Marrón Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' },
+                { color: 0x1A5276, name: 'Azul Marino' },
+                { color: 0x154360, name: 'Azul Oscuro' }
             ];
 
             // Crear opciones de color para cada tipo
-            const createOption = (color, type) => {
+            const createOption = (colorObj, type) => {
                 const option = document.createElement('div');
                 option.className = 'color-option';
-                option.style.setProperty('--color', '#' + color.toString(16).padStart(6, '0'));
-                option.dataset.color = color;
+                option.style.setProperty('--color', '#' + colorObj.color.toString(16).padStart(6, '0'));
+                option.dataset.color = colorObj.color;
                 option.dataset.type = type;
                 
+                // Agregar título al pasar el mouse
+                option.title = colorObj.name;
+                
                 option.addEventListener('click', () => {
-                    selectColor(color, type);
+                    selectColor(colorObj.color, type);
                 });
                 
                 return option;
@@ -3188,6 +3113,9 @@
             shirtColors.forEach(color => shirtColorsGrid.appendChild(createOption(color, 'shirt')));
             pantsColors.forEach(color => pantsColorsGrid.appendChild(createOption(color, 'pants')));
             shoesColors.forEach(color => shoesColorsGrid.appendChild(createOption(color, 'shoes')));
+
+            // Actualizar selecciones iniciales
+            updateSelectedColors();
         }
 
         // Inicializar los grids de colores al cargar
@@ -3232,6 +3160,9 @@
                     currentCustomization.shoesColor = color;
                     break;
             }
+            
+            // Actualizar selecciones visuales
+            updateSelectedColors();
             
             // Aplicar cambios inmediatamente al avatar
             applyCustomizationToAvatar();
