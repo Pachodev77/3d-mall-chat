@@ -1135,7 +1135,6 @@
             collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
-            const storeWidth = storeDepth; // Usar la misma profundidad que storeDepth
             const storeSpacing = 1.5; // Espaciado ajustado para un balance entre densidad y espacio
             const numStoresPerSide = Math.floor(HALL_SIZE / (storeWidth + storeSpacing));
             const totalStoresWidth = numStoresPerSide * storeWidth + (numStoresPerSide - 1) * storeSpacing;
