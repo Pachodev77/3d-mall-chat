@@ -3025,6 +3025,7 @@
             shoesColorsGrid.innerHTML = '';
 
             // Definir los colores disponibles para cada tipo
+            // Colores para camisas (colores vibrantes y variados)
             const shirtColors = [
                 { color: 0xFF6B6B, name: 'Rosado' },
                 { color: 0x4ECDC4, name: 'Turquesa' },
@@ -3037,25 +3038,11 @@
                 { color: 0xBB8FCE, name: 'Morado' },
                 { color: 0x85C1E9, name: 'Azul Cielo' },
                 { color: 0xF8C471, name: 'Naranja' },
-                { color: 0x82E0AA, name: 'Verde Hoja' },
-                { color: 0x2C3E50, name: 'Gris Oscuro' },
-                { color: 0x3498DB, name: 'Azul' },
-                { color: 0xE74C3C, name: 'Rojo' },
-                { color: 0x9B59B6, name: 'Violeta' },
-                { color: 0x34495E, name: 'Azul Oscuro' },
-                { color: 0x2ECC71, name: 'Verde' }
+                { color: 0x82E0AA, name: 'Verde Hoja' }
             ];
 
+            // Colores para pantalones (colores más sobrios y neutros)
             const pantsColors = [
-                { color: 0x2C3E50, name: 'Gris Oscuro' },
-                { color: 0x3498DB, name: 'Azul' },
-                { color: 0xE74C3C, name: 'Rojo' },
-                { color: 0x9B59B6, name: 'Violeta' },
-                { color: 0x34495E, name: 'Azul Oscuro' },
-                { color: 0x2ECC71, name: 'Verde' },
-                { color: 0x16A085, name: 'Verde Agua' },
-                { color: 0x2980B9, name: 'Azul Marino' },
-                { color: 0x8E44AD, name: 'Morado' },
                 { color: 0x2C3E50, name: 'Gris Oscuro' },
                 { color: 0x3498DB, name: 'Azul' },
                 { color: 0xE74C3C, name: 'Rojo' },
@@ -3067,23 +3054,10 @@
                 { color: 0x8E44AD, name: 'Morado' }
             ];
 
+            // Colores para zapatos (colores oscuros y neutros)
             const shoesColors = [
                 { color: 0x8B4513, name: 'Marrón' },
                 { color: 0x6E2C00, name: 'Marrón Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' },
                 { color: 0x1A5276, name: 'Azul Marino' },
                 { color: 0x154360, name: 'Azul Oscuro' }
             ];
@@ -3163,21 +3137,70 @@
             if (shoesOption) shoesOption.classList.add('selected');
         }
 
+        // Función para crear un avatar 3D simple
+        function createSimpleAvatar() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            
+            // Crear un cilindro simple como cuerpo
+            const geometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 32);
+            const shirtMaterial = new THREE.MeshBasicMaterial({
+                color: currentCustomization.shirtColor,
+                wireframe: true
+            });
+            const pantsMaterial = new THREE.MeshBasicMaterial({
+                color: currentCustomization.pantsColor,
+                wireframe: true
+            });
+            const shoesMaterial = new THREE.MeshBasicMaterial({
+                color: currentCustomization.shoesColor,
+                wireframe: true
+            });
+            
+            // Crear las prendas
+            const shirt = new THREE.Mesh(geometry, shirtMaterial);
+            const pants = new THREE.Mesh(geometry, pantsMaterial);
+            const shoes = new THREE.Mesh(geometry, shoesMaterial);
+            
+            // Posicionar las prendas
+            shirt.position.y = 1;
+            pants.position.y = -0.5;
+            shoes.position.y = -1.5;
+            
+            // Agregar al escena
+            scene.add(shirt);
+            scene.add(pants);
+            scene.add(shoes);
+            
+            // Configurar cámara
+            camera.position.z = 5;
+            
+            // Renderizar
+            renderer.setSize(150, 200);
+            
+            return {
+                renderer,
+                scene,
+                camera
+            };
+        }
+
         function applyCustomizationToAvatar() {
             // Obtener el div de preview
             const preview = document.getElementById('avatar-preview');
             if (!preview) return;
 
-            // Crear un div temporal para mostrar el color
-            const colorDiv = document.createElement('div');
-            colorDiv.style.width = '100%';
-            colorDiv.style.height = '100%';
-            colorDiv.style.backgroundColor = `#${currentCustomization.shirtColor.toString(16).padStart(6, '0')}`;
-            
-            // Limpiar el preview y agregar el nuevo color
+            // Limpiar el preview
             preview.innerHTML = '';
-            preview.appendChild(colorDiv);
+
+            // Crear el avatar
+            const { renderer, scene, camera } = createSimpleAvatar();
             
+            // Renderizar y agregar al DOM
+            renderer.render(scene, camera);
+            preview.appendChild(renderer.domElement);
+
             // Actualizar los colores en el localStorage
             const customizationData = {
                 shirtColor: currentCustomization.shirtColor,
@@ -3185,6 +3208,11 @@
                 shoesColor: currentCustomization.shoesColor
             };
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
+
+            // Actualizar la vista
+            requestAnimationFrame(() => {
+                renderer.render(scene, camera);
+            });
         }
 
         function saveCustomization() {
