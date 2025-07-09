@@ -3278,8 +3278,16 @@
         positionsRef.on('value', (snapshot) => {
             const positions = snapshot.val() || {};
             Object.keys(positions).forEach(alias => {
-                if (alias !== userAlias) {
-                    const userData = positions[alias];
+                const userData = positions[alias];
+                if (
+                    alias !== userAlias &&
+                    userData &&
+                    userData.position && typeof userData.position.x === 'number' &&
+                    typeof userData.position.y === 'number' &&
+                    typeof userData.position.z === 'number' &&
+                    typeof userData.floor === 'number' &&
+                    typeof userData.rotation === 'number'
+                ) {
                     updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
                 }
             });
