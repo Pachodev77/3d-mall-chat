@@ -373,7 +373,7 @@
             cursor: pointer !important;
             transition: all 0.3s !important;
             position: relative !important;
-            background: var(--color-bg, #333) !important;
+            background: #333 !important;
         }
 
         #simple-panel .color-btn[data-color] {
@@ -389,7 +389,7 @@
             cursor: pointer !important;
             transition: all 0.3s !important;
             position: relative !important;
-            background: var(--color-bg, #333) !important;
+            background: #333 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -399,9 +399,13 @@
             border: 2px solid #333 !important;
         }
 
-        /* Estilos para ambos sistemas usando data-bg */
-        [data-bg] {
-            --color-bg: attr(data-bg color);
+        /* Estilos para mostrar colores en ambos sistemas */
+        #simple-panel .color-btn[data-bg] {
+            background-color: attr(data-bg color) !important;
+        }
+
+        .color-option[data-bg] {
+            background-color: attr(data-bg color) !important;
         }
 
         /* Estilos para botones de color del sistema dinámico */
@@ -619,18 +623,18 @@
                         Color de Camisa
                     </h3>
                     <div class="color-grid">
-                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" data-bg="#FF6B6B"></button>
-                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" data-bg="#4ECDC4"></button>
-                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" data-bg="#45B7D1"></button>
-                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" data-bg="#96CEB4"></button>
-                        <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" data-bg="#FFEAA7"></button>
-                        <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" data-bg="#DDA0DD"></button>
-                        <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" data-bg="#98D8C8"></button>
-                        <button onclick="changeShirtColor(0xF7DC6F)" class="color-btn" data-color="0xF7DC6F" data-bg="#F7DC6F"></button>
-                        <button onclick="changeShirtColor(0xBB8FCE)" class="color-btn" data-color="0xBB8FCE" data-bg="#BB8FCE"></button>
-                        <button onclick="changeShirtColor(0x85C1E9)" class="color-btn" data-color="0x85C1E9" data-bg="#85C1E9"></button>
-                        <button onclick="changeShirtColor(0xF8C471)" class="color-btn" data-color="0xF8C471" data-bg="#F8C471"></button>
-                        <button onclick="changeShirtColor(0x82E0AA)" class="color-btn" data-color="0x82E0AA" data-bg="#82E0AA"></button>
+                        <button onclick="changeShirtColor(0xFF6B6B)" class="color-btn" data-color="0xFF6B6B" style="background-color: #FF6B6B"></button>
+                        <button onclick="changeShirtColor(0x4ECDC4)" class="color-btn" data-color="0x4ECDC4" style="background-color: #4ECDC4"></button>
+                        <button onclick="changeShirtColor(0x45B7D1)" class="color-btn" data-color="0x45B7D1" style="background-color: #45B7D1"></button>
+                        <button onclick="changeShirtColor(0x96CEB4)" class="color-btn" data-color="0x96CEB4" style="background-color: #96CEB4"></button>
+                        <button onclick="changeShirtColor(0xFFEAA7)" class="color-btn" data-color="0xFFEAA7" style="background-color: #FFEAA7"></button>
+                        <button onclick="changeShirtColor(0xDDA0DD)" class="color-btn" data-color="0xDDA0DD" style="background-color: #DDA0DD"></button>
+                        <button onclick="changeShirtColor(0x98D8C8)" class="color-btn" data-color="0x98D8C8" style="background-color: #98D8C8"></button>
+                        <button onclick="changeShirtColor(0xF7DC6F)" class="color-btn" data-color="0xF7DC6F" style="background-color: #F7DC6F"></button>
+                        <button onclick="changeShirtColor(0xBB8FCE)" class="color-btn" data-color="0xBB8FCE" style="background-color: #BB8FCE"></button>
+                        <button onclick="changeShirtColor(0x85C1E9)" class="color-btn" data-color="0x85C1E9" style="background-color: #85C1E9"></button>
+                        <button onclick="changeShirtColor(0xF8C471)" class="color-btn" data-color="0xF8C471" style="background-color: #F8C471"></button>
+                        <button onclick="changeShirtColor(0x82E0AA)" class="color-btn" data-color="0x82E0AA" style="background-color: #82E0AA"></button>
                     </div>
                 </div>
                 
