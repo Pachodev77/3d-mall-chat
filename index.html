@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3386,6 +3386,7 @@
         }
 
         // Listener de mensajes de Firebase
+        messagesRef.off('child_added'); // <-- Evita listeners duplicados
         messagesRef.on('child_added', (snapshot) => {
             const msg = snapshot.val();
             addMessageToChat(msg.alias, msg.message, msg.alias === userAlias ? 'own' : 'user', msg.timestamp);
