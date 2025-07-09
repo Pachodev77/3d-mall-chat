@@ -90,12 +90,10 @@ function updateUsersList(users) {
     if (usersList) {
         usersList.innerHTML = '';
         users.forEach(user => {
-            if (user.alias !== currentUser?.alias) {
-                const userElement = document.createElement('div');
-                userElement.className = 'user-item';
-                userElement.textContent = user.alias;
-                usersList.appendChild(userElement);
-            }
+            const userElement = document.createElement('div');
+            userElement.className = 'user-item' + (user.alias === currentUser?.alias ? ' own' : '');
+            userElement.textContent = user.alias + (user.alias === currentUser?.alias ? ' (Tú)' : '');
+            usersList.appendChild(userElement);
         });
     }
 }
