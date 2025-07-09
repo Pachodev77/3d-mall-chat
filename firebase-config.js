@@ -90,10 +90,10 @@ function updateUsersList(users) {
     if (usersList) {
         usersList.innerHTML = '';
         users.forEach(user => {
-            const userElement = document.createElement('div');
+                const userElement = document.createElement('div');
             userElement.className = 'user-item' + (user.alias === currentUser?.alias ? ' own' : '');
             userElement.textContent = user.alias + (user.alias === currentUser?.alias ? ' (Tú)' : '');
-            usersList.appendChild(userElement);
+                usersList.appendChild(userElement);
         });
     }
 }
@@ -129,7 +129,7 @@ function cleanupDisconnectedUsers() {
         }
     });
 }
-setInterval(cleanupDisconnectedUsers, 10000);
+setInterval(cleanupDisconnectedUsers, 10000); 
 
 function getPrivateChatId(aliasA, aliasB) {
     return [aliasA, aliasB].sort().join('_');
