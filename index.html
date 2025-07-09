@@ -3301,13 +3301,15 @@
 
         // --- Función para crear un avatar de usuario ---
         function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
-            // Solo crear si no existe
             if (userAvatars.has(alias)) return;
-            // Aquí deberías crear el avatar 3D y añadirlo a la escena
-            // Ejemplo básico (ajusta según tu lógica 3D):
             const avatarGroup = new THREE.Group();
             avatarGroup.position.set(position.x, position.y, position.z);
-            // Puedes añadir más geometría/materiales aquí
+            // Geometría visible para el avatar (cubo simple)
+            const geometry = new THREE.BoxGeometry(1, 2, 1);
+            const material = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = false;
+            avatarGroup.add(mesh);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
