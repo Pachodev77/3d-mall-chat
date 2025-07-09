@@ -3164,18 +3164,27 @@
         }
 
         function applyCustomizationToAvatar() {
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                // Actualizar materiales del avatar
-                avatar.bodyMaterial.color.setHex(currentCustomization.shirtColor);
-                avatar.pantsMaterial.color.setHex(currentCustomization.pantsColor);
-                avatar.shoeMaterial.color.setHex(currentCustomization.shoesColor);
-                
-                // Forzar actualización de materiales
-                avatar.bodyMaterial.needsUpdate = true;
-                avatar.pantsMaterial.needsUpdate = true;
-                avatar.shoeMaterial.needsUpdate = true;
-            }
+            // Obtener el div de preview
+            const preview = document.getElementById('avatar-preview');
+            if (!preview) return;
+
+            // Crear un div temporal para mostrar el color
+            const colorDiv = document.createElement('div');
+            colorDiv.style.width = '100%';
+            colorDiv.style.height = '100%';
+            colorDiv.style.backgroundColor = `#${currentCustomization.shirtColor.toString(16).padStart(6, '0')}`;
+            
+            // Limpiar el preview y agregar el nuevo color
+            preview.innerHTML = '';
+            preview.appendChild(colorDiv);
+            
+            // Actualizar los colores en el localStorage
+            const customizationData = {
+                shirtColor: currentCustomization.shirtColor,
+                pantsColor: currentCustomization.pantsColor,
+                shoesColor: currentCustomization.shoesColor
+            };
+            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
         }
 
         function saveCustomization() {
