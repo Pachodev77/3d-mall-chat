@@ -2629,10 +2629,8 @@
         const pantsColorsGrid = document.getElementById('pants-colors');
         const shoesColorsGrid = document.getElementById('shoes-colors');
         
-
-
         function openCustomizationPanel() {
-            console.log('Abriendo panel simple de personalización');
+            console.log('Abriendo panel de personalización mejorada');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2641,44 +2639,65 @@
             }
             
             const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
+            const overlay = document.getElementById('ui-overlay');
+            
+            if (simplePanel && overlay) {
                 // Actualizar el alias actual
                 const currentAliasElement = document.getElementById('current-alias');
+                const aliasInput = document.getElementById('simple-alias-input');
+                
                 if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin alias';
+                    currentAliasElement.textContent = userAlias || 'Sin nombre';
                 }
                 
-                // Poblar el input con el alias actual
-                const aliasInput = document.getElementById('simple-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
-                    // Agregar event listener para actualizar vista previa en tiempo real
-                    aliasInput.addEventListener('input', function() {
-                        updateAvatarPreview();
-                    });
                 }
                 
                 // Mostrar el panel
-                simplePanel.style.display = 'block';
+                simplePanel.style.display = 'flex';
                 customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
                 
-                console.log('✅ Panel simple mostrado');
-                            // Mostrar overlay y bloquear clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
+                // Marcar colores actuales en los botones
+                updateColorButtonSelection('shirt', shirtColor);
+                updateColorButtonSelection('pants', pantsColor);
+                updateColorButtonSelection('shoes', shoesColor);
+                
+                console.log('✅ Panel de personalización mejorada mostrada');
+                
+                // Mostrar overlay
                 overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '1002';
-            }
-            } else {
-                console.log('❌ Panel simple no encontrado');
+                overlay.style.pointerEvents = 'all';
+                overlay.style.zIndex = '1005';
+                overlay.style.position = 'fixed';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.right = '0';
+                overlay.style.bottom = '0';
+                overlay.style.background = 'rgba(0,0,0,0.5)';
+                overlay.style.cursor = 'default';
             }
         }
-        
 
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            const overlay = document.getElementById('ui-overlay');
+            
+            if (panel && overlay) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                
+                // Ocultar overlay
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '999';
+                
+                console.log('Panel de personalización cerrado');
+            }
+        }
         
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
@@ -2880,83 +2899,10 @@
                 chatOpen = false;
             }
             
-            const simplePanel = document.getElementById('simple-panel');
-            const overlay = document.getElementById('ui-overlay');
-            
-            if (simplePanel && overlay) {
-                // Añadir listener de eventos al overlay
-                overlay.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                }, true);
-                
-                // Añadir listener para cerrar al hacer clic en el overlay
-                overlay.addEventListener('click', function() {
-                    closeSimplePanel();
-                });
-                
-                // Actualizar el alias actual
-                const currentAliasElement = document.getElementById('current-alias');
-                const aliasInput = document.getElementById('simple-alias-input');
-                
-                if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin nombre';
-                }
-                
-                if (aliasInput) {
-                    aliasInput.value = userAlias || '';
-                }
-                
-                // Mostrar el panel
-                simplePanel.style.display = 'flex';
-                customizationPanelOpen = true;
-                
-                // Inicializar vista previa del avatar
-                updateAvatarPreview();
-                
-                // Marcar colores actuales en los botones
-                updateColorButtonSelection('shirt', shirtColor);
-                updateColorButtonSelection('pants', pantsColor);
-                updateColorButtonSelection('shoes', shoesColor);
-                
-                console.log('✅ Panel de personalización mejorada mostrada');
-                
-                // Mostrar overlay
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'all';
-                overlay.style.zIndex = '1005';
-                overlay.style.position = 'fixed';
-                overlay.style.top = '0';
-                overlay.style.left = '0';
-                overlay.style.right = '0';
-                overlay.style.bottom = '0';
-                overlay.style.background = 'rgba(0,0,0,0.5)';
-                overlay.style.cursor = 'default';
-            }
-            }
-        }
         
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            const overlay = document.getElementById('ui-overlay');
-            
-            if (panel && overlay) {
-                // Remover listeners de eventos del overlay
-                const clickHandler = function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                };
-                const closeHandler = function() {
-                    closeSimplePanel();
-                };
-                overlay.removeEventListener('click', clickHandler);
-                overlay.removeEventListener('click', closeHandler);
-                
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                
+        // Actualizar el alias actual
+        const currentAliasElement = document.getElementById('current-alias');
+        const aliasInput = document.getElementById('simple-alias-input');
                 // Ocultar overlay
                 overlay.style.display = 'none';
                 overlay.style.pointerEvents = 'none';
