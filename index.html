@@ -2225,15 +2225,6 @@
                 console.error('No se encontró el botón de personalización');
             }
             
-            // Verificar que los elementos de personalización se encontraron correctamente
-            if (customizationPanel) {
-                console.log('Panel de personalización encontrado');
-                console.log('Panel inicial display:', customizationPanel.style.display);
-                console.log('Panel inicial visibility:', customizationPanel.style.visibility);
-            } else {
-                console.error('No se encontró el panel de personalización');
-            }
-            
             if (saveCustomizationBtn) {
                 console.log('Botón de guardar personalización encontrado');
                 saveCustomizationBtn.onclick = saveCustomization;
