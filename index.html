@@ -26,23 +26,6 @@
             mix-blend-mode: difference;
             z-index: 5;
         }
-        #ui-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1005;
-            display: none;
-            pointer-events: all;
-            cursor: default;
-            user-select: none;
-            touch-action: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
         #chat-toggle-btn {
             position: fixed;
             top: 16px;
@@ -75,7 +58,7 @@
             background: rgba(30,30,30,0.85);
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            z-index: 1001;
+            z-index: 1003;
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -252,7 +235,7 @@
         }
         
         /* Estilos para el panel de personalización simple */
-        #simple-panel {
+        #simple-panel.customization-panel {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -263,13 +246,12 @@
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 1006;
+            z-index: 1004;
             display: none;
             flex-direction: column;
             overflow: hidden;
             backdrop-filter: blur(20px);
             border: 2px solid #4B0000;
-            pointer-events: auto;
         }
         
         #simple-panel .panel-header {
@@ -596,7 +578,7 @@
     </style>
 </head>
 <body>
-    <div id="ui-overlay"></div>
+    <div id="ui-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:1002; pointer-events:auto;"></div>
     <div id="crosshair"></div>
     <button id="chat-toggle-btn" title="Abrir chat">💬</button>
     <button id="change-alias-btn" title="Personalizar avatar">👤</button>
@@ -2629,8 +2611,10 @@
         const pantsColorsGrid = document.getElementById('pants-colors');
         const shoesColorsGrid = document.getElementById('shoes-colors');
         
+
+
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorada');
+            console.log('Abriendo panel simple de personalización');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2639,142 +2623,44 @@
             }
             
             const simplePanel = document.getElementById('simple-panel');
-            const overlay = document.getElementById('ui-overlay');
-            
-            if (simplePanel && overlay) {
+            if (simplePanel) {
                 // Actualizar el alias actual
                 const currentAliasElement = document.getElementById('current-alias');
-                const aliasInput = document.getElementById('simple-alias-input');
-                
                 if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin nombre';
+                    currentAliasElement.textContent = userAlias || 'Sin alias';
                 }
                 
+                // Poblar el input con el alias actual
+                const aliasInput = document.getElementById('simple-alias-input');
                 if (aliasInput) {
                     aliasInput.value = userAlias || '';
+                    // Agregar event listener para actualizar vista previa en tiempo real
+                    aliasInput.addEventListener('input', function() {
+                        updateAvatarPreview();
+                    });
                 }
                 
                 // Mostrar el panel
-                simplePanel.style.display = 'flex';
+                simplePanel.style.display = 'block';
                 customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
                 
-                // Marcar colores actuales en los botones
-                updateColorButtonSelection('shirt', shirtColor);
-                updateColorButtonSelection('pants', pantsColor);
-                updateColorButtonSelection('shoes', shoesColor);
-                
-                console.log('✅ Panel de personalización mejorada mostrada');
-                
-                // Mostrar overlay
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'all';
-                overlay.style.zIndex = '1005';
-                overlay.style.position = 'fixed';
-                overlay.style.top = '0';
-                overlay.style.left = '0';
-                overlay.style.right = '0';
-                overlay.style.bottom = '0';
-                overlay.style.background = 'rgba(0,0,0,0.5)';
-                overlay.style.cursor = 'default';
-            }
-        }
-
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
+                console.log('✅ Panel simple mostrado');
+                            // Mostrar overlay y bloquear clics
             const overlay = document.getElementById('ui-overlay');
-            
-            if (panel && overlay) {
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                
-                // Ocultar overlay
-                overlay.style.display = 'none';
-                overlay.style.pointerEvents = 'none';
-                overlay.style.zIndex = '999';
-                
-                console.log('Panel de personalización cerrado');
+            if (overlay) {
+                overlay.style.display = 'block';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '1002';
+            }
+            } else {
+                console.log('❌ Panel simple no encontrado');
             }
         }
+        
 
-        // Event listeners para actualización en tiempo real
-        document.addEventListener('DOMContentLoaded', function() {
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.addEventListener('input', function() {
-                    updateAvatarPreview();
-                });
-            }
-        });
-
-        function closeWorkingPanel() {
-            const panel = document.getElementById('working-customization-panel');
-            if (panel) {
-                panel.remove();
-            }
-            customizationPanelOpen = false;
-        }
-
-        function changeShirtColor(color) {
-            currentCustomization.shirtColor = color;
-            applyCustomizationToAvatar();
-            console.log('Color de camisa cambiado a:', color);
-        }
-
-        function saveSimpleCustomization() {
-            const aliasInput = document.getElementById('simple-alias-input');
-            const newAlias = aliasInput.value.trim();
-            
-            if (newAlias.length > 0) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                if (isConnected) {
-                    sendAlias();
-                }
-                
-                console.log('Alias guardado:', newAlias);
-            }
-            
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeSimplePanel();
-            alert('¡Personalización guardada!');
-        }
-
-        function createWorkingColorGrids() {
-            // Crear opciones de color para camisas (primeros 18 colores)
-            const shirtGrid = document.getElementById('working-shirt-colors');
-            for (let i = 0; i < 18; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
-                if (customizationColors[i] === currentCustomization.shirtColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                shirtGrid.appendChild(colorOption);
-            }
-        }
-
-        function closeCustomizationPanel() {
-            customizationPanel.style.display = 'none';
-            customizationPanelOpen = false;
-        }
-
-        function createColorGrids() {
-            // Limpiar grids existentes
-            const shirtColorsGrid = document.getElementById('shirt-colors');
-            const pantsColorsGrid = document.getElementById('pants-colors');
-            const shoesColorsGrid = document.getElementById('shoes-colors');
-        }
         
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
@@ -2968,7 +2854,7 @@
         }
         
         function openCustomizationPanel() {
-            console.log('Abriendo panel de personalización mejorada');
+            console.log('Abriendo panel de personalización mejorado');
             
             // Cerrar chat si está abierto
             if (chatOpen) {
@@ -2976,6 +2862,61 @@
                 chatOpen = false;
             }
             
+            const simplePanel = document.getElementById('simple-panel');
+            if (simplePanel) {
+                // Actualizar el alias actual
+                const currentAliasElement = document.getElementById('current-alias');
+                const aliasInput = document.getElementById('simple-alias-input');
+                
+                if (currentAliasElement) {
+                    currentAliasElement.textContent = userAlias || 'Sin nombre';
+                }
+                
+                if (aliasInput) {
+                    aliasInput.value = userAlias || '';
+                }
+                
+                // Mostrar el panel
+                simplePanel.style.display = 'flex';
+                customizationPanelOpen = true;
+                
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+                
+                // Marcar colores actuales en los botones
+                updateColorButtonSelection('shirt', shirtColor);
+                updateColorButtonSelection('pants', pantsColor);
+                updateColorButtonSelection('shoes', shoesColor);
+                
+                console.log('✅ Panel de personalización mejorado mostrado');
+                
+                // Mostrar overlay
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.style.pointerEvents = 'auto';
+                    overlay.style.zIndex = '1002';
+                }
+            }
+        }
+        
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                
+                // Ocultar overlay
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.pointerEvents = 'none';
+                    overlay.style.zIndex = '999';
+                }
+                
+                console.log('Panel de personalización cerrado');
+            }
+        }
         
         // Event listeners para actualización en tiempo real
         document.addEventListener('DOMContentLoaded', function() {
@@ -2993,6 +2934,22 @@
                 panel.remove();
             }
             customizationPanelOpen = false;
+        }
+        
+        function closeSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'none';
+                customizationPanelOpen = false;
+                            // Ocultar overlay y permitir clics
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '999';
+            }
+                console.log('Panel simple cerrado');
+            }
         }
         
         function changeShirtColor(color) {

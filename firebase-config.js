@@ -24,12 +24,6 @@ function connectToChat(alias) {
         alert('Please enter a valid alias');
         return;
     }
-    
-    // Limpiar listeners existentes
-    usersRef.off('value');
-    messagesRef.off('child_added');
-    positionsRef.off('value');
-    
     currentUser = {
         alias: alias.trim(),
         position: { x: 25, y: 1.6, z: 25 },
@@ -37,30 +31,17 @@ function connectToChat(alias) {
         rotation: 0,
         timestamp: Date.now()
     };
-    
-    // Configurar listeners únicos
     usersRef.child(currentUser.alias).set(currentUser);
-    
-    // Listener de usuarios
     usersRef.on('value', (snapshot) => {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
-    }, (error) => {
-        console.error('Error en listener de usuarios:', error);
     });
-    
-    // Listener de mensajes
     messagesRef.on('child_added', (snapshot) => {
         const message = snapshot.val();
         if (message.alias !== currentUser.alias) {
-            // Añadir timestamp para mejorar el orden de los mensajes
-            addMessageToChat(message.alias, message.message, 'user', message.timestamp);
+            addMessageToChat(message.alias, message.message, 'user');
         }
-    }, (error) => {
-        console.error('Error en listener de mensajes:', error);
     });
-    
-    // Listener de posiciones
     positionsRef.on('value', (snapshot) => {
         const positions = snapshot.val() || {};
         Object.keys(positions).forEach(alias => {
@@ -69,10 +50,7 @@ function connectToChat(alias) {
                 updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
             }
         });
-    }, (error) => {
-        console.error('Error en listener de posiciones:', error);
     });
-    
     isConnected = true;
     console.log('Connected as:', currentUser.alias);
 }
