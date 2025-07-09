@@ -906,15 +906,7 @@
             document.body.appendChild(renderer.domElement);
 
             // Crear avatar propio al inicializar la escena
-            if (typeof userAlias !== 'undefined' && userAlias) {
-                // Obtener personalización guardada o usar por defecto
-                let custom = {};
-                try {
-                    const saved = JSON.parse(localStorage.getItem('avatarCustomization'));
-                    if (saved) custom = saved;
-                } catch(e) {}
-                createUserAvatar(userAlias, {x: camera.position.x, y: 0, z: camera.position.z}, currentFloor, custom);
-            }
+            // (Eliminado: no crear el avatar propio, solo los de los demás usuarios)
         }
 
         function setupLighting() {
