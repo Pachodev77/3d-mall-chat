@@ -3137,70 +3137,15 @@
             if (shoesOption) shoesOption.classList.add('selected');
         }
 
-        // Función para crear un avatar 3D simple
-        function createSimpleAvatar() {
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            
-            // Crear un cilindro simple como cuerpo
-            const geometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 32);
-            const shirtMaterial = new THREE.MeshBasicMaterial({
-                color: currentCustomization.shirtColor,
-                wireframe: true
-            });
-            const pantsMaterial = new THREE.MeshBasicMaterial({
-                color: currentCustomization.pantsColor,
-                wireframe: true
-            });
-            const shoesMaterial = new THREE.MeshBasicMaterial({
-                color: currentCustomization.shoesColor,
-                wireframe: true
-            });
-            
-            // Crear las prendas
-            const shirt = new THREE.Mesh(geometry, shirtMaterial);
-            const pants = new THREE.Mesh(geometry, pantsMaterial);
-            const shoes = new THREE.Mesh(geometry, shoesMaterial);
-            
-            // Posicionar las prendas
-            shirt.position.y = 1;
-            pants.position.y = -0.5;
-            shoes.position.y = -1.5;
-            
-            // Agregar al escena
-            scene.add(shirt);
-            scene.add(pants);
-            scene.add(shoes);
-            
-            // Configurar cámara
-            camera.position.z = 5;
-            
-            // Renderizar
-            renderer.setSize(150, 200);
-            
-            return {
-                renderer,
-                scene,
-                camera
-            };
-        }
-
         function applyCustomizationToAvatar() {
-            // Obtener el div de preview
-            const preview = document.getElementById('avatar-preview');
-            if (!preview) return;
-
-            // Limpiar el preview
-            preview.innerHTML = '';
-
-            // Crear el avatar
-            const { renderer, scene, camera } = createSimpleAvatar();
+            // Actualizar las variables globales
+            shirtColor = currentCustomization.shirtColor;
+            pantsColor = currentCustomization.pantsColor;
+            shoesColor = currentCustomization.shoesColor;
             
-            // Renderizar y agregar al DOM
-            renderer.render(scene, camera);
-            preview.appendChild(renderer.domElement);
-
+            // Actualizar la vista previa existente
+            updateAvatarPreview();
+            
             // Actualizar los colores en el localStorage
             const customizationData = {
                 shirtColor: currentCustomization.shirtColor,
@@ -3208,11 +3153,7 @@
                 shoesColor: currentCustomization.shoesColor
             };
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
-
-            // Actualizar la vista
-            requestAnimationFrame(() => {
-                renderer.render(scene, camera);
-            });
+        }
         }
 
         function saveCustomization() {
