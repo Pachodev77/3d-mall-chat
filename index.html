@@ -615,10 +615,8 @@
                         <span class="section-icon">👕</span>
                         Color de Camisa
                     </h3>
-                    <div class="color-grid">
-                        <div id="shirt-colors" class="color-grid">
-                            <!-- Los colores se agregarán dinámicamente -->
-                        </div>
+                    <div id="shirt-colors" class="color-grid">
+                        <!-- Los colores se agregarán dinámicamente -->
                     </div>
                 </div>
                 
@@ -628,19 +626,8 @@
                         <span style="font-size: 20px;">👖</span>
                         Color de Pantalón
                     </h3>
-                    <div class="color-grid">
-                        <button onclick="changePantsColor(0x2C3E50)" class="color-btn" data-color="0x2C3E50" style="width: 45px; height: 45px; background: #2C3E50; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x34495E)" class="color-btn" data-color="0x34495E" style="width: 45px; height: 45px; background: #34495E; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x556B2F)" class="color-btn" data-color="0x556B2F" style="width: 45px; height: 45px; background: #556B2F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x006400)" class="color-btn" data-color="0x006400" style="width: 45px; height: 45px; background: #006400; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changePantsColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    <div id="pants-colors" class="color-grid">
+                        <!-- Los colores se agregarán dinámicamente -->
                     </div>
                 </div>
                 
@@ -650,15 +637,8 @@
                         <span style="font-size: 20px;">👞</span>
                         Color de Zapatos
                     </h3>
-                    <div class="color-grid">
-                        <button onclick="changeShoesColor(0x8B4513)" class="color-btn" data-color="0x8B4513" style="width: 45px; height: 45px; background: #8B4513; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x654321)" class="color-btn" data-color="0x654321" style="width: 45px; height: 45px; background: #654321; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x000000)" class="color-btn" data-color="0x000000" style="width: 45px; height: 45px; background: #000000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x2F4F4F)" class="color-btn" data-color="0x2F4F4F" style="width: 45px; height: 45px; background: #2F4F4F; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x696969)" class="color-btn" data-color="0x696969" style="width: 45px; height: 45px; background: #696969; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x8B0000)" class="color-btn" data-color="0x8B0000" style="width: 45px; height: 45px; background: #8B0000; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x4B0082)" class="color-btn" data-color="0x4B0082" style="width: 45px; height: 45px; background: #4B0082; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
-                        <button onclick="changeShoesColor(0x191970)" class="color-btn" data-color="0x191970" style="width: 45px; height: 45px; background: #191970; border: 3px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.3s; position: relative;"></button>
+                    <div id="shoes-colors" class="color-grid">
+                        <!-- Los colores se agregarán dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -3570,6 +3550,10 @@
                 customizationPanelOpen = true;
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
+                // Inicializar los grids de colores
+                createColorGrids();
+                // Actualizar selecciones de colores
+                updateSelectedColors();
             }
         }
 
