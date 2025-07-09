@@ -378,53 +378,16 @@
             justify-content: center;
             background-color: var(--color, #333);
         }
-
         .color-option[data-color] {
             border: 2px solid #333;
         }
-
         .color-option.selected {
             border-color: #FFD700;
             transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
-
         .color-option:hover {
             border-color: #FFD700;
-        }
-
-        /* Eliminar estilos innecesarios */
-        #simple-panel .color-btn[data-bg] {
-            display: none;
-        }
-            background-color: attr(data-bg color) !important;
-        }
-
-        /* Estilos para botones de color del sistema dinámico */
-        .color-option {
-            width: 30px !important;
-            height: 30px !important;
-            border: 2px solid transparent !important;
-            border-radius: 5px !important;
-            cursor: pointer !important;
-            transition: all 0.3s !important;
-            position: relative !important;
-            background: #333 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-
-        .color-option[data-color] {
-            border: 2px solid #333 !important;
-        }
-
-        .color-option:hover {
-            border-color: #FFD700 !important;
-        }
-
-        .color-option.selected {
-            border-color: #FFD700 !important;
-            transform: scale(1.1) !important;
         }
         
         /* Estilos adicionales para elementos específicos */
