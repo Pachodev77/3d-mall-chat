@@ -401,6 +401,7 @@
 
         #simple-panel #simple-alias-input:focus {
             border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         #customization-actions {
@@ -520,26 +521,7 @@
             pointer-events: none; /* Solo se activa cuando el panel está abierto */
             display: none; /* Solo se muestra cuando el panel está abierto */
         }
-        /* Panel de personalización siempre por encima del overlay */
-        #simple-panel.customization-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1100px;
-            max-width: 99vw;
-            height: 700px;
-            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 21000; /* Siempre por encima del overlay */
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            border: 2px solid #4B0000;
-            pointer-events: auto;
-        }
+
     </style>
 </head>
 <body>
@@ -772,11 +754,7 @@
             0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
         ];
         
-        let currentCustomization = {
-            shirtColor: 0x4ECDC4, // Color por defecto
-            pantsColor: 0x2C3E50, // Color por defecto
-            shoesColor: 0x8B4513  // Color por defecto
-        };
+
         
         let customizationPanelOpen = false;
 
@@ -901,17 +879,17 @@
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar pixel ratio
-            renderer.shadowMap.enabled = false; // Desactivar sombras completamente
+            renderer.shadowMap.enabled = false;
             document.body.appendChild(renderer.domElement);
         }
 
         function setupLighting() {
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Aumentar intensidad para compensar falta de sombras
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); // Reducir intensidad
-            directionalLight.position.set(30, 45, 15); // Ajustado para el nuevo tamaño
-            directionalLight.castShadow = false; // Desactivar sombras
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            directionalLight.position.set(30, 45, 15);
+            directionalLight.castShadow = false;
             scene.add(directionalLight);
         }
 
@@ -947,17 +925,15 @@
             const pyramid = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
             pyramid.position.set(HALL_SIZE / 2, clockCubeY + cubeSize * 0.8 + pyramidHeight / 2, HALL_SIZE / 2);
             pyramid.rotation.y = Math.PI / 4;
-            // pyramid.castShadow = false; // Desactivar sombras para mejor rendimiento
-            // pyramid.receiveShadow = true;
             scene.add(pyramid);
 
             // Crear área de descanso completa (restaurar 8 mesas)
             const gardenRadius = 8;
-            const tableCount = 8; // Restaurar 8 mesas
+            const tableCount = 8;
             
             for (let i = 0; i < tableCount; i++) {
                 const angle = (i / tableCount) * Math.PI * 2;
-                const radius = gardenRadius + Math.random() * 2 - 1; // Variación en el radio
+                const radius = gardenRadius + Math.random() * 2 - 1;
                 
                 // Crear mesa
                 const tableTopGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 8);
@@ -973,8 +949,6 @@
                 const tableZ = HALL_SIZE / 2 + Math.sin(angle) * radius;
                 
                 tableTop.position.set(tableX, 0.85, tableZ);
-                // tableTop.castShadow = false; // Desactivar sombras para mejor rendimiento
-                // tableTop.receiveShadow = true;
                 scene.add(tableTop);
                 
                 // Agregar 4 patas a la mesa
@@ -987,8 +961,6 @@
                         0.35,
                         tableZ + Math.sin(legAngle) * legRadius
                     );
-                    // leg.castShadow = false; // Desactivar sombras para mejor rendimiento
-                    // leg.receiveShadow = true;
                     scene.add(leg);
                 }
                 
@@ -997,7 +969,6 @@
                 const parasolPoleMaterial = getCachedMaterial(new THREE.Color().setHSL(0.05, 0.2, 0.5));
                 const parasolPole = new THREE.Mesh(parasolPoleGeometry, parasolPoleMaterial);
                 parasolPole.position.set(tableX, 2.1, tableZ);
-                // parasolPole.castShadow = false; // Desactivar sombras para mejor rendimiento
                 // parasolPole.receiveShadow = true;
                 scene.add(parasolPole);
                 
@@ -1031,12 +1002,8 @@
                     // seat.receiveShadow = true;
                     scene.add(seat);
                     
-
-                    
                     // Patas de la silla
                     for (let l = 0; l < 4; l++) {
-                        const chairLegGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.45, 6);
-                        const chairLegMaterial = getCachedMaterial(new THREE.Color().setHSL(0.05, 0.2, 0.5));
                         const chairLeg = new THREE.Mesh(chairLegGeometry, chairLegMaterial);
                         
                         const legOffsetX = (l % 2 === 0 ? -1 : 1) * 0.15;
@@ -1048,6 +1015,78 @@
                         scene.add(chairLeg);
                     }
                 }
+            }
+        }
+
+        // Función centralizada para crear tiendas en sentido horario
+        function createClockwiseStores(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, wallMaterial, linkIndex) {
+            // Función para verificar si una posición está en una esquina
+            const isCornerPosition = (index, side) => {
+                // Saltar solo la primera y la última tienda de cada lado
+                return index === 0 || index === numStoresPerSide - 1;
+            };
+
+            // Norte (de izquierda a derecha)
+            for (let i = 0; i < numStoresPerSide; i++) {
+                if (isCornerPosition(i, 'north')) continue;
+                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                const currentLinkIndex = linkIndex % storeLinks.length;
+                createStoreWithParams(x, storeDepth / 2, 0, currentLinkIndex, wallMaterial, yOffset, getNextShopNumber());
+                linkIndex++;
+            }
+
+            // Este (de arriba hacia abajo)
+            for (let i = 0; i < numStoresPerSide; i++) {
+                if (isCornerPosition(i, 'east')) continue;
+                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                const currentLinkIndex = linkIndex % storeLinks.length;
+                createStoreWithParams(HALL_SIZE - storeDepth / 2, z, -Math.PI / 2, currentLinkIndex, wallMaterial, yOffset, getNextShopNumber());
+                linkIndex++;
+            }
+
+            // Sur (de derecha a izquierda)
+            for (let i = numStoresPerSide - 1; i >= 0; i--) {
+                if (isCornerPosition(i, 'south')) continue;
+                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                const currentLinkIndex = linkIndex % storeLinks.length;
+                createStoreWithParams(x, HALL_SIZE - storeDepth / 2, Math.PI, currentLinkIndex, wallMaterial, yOffset, getNextShopNumber());
+                linkIndex++;
+            }
+
+            // Oeste (de abajo hacia arriba)
+            for (let i = numStoresPerSide - 1; i >= 0; i--) {
+                if (isCornerPosition(i, 'west')) continue;
+                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                const currentLinkIndex = linkIndex % storeLinks.length;
+                createStoreWithParams(storeDepth / 2, z, Math.PI / 2, currentLinkIndex, wallMaterial, yOffset, getNextShopNumber());
+                linkIndex++;
+            }
+        }
+
+        // Función centralizada para crear muros separadores
+        function createSeparatorWalls(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, separatorMaterial) {
+            // Norte
+            for (let i = 0; i < numStoresPerSide - 1; i++) {
+                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
+                createSeparatorWall(x, storeDepth, true, yOffset, separatorMaterial);
+            }
+
+            // Sur
+            for (let i = 0; i < numStoresPerSide - 1; i++) {
+                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
+                createSeparatorWall(x, HALL_SIZE - storeDepth, true, yOffset, separatorMaterial);
+            }
+
+            // Oeste
+            for (let i = 0; i < numStoresPerSide - 1; i++) {
+                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
+                createSeparatorWall(storeDepth, z, false, yOffset, separatorMaterial);
+            }
+
+            // Este
+            for (let i = 0; i < numStoresPerSide - 1; i++) {
+                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
+                createSeparatorWall(HALL_SIZE - storeDepth, z, false, yOffset, separatorMaterial);
             }
         }
 
@@ -1085,7 +1124,6 @@
             const storeDepth = 12;
             const corridorWidth = 8;
             const sueloOffset = corridorWidth / 2;
-            // Hacer el área central más pequeña para que se vea mejor la separación
             const areaCentralSize = HALL_SIZE - 2 * (storeDepth + sueloOffset + 4); // Agregar 4 unidades más de margen
             
             // Crear suelo de ajedrez solo para el área central
@@ -1097,145 +1135,18 @@
             collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
-            const storeWidth = 8; // Reducido para que las tiendas sean más estrechas
+            const storeWidth = storeDepth; // Usar la misma profundidad que storeDepth
             const storeSpacing = 1.5; // Espaciado ajustado para un balance entre densidad y espacio
             const numStoresPerSide = Math.floor(HALL_SIZE / (storeWidth + storeSpacing));
             const totalStoresWidth = numStoresPerSide * storeWidth + (numStoresPerSide - 1) * storeSpacing;
             const initialOffset = (HALL_SIZE - totalStoresWidth) / 2;
             let linkIndex = startLinkIndex;
 
-            // Función para verificar si una posición está en una esquina
-            const isCornerPosition = (index, side) => {
-                // Saltar solo la primera y la última tienda de cada lado
-                return index === 0 || index === numStoresPerSide - 1;
-            };
+            // Crear tiendas en sentido horario usando la función centralizada
+            createClockwiseStores(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, wallMaterial, linkIndex);
 
-            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
-            const createClockwiseStores = () => {
-                // Norte (de izquierda a derecha)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'north')) continue;
-                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                    new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                    0, // Rotación para mirar hacia el centro (sur)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                    yOffset,
-                    getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Este (de arriba hacia abajo)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'east')) continue;
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(HALL_SIZE - storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        -Math.PI / 2, // Rotación para mirar hacia el centro (oeste)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Sur (de derecha a izquierda)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'south')) continue;
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, HALL_SIZE - storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI, // Rotación para mirar hacia el centro (norte)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Oeste (de abajo hacia arriba)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'west')) continue;
-                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI / 2, // Rotación para mirar hacia el centro (este)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-                }
-            };
-
-            // Crear tiendas en sentido horario
-            createClockwiseStores();
-
-            // --- Crear muros separadores entre tiendas ---
-            // Norte
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Sur
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, HALL_SIZE - storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Oeste
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Este
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(HALL_SIZE - storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
+            // Crear muros separadores usando la función centralizada
+            createSeparatorWalls(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, separatorMaterial);
 
             // --- Crear pasillos en la planta baja ---
             // Usar las variables ya declaradas arriba
@@ -1475,72 +1386,9 @@
                 createCeilingCorner(esteX - 2, surZ - 2); // SE
             }
 
-            // --- Crear techo trapezoidal sobre las tiendas del último piso ---
-            // ELIMINADO: Techos trapezoidales para mejorar rendimiento
-            // Ya no se necesitan porque solo tenemos 2 pisos
-            /*
-            if (currentFloor === 3) { // Solo para el último piso (piso 3)
-                const trapezoidMaterial = new THREE.MeshStandardMaterial({ 
-                    color: 0xA0522D, 
-                    roughness: 0.8,
-                    metalness: 0.1,
-                    side: THREE.DoubleSide
-                });
-                
-                // Crear techo trapezoidal para cada lado
-                const trapezoidHeight = 6; // Más alto y más grande
-                const baseWidth = storeWidth + 2; // Un poco más ancho que la tienda
-                
-                // Norte - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, storeDepth / 2);
                     trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
                     trapezoid.castShadow = true;
                     trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Sur - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, HALL_SIZE - storeDepth / 2);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Oeste - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Este - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(HALL_SIZE - storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-            }
-            */
-
             // --- Crear barandas al borde exterior de los corredores ---
             const railingHeight = 0.8;
             const railMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.5, roughness: 0.5 }); // Color negro
@@ -1580,146 +1428,31 @@
             railE2.position.set(HALL_SIZE - storeDepth - corridorWidth, yOffset + railingHeight / 2 - 0.1, HALL_SIZE - storeDepth - corridorWidth - barandaLong / 2);
             scene.add(railE2);
 
-            // --- Actualizar colisiones de las barandas después de agregarlas a la escena ---
-            [railN1, railN2, railS1, railS2, railO1, railO2, railE1, railE2].forEach(rail => {
-                rail.updateMatrixWorld(true);
-                const railBox = new THREE.Box3().setFromObject(rail);
-                // Expandir la caja de colisión para hacer las barandas más efectivas
-                railBox.expandByScalar(0.2);
-                collisionObjects.push(railBox);
-            });
+            // --- Tiendas ---
+            const storeWidth = 8;
+            const storeSpacing = 1.5;
+            const numStoresPerSide = Math.floor(HALL_SIZE / (storeWidth + storeSpacing));
+            const totalStoresWidth = numStoresPerSide * storeWidth + (numStoresPerSide - 1) * storeSpacing;
+            const initialOffset = (HALL_SIZE - totalStoresWidth) / 2;
+            let linkIndex = startLinkIndex;
 
-            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
-            const createClockwiseStores = () => {
-                // Norte (de izquierda a derecha)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'north')) continue;
-                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                    new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                    0, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Este (de arriba hacia abajo)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'east')) continue;
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(HALL_SIZE - storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        -Math.PI / 2, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Sur (de derecha a izquierda)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'south')) continue;
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, HALL_SIZE - storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Oeste (de abajo hacia arriba)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'west')) continue;
-                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI / 2, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-                }
+            // Función para verificar si una posición está en una esquina
+            const isCornerPosition = (index, side) => {
+                // Saltar solo la primera y la última tienda de cada lado
+                return index === 0 || index === numStoresPerSide - 1;
             };
 
-            // Crear tiendas en sentido horario
-            createClockwiseStores();
+            // Crear tiendas en sentido horario usando la función centralizada
+            createClockwiseStores(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, wallMaterial, linkIndex, getNextShopNumber);
+            return linkIndex;
 
-            // --- Crear muros separadores entre tiendas ---
-            // Norte
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Sur
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, HALL_SIZE - storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Oeste
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Este
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(HALL_SIZE - storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
+            // Crear muros separadores usando la función centralizada
+            createSeparatorWalls(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, separatorMaterial);
 
             return linkIndex;
         }
 
-        function createStore(position, size, rotationY, linkIdx, depth, wallMaterial, floorY, shopNumber) {
+        function createStoreWithParams(position, size, rotationY, linkIdx, depth, wallMaterial, floorY, shopNumber) {
             const storeGroup = new THREE.Group();
             storeGroup.position.copy(position);
             storeGroup.rotation.y = rotationY;
@@ -2331,9 +2064,28 @@
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha ---
-            if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
+            // --- Rotación con flechas izquierda/derecha usando Quaternion ---
+            const currentRotation = new THREE.Quaternion();
+            camera.getWorldQuaternion(currentRotation);
+            
+            // Crear un quaternion de rotación alrededor del eje Y
+            const rotationSpeed = ROTATE_SPEED * 0.1; // Ajustar la velocidad para Quaternion
+            const deltaRotation = new THREE.Quaternion();
+            if (keys.ArrowLeft) {
+                deltaRotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -rotationSpeed);
+            } else if (keys.ArrowRight) {
+                deltaRotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotationSpeed);
+            }
+            
+            // Interpolar entre la rotación actual y la nueva
+            const targetRotation = new THREE.Quaternion();
+            targetRotation.copy(currentRotation);
+            targetRotation.multiply(deltaRotation);
+            
+            // Aplicar la rotación suavemente
+            const lerpFactor = 0.1; // Factor de suavizado
+            currentRotation.slerp(targetRotation, lerpFactor);
+            camera.quaternion.copy(currentRotation);
 
             // --- Movimiento hacia adelante/atrás con flechas ---
             const direction = new THREE.Vector3();
@@ -2389,7 +2141,6 @@
 
             // --- Interpolación para suavidad ---
             camera.position.lerp(targetPosition, 0.2);
-            camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
         }
 
         function animate(currentTime) {
@@ -2446,17 +2197,8 @@
                 }
             });
             textureCache.clear();
-        }
-        
         // Limpiar al cerrar la página
         window.addEventListener('beforeunload', cleanup);
-
-        function lerpAngle(a, b, t) {
-            let diff = b - a;
-            while (diff < -Math.PI) diff += Math.PI * 2;
-            while (diff > Math.PI) diff -= Math.PI * 2;
-            return a + diff * t;
-        }
 
         // --- Chat UI Logic ---
         const chatToggleBtn = document.getElementById('chat-toggle-btn');
@@ -2549,222 +2291,159 @@
         }
         connectToChat(userAlias); // Provided by firebase-config.js
 
-        // --- Funciones de personalización de avatar ---
-        const saveCustomizationBtn = document.getElementById('save-customization-btn');
-        const resetCustomizationBtn = document.getElementById('reset-customization-btn');
-        const shirtColorsGrid = document.getElementById('shirt-colors');
-        const pantsColorsGrid = document.getElementById('pants-colors');
-        const shoesColorsGrid = document.getElementById('shoes-colors');
-        
+        // Estado de personalización
+        const currentCustomization = {
+            shirtColor: 0x4ECDC4,
+            pantsColor: 0x2C3E50,
+            shoesColor: 0x8B4513,
+            alias: 'Usuario'
+        };
 
+        // Paletas de colores
+        const shirtColors = [
+            { color: 0x96CEB4, name: 'Verde Claro' },
+            { color: 0xFFEAA7, name: 'Amarillo' },
+            { color: 0xDDA0DD, name: 'Lila' },
+            { color: 0xFF5733, name: 'Naranja' },
+            { color: 0x8E4585, name: 'Morado' },
+            { color: 0x3498DB, name: 'Azul' },
+            { color: 0x2ECC71, name: 'Verde' },
+            { color: 0xF1C40F, name: 'Dorado' },
+            { color: 0xE74C3C, name: 'Rojo' },
+            { color: 0x95A5A6, name: 'Gris' },
+            { color: 0x1ABC9C, name: 'Turquesa Oscuro' },
+            { color: 0x34495E, name: 'Azul Oscuro' }
+        ];
 
-        function openCustomizationPanel() {
-            console.log('Abriendo panel simple de personalización');
-            
-            // Cerrar chat si está abierto
-            if (chatOpen) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-            }
-            
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
-                // Actualizar el alias actual
-                const currentAliasElement = document.getElementById('current-alias');
-                if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin alias';
+        const pantsColors = [
+            { color: 0x2C3E50, name: 'Azul Oscuro' },
+            { color: 0x2E4053, name: 'Azul Marino' },
+            { color: 0x2B2B2B, name: 'Negro' },
+            { color: 0x3498DB, name: 'Azul' },
+            { color: 0x1ABC9C, name: 'Verde Azulado' },
+            { color: 0x95A5A6, name: 'Gris' },
+            { color: 0x7F8C8D, name: 'Gris Azulado' },
+            { color: 0x34495E, name: 'Azul Grisáceo' },
+            { color: 0x273746, name: 'Azul Oscuro' },
+            { color: 0x1A237E, name: 'Azul Profundo' },
+            { color: 0x0D47A1, name: 'Azul Real' },
+            { color: 0x01579B, name: 'Azul Marino' },
+            { color: 0x004D40, name: 'Verde Marino' },
+            { color: 0x006064, name: 'Azul Verde' },
+            { color: 0x004D40, name: 'Verde Oscuro' }
+        ];
+
+        const shoesColors = [
+            { color: 0x8B4513, name: 'Marrón' },
+            { color: 0x5B2C2F, name: 'Marrón Oscuro' },
+            { color: 0x331C14, name: 'Marrón Profundo' },
+            { color: 0x2C3E50, name: 'Azul Oscuro' },
+            { color: 0x2B2B2B, name: 'Negro' },
+            { color: 0x3498DB, name: 'Azul' },
+            { color: 0x1ABC9C, name: 'Verde Azulado' },
+            { color: 0x95A5A6, name: 'Gris' },
+            { color: 0x7F8C8D, name: 'Gris Azulado' },
+            { color: 0x34495E, name: 'Azul Grisáceo' },
+            { color: 0x273746, name: 'Azul Oscuro' },
+            { color: 0x1A237E, name: 'Azul Profundo' },
+            { color: 0x0D47A1, name: 'Azul Real' },
+            { color: 0x01579B, name: 'Azul Marino' },
+            { color: 0x004D40, name: 'Verde Marino' },
+            { color: 0x006064, name: 'Azul Verde' },
+            { color: 0x004D40, name: 'Verde Oscuro' }
+        ];
+
+        // Crear botones para cada color
+        function createColorButton(color, name, type) {
+            const button = document.createElement('button');
+            button.className = 'color-option';
+            button.style.backgroundColor = '#' + color.toString(16).padStart(6, '0');
+            button.style.borderColor = 'transparent';
+            button.style.cursor = 'pointer';
+            button.style.transition = 'all 0.2s';
+            button.title = name;
+            button.dataset.color = color;
+            button.onclick = () => {
+                // Actualizar el color correspondiente
+                switch (type) {
+                    case 'shirt':
+                        currentCustomization.shirtColor = color;
+                        break;
+                    case 'pants':
+                        currentCustomization.pantsColor = color;
+                        break;
+                    case 'shoes':
+                        currentCustomization.shoesColor = color;
+                        break;
                 }
-                
-                // Poblar el input con el alias actual
-                const aliasInput = document.getElementById('simple-alias-input');
-                if (aliasInput) {
-                    aliasInput.value = userAlias || '';
-                    // Agregar event listener para actualizar vista previa en tiempo real
-                    aliasInput.addEventListener('input', function() {
-                        updateAvatarPreview();
-                    });
-                }
-                
-                // Mostrar el panel
-                simplePanel.style.display = 'block';
-                customizationPanelOpen = true;
-                
-                // Inicializar vista previa del avatar
                 updateAvatarPreview();
-                
-                console.log('✅ Panel simple mostrado');
-                            // Mostrar overlay y bloquear clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '20000';
-            }
-            // Asegurar que el panel esté por encima
-            simplePanel.style.zIndex = '21000';
-            simplePanel.style.pointerEvents = 'auto';
-            } else {
-                console.log('❌ Panel simple no encontrado');
-            }
+            };
+            return button;
         }
-        
 
-        
-        function changeShirtColor(color) {
-            console.log('Cambiando color de camisa a:', color);
-            shirtColor = color;
-            currentCustomization.shirtColor = color;
-            updateAvatarPreview();
-            updateColorButtonSelection('shirt', color);
-        }
-        
-        function changePantsColor(color) {
-            console.log('Cambiando color de pantalón a:', color);
-            pantsColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.pantsMaterial) {
-                avatar.pantsMaterial.color.setHex(color);
-                avatar.pantsMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('pants', color);
-        }
-        
-        function changeShoesColor(color) {
-            console.log('Cambiando color de zapatos a:', color);
-            shoesColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.shoeMaterial) {
-                avatar.shoeMaterial.color.setHex(color);
-                avatar.shoeMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('shoes', color);
-        }
-        
-        function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-            });
-            
-            // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
-            if (selectedBtn) {
-                selectedBtn.style.borderColor = '#FFD700';
-                selectedBtn.style.transform = 'scale(1.1)';
-                selectedBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-            }
-        }
-        
+        // Agregar botones a cada grid
+        shirtColors.forEach(color => {
+            const button = createColorButton(color.color, color.name, 'shirt');
+            document.getElementById('shirt-colors').appendChild(button);
+        });
+
+        pantsColors.forEach(color => {
+            const button = createColorButton(color.color, color.name, 'pants');
+            document.getElementById('pants-colors').appendChild(button);
+        });
+
+        shoesColors.forEach(color => {
+            const button = createColorButton(color.color, color.name, 'shoes');
+            document.getElementById('shoes-colors').appendChild(button);
+        });
+
+        // Funciones de personalización
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
             const aliasInput = document.getElementById('simple-alias-input');
-            // Eliminar referencia a preview-alias
-            if (previewDiv) {
-                // Actualizar el alias en la vista previa
-                const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                // Crear una vista previa visual del avatar más detallada
-                const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
-                const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
-                const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
-                previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
-                        <!-- Cabeza cuadrada -->
-                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
-                            <!-- Ojos -->
-                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <!-- Boca -->
-                            <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
-                        </div>
-                        <!-- Torso y brazos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
-                            <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
-                            <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
-                            <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
-                        </div>
-                        <!-- Piernas -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
-                            <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Zapatos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
-                            <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Nombre del avatar -->
-                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
+            if (!previewDiv) return;
+            
+            // Actualizar el alias en la vista previa
+            const currentAlias = aliasInput ? aliasInput.value.trim() : currentCustomization.alias;
+            const shirtColorHex = currentCustomization.shirtColor.toString(16).padStart(6, '0');
+            const pantsColorHex = currentCustomization.pantsColor.toString(16).padStart(6, '0');
+            const shoesColorHex = currentCustomization.shoesColor.toString(16).padStart(6, '0');
+            
+            previewDiv.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
+                    <!-- Cabeza -->
+                    <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
+                        <!-- Ojos -->
+                        <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
+                        <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
+                        <!-- Boca -->
+                        <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
                     </div>
-                `;
-            }
+                    <!-- Torso y brazos -->
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
+                        <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
+                        <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
+                        <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
+                    </div>
+                    <!-- Piernas -->
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
+                        <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                        <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                    </div>
+                    <!-- Zapatos -->
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
+                        <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                        <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                    </div>
+                    <!-- Nombre -->
+                    <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
+                </div>
+            `;
+            
+
         }
-        
-        function resetSimpleCustomization() {
-            console.log('Restableciendo personalización');
-            
-            // Restablecer colores por defecto
-            shirtColor = 0xFF6B6B;
-            pantsColor = 0x2C3E50;
-            shoesColor = 0x8B4513;
-            
-            // Restablecer alias
-            userAlias = '';
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.value = '';
-            }
-            
-            // Actualizar avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
-                
-                // Forzar actualización de materiales
-                if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
-                if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
-                if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Limpiar selección de botones
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-                btn.style.boxShadow = 'none';
-            });
-            
-            console.log('✅ Personalización restablecida');
-        }
-        
-        function saveSimpleCustomization() {
-            console.log('Guardando personalización');
-            
+
+        function saveCustomization() {
             const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput ? aliasInput.value.trim() : '';
             
@@ -2775,51 +2454,236 @@
             }
             
             // Guardar alias
-            userAlias = newAlias;
+            currentCustomization.alias = newAlias;
             
             // Guardar en localStorage
             const customizationData = {
-                alias: userAlias,
-                shirtColor: shirtColor,
-                pantsColor: pantsColor,
-                shoesColor: shoesColor
+                ...currentCustomization
             };
             
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
             
-            // Actualizar nombre en el avatar
-            updateAvatarName();
+            // Limpiar selección de botones
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.style.borderColor = 'transparent';
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+            });
+            
+            console.log('✅ Personalización guardada:', customizationData);
+            updateAvatarPreview();
+            
+            // Actualizar el avatar 3D si existe
+            const myAvatar = userAvatars.get(userAlias);
+            if (myAvatar) {
+                if (myAvatar.bodyMaterial) {
+                    myAvatar.bodyMaterial.color.setHex(currentCustomization.shirtColor);
+                    myAvatar.bodyMaterial.needsUpdate = true;
+                }
+                if (myAvatar.pantsMaterial) {
+                    myAvatar.pantsMaterial.color.setHex(currentCustomization.pantsColor);
+                    myAvatar.pantsMaterial.needsUpdate = true;
+                }
+                if (myAvatar.shoeMaterial) {
+                    myAvatar.shoeMaterial.color.setHex(currentCustomization.shoesColor);
+                    myAvatar.shoeMaterial.needsUpdate = true;
+                }
+            }
+            
+            closeCustomizationPanel();
             
             // Enviar alias al servidor si está conectado
             if (isConnected) {
                 sendAlias();
             }
-            
-            // Cerrar panel
-            closeSimplePanel();
-            
-            console.log('✅ Personalización guardada:', customizationData);
         }
-        
-        function closeSimplePanel() {
+
+        function resetSimpleCustomization() {
+            // Restablecer valores por defecto
+            Object.assign(currentCustomization, {
+                shirtColor: 0x4ECDC4,
+                pantsColor: 0x2C3E50,
+                shoesColor: 0x8B4513,
+                alias: 'Usuario'
+            });
+            
+            // Limpiar selección de botones
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.style.borderColor = 'transparent';
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+            });
+            
+            console.log('✅ Personalización restablecida');
+            updateAvatarPreview();
+        }
+
+        function loadSimpleCustomization() {
+            const savedData = localStorage.getItem('avatarCustomization');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    Object.assign(currentCustomization, {
+                        shirtColor: data.shirtColor || 0x4ECDC4,
+                        pantsColor: data.pantsColor || 0x2C3E50,
+                        shoesColor: data.shoesColor || 0x8B4513,
+                        alias: data.alias || 'Usuario'
+                    });
+                    console.log('✅ Personalización cargada:', data);
+                    updateAvatarPreview();
+                } catch (e) {
+                    console.error('Error al cargar la personalización:', e);
+                    resetSimpleCustomization();
+                }
+            } else {
+                resetSimpleCustomization();
+            }
+        }
+
+        // Inicializar la personalización al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCustomization();
+            
+            // Event listener para el input de alias
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', updateAvatarPreview);
+            }
+        });
+
+
+
+        // Funciones de panel
+        function openCustomizationPanel() {
+            console.log('Abriendo panel de personalización');
+            
+            // Cerrar chat si está abierto
+            if (chatOpen) {
+                chatPanel.style.display = 'none';
+                chatOpen = false;
+            }
+            
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                // Actualizar el alias actual
+                const currentAliasElement = document.getElementById('current-alias');
+                if (currentAliasElement) {
+                    currentAliasElement.textContent = currentCustomization.alias || 'Sin alias';
+                }
+                
+                // Poblar el input con el alias actual
+                const aliasInput = document.getElementById('simple-alias-input');
+                if (aliasInput) {
+                    aliasInput.value = currentCustomization.alias || '';
+                }
+                
+                // Mostrar el panel
+                panel.style.display = 'block';
+                customizationPanelOpen = true;
+                
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+                
+                // Mostrar overlay y bloquear clics
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.style.pointerEvents = 'auto';
+                    overlay.style.zIndex = '20000';
+                }
+                
+                // Asegurar que el panel esté por encima
+                panel.style.zIndex = '21000';
+                panel.style.pointerEvents = 'auto';
+                
+                console.log('✅ Panel mostrado');
+            } else {
+                console.log('❌ Panel no encontrado');
+            }
+        }
+
+        function closeCustomizationPanel() {
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'none';
                 customizationPanelOpen = false;
+                
                 // Ocultar overlay y permitir clics
                 const overlay = document.getElementById('ui-overlay');
                 if (overlay) {
                     overlay.style.display = 'none';
                     overlay.style.pointerEvents = 'none';
                 }
-                panel.style.zIndex = '21000';
-                panel.style.pointerEvents = 'auto';
-                console.log('Panel simple cerrado');
+                
+                console.log('Panel cerrado');
             }
         }
+
+        if (!previewDiv) return;
         
-        // Event listeners para actualización en tiempo real
-        document.addEventListener('DOMContentLoaded', function() {
+        // Actualizar el alias en la vista previa
+        const currentAlias = aliasInput ? aliasInput.value.trim() : currentCustomization.alias;
+        const shirtColorHex = currentCustomization.shirtColor.toString(16).padStart(6, '0');
+        const pantsColorHex = currentCustomization.pantsColor.toString(16).padStart(6, '0');
+        const shoesColorHex = currentCustomization.shoesColor.toString(16).padStart(6, '0');
+        
+        previewDiv.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
+                <!-- Cabeza -->
+                <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
+                    <!-- Ojos -->
+                    <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
+                    <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
+                    <!-- Boca -->
+                    <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
+                </div>
+                <!-- Torso y brazos -->
+                <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
+                    <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
+                    <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
+                    <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
+                </div>
+                <!-- Piernas -->
+                <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
+                    <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                    <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                </div>
+                <!-- Zapatos -->
+                <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
+                    <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                    <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                </div>
+                <!-- Nombre -->
+                <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
+            </div>
+        `;
+        
+        // Actualizar avatar 3D si existe
+        if (avatar) {
+            if (avatar.bodyMaterial) {
+                avatar.bodyMaterial.color.setHex(currentCustomization.shirtColor);
+                avatar.bodyMaterial.needsUpdate = true;
+            avatar.bodyMaterial.needsUpdate = true;
+            // Agregar botones a cada grid
+            shirtColors.forEach(color => {
+                const button = createColorButton(color.color, color.name, 'shirt');
+                shirtColorsGrid.appendChild(button);
+            });
+
+            pantsColors.forEach(color => {
+                const button = createColorButton(color.color, color.name, 'pants');
+                pantsColorsGrid.appendChild(button);
+            });
+
+            shoesColors.forEach(color => {
+                const button = createColorButton(color.color, color.name, 'shoes');
+                shoesColorsGrid.appendChild(button);
+            });
+        }
+
+        // Inicializar el sistema de personalización al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar el sistema de personalización simple
             const aliasInput = document.getElementById('simple-alias-input');
             if (aliasInput) {
                 aliasInput.addEventListener('input', function() {
@@ -2828,272 +2692,127 @@
             }
         });
 
-        function closeWorkingPanel() {
-            const panel = document.getElementById('working-customization-panel');
-            if (panel) {
-                panel.remove();
-            }
-            customizationPanelOpen = false;
-        }
-        
-        function changeShirtColor(color) {
-            currentCustomization.shirtColor = color;
-            applyCustomizationToAvatar();
-            console.log('Color de camisa cambiado a:', color);
-        }
-        
-        function saveSimpleCustomization() {
-            const aliasInput = document.getElementById('simple-alias-input');
-            const newAlias = aliasInput.value.trim();
-            
-            if (newAlias.length > 0) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                if (isConnected) {
-                    sendAlias();
-                }
-                
-                console.log('Alias guardado:', newAlias);
-            }
-            
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeSimplePanel();
-            alert('¡Personalización guardada!');
-        }
-        
-        function createWorkingColorGrids() {
-            // Crear opciones de color para camisas (primeros 18 colores)
-            const shirtGrid = document.getElementById('working-shirt-colors');
-            for (let i = 0; i < 18; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
-                if (customizationColors[i] === currentCustomization.shirtColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                shirtGrid.appendChild(colorOption);
-            }
-            
-
-        }
-        
-
-        
-
-        
-
-        
-
-
-        function closeCustomizationPanel() {
-            customizationPanel.style.display = 'none';
-            customizationPanelOpen = false;
-        }
-
-        function createColorGrids() {
-            // Limpiar grids existentes
-            const shirtColorsGrid = document.getElementById('shirt-colors');
-            const pantsColorsGrid = document.getElementById('pants-colors');
-            const shoesColorsGrid = document.getElementById('shoes-colors');
-
-            shirtColorsGrid.innerHTML = '';
-            pantsColorsGrid.innerHTML = '';
-            shoesColorsGrid.innerHTML = '';
-
-            // Definir los colores disponibles para cada tipo
-            // Colores para camisas (colores vibrantes y variados)
-            const shirtColors = [
-                { color: 0xFF6B6B, name: 'Rosado' },
-                { color: 0x4ECDC4, name: 'Turquesa' },
-                { color: 0x45B7D1, name: 'Azul Marino' },
-                { color: 0x96CEB4, name: 'Verde Claro' },
-                { color: 0xFFEAA7, name: 'Amarillo' },
-                { color: 0xDDA0DD, name: 'Lila' },
-                { color: 0x98D8C8, name: 'Verde Agua' },
-                { color: 0xF7DC6F, name: 'Amarillo Dorado' },
-                { color: 0xBB8FCE, name: 'Morado' },
-                { color: 0x85C1E9, name: 'Azul Cielo' },
-                { color: 0xF8C471, name: 'Naranja' },
-                { color: 0x82E0AA, name: 'Verde Hoja' }
-            ];
-
-            // Colores para pantalones (colores más sobrios y neutros)
-            const pantsColors = [
-                { color: 0x2C3E50, name: 'Gris Oscuro' },
-                { color: 0x3498DB, name: 'Azul' },
-                { color: 0xE74C3C, name: 'Rojo' },
-                { color: 0x9B59B6, name: 'Violeta' },
-                { color: 0x34495E, name: 'Azul Oscuro' },
-                { color: 0x2ECC71, name: 'Verde' },
-                { color: 0x16A085, name: 'Verde Agua' },
-                { color: 0x2980B9, name: 'Azul Marino' },
-                { color: 0x8E44AD, name: 'Morado' }
-            ];
-
-            // Colores para zapatos (colores oscuros y neutros)
-            const shoesColors = [
-                { color: 0x8B4513, name: 'Marrón' },
-                { color: 0x6E2C00, name: 'Marrón Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' }
-            ];
-
-            // Crear opciones de color para cada tipo
-            const createOption = (colorObj, type) => {
-                const option = document.createElement('div');
-                option.className = 'color-option';
-                option.style.setProperty('--color', '#' + colorObj.color.toString(16).padStart(6, '0'));
-                option.dataset.color = colorObj.color;
-                option.dataset.type = type;
-                
-                // Agregar título al pasar el mouse
-                option.title = colorObj.name;
-                
-                // Agregar evento click
-                option.onclick = () => selectColor(colorObj.color, type);
-                
-                return option;
-            };
-
-            // Crear botones para cada tipo
-            shirtColors.forEach(color => shirtColorsGrid.appendChild(createOption(color, 'shirt')));
-            pantsColors.forEach(color => pantsColorsGrid.appendChild(createOption(color, 'pants')));
-            shoesColors.forEach(color => shoesColorsGrid.appendChild(createOption(color, 'shoes')));
-
-            // Actualizar selecciones iniciales
-            updateSelectedColors();
-        }
-
-        // Inicializar los grids de colores al cargar
-        document.addEventListener('DOMContentLoaded', createColorGrids);
-
-
-
+        // Función centralizada para manejar cambios de color
         function selectColor(color, type) {
-            // Remover selección previa del mismo tipo
-            const allSelected = document.querySelectorAll(`.color-option.selected[data-type="${type}"]`);
-            allSelected.forEach(btn => btn.classList.remove('selected'));
+            console.log(`Cambiando color de ${type} a:`, color);
             
-            // Seleccionar nueva opción
-            const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
-            
-            // Actualizar color actual
-            switch (type) {
+            // Actualizar la variable global correspondiente
+            switch(type) {
                 case 'shirt':
+                    shirtColor = color;
                     currentCustomization.shirtColor = color;
                     break;
                 case 'pants':
+                    pantsColor = color;
                     currentCustomization.pantsColor = color;
                     break;
                 case 'shoes':
+                    shoesColor = color;
                     currentCustomization.shoesColor = color;
                     break;
             }
             
-            // Actualizar selecciones visuales
-            updateSelectedColors();
-            
-            // Aplicar cambios inmediatamente al avatar
+            // Actualizar avatar
             applyCustomizationToAvatar();
+            
+            // Actualizar vista previa
+            updateAvatarPreview();
+            
+            // Feedback visual en los botones
+            updateColorButtonSelection(type, color);
+        }
+
+        function updateColorButtonSelection(type, selectedColor) {
+            // Remover selección anterior
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(btn => {
+                btn.style.borderColor = 'transparent';
+                btn.style.transform = 'scale(1)';
+                btn.style.boxShadow = 'none';
+            });
+            
+            // Marcar el botón seleccionado
+            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"][data-type="${type}"]`);
+            if (selectedBtn) {
+                selectedBtn.style.borderColor = '#FFD700';
+                selectedBtn.style.transform = 'scale(1.1)';
+                selectedBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
+            }
         }
 
         function updateSelectedColors() {
-            // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
-            
-            if (shirtOption) shirtOption.classList.add('selected');
-            if (pantsOption) pantsOption.classList.add('selected');
-            if (shoesOption) shoesOption.classList.add('selected');
+            // Actualizar selección de botones según los colores actuales
+            updateColorButtonSelection('shirt', shirtColor);
+            updateColorButtonSelection('pants', pantsColor);
+            updateColorButtonSelection('shoes', shoesColor);
         }
 
         function applyCustomizationToAvatar() {
-            // Actualizar las variables globales
-            shirtColor = currentCustomization.shirtColor;
-            pantsColor = currentCustomization.pantsColor;
-            shoesColor = currentCustomization.shoesColor;
-            
-            // Actualizar la vista previa existente
-            updateAvatarPreview();
-            
-            // Actualizar los colores en el localStorage
-            const customizationData = {
-                shirtColor: currentCustomization.shirtColor,
-                pantsColor: currentCustomization.pantsColor,
-                shoesColor: currentCustomization.shoesColor
-            };
-            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
+            // Aplicar la personalización actual al avatar
+            const avatar = userAvatars.get(userAlias);
+            if (avatar) {
+                if (avatar.bodyMaterial) {
+                    avatar.bodyMaterial.color.setHex(shirtColor);
+                    avatar.bodyMaterial.needsUpdate = true;
+                }
+                if (avatar.pantsMaterial) {
+                    avatar.pantsMaterial.color.setHex(pantsColor);
+                    avatar.pantsMaterial.needsUpdate = true;
+                }
+                if (avatar.shoeMaterial) {
+                    avatar.shoeMaterial.color.setHex(shoesColor);
+                    avatar.shoeMaterial.needsUpdate = true;
+                }
+            }
         }
 
         function saveCustomization() {
-            // Obtener el nuevo alias del input
-            const aliasInput = document.getElementById('customization-alias-input');
-            const newAlias = aliasInput.value.trim();
+            // Guardar la personalización actual
+            const customizationData = {
+                alias: userAlias,
+                shirtColor: shirtColor,
+                pantsColor: pantsColor,
+                shoesColor: shoesColor
+            };
             
-            // Validar el alias
-            if (newAlias.length === 0) {
-                addMessageToChat('Sistema', 'El alias no puede estar vacío', 'system');
-                return;
-            }
-            
-            if (newAlias.length > 18) {
-                addMessageToChat('Sistema', 'El alias no puede tener más de 18 caracteres', 'system');
-                return;
-            }
-            
-            // Actualizar el alias si ha cambiado
-            if (newAlias !== userAlias) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                // Enviar nuevo alias al servidor
-                if (isConnected) {
-                    sendAlias();
-                }
-            }
-            
-            // Guardar personalización en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeCustomizationPanel();
-            
-            // Mostrar mensaje de confirmación
-            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
+            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
+            console.log('Personalización guardada:', customizationData);
         }
 
         function resetCustomization() {
-            // Restablecer a colores por defecto
-            currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513
-            };
+            // Restablecer a valores por defecto
+            shirtColor = 0xFF6B6B;
+            pantsColor = 0x2C3E50;
+            shoesColor = 0x8B4513;
             
-            // Aplicar cambios
+            // Actualizar avatar
             applyCustomizationToAvatar();
+            
+            // Actualizar vista previa
+            updateAvatarPreview();
+            
+            // Actualizar selección de botones
             updateSelectedColors();
         }
 
         function loadCustomization() {
-            const saved = localStorage.getItem('avatarCustomization');
-            if (saved) {
-                try {
-                    currentCustomization = JSON.parse(saved);
-                    applyCustomizationToAvatar();
-                } catch (error) {
-                    console.error('Error cargando personalización:', error);
-                }
+            // Cargar personalización guardada
+            const savedData = localStorage.getItem('avatarCustomization');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                userAlias = data.alias;
+                shirtColor = data.shirtColor;
+                pantsColor = data.pantsColor;
+                shoesColor = data.shoesColor;
+                
+                // Actualizar avatar
+                applyCustomizationToAvatar();
+                
+                // Actualizar vista previa
+                updateAvatarPreview();
+                
+                // Actualizar selección de botones
+                updateSelectedColors();
             }
         }
 
@@ -3216,119 +2935,62 @@
             }
         }
 
-        // Conectar al chat de Firebase
-        connectToChat(userAlias);
-
-        
-
-        // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
-        setInterval(() => {
-            if (
-                typeof camera !== 'undefined' &&
-                camera.position &&
-                typeof camera.position.x !== 'undefined' &&
-                typeof camera.position.y !== 'undefined' &&
-                typeof camera.position.z !== 'undefined'
-            ) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                // Invertir la rotación para que los avatares miren igual que la cámara
-                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                sendPosition(position, floor, rotation);
-            } else {
-                console.warn('Cámara o posición no definida:', camera);
-            }
-        }, 500);
-
-        // Función mejorada para mostrar mensajes en el chat
-        function addMessageToChat(alias, message, type = 'user', timestamp = null) {
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) return;
-            let timeStr = '';
-            if (timestamp) {
-                const date = new Date(timestamp);
-                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
-            }
-            const isOwn = (alias === userAlias || type === 'own');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
-            msgDiv.style.margin = '6px 0';
-            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
-            msgDiv.innerHTML = `
-                <span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span>
-                <span style="color:#fff;">${message}</span>
-                ${timeStr}
-            `;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Listener de mensajes de Firebase
-        messagesRef.off('child_added'); // <-- Evita listeners duplicados
-        messagesRef.on('child_added', (snapshot) => {
-            const msg = snapshot.val();
-            addMessageToChat(msg.alias, msg.message, msg.alias === userAlias ? 'own' : 'user', msg.timestamp);
-        });
-
-        // Listener de posiciones de avatares en Firebase
-        positionsRef.on('value', (snapshot) => {
-            const positions = snapshot.val() || {};
-            Object.keys(positions).forEach(alias => {
-                const userData = positions[alias];
-                if (
-                    alias !== userAlias &&
-                    userData &&
-                    userData.position && typeof userData.position.x === 'number' &&
-                    typeof userData.position.y === 'number' &&
-                    typeof userData.position.z === 'number' &&
-                    typeof userData.floor === 'number' &&
-                    typeof userData.rotation === 'number'
-                ) {
-                    updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+        // Función centralizada para inicializar Firebase
+        function initializeFirebase() {
+            // Configurar botones de chat
+            chatSendBtn.onclick = handleSendMessage;
+            chatInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    handleSendMessage();
                 }
             });
-            // Eliminar avatares de usuarios que ya no están
-            Object.keys(userAvatars).forEach(alias => {
-                if (!positions[alias] && alias !== userAlias) {
-                    removeUserAvatar(alias);
-                }
-            });
-        });
 
-        // --- Función para crear un avatar de usuario ---
-        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
-            if (userAvatars.has(alias)) return;
-            const avatarGroup = new THREE.Group();
-            avatarGroup.position.set(position.x, position.y, position.z);
-            // Geometría visible para el avatar (cubo simple)
-            const geometry = new THREE.BoxGeometry(1, 2, 1);
-            const material = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.castShadow = false;
-            avatarGroup.add(mesh);
-            scene.add(avatarGroup);
-            userAvatars.set(alias, {
-                group: avatarGroup,
-                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
-                targetRotation: 0,
-                currentFloor: floor
+            // Configurar listeners de Firebase
+            // Listener de mensajes
+            messagesRef.off('child_added');
+            messagesRef.on('child_added', (snapshot) => {
+                const msg = snapshot.val();
+                addMessageToChat(msg.alias, msg.message, msg.type, msg.timestamp);
             });
-        }
-        // --- Función para actualizar todas las posiciones de avatares ---
-        function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
-                // Interpolación suave hacia la posición objetivo
-                avatar.group.position.lerp(avatar.targetPosition, 0.2);
-                // Interpolación suave de rotación
-                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-                // Animación de movimiento estilo Roblox
-                animateRobloxAvatar(avatar, alias);
+
+            // Listener de posiciones
+            positionsRef.off('value');
+            positionsRef.on('value', (snapshot) => {
+                const positions = snapshot.val() || {};
+                Object.keys(positions).forEach(alias => {
+                    const data = positions[alias];
+                    if (
+                        alias !== userAlias &&
+                        data &&
+                        data.position && typeof data.position.x === 'number' &&
+                        typeof data.position.y === 'number' &&
+                        typeof data.position.z === 'number' &&
+                        typeof data.floor === 'number' &&
+                        typeof data.rotation === 'number'
+                    ) {
+                        updateAvatarPosition(alias, data.position, data.floor, data.rotation);
+                    }
+                });
+                // Eliminar avatares de usuarios que ya no están
+                Object.keys(userAvatars).forEach(alias => {
+                    if (!positions[alias] && alias !== userAlias) {
+                        removeUserAvatar(alias);
+                    }
+                });
             });
-        }
+
+ else {
+            console.log('✅ Firebase inicializado correctamente');
+            // Inicializar Firebase cuando el usuario tenga un alias
+            if (userAlias) {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log('✅ Firebase inicializado correctamente');
+            }
+
+
+
+
 
         function openSimplePanel() {
             const panel = document.getElementById('simple-panel');
@@ -3376,70 +3038,15 @@
                 indicator.appendChild(exitBtn);
             }
         });
-        
-        // Diferenciar mensajes privados en el chat
-        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) return;
-            let timeStr = '';
-            if (timestamp) {
-                const date = new Date(timestamp);
-                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
-            }
-            const isOwn = (alias === userAlias || type === 'own');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
-            msgDiv.style.margin = '6px 0';
-            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
-            if (isPrivate) {
-                msgDiv.style.background = 'rgba(255,215,0,0.12)';
-                msgDiv.style.border = '1px solid #FFD700';
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
-            } else {
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
-            }
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
 
-        // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
-        // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
-        window.addMessageToChat = addMessageToChat;
-
-        // --- Enviar posición del usuario periódicamente SOLO si está conectado y sin duplicados ---
-        let positionInterval = null;
-        function startPositionUpdates() {
-            if (positionInterval) clearInterval(positionInterval);
-            positionInterval = setInterval(() => {
-                if (
-                    typeof camera !== 'undefined' &&
-                    camera.position &&
-                    typeof camera.position.x !== 'undefined' &&
-                    typeof camera.position.y !== 'undefined' &&
-                    typeof camera.position.z !== 'undefined'
-                ) {
-                    const position = {
-                        x: camera.position.x,
-                        y: camera.position.y,
-                        z: camera.position.z
-                    };
-                    const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                    const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                    sendPosition(position, floor, rotation);
-                }
-            }, 500);
-        }
-        function stopPositionUpdates() {
-            if (positionInterval) clearInterval(positionInterval);
-            positionInterval = null;
-        }
         // Iniciar al conectar
         document.addEventListener('DOMContentLoaded', () => {
             connectToChat(userAlias);
-            startPositionUpdates();
+            handleConnection();
         });
         // Limpiar al cerrar la página
         window.addEventListener('beforeunload', () => {
+            positionInterval.stop();
             stopPositionUpdates();
             disconnectFromChat();
         });
