@@ -1429,12 +1429,6 @@
 
             // --- Tiendas ---
 
-            // Función para verificar si una posición está en una esquina
-            const isCornerPosition = (index, side) => {
-                // Saltar solo la primera y la última tienda de cada lado
-                return index === 0 || index === numStoresPerSide - 1;
-            };
-
             // Crear tiendas en sentido horario usando la función centralizada
             createClockwiseStores(yOffset, storeDepth, storeWidth, storeSpacing, initialOffset, numStoresPerSide, wallMaterial, linkIndex, getNextShopNumber);
             
