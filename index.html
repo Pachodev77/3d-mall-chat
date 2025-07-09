@@ -365,17 +365,27 @@
         }
         
         #simple-panel .color-btn {
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
             border: 2px solid transparent;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            background: #333 !important;
+        }
+        
+        #simple-panel .color-btn[data-color] {
+            border: 2px solid #333;
         }
         
         #simple-panel .color-btn:hover {
             border-color: #FFD700;
+        }
+        
+        #simple-panel .color-btn.selected {
+            border-color: #FFD700;
+            transform: scale(1.1);
         }
         
         /* Estilos adicionales para elementos específicos */
