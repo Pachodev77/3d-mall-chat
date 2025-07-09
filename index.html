@@ -2740,7 +2740,7 @@
         
         function updateColorButtonSelection(type, selectedColor) {
             // Remover selección anterior
-            document.querySelectorAll('.color-btn').forEach(btn => {
+            document.querySelectorAll('.color-option').forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
             });
@@ -2837,7 +2837,7 @@
             updateAvatarPreview();
             
             // Limpiar selección de botones
-            document.querySelectorAll('.color-btn').forEach(btn => {
+            document.querySelectorAll('.color-option').forEach(btn => {
                 btn.style.borderColor = 'transparent';
                 btn.style.transform = 'scale(1)';
                 btn.style.boxShadow = 'none';
