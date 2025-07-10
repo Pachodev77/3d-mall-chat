@@ -2689,18 +2689,8 @@
             }
             
             updateMovement();
-            // updateAvatarPositions(); // Actualizar posiciones de avatares
-            // --- NUEVO: Actualizar y animar todos los avatares ---
-            userAvatars.forEach((avatar, alias) => {
-                if (alias !== userAlias) {
-                    // Interpolación de posición
-                    avatar.group.position.lerp(avatar.targetPosition, 0.2);
-                    // Interpolación de rotación
-                    avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-                    // Animación estilo Roblox
-                    animateRobloxAvatar(avatar, alias);
-                }
-            });
+            updateAvatarPositions(); // Actualizar posiciones de avatares
+            
             // Enviar posición del usuario cada 100ms (10 veces por segundo)
             if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
                 sendUserPosition();
@@ -3471,7 +3461,7 @@
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                createUserAvatar(alias, position, floor, shirtColor, pantsColor, shoesColor);
+                createUserAvatar(alias, position, floor, { shirtColor, pantsColor, shoesColor });
                 avatar = userAvatars.get(alias);
             }
             if (avatar) {
@@ -3484,16 +3474,16 @@
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
                 avatar.targetRotation = normalizedRotation;
-                // Aplicar colores si están presentes
-                if (typeof shirtColor === 'number' && avatar.bodyMaterial) {
+                // --- Actualizar colores en tiempo real si cambian ---
+                if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
                     avatar.bodyMaterial.color.setHex(shirtColor);
                     avatar.bodyMaterial.needsUpdate = true;
                 }
-                if (typeof pantsColor === 'number' && avatar.pantsMaterial) {
+                if (typeof pantsColor === 'number' && avatar.pantsMaterial && avatar.pantsMaterial.color.getHex() !== pantsColor) {
                     avatar.pantsMaterial.color.setHex(pantsColor);
                     avatar.pantsMaterial.needsUpdate = true;
                 }
-                if (typeof shoesColor === 'number' && avatar.shoeMaterial) {
+                if (typeof shoesColor === 'number' && avatar.shoeMaterial && avatar.shoeMaterial.color.getHex() !== shoesColor) {
                     avatar.shoeMaterial.color.setHex(shoesColor);
                     avatar.shoeMaterial.needsUpdate = true;
                 }
@@ -3636,7 +3626,7 @@
         positionsRef.on('value', (snapshot) => {
             const positions = snapshot.val() || {};
             Object.keys(positions).forEach(alias => {
-                    const userData = positions[alias];
+                const userData = positions[alias];
                 if (
                     alias !== userAlias &&
                     userData &&
@@ -3666,16 +3656,217 @@
         });
 
         // --- Función para crear un avatar de usuario ---
-        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, shirtColor, pantsColor, shoesColor) {
+        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
             if (userAvatars.has(alias)) return;
-            // Usar colores personalizados si existen
-            shirtColor = typeof shirtColor === 'number' ? shirtColor : 0x4ECDC4;
-            pantsColor = typeof pantsColor === 'number' ? pantsColor : 0x2C3E50;
-            shoesColor = typeof shoesColor === 'number' ? shoesColor : 0x8B4513;
+            const avatarGroup = new THREE.Group();
+            avatarGroup.position.set(position.x, position.y, position.z);
+            // Geometría visible para el avatar (cubo simple)
+            const geometry = new THREE.BoxGeometry(1, 2, 1);
+            const material = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = false;
+            avatarGroup.add(mesh);
+            scene.add(avatarGroup);
+            userAvatars.set(alias, {
+                group: avatarGroup,
+                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                targetRotation: 0,
+                currentFloor: floor
+            });
+        }
+        // --- Función para actualizar todas las posiciones de avatares ---
+        function updateAvatarPositions() {
+            userAvatars.forEach((avatar, alias) => {
+                // Interpolación suave hacia la posición objetivo
+                avatar.group.position.lerp(avatar.targetPosition, 0.2);
+                // Interpolación suave de rotación
+                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+                // Animación de movimiento estilo Roblox
+                animateRobloxAvatar(avatar, alias);
+            });
+        }
+
+        function openSimplePanel() {
+            const panel = document.getElementById('simple-panel');
+            if (panel) {
+                panel.style.display = 'block';
+                customizationPanelOpen = true;
+                // Inicializar vista previa del avatar
+                updateAvatarPreview();
+                // Inicializar los grids de colores
+                createColorGrids();
+                // Actualizar selecciones de colores
+                updateSelectedColors();
+            }
+        }
+
+        // Inicialización robusta de colores de avatar
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
+        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
+        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
+
+        let privateRecipient = null;
+        
+        // UI: Al hacer clic en un usuario, activar modo privado
+        usersList.addEventListener('click', function(e) {
+            const userItem = e.target.closest('.user-item');
+            if (userItem && !userItem.classList.contains('own')) {
+                privateRecipient = userItem.textContent.replace(' (Tú)', '').trim();
+                chatInput.placeholder = `Mensaje privado a: ${privateRecipient}`;
+                chatInput.focus();
+                document.getElementById('private-mode-indicator')?.remove();
+                const indicator = document.createElement('div');
+                indicator.id = 'private-mode-indicator';
+                indicator.textContent = `Modo privado con: ${privateRecipient}`;
+                indicator.style = 'background:#FFD700;color:#222;padding:4px 10px;border-radius:6px;margin-bottom:4px;font-weight:bold;text-align:center;';
+                chatInput.parentElement.insertBefore(indicator, chatInput);
+                // Botón para salir del modo privado
+                const exitBtn = document.createElement('button');
+                exitBtn.textContent = 'Volver a chat público';
+                exitBtn.style = 'margin-left:10px;padding:2px 8px;border-radius:4px;border:none;background:#800000;color:#fff;cursor:pointer;font-size:12px;';
+                exitBtn.onclick = function() {
+                    privateRecipient = null;
+                    chatInput.placeholder = 'Escribe un mensaje...';
+                    indicator.remove();
+                };
+                indicator.appendChild(exitBtn);
+            }
+        });
+        
+        // Diferenciar mensajes privados en el chat
+        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            let timeStr = '';
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+            }
+            const isOwn = (alias === userAlias || type === 'own');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
+            msgDiv.style.margin = '6px 0';
+            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+            if (isPrivate) {
+                msgDiv.style.background = 'rgba(255,215,0,0.12)';
+                msgDiv.style.border = '1px solid #FFD700';
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            } else {
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            }
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
+        // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
+        window.addMessageToChat = addMessageToChat;
+
+        // --- Enviar posición del usuario periódicamente SOLO si está conectado y sin duplicados ---
+        let positionInterval = null;
+        function startPositionUpdates() {
+            if (positionInterval) clearInterval(positionInterval);
+            positionInterval = setInterval(() => {
+                if (
+                    typeof camera !== 'undefined' &&
+                    camera.position &&
+                    typeof camera.position.x !== 'undefined' &&
+                    typeof camera.position.y !== 'undefined' &&
+                    typeof camera.position.z !== 'undefined'
+                ) {
+                    const position = {
+                        x: camera.position.x,
+                        y: camera.position.y,
+                        z: camera.position.z
+                    };
+                    const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
+                    const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
+                    sendPosition(position, floor, rotation);
+                }
+            }, 500);
+        }
+        function stopPositionUpdates() {
+            if (positionInterval) clearInterval(positionInterval);
+            positionInterval = null;
+        }
+        // Iniciar al conectar
+        document.addEventListener('DOMContentLoaded', () => {
+            connectToChat(userAlias);
+            startPositionUpdates();
+        });
+        // Limpiar al cerrar la página
+        window.addEventListener('beforeunload', () => {
+            stopPositionUpdates();
+            disconnectFromChat();
+        });
+
+        // --- Función reutilizable para crear un avatar estilo Roblox ---
+        function createRobloxAvatar(options) {
+            const group = new THREE.Group();
+            // Opciones y colores
+            const shirtColor = options.shirtColor || 0x4ECDC4;
+            const pantsColor = options.pantsColor || 0x2C3E50;
+            const shoesColor = options.shoesColor || 0x8B4513;
+            const skinColor = 0xFFE4C4;
+            // Cabeza
+            const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.set(0, 1.7, 0);
+            group.add(head);
+            // Torso
+            const bodyGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.set(0, 0.9, 0);
+            group.add(body);
+            // Brazos
+            const armGeometry = new THREE.BoxGeometry(0.35, 1, 0.35);
+            const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
+            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+            leftArm.position.set(-0.7, 1.1, 0);
+            group.add(leftArm);
+            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+            rightArm.position.set(0.7, 1.1, 0);
+            group.add(rightArm);
+            // Piernas
+            const legGeometry = new THREE.BoxGeometry(0.38, 1, 0.38);
+            const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
+            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+            leftLeg.position.set(-0.25, 0.0, 0);
+            group.add(leftLeg);
+            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+            rightLeg.position.set(0.25, 0.0, 0);
+            group.add(rightLeg);
+            // Zapatos
+            const shoeGeometry = new THREE.BoxGeometry(0.38, 0.18, 0.38);
+            const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
+            const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            leftShoe.position.set(-0.25, -0.5, 0);
+            group.add(leftShoe);
+            const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            rightShoe.position.set(0.25, -0.5, 0);
+            group.add(rightShoe);
+            // Materiales para personalización en tiempo real
+            group.bodyMaterial = bodyMaterial;
+            group.pantsMaterial = legMaterial;
+            group.shoeMaterial = shoeMaterial;
+            return group;
+        }
+
+        // --- Función para crear un avatar de usuario (propio o de otros) ---
+        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
+            if (userAvatars.has(alias)) return;
+            // Obtener colores personalizados si existen
+            const shirtColor = custom.shirtColor || 0x4ECDC4;
+            const pantsColor = custom.pantsColor || 0x2C3E50;
+            const shoesColor = custom.shoesColor || 0x8B4513;
             const avatarGroup = createRobloxAvatar({ shirtColor, pantsColor, shoesColor });
+            
             // Calcular la posición Y correcta para el piso
             const floorStep = HALL_HEIGHT + 1;
-            const correctY = floor * floorStep + 0.6;
+            const correctY = floor * floorStep + 0.6; // Punto intermedio entre 0.2 y 1.0
+            
             avatarGroup.position.set(position.x, correctY, position.z);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
@@ -3724,53 +3915,6 @@
             } else {
                 canvas.style.pointerEvents = 'auto';
             }
-        }
-
-        // --- Función para crear un avatar estilo Roblox ---
-        function createRobloxAvatar({ shirtColor, pantsColor, shoesColor }) {
-            const group = new THREE.Group();
-            // Cuerpo
-            const bodyMaterial = getCachedMaterial(shirtColor);
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1, 0.35), bodyMaterial);
-            body.position.y = 1.0;
-            group.add(body);
-            // Cabeza
-            const headMaterial = getCachedMaterial(0xFFD39B, 0.6, 0.1); // Color piel
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), headMaterial);
-            head.position.y = 1.55;
-            group.add(head);
-            // Brazo izquierdo
-            const leftArmMaterial = getCachedMaterial(shirtColor);
-            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), leftArmMaterial);
-            leftArm.position.set(-0.46, 1.0, 0);
-            group.add(leftArm);
-            // Brazo derecho
-            const rightArmMaterial = getCachedMaterial(shirtColor);
-            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), rightArmMaterial);
-            rightArm.position.set(0.46, 1.0, 0);
-            group.add(rightArm);
-            // Pierna izquierda
-            const pantsMaterial = getCachedMaterial(pantsColor);
-            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), pantsMaterial);
-            leftLeg.position.set(-0.18, 0.35, 0);
-            group.add(leftLeg);
-            // Pierna derecha
-            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), pantsMaterial);
-            rightLeg.position.set(0.18, 0.35, 0);
-            group.add(rightLeg);
-            // Zapatos (como cubos pequeños debajo de las piernas)
-            const shoeMaterial = getCachedMaterial(shoesColor);
-            const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.22), shoeMaterial);
-            leftShoe.position.set(-0.18, -0.01, 0);
-            group.add(leftShoe);
-            const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.22), shoeMaterial);
-            rightShoe.position.set(0.18, -0.01, 0);
-            group.add(rightShoe);
-            // Devolver referencias a los materiales para personalización
-            group.bodyMaterial = bodyMaterial;
-            group.pantsMaterial = pantsMaterial;
-            group.shoeMaterial = shoeMaterial;
-            return group;
         }
     </script>
 </body>

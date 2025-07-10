@@ -69,10 +69,24 @@ function sendMessage(message) {
 
 function sendPosition(position, floor, rotation) {
     if (!isConnected || !currentUser) return;
+    // Obtener colores actuales del avatar
+    let shirtColor = 0x4ECDC4, pantsColor = 0x2C3E50, shoesColor = 0x8B4513;
+    if (typeof window.currentCustomization === 'object') {
+        shirtColor = window.currentCustomization.shirtColor || shirtColor;
+        pantsColor = window.currentCustomization.pantsColor || pantsColor;
+        shoesColor = window.currentCustomization.shoesColor || shoesColor;
+    } else if (typeof window.shirtColor !== 'undefined') {
+        shirtColor = window.shirtColor;
+        pantsColor = window.pantsColor;
+        shoesColor = window.shoesColor;
+    }
     const positionData = {
         position: position,
         floor: floor,
         rotation: rotation,
+        shirtColor: shirtColor,
+        pantsColor: pantsColor,
+        shoesColor: shoesColor,
         timestamp: Date.now()
     };
     positionsRef.child(currentUser.alias).set(positionData);
