@@ -47,7 +47,8 @@ function connectToChat(alias) {
         Object.keys(positions).forEach(alias => {
             if (alias !== currentUser.alias) {
                 const userData = positions[alias];
-                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                const customization = userData.customization || null;
+                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation, customization);
             }
         });
     });
@@ -65,7 +66,7 @@ function sendMessage(message) {
     messagesRef.push(messageData);
 }
 
-function sendPosition(position, floor, rotation) {
+function sendPosition(position, floor, rotation, customization = null) {
     if (!isConnected || !currentUser) return;
     const positionData = {
         position: position,
@@ -73,6 +74,12 @@ function sendPosition(position, floor, rotation) {
         rotation: rotation,
         timestamp: Date.now()
     };
+    
+    // Agregar datos de personalización si están disponibles
+    if (customization) {
+        positionData.customization = customization;
+    }
+    
     positionsRef.child(currentUser.alias).set(positionData);
 }
 

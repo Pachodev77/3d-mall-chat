@@ -3436,7 +3436,7 @@
             }
         }
 
-        function updateAvatarPosition(alias, position, floor, rotation = 0) {
+        function updateAvatarPosition(alias, position, floor, rotation = 0, customization = null) {
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
                 return;
@@ -3455,8 +3455,11 @@
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                createUserAvatar(alias, position, floor);
+                createUserAvatar(alias, position, floor, customization);
                 avatar = userAvatars.get(alias);
+            } else if (customization && avatar.group) {
+                // Actualizar colores del avatar existente si se reciben datos de personalización
+                updateAvatarColors(avatar, customization);
             }
             if (avatar) {
                 const floorStep = HALL_HEIGHT + 1;
@@ -3571,7 +3574,15 @@
                 const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
                 // Invertir la rotación para que los avatares miren igual que la cámara
                 const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                sendPosition(position, floor, rotation);
+                
+                // Incluir datos de personalización
+                const customization = {
+                    shirtColor: shirtColor,
+                    pantsColor: pantsColor,
+                    shoesColor: shoesColor
+                };
+                
+                sendPosition(position, floor, rotation, customization);
             } else {
                 console.warn('Cámara o posición no definida:', camera);
             }
@@ -3600,12 +3611,8 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Listener de mensajes de Firebase
-        messagesRef.off('child_added'); // <-- Evita listeners duplicados
-        messagesRef.on('child_added', (snapshot) => {
-            const msg = snapshot.val();
-            addMessageToChat(msg.alias, msg.message, msg.alias === userAlias ? 'own' : 'user', msg.timestamp);
-        });
+        // Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
+        // El listener principal está en firebase-config.js
 
         // Listener de posiciones de avatares en Firebase
         positionsRef.on('value', (snapshot) => {
@@ -3621,7 +3628,9 @@
                     typeof userData.floor === 'number' &&
                     typeof userData.rotation === 'number'
                 ) {
-                    updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+                    // Extraer datos de personalización si están disponibles
+                    const customization = userData.customization || null;
+                    updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation, customization);
                 }
             });
             // Eliminar avatares de usuarios que ya no están
@@ -3633,23 +3642,60 @@
         });
 
         // --- Función para crear un avatar de usuario ---
-        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0) {
+        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, customization = null) {
             if (userAvatars.has(alias)) return;
-            const avatarGroup = new THREE.Group();
-            avatarGroup.position.set(position.x, position.y, position.z);
-            // Geometría visible para el avatar (cubo simple)
-            const geometry = new THREE.BoxGeometry(1, 2, 1);
-            const material = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.castShadow = false;
-            avatarGroup.add(mesh);
+            
+            // Usar colores personalizados si están disponibles, sino usar colores por defecto
+            const shirtColor = customization?.shirtColor || 0x4ECDC4;
+            const pantsColor = customization?.pantsColor || 0x2C3E50;
+            const shoesColor = customization?.shoesColor || 0x8B4513;
+            
+            const avatarGroup = createRobloxAvatar({ shirtColor, pantsColor, shoesColor });
+            
+            // Calcular la posición Y correcta para el piso
+            const floorStep = HALL_HEIGHT + 1;
+            const correctY = floor * floorStep + 0.6; // Punto intermedio entre 0.2 y 1.0
+            
+            avatarGroup.position.set(position.x, correctY, position.z);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
-                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
-                currentFloor: floor
+                currentFloor: floor,
+                bodyMaterial: avatarGroup.bodyMaterial,
+                pantsMaterial: avatarGroup.pantsMaterial,
+                shoeMaterial: avatarGroup.shoeMaterial
             });
+        }
+        
+        // --- Función para actualizar colores de un avatar existente ---
+        function updateAvatarColors(avatar, customization) {
+            if (!avatar || !customization) return;
+            
+            if (customization.shirtColor && avatar.bodyMaterial) {
+                avatar.bodyMaterial.color.setHex(customization.shirtColor);
+                avatar.bodyMaterial.needsUpdate = true;
+            }
+            
+            if (customization.pantsColor && avatar.pantsMaterial) {
+                avatar.pantsMaterial.color.setHex(customization.pantsColor);
+                avatar.pantsMaterial.needsUpdate = true;
+            }
+            
+            if (customization.shoesColor && avatar.shoeMaterial) {
+                avatar.shoeMaterial.color.setHex(customization.shoesColor);
+                avatar.shoeMaterial.needsUpdate = true;
+            }
+        }
+        
+        // --- Función para eliminar un avatar de usuario ---
+        function removeUserAvatar(alias) {
+            const avatar = userAvatars.get(alias);
+            if (avatar && avatar.group) {
+                scene.remove(avatar.group);
+                userAvatars.delete(alias);
+            }
         }
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
