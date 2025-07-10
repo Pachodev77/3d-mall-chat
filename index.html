@@ -548,7 +548,7 @@
     <!-- Contenedor de UI completamente separado del canvas -->
     <div id="ui-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 30000;">
         <div id="ui-overlay"></div>
-        <div id="crosshair"></div>
+    <div id="crosshair"></div>
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
     </div>
@@ -1058,144 +1058,69 @@
         }
 
         function createFloorLevel(yOffset, floorMaterial, wallMaterial, separatorMaterial, startLinkIndex) {
-            // --- Suelo con textura de madera ultra realista ---
-            // Crear textura de madera usando canvas de alta resolución
+            // --- Suelo con textura de madera realista ---
+            // Crear textura de madera usando canvas
             const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 1024;
+            canvas.width = 512;
+            canvas.height = 512;
             const ctx = canvas.getContext('2d');
             
-            // Configuración de la textura de madera mejorada
-            const boardWidth = 128; // Ancho de cada tabla de madera
-            const boardHeight = 1024; // Altura de cada tabla
+            // Configuración de la textura de madera
+            const boardWidth = 64; // Ancho de cada tabla de madera
+            const boardHeight = 512; // Altura de cada tabla
             const numBoards = 8; // Número de tablas de madera
             
-            // Paleta de colores de madera más realista y variada
-            const woodColors = [
-                { base: '#8B4513', grain: '#654321', highlight: '#CD853F' }, // Saddle Brown
-                { base: '#A0522D', grain: '#8B4513', highlight: '#DEB887' }, // Sienna
-                { base: '#CD853F', grain: '#A0522D', highlight: '#F4A460' }, // Peru
-                { base: '#D2691E', grain: '#8B4513', highlight: '#F5DEB3' }, // Chocolate
-                { base: '#B8860B', grain: '#8B4513', highlight: '#DAA520' }, // Dark Goldenrod
-                { base: '#DAA520', grain: '#B8860B', highlight: '#F0E68C' }, // Goldenrod
-                { base: '#F4A460', grain: '#D2691E', highlight: '#F5DEB3' }, // Sandy Brown
-                { base: '#DEB887', grain: '#CD853F', highlight: '#F5DEB3' }  // Burly Wood
-            ];
+            // Color único de madera
+            const woodColor = '#8B4513'; // Saddle Brown - tono uniforme
             
-            // Crear patrón de tablas de madera ultra realista
+            // Crear patrón de tablas de madera con un solo tono
             for (let i = 0; i < numBoards; i++) {
                 const x = i * boardWidth;
-                const woodColor = woodColors[i % woodColors.length];
                 
-                // Color base de la tabla con gradiente sutil
-                const gradient = ctx.createLinearGradient(x, 0, x + boardWidth, 0);
-                gradient.addColorStop(0, woodColor.base);
-                gradient.addColorStop(0.5, woodColor.highlight);
-                gradient.addColorStop(1, woodColor.base);
-                
-                ctx.fillStyle = gradient;
+                // Color base de la tabla (mismo para todas)
+                ctx.fillStyle = woodColor;
                 ctx.fillRect(x, 0, boardWidth, boardHeight);
                 
-                // Agregar vetas de madera principales (horizontales)
-                ctx.strokeStyle = woodColor.grain;
-                ctx.lineWidth = 2;
-                
-                // Vetas principales más pronunciadas
-                for (let v = 0; v < 30; v++) {
-                    const y = v * 35 + Math.random() * 20 - 10;
-                    const wave = Math.sin(v * 0.3) * 3;
-                    ctx.beginPath();
-                    ctx.moveTo(x, y + wave);
-                    ctx.lineTo(x + boardWidth, y + wave);
-                    ctx.stroke();
-                }
-                
-                // Vetas secundarias más finas
-                ctx.strokeStyle = woodColor.grain;
+                // Agregar vetas de madera
+                ctx.strokeStyle = '#654321'; // Color más oscuro para las vetas
                 ctx.lineWidth = 1;
-                for (let v = 0; v < 60; v++) {
-                    const y = v * 17 + Math.random() * 15 - 7;
-                    const wave = Math.sin(v * 0.5) * 2;
+                
+                // Vetas horizontales
+                for (let v = 0; v < 20; v++) {
+                    const y = v * 25 + Math.random() * 10;
                     ctx.beginPath();
-                    ctx.moveTo(x, y + wave);
-                    ctx.lineTo(x + boardWidth, y + wave);
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + boardWidth, y);
                     ctx.stroke();
                 }
                 
-                // Vetas verticales para simular fibras de madera
-                ctx.strokeStyle = woodColor.grain;
+                // Vetas verticales sutiles
+                ctx.strokeStyle = '#5D4037';
                 ctx.lineWidth = 0.5;
-                for (let v = 0; v < 15; v++) {
-                    const vx = x + v * 8 + Math.random() * 6;
-                    const wave = Math.sin(v * 0.4) * 2;
+                for (let v = 0; v < 5; v++) {
+                    const vx = x + v * 15 + Math.random() * 10;
                     ctx.beginPath();
-                    ctx.moveTo(vx + wave, 0);
-                    ctx.lineTo(vx + wave, boardHeight);
+                    ctx.moveTo(vx, 0);
+                    ctx.lineTo(vx, boardHeight);
                     ctx.stroke();
                 }
                 
-                // Agregar nudos de madera aleatorios
-                for (let k = 0; k < 3; k++) {
-                    const knotX = x + Math.random() * boardWidth;
-                    const knotY = Math.random() * boardHeight;
-                    const knotSize = 10 + Math.random() * 20;
-                    
-                    // Círculo exterior del nudo
-                    ctx.fillStyle = woodColor.grain;
-                    ctx.beginPath();
-                    ctx.arc(knotX, knotY, knotSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Círculo interior del nudo
-                    ctx.fillStyle = woodColor.base;
-                    ctx.beginPath();
-                    ctx.arc(knotX, knotY, knotSize * 0.6, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Detalles del nudo
-                    ctx.strokeStyle = woodColor.grain;
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(knotX, knotY, knotSize * 0.8, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-                
-                // Agregar variación de color y textura para realismo
-                const noiseGradient = ctx.createRadialGradient(
-                    x + boardWidth/2, boardHeight/2, 0,
-                    x + boardWidth/2, boardHeight/2, boardWidth
-                );
-                noiseGradient.addColorStop(0, 'rgba(139, 69, 19, 0.05)');
-                noiseGradient.addColorStop(0.5, 'rgba(160, 82, 45, 0.1)');
-                noiseGradient.addColorStop(1, 'rgba(139, 69, 19, 0.05)');
-                
-                ctx.fillStyle = noiseGradient;
-                ctx.fillRect(x, 0, boardWidth, boardHeight);
-                
-                // Agregar brillo sutil en el centro de cada tabla
-                const shineGradient = ctx.createLinearGradient(x, 0, x, boardHeight);
-                shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.02)');
-                shineGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
-                shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
-                
-                ctx.fillStyle = shineGradient;
+                // Agregar variación sutil de color para realismo (mismo tono)
+                ctx.fillStyle = 'rgba(139, 69, 19, 0.1)';
                 ctx.fillRect(x, 0, boardWidth, boardHeight);
             }
             
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(3, 1); // Repetir la textura para cubrir el área
-            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            texture.repeat.set(4, 2); // Repetir la textura para cubrir el área
             
             const woodFloorMaterial = new THREE.MeshStandardMaterial({ 
                 map: texture,
-                roughness: 0.6, 
+                roughness: 0.7, 
                 metalness: 0.0,
                 bumpMap: texture,
-                bumpScale: 0.2,
-                normalMap: texture,
-                normalScale: new THREE.Vector2(0.5, 0.5)
+                bumpScale: 0.1
             });
             
             // Calcular el tamaño del área central (sin tiendas ni corredores)
@@ -3277,9 +3202,9 @@
                                   e.target.closest('#simple-panel');
                 
                 if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
+                e.stopPropagation();
+                e.preventDefault();
+                return false;
                 }
             });
         }
@@ -3351,9 +3276,9 @@
                                       e.target.closest('#simple-panel');
                     
                     if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        return false;
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
                     }
                 });
             }
@@ -3435,7 +3360,7 @@
         positionsRef.on('value', (snapshot) => {
             const positions = snapshot.val() || {};
             Object.keys(positions).forEach(alias => {
-                const userData = positions[alias];
+                    const userData = positions[alias];
                 if (
                     alias !== userAlias &&
                     userData &&
