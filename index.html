@@ -2875,12 +2875,12 @@
                 console.log('✅ Panel simple mostrado');
                 
                 // Mostrar overlay después del panel, pero con pointer-events: none para el panel
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'block';
+            const overlay = document.getElementById('ui-overlay');
+            if (overlay) {
+                overlay.style.display = 'block';
                     overlay.style.pointerEvents = 'none'; // Cambiar a none para que no interfiera
-                    overlay.style.zIndex = '20000';
-                }
+                overlay.style.zIndex = '20000';
+            }
             } else {
                 console.log('❌ Panel simple no encontrado');
             }
@@ -3584,7 +3584,7 @@
         }, 500);
 
         // Función mejorada para mostrar mensajes en el chat
-        function addMessageToChat(alias, message, type = 'user', timestamp = null) {
+        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
             let timeStr = '';
@@ -3597,11 +3597,13 @@
             msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
             msgDiv.style.margin = '6px 0';
             msgDiv.style.textAlign = isOwn ? 'right' : 'left';
-            msgDiv.innerHTML = `
-                <span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span>
-                <span style="color:#fff;">${message}</span>
-                ${timeStr}
-            `;
+            if (isPrivate) {
+                msgDiv.style.background = 'rgba(255,215,0,0.12)';
+                msgDiv.style.border = '1px solid #FFD700';
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            } else {
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            }
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }

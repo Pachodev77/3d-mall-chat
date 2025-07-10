@@ -39,7 +39,9 @@ function connectToChat(alias) {
     messagesRef.on('child_added', (snapshot) => {
         const message = snapshot.val();
         if (message.alias !== currentUser.alias) {
-            addMessageToChat(message.alias, message.message, 'user');
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+            }
         }
     });
     positionsRef.on('value', (snapshot) => {
