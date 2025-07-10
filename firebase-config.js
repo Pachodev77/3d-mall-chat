@@ -202,12 +202,4 @@ setInterval(() => {
     if (isConnected && currentUser) {
         usersRef.child(currentUser.alias).update({ timestamp: Date.now() });
     }
-}, 10000);
-
-// Llama a listenToPrivateMessages al conectar
-const oldConnectToChat = connectToChat;
-connectToChat = function(alias) {
-    oldConnectToChat(alias);
-    listenToPrivateMessages();
-};
-window.connectToChat = connectToChat; 
+}, 10000); 
