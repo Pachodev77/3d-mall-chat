@@ -939,6 +939,23 @@
             }
         }
 
+        // --- Configuración de la Escena, Cámara y Renderer ---
+        function setupScene() {
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(25, CAMERA_HEIGHT, 25); // Posición más cerca del centro
+            camera.lookAt(HALL_SIZE / 2, CAMERA_HEIGHT, HALL_SIZE / 2);
+
+            targetPosition = camera.position.clone();
+            targetRotationY = camera.rotation.y;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar pixel ratio
+            renderer.shadowMap.enabled = false; // Desactivar sombras completamente
+            renderer.domElement.style.zIndex = '1'; // Asegurar que el canvas esté por debajo de la UI
+            document.body.appendChild(renderer.domElement);
+        }
+
         function init() {
             scene = new THREE.Scene();
             scene.background = getSkyColor(); // Color dinámico del cielo
