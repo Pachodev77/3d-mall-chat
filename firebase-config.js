@@ -18,6 +18,7 @@ const positionsRef = db.ref('positions');
 
 let currentUser = null;
 let isConnected = false;
+let messagesListenerSet = false;
 
 function connectToChat(alias) {
     if (!alias || alias.trim().length === 0) {
@@ -36,14 +37,18 @@ function connectToChat(alias) {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
     });
-    messagesRef.on('child_added', (snapshot) => {
-        const message = snapshot.val();
-        if (message.alias !== currentUser.alias) {
-            if (typeof window.addMessageToChat === 'function') {
-                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+    // SOLO REGISTRAR UNA VEZ EL LISTENER DE MENSAJES
+    if (!messagesListenerSet) {
+        messagesRef.on('child_added', (snapshot) => {
+            const message = snapshot.val();
+            if (message.alias !== currentUser.alias) {
+                if (typeof window.addMessageToChat === 'function') {
+                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+                }
             }
-        }
-    });
+        });
+        messagesListenerSet = true;
+    }
     positionsRef.on('value', (snapshot) => {
         const positions = snapshot.val() || {};
         Object.keys(positions).forEach(alias => {
