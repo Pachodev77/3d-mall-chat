@@ -2689,8 +2689,18 @@
             }
             
             updateMovement();
-            updateAvatarPositions(); // Actualizar posiciones de avatares
-            
+            // updateAvatarPositions(); // Actualizar posiciones de avatares
+            // --- NUEVO: Actualizar y animar todos los avatares ---
+            userAvatars.forEach((avatar, alias) => {
+                if (alias !== userAlias) {
+                    // Interpolación de posición
+                    avatar.group.position.lerp(avatar.targetPosition, 0.2);
+                    // Interpolación de rotación
+                    avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+                    // Animación estilo Roblox
+                    animateRobloxAvatar(avatar, alias);
+                }
+            });
             // Enviar posición del usuario cada 100ms (10 veces por segundo)
             if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
                 sendUserPosition();
@@ -3714,6 +3724,53 @@
             } else {
                 canvas.style.pointerEvents = 'auto';
             }
+        }
+
+        // --- Función para crear un avatar estilo Roblox ---
+        function createRobloxAvatar({ shirtColor, pantsColor, shoesColor }) {
+            const group = new THREE.Group();
+            // Cuerpo
+            const bodyMaterial = getCachedMaterial(shirtColor);
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1, 0.35), bodyMaterial);
+            body.position.y = 1.0;
+            group.add(body);
+            // Cabeza
+            const headMaterial = getCachedMaterial(0xFFD39B, 0.6, 0.1); // Color piel
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), headMaterial);
+            head.position.y = 1.55;
+            group.add(head);
+            // Brazo izquierdo
+            const leftArmMaterial = getCachedMaterial(shirtColor);
+            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), leftArmMaterial);
+            leftArm.position.set(-0.46, 1.0, 0);
+            group.add(leftArm);
+            // Brazo derecho
+            const rightArmMaterial = getCachedMaterial(shirtColor);
+            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), rightArmMaterial);
+            rightArm.position.set(0.46, 1.0, 0);
+            group.add(rightArm);
+            // Pierna izquierda
+            const pantsMaterial = getCachedMaterial(pantsColor);
+            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), pantsMaterial);
+            leftLeg.position.set(-0.18, 0.35, 0);
+            group.add(leftLeg);
+            // Pierna derecha
+            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), pantsMaterial);
+            rightLeg.position.set(0.18, 0.35, 0);
+            group.add(rightLeg);
+            // Zapatos (como cubos pequeños debajo de las piernas)
+            const shoeMaterial = getCachedMaterial(shoesColor);
+            const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.22), shoeMaterial);
+            leftShoe.position.set(-0.18, -0.01, 0);
+            group.add(leftShoe);
+            const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.22), shoeMaterial);
+            rightShoe.position.set(0.18, -0.01, 0);
+            group.add(rightShoe);
+            // Devolver referencias a los materiales para personalización
+            group.bodyMaterial = bodyMaterial;
+            group.pantsMaterial = pantsMaterial;
+            group.shoeMaterial = shoeMaterial;
+            return group;
         }
     </script>
 </body>
