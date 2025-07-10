@@ -19,6 +19,7 @@ const positionsRef = db.ref('positions');
 let currentUser = null;
 let isConnected = false;
 let messagesListenerSet = false;
+let usersListener = null; // NUEVO: referencia global al listener de usuarios
 
 function connectToChat(alias) {
     if (!alias || alias.trim().length === 0) {
@@ -33,10 +34,15 @@ function connectToChat(alias) {
         timestamp: Date.now()
     };
     usersRef.child(currentUser.alias).set(currentUser);
-    usersRef.on('value', (snapshot) => {
+
+    // Elimina listener anterior si existe
+    if (usersListener) usersRef.off('value', usersListener);
+    usersListener = (snapshot) => {
         const users = snapshot.val() || {};
-        updateUsersList(Object.values(users));
-    });
+        // Filtra usuarios undefined
+        updateUsersList(Object.values(users).filter(u => u && u.alias));
+    };
+    usersRef.on('value', usersListener);
     // Cargar historial de los últimos 10 mensajes al conectar
     messagesRef.limitToLast(10).once('value', (snapshot) => {
         snapshot.forEach((child) => {
@@ -55,14 +61,14 @@ function connectToChat(alias) {
     });
     // SOLO REGISTRAR UNA VEZ EL LISTENER DE MENSAJES
     if (!messagesListenerSet) {
-        messagesRef.on('child_added', (snapshot) => {
-            const message = snapshot.val();
-            if (message.alias !== currentUser.alias) {
-                if (typeof window.addMessageToChat === 'function') {
-                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
-                }
+    messagesRef.on('child_added', (snapshot) => {
+        const message = snapshot.val();
+        if (message.alias !== currentUser.alias) {
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
             }
-        });
+        }
+    });
         messagesListenerSet = true;
     }
     positionsRef.on('value', (snapshot) => {
@@ -124,6 +130,11 @@ function disconnectFromChat() {
         currentUser = null;
     }
     isConnected = false;
+    // Limpia el listener de usuarios al desconectar
+    if (usersListener) {
+        usersRef.off('value', usersListener);
+        usersListener = null;
+    }
 }
 
 function updateUsersList(users) {
@@ -131,10 +142,11 @@ function updateUsersList(users) {
     if (usersList) {
         usersList.innerHTML = '';
         users.forEach(user => {
-                const userElement = document.createElement('div');
+            if (!user || !user.alias) return; // Salta undefined
+            const userElement = document.createElement('div');
             userElement.className = 'user-item' + (user.alias === currentUser?.alias ? ' own' : '');
             userElement.textContent = user.alias + (user.alias === currentUser?.alias ? ' (Tú)' : '');
-                usersList.appendChild(userElement);
+            usersList.appendChild(userElement);
         });
     }
 }
