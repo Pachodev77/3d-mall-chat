@@ -583,6 +583,11 @@
             #mobile-rotation-controls {
                 display: block;
             }
+            .mobile-btn {
+                width: 90px;
+                height: 90px;
+                font-size: 36px;
+            }
         }
         .chat-message {
             padding: 6px 10px;
@@ -3037,19 +3042,15 @@
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
-            
             const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput ? aliasInput.value.trim() : '';
-            
             // Validar alias
             if (newAlias.length > 20) {
                 alert('El nombre no puede tener más de 20 caracteres');
                 return;
             }
-            
             // Guardar alias
             userAlias = newAlias;
-            
             // Guardar en localStorage
             const customizationData = {
                 alias: userAlias,
@@ -3057,31 +3058,25 @@
                 pantsColor: pantsColor,
                 shoesColor: shoesColor
             };
-            
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
-            
             // Actualizar nombre en el avatar
-            updateAvatarName();
-            
-            // APLICAR COLORES AL AVATAR 3D DEL USUARIO
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
-                if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
-                if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
-                if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
+            updateAvatarName && updateAvatarName();
+            // Aplicar colores al avatar propio si existe
+            const myAvatar = userAvatars.get(userAlias);
+            if (myAvatar) {
+                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(shirtColor);
+                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(pantsColor);
+                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(shoesColor);
+                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.needsUpdate = true;
+                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.needsUpdate = true;
+                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.needsUpdate = true;
             }
-            
             // Enviar alias al servidor si está conectado
-            if (isConnected) {
-                sendAlias();
+            if (typeof isConnected !== 'undefined' && isConnected) {
+                sendAlias && sendAlias();
             }
-            
             // Cerrar panel
-            closeSimplePanel();
-            
+            closeSimplePanel && closeSimplePanel();
             console.log('✅ Personalización guardada:', customizationData);
         }
         
