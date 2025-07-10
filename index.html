@@ -665,12 +665,6 @@
                 min-width: 320px;
             }
         }
-        /* Sistema de notificación eliminado - se usa el badge dinámico */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -678,9 +672,7 @@
     <div id="ui-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 30000;">
         <div id="ui-overlay"></div>
     <div id="crosshair"></div>
-        <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto; position:relative;">
-            💬
-        </button>
+        <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
     </div>
     <!-- Contenedor para ventanas de chats privados -->
@@ -2779,10 +2771,7 @@
             }
             chatPanel.style.display = 'flex';
             chatOpen = true;
-            // Solo hacer focus automático en escritorio
-            if (!/Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)) {
-                chatInput.focus();
-            }
+            chatInput.focus();
             // Forzar scroll abajo al abrir
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -2989,36 +2978,36 @@
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
-                        <!-- Cabeza cuadrada -->
-                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
+                        <!-- Cabeza esférica -->
+                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; position: relative; margin-bottom: 0;">
                             <!-- Ojos -->
-                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <!-- Boca -->
-                            <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
+                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 50%;"></div>
+                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 50%;"></div>
+                            <!-- Sonrisa -->
+                            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 16px; height: 8px; border: 2px solid #222; border-top: none; border-radius: 0 0 16px 16px;"></div>
                         </div>
                         <!-- Torso y brazos -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
                             <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
+                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 8px; margin-right: 0;"></div>
                             <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
+                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 14px; margin: 0 0;"></div>
                             <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
+                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 8px; margin-left: 0;"></div>
                         </div>
                         <!-- Piernas -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
                             <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-right: 4px;"></div>
                             <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-left: 4px;"></div>
                         </div>
                         <!-- Zapatos -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
                             <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 6px; margin-right: 4px;"></div>
                             <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 6px; margin-left: 4px;"></div>
                         </div>
                         <!-- Nombre del avatar -->
                         <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
@@ -3802,45 +3791,81 @@
             const pantsColor = options.pantsColor || 0x2C3E50;
             const shoesColor = options.shoesColor || 0x8B4513;
             const skinColor = 0xFFE4C4;
-            // Cabeza
-            const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            const eyeColor = 0x000000;
+            const smileColor = 0x000000;
+            
+            // Cabeza (esférica)
+            const headGeometry = new THREE.SphereGeometry(0.4, 16, 16);
             const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             const head = new THREE.Mesh(headGeometry, headMaterial);
             head.position.set(0, 1.7, 0);
             group.add(head);
-            // Torso
-            const bodyGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
+            
+            // Ojos
+            const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const eyeMaterial = new THREE.MeshStandardMaterial({ color: eyeColor });
+            
+            // Ojo izquierdo
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.15, 1.75, 0.35);
+            group.add(leftEye);
+            
+            // Ojo derecho
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.15, 1.75, 0.35);
+            group.add(rightEye);
+            
+            // Sonrisa (arco)
+            const smileGeometry = new THREE.TorusGeometry(0.12, 0.02, 8, 16, Math.PI);
+            const smileMaterial = new THREE.MeshStandardMaterial({ color: smileColor });
+            const smile = new THREE.Mesh(smileGeometry, smileMaterial);
+            smile.position.set(0, 1.6, 0.35);
+            smile.rotation.x = Math.PI / 2;
+            group.add(smile);
+            
+            // Torso (cilíndrico)
+            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 1.2, 16);
             const bodyMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             body.position.set(0, 0.9, 0);
             group.add(body);
-            // Brazos
-            const armGeometry = new THREE.BoxGeometry(0.35, 1, 0.35);
+            
+            // Brazos (cilíndricos)
+            const armGeometry = new THREE.CylinderGeometry(0.175, 0.175, 1, 12);
             const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
+            
             const leftArm = new THREE.Mesh(armGeometry, armMaterial);
             leftArm.position.set(-0.7, 1.1, 0);
             group.add(leftArm);
+            
             const rightArm = new THREE.Mesh(armGeometry, armMaterial);
             rightArm.position.set(0.7, 1.1, 0);
             group.add(rightArm);
-            // Piernas
-            const legGeometry = new THREE.BoxGeometry(0.38, 1, 0.38);
+            
+            // Piernas (cilíndricas)
+            const legGeometry = new THREE.CylinderGeometry(0.19, 0.19, 1, 12);
             const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
+            
             const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
             leftLeg.position.set(-0.25, 0.0, 0);
             group.add(leftLeg);
+            
             const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
             rightLeg.position.set(0.25, 0.0, 0);
             group.add(rightLeg);
-            // Zapatos
-            const shoeGeometry = new THREE.BoxGeometry(0.38, 0.18, 0.38);
+            
+            // Zapatos (cilíndricos)
+            const shoeGeometry = new THREE.CylinderGeometry(0.19, 0.19, 0.18, 12);
             const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
+            
             const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
             leftShoe.position.set(-0.25, -0.5, 0);
             group.add(leftShoe);
+            
             const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
             rightShoe.position.set(0.25, -0.5, 0);
             group.add(rightShoe);
+            
             // Materiales para personalización en tiempo real
             group.bodyMaterial = bodyMaterial;
             group.armMaterial = armMaterial;
@@ -3885,18 +3910,18 @@
             if (velocity > 0.01) {
                 const time = performance.now() * 0.002 + avatar.group.position.x * 0.1;
                 const swing = Math.sin(time * 8) * 0.4;
-                // Brazos
-                if (avatar.group.children[2]) avatar.group.children[2].rotation.x = swing; // leftArm
-                if (avatar.group.children[3]) avatar.group.children[3].rotation.x = -swing; // rightArm
-                // Piernas
-                if (avatar.group.children[4]) avatar.group.children[4].rotation.x = -swing; // leftLeg
-                if (avatar.group.children[5]) avatar.group.children[5].rotation.x = swing; // rightLeg
+                // Brazos (ahora en índices 5 y 6 después de cabeza, ojos y sonrisa)
+                if (avatar.group.children[5]) avatar.group.children[5].rotation.x = swing; // leftArm
+                if (avatar.group.children[6]) avatar.group.children[6].rotation.x = -swing; // rightArm
+                // Piernas (ahora en índices 7 y 8)
+                if (avatar.group.children[7]) avatar.group.children[7].rotation.x = -swing; // leftLeg
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.x = swing; // rightLeg
             } else {
                 // Si está quieto, mantener la rotación actual
-                if (avatar.group.children[2]) avatar.group.children[2].rotation.x = avatar.group.children[2].rotation.x;
-                if (avatar.group.children[3]) avatar.group.children[3].rotation.x = avatar.group.children[3].rotation.x;
-                if (avatar.group.children[4]) avatar.group.children[4].rotation.x = avatar.group.children[4].rotation.x;
                 if (avatar.group.children[5]) avatar.group.children[5].rotation.x = avatar.group.children[5].rotation.x;
+                if (avatar.group.children[6]) avatar.group.children[6].rotation.x = avatar.group.children[6].rotation.x;
+                if (avatar.group.children[7]) avatar.group.children[7].rotation.x = avatar.group.children[7].rotation.x;
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.x = avatar.group.children[8].rotation.x;
             }
         }
 
@@ -3919,15 +3944,6 @@
         const privateChatListeners = {};
 
         function openPrivateChatWindow(alias) {
-            // Eliminar círculo rojo
-            const badge = document.getElementById('private-msg-badge');
-            if (badge) badge.remove();
-            // Pausar sonido
-            const audio = document.getElementById('private-msg-audio');
-            if (audio && typeof audio.pause === 'function') {
-                audio.pause();
-                audio.currentTime = 0;
-            }
             if (!alias || alias === userAlias) return;
             if (privateChatWindows[alias]) {
                 // Traer al frente
@@ -4012,10 +4028,6 @@
                 if (!msg.timestamp || !loadedTimestamps.has(msg.timestamp)) {
                     appendPrivateMessage(messagesDiv, msg, alias);
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    // Notificar si la ventana no está abierta
-                    if (!privateChatWindows[alias] || privateChatWindows[alias].style.display === 'none') {
-                        if (msg.from !== userAlias) notifyPrivateMessage(msg.from);
-                    }
                 }
             });
             // Guardar función para limpiar listener
@@ -4042,50 +4054,6 @@
                 openPrivateChatWindow(alias);
             }
         });
-
-        // --- Notificación visual y sonora para mensajes privados ---
-        // Añadir audio oculto si no existe
-        if (!document.getElementById('private-msg-audio')) {
-            const audio = document.createElement('audio');
-            audio.id = 'private-msg-audio';
-            audio.src = 'https://cdn.jsdelivr.net/gh/rohitguptab/notification-sounds@main/sounds/bell-notification.mp3'; // Sonido de campanita simple
-            audio.preload = 'auto';
-            audio.style.display = 'none';
-            document.body.appendChild(audio);
-        }
-
-        function notifyPrivateMessage(fromAlias) {
-            // Log visual para depuración
-            console.log('[NOTIFICACIÓN PRIVADA] Mensaje de:', fromAlias);
-            // Círculo rojo sobre el botón del chat
-            let badge = document.getElementById('private-msg-badge');
-            if (!badge) {
-                badge = document.createElement('span');
-                badge.id = 'private-msg-badge';
-                badge.style.cssText = 'position:absolute;top:2px;right:2px;width:16px;height:16px;background:#FF3333;border-radius:50%;z-index:50000;border:2px solid #fff;box-shadow:0 0 8px #FF3333;animation:pulse 1s infinite;';
-                const btn = document.getElementById('chat-toggle-btn');
-                if (btn) btn.appendChild(badge);
-            }
-            // Sonido
-            const audio = document.getElementById('private-msg-audio');
-            if (audio && typeof audio.play === 'function') {
-                audio.currentTime = 0;
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(err => {
-                        console.warn('[NOTIFICACIÓN PRIVADA] El navegador bloqueó el audio:', err);
-                        // Fallback: alerta visual
-                        alert('¡Tienes un mensaje privado! (El navegador bloqueó el sonido)');
-                    });
-                }
-            } else {
-                alert('¡Tienes un mensaje privado! (No se pudo reproducir el sonido)');
-            }
-            // Vibración en móvil si está disponible
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-        }
     </script>
 </body>
 </html>

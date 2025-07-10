@@ -19,7 +19,6 @@ const positionsRef = db.ref('positions');
 let currentUser = null;
 let isConnected = false;
 let messagesListenerSet = false;
-let usersListener = null; // NUEVO: referencia global al listener de usuarios
 
 function connectToChat(alias) {
     if (!alias || alias.trim().length === 0) {
@@ -34,15 +33,10 @@ function connectToChat(alias) {
         timestamp: Date.now()
     };
     usersRef.child(currentUser.alias).set(currentUser);
-
-    // Elimina listener anterior si existe
-    if (usersListener) usersRef.off('value', usersListener);
-    usersListener = (snapshot) => {
+    usersRef.on('value', (snapshot) => {
         const users = snapshot.val() || {};
-        // Filtra usuarios undefined
-        updateUsersList(Object.values(users).filter(u => u && u.alias));
-    };
-    usersRef.on('value', usersListener);
+        updateUsersList(Object.values(users));
+    });
     // Cargar historial de los últimos 10 mensajes al conectar
     messagesRef.limitToLast(10).once('value', (snapshot) => {
         snapshot.forEach((child) => {
@@ -130,11 +124,6 @@ function disconnectFromChat() {
         currentUser = null;
     }
     isConnected = false;
-    // Limpia el listener de usuarios al desconectar
-    if (usersListener) {
-        usersRef.off('value', usersListener);
-        usersListener = null;
-    }
 }
 
 function updateUsersList(users) {
@@ -142,11 +131,10 @@ function updateUsersList(users) {
     if (usersList) {
         usersList.innerHTML = '';
         users.forEach(user => {
-            if (!user || !user.alias) return; // Salta undefined
-            const userElement = document.createElement('div');
+                const userElement = document.createElement('div');
             userElement.className = 'user-item' + (user.alias === currentUser?.alias ? ' own' : '');
             userElement.textContent = user.alias + (user.alias === currentUser?.alias ? ' (Tú)' : '');
-            usersList.appendChild(userElement);
+                usersList.appendChild(userElement);
         });
     }
 }
