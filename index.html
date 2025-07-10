@@ -654,6 +654,24 @@
             border: 2px solid #4B0000;
             pointer-events: auto;
         }
+        @media (max-width: 768px) {
+            #chat-content {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100vw;
+            }
+            #users-sidebar {
+                min-width: 120px;
+                max-width: 60vw;
+                flex-shrink: 0;
+            }
+            #chat-main {
+                min-width: 250px;
+                flex-shrink: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -3898,6 +3916,11 @@
 
         function openPrivateChatWindow(alias) {
             if (!alias || alias === userAlias) return;
+            // Antes de abrir, elimina cualquier listener previo para este alias
+            if (privateChatListeners[alias]) {
+                privateChatListeners[alias]();
+                delete privateChatListeners[alias];
+            }
             if (privateChatWindows[alias]) {
                 // Traer al frente
                 privateChatWindows[alias].style.zIndex = Date.now();
