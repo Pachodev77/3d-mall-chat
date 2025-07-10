@@ -3602,52 +3602,26 @@
             }
         }, 500);
 
-        // Función mejorada para mostrar mensajes en el chat (única definición)
+        // Función mejorada para mostrar mensajes en el chat
         function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
-            
-            // Verificar si ya existe un mensaje igual
-            const existingMessage = Array.from(chatMessages.children).find(msg => 
-                msg.textContent.includes(message) && 
-                msg.querySelector('.chat-alias')?.textContent === alias
-            );
-            
-            if (existingMessage) {
-                // Si existe, solo actualizamos el timestamp
-                const timestampSpan = existingMessage.querySelector('.chat-timestamp');
-                if (timestampSpan) {
-                    timestampSpan.textContent = new Date(timestamp || Date.now()).toLocaleTimeString();
-                }
-                return;
-            }
-
             let timeStr = '';
             if (timestamp) {
                 const date = new Date(timestamp);
-                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;" class="chat-timestamp">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
             }
             const isOwn = (alias === userAlias || type === 'own');
             const msgDiv = document.createElement('div');
             msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
             msgDiv.style.margin = '6px 0';
             msgDiv.style.textAlign = isOwn ? 'right' : 'left';
-            
-            // Agregar clase única para identificar mensajes
-            msgDiv.setAttribute('data-message-id', Date.now());
-            
             if (isPrivate) {
                 msgDiv.style.background = 'rgba(255,215,0,0.12)';
                 msgDiv.style.border = '1px solid #FFD700';
-                msgDiv.innerHTML = `
-                    <span class="chat-alias" style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> 
-                    <span style="color:#fff;">${message}</span> ${timeStr}
-                `;
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             } else {
-                msgDiv.innerHTML = `
-                    <span class="chat-alias" style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> 
-                    <span style="color:#fff;">${message}</span> ${timeStr}
-                `;
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             }
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -3767,7 +3741,33 @@
             }
         });
         
-        // Exponer la función en window para que sea accesible desde firebase-config.js
+        // Diferenciar mensajes privados en el chat
+        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+            const chatMessages = document.getElementById('chat-messages');
+            if (!chatMessages) return;
+            let timeStr = '';
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+            }
+            const isOwn = (alias === userAlias || type === 'own');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
+            msgDiv.style.margin = '6px 0';
+            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+            if (isPrivate) {
+                msgDiv.style.background = 'rgba(255,215,0,0.12)';
+                msgDiv.style.border = '1px solid #FFD700';
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            } else {
+                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+            }
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
+        // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
         window.addMessageToChat = addMessageToChat;
 
         // --- Enviar posición del usuario periódicamente SOLO si está conectado y sin duplicados ---

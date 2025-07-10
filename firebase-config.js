@@ -36,16 +36,11 @@ function connectToChat(alias) {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
     });
-    // Mejorado el listener de mensajes para evitar duplicados
     messagesRef.on('child_added', (snapshot) => {
         const message = snapshot.val();
         if (message.alias !== currentUser.alias) {
-            // Verificar si ya existe este mensaje en el DOM
-            const existingMessage = document.querySelector(`[data-message-id="${snapshot.key}"]`);
-            if (!existingMessage) {
-                if (typeof window.addMessageToChat === 'function') {
-                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
-                }
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
             }
         }
     });
