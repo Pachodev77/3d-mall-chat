@@ -665,18 +665,11 @@
                 min-width: 320px;
             }
         }
-        #private-msg-indicator {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 13px;
-            height: 13px;
-            background: red;
-            border-radius: 50%;
-            z-index: 23000;
-            border: 2px solid #fff;
-            display: none;
-            pointer-events: none;
+        /* Sistema de notificación eliminado - se usa el badge dinámico */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -687,7 +680,6 @@
     <div id="crosshair"></div>
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto; position:relative;">
             💬
-            <span id="private-msg-indicator"></span>
         </button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
     </div>
@@ -4070,7 +4062,7 @@
             if (!badge) {
                 badge = document.createElement('span');
                 badge.id = 'private-msg-badge';
-                badge.style.cssText = 'position:absolute;top:2px;right:2px;width:14px;height:14px;background:#FF3333;border-radius:50%;z-index:2;border:2px solid #fff;box-shadow:0 0 4px #000a;';
+                badge.style.cssText = 'position:absolute;top:2px;right:2px;width:16px;height:16px;background:#FF3333;border-radius:50%;z-index:50000;border:2px solid #fff;box-shadow:0 0 8px #FF3333;animation:pulse 1s infinite;';
                 const btn = document.getElementById('chat-toggle-btn');
                 if (btn) btn.appendChild(badge);
             }
