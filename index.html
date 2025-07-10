@@ -2759,6 +2759,10 @@
             chatPanel.style.display = 'flex';
             chatOpen = true;
             chatInput.focus();
+            // Forzar scroll abajo al abrir
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 50);
             // El overlay NO debe mostrarse al abrir el chat
         };
         chatCloseBtn.onclick = () => {
@@ -3624,6 +3628,10 @@
                 msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             }
             chatMessages.appendChild(msgDiv);
+            // Limitar a los últimos 10 mensajes
+            while (chatMessages.children.length > 10) {
+                chatMessages.removeChild(chatMessages.firstChild);
+            }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
         window.addMessageToChat = addMessageToChat;
@@ -3764,6 +3772,10 @@
                 msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             }
             chatMessages.appendChild(msgDiv);
+            // Limitar a los últimos 10 mensajes
+            while (chatMessages.children.length > 10) {
+                chatMessages.removeChild(chatMessages.firstChild);
+            }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
