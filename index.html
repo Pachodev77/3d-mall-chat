@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -498,6 +498,88 @@
         #simple-panel button:active {
             transform: translateY(0);
         }
+        
+        /* Controles móviles */
+        #mobile-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10000;
+            display: none;
+            pointer-events: auto;
+        }
+        
+        #mobile-controls .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #mobile-controls .movement-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        #mobile-controls .rotation-controls {
+            position: absolute;
+            right: -80px;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .mobile-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(75, 0, 0, 0.8);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .mobile-btn:hover {
+            background: rgba(128, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .mobile-btn:active {
+            background: rgba(255, 215, 0, 0.8);
+            transform: scale(0.95);
+        }
+        
+        /* Botones triangulares */
+        .mobile-btn.forward {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        
+        .mobile-btn.backward {
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        }
+        
+        .mobile-btn.left {
+            clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+        }
+        
+        .mobile-btn.right {
+            clip-path: polygon(0% 0%, 0% 100%, 100% 50%);
+        }
+        
+        /* Mostrar controles solo en móviles */
+        @media (max-width: 768px) {
+            #mobile-controls {
+                display: block;
+            }
+        }
         .chat-message {
             padding: 6px 10px;
             border-radius: 8px;
@@ -551,6 +633,20 @@
     <div id="crosshair"></div>
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
+    </div>
+    
+    <!-- Controles móviles -->
+    <div id="mobile-controls">
+        <div class="control-group">
+            <div class="movement-controls">
+                <button class="mobile-btn forward" id="mobile-forward" title="Mover adelante">▲</button>
+                <button class="mobile-btn backward" id="mobile-backward" title="Mover atrás">▼</button>
+            </div>
+            <div class="rotation-controls">
+                <button class="mobile-btn left" id="mobile-left" title="Rotar izquierda">◀</button>
+                <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
+            </div>
+        </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
     <div id="simple-panel" class="customization-panel">
@@ -796,6 +892,12 @@
         let keyW = false;
         let keyS = false;
         let shopNumberCounter = 1; // Contador global para numerar las tiendas
+        
+        // --- Variables para controles móviles ---
+        let mobileForward = false;
+        let mobileBackward = false;
+        let mobileLeft = false;
+        let mobileRight = false;
 
         // Función para obtener el siguiente número de tienda solo cuando se crea una
         const getNextShopNumber = () => {
@@ -2280,6 +2382,94 @@
             } else {
                 console.error('No se encontró el botón de resetear personalización');
             }
+            
+            // Configurar controles móviles
+            setupMobileControls();
+        }
+        
+        function setupMobileControls() {
+            const mobileForwardBtn = document.getElementById('mobile-forward');
+            const mobileBackwardBtn = document.getElementById('mobile-backward');
+            const mobileLeftBtn = document.getElementById('mobile-left');
+            const mobileRightBtn = document.getElementById('mobile-right');
+            
+            // Eventos para movimiento hacia adelante/atrás
+            if (mobileForwardBtn) {
+                mobileForwardBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileForward = true;
+                });
+                mobileForwardBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileForward = false;
+                });
+                mobileForwardBtn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    mobileForward = true;
+                });
+                mobileForwardBtn.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    mobileForward = false;
+                });
+            }
+            
+            if (mobileBackwardBtn) {
+                mobileBackwardBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileBackward = true;
+                });
+                mobileBackwardBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileBackward = false;
+                });
+                mobileBackwardBtn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    mobileBackward = true;
+                });
+                mobileBackwardBtn.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    mobileBackward = false;
+                });
+            }
+            
+            // Eventos para rotación izquierda/derecha
+            if (mobileLeftBtn) {
+                mobileLeftBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileLeft = true;
+                });
+                mobileLeftBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileLeft = false;
+                });
+                mobileLeftBtn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    mobileLeft = true;
+                });
+                mobileLeftBtn.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    mobileLeft = false;
+                });
+            }
+            
+            if (mobileRightBtn) {
+                mobileRightBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileRight = true;
+                });
+                mobileRightBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileRight = false;
+                });
+                mobileRightBtn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    mobileRight = true;
+                });
+                mobileRightBtn.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    mobileRight = false;
+                });
+            }
         }
 
         function onKeyDown(event) {
@@ -2387,11 +2577,11 @@
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha ---
-            if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
+            // --- Rotación con flechas izquierda/derecha y controles móviles ---
+            if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
 
-            // --- Movimiento hacia adelante/atrás con flechas ---
+            // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
             camera.getWorldDirection(direction);
             direction.y = 0;
@@ -2399,9 +2589,9 @@
             
             const velocity = new THREE.Vector3();
             
-            // Movimiento hacia adelante/atrás con flechas arriba/abajo
-            if (keys.ArrowUp) velocity.add(direction);
-            if (keys.ArrowDown) velocity.sub(direction);
+            // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
+            if (keys.ArrowUp || mobileForward) velocity.add(direction);
+            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
             
             // Movimiento lateral con A y D (teclas)
             const rightDirection = new THREE.Vector3();
@@ -3262,6 +3452,30 @@
         } else {
             init();
         }
+        
+        // Función para detectar dispositivo móvil
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+        }
+        
+        // Función para mostrar/ocultar controles móviles
+        function toggleMobileControls() {
+            const mobileControls = document.getElementById('mobile-controls');
+            if (mobileControls) {
+                if (isMobileDevice()) {
+                    mobileControls.style.display = 'block';
+                } else {
+                    mobileControls.style.display = 'none';
+                }
+            }
+        }
+        
+        // Detectar cambios de tamaño de ventana
+        window.addEventListener('resize', toggleMobileControls);
+        
+        // Inicializar controles móviles al cargar
+        document.addEventListener('DOMContentLoaded', toggleMobileControls);
 
         // Configurar overlay al cargar la página - VERSIÓN MEJORADA
         document.addEventListener('DOMContentLoaded', () => {
