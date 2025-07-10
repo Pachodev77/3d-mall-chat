@@ -37,6 +37,22 @@ function connectToChat(alias) {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
     });
+    // Cargar historial de los últimos 10 mensajes al conectar
+    messagesRef.limitToLast(10).once('value', (snapshot) => {
+        snapshot.forEach((child) => {
+            const message = child.val();
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(
+                    message.alias,
+                    message.message,
+                    message.alias === currentUser.alias ? 'own' : 'user',
+                    message.timestamp,
+                    false,
+                    null
+                );
+            }
+        });
+    });
     // SOLO REGISTRAR UNA VEZ EL LISTENER DE MENSAJES
     if (!messagesListenerSet) {
         messagesRef.on('child_added', (snapshot) => {
