@@ -967,6 +967,17 @@
             scene.add(directionalLight);
         }
 
+        // --- Configuración de la Iluminación ---
+        function setupLighting() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Aumentar intensidad para compensar falta de sombras
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); // Reducir intensidad
+            directionalLight.position.set(30, 45, 15); // Ajustado para el nuevo tamaño
+            directionalLight.castShadow = false; // Desactivar sombras
+            scene.add(directionalLight);
+        }
+
         function init() {
             scene = new THREE.Scene();
             scene.background = getSkyColor(); // Color dinámico del cielo
