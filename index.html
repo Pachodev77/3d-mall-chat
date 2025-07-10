@@ -3243,7 +3243,7 @@
             }
             if (avatar) {
                 const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep + 0.2; // Reducido para estar más cerca del suelo
+                const targetY = floor * floorStep + 0.6; // Punto intermedio entre 0.2 y 1.0
                 avatar.targetPosition.set(position.x, targetY, position.z);
                 avatar.currentFloor = floor;
                 avatar.group.position.y = targetY;
@@ -3591,7 +3591,7 @@
             
             // Calcular la posición Y correcta para el piso
             const floorStep = HALL_HEIGHT + 1;
-            const correctY = floor * floorStep + 1.0;
+            const correctY = floor * floorStep + 0.6; // Punto intermedio entre 0.2 y 1.0
             
             avatarGroup.position.set(position.x, correctY, position.z);
             scene.add(avatarGroup);
