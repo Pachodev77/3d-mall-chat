@@ -2374,9 +2374,23 @@
                     return;
                 }
                 
-                // Verificar si es un clic en una tienda
-                if (clickedObject.userData.URL) {
-                    window.open(clickedObject.userData.URL, '_blank');
+                // Verificar si es un clic en una tienda - CON VERIFICACIÓN DE PROXIMIDAD
+                if (clickedObject.userData && clickedObject.userData.URL) {
+                    // Calcular distancia entre el usuario y la tienda
+                    const storePosition = clickedObject.position;
+                    const userPosition = camera.position;
+                    const distance = userPosition.distanceTo(storePosition);
+                    
+                    // Solo permitir clic si está a menos de 8 unidades de distancia
+                    const maxClickDistance = 8;
+                    if (distance <= maxClickDistance) {
+                        window.open(clickedObject.userData.URL, '_blank');
+                    } else {
+                        // Mostrar mensaje de que está muy lejos
+                        console.log(`Estás muy lejos de la tienda. Distancia: ${distance.toFixed(1)} unidades`);
+                        // Opcional: mostrar notificación visual
+                        showProximityMessage(`Acércate más a la tienda para hacer clic (${distance.toFixed(1)}m)`);
+                    }
                 }
             }
         }
@@ -3641,6 +3655,40 @@
             } else {
                 canvas.style.pointerEvents = 'auto';
             }
+        }
+
+        // Función para mostrar mensajes de proximidad
+        function showProximityMessage(message) {
+            // Crear o actualizar el elemento de mensaje
+            let messageElement = document.getElementById('proximity-message');
+            if (!messageElement) {
+                messageElement = document.createElement('div');
+                messageElement.id = 'proximity-message';
+                messageElement.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    color: #FFD700;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    z-index: 25000;
+                    pointer-events: none;
+                    transition: opacity 0.3s;
+                `;
+                document.body.appendChild(messageElement);
+            }
+            
+            messageElement.textContent = message;
+            messageElement.style.opacity = '1';
+            
+            // Ocultar el mensaje después de 3 segundos
+            setTimeout(() => {
+                messageElement.style.opacity = '0';
+            }, 3000);
         }
     </script>
 </body>
