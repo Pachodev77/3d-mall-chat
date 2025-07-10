@@ -665,6 +665,19 @@
                 min-width: 320px;
             }
         }
+        #private-msg-indicator {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 13px;
+            height: 13px;
+            background: red;
+            border-radius: 50%;
+            z-index: 23000;
+            border: 2px solid #fff;
+            display: none;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -672,7 +685,10 @@
     <div id="ui-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 30000;">
         <div id="ui-overlay"></div>
     <div id="crosshair"></div>
-        <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
+        <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto; position:relative;">
+            💬
+            <span id="private-msg-indicator"></span>
+        </button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
     </div>
     <!-- Contenedor para ventanas de chats privados -->
@@ -3992,6 +4008,10 @@
                 if (!msg.timestamp || !loadedTimestamps.has(msg.timestamp)) {
                     appendPrivateMessage(messagesDiv, msg, alias);
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    // Notificar si la ventana no está abierta
+                    if (!privateChatWindows[alias] || privateChatWindows[alias].style.display === 'none') {
+                        if (msg.from !== userAlias) notifyPrivateMessage(msg.from);
+                    }
                 }
             });
             // Guardar función para limpiar listener
