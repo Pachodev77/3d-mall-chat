@@ -664,6 +664,8 @@
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
     </div>
+    <!-- Contenedor para ventanas de chats privados -->
+    <div id="private-chats-container" style="position:fixed; bottom:20px; right:20px; z-index:40000; pointer-events:none;"></div>
     
     <!-- Controles móviles -->
     <div id="mobile-controls">
@@ -3911,6 +3913,118 @@
                 canvas.style.pointerEvents = 'auto';
             }
         }
+
+        // --- Ventanas independientes para chats privados ---
+        const privateChatsContainer = document.getElementById('private-chats-container');
+        const privateChatWindows = {};
+        const privateChatListeners = {};
+
+        function openPrivateChatWindow(alias) {
+            if (!alias || alias === userAlias) return;
+            if (privateChatWindows[alias]) {
+                // Traer al frente
+                privateChatWindows[alias].style.zIndex = Date.now();
+                privateChatWindows[alias].style.display = 'block';
+                privateChatsContainer.style.pointerEvents = 'auto';
+                return;
+            }
+            // Crear ventana
+            const win = document.createElement('div');
+            win.className = 'private-chat-window';
+            win.style.cssText = `width:320px; height:380px; background:rgba(30,30,30,0.97); border-radius:10px; box-shadow:0 4px 24px #000a; position:relative; margin-bottom:16px; margin-left:16px; display:block; pointer-events:auto; overflow:hidden; border:2px solid #FFD700;`;
+            win.style.zIndex = Date.now();
+            win.innerHTML = `
+                <div style="background:#222; color:#FFD700; padding:10px 14px; font-weight:bold; display:flex; align-items:center; justify-content:space-between;">
+                    <span>Chat privado con ${alias}</span>
+                    <button style="background:none; border:none; color:#FFD700; font-size:18px; cursor:pointer;" title="Cerrar">✖</button>
+                </div>
+                <div class="private-chat-messages" style="flex:1; padding:10px; overflow-y:auto; height:260px; background:rgba(34,34,34,0.95);"></div>
+                <div style="padding:10px; border-top:1px solid #333; background:rgba(34,34,34,0.95); display:flex;">
+                    <input class="private-chat-input" type="text" placeholder="Escribe un mensaje privado..." style="flex:1; border:none; background:#333; color:#fff; border-radius:6px; padding:8px; font-size:15px;">
+                    <button class="private-chat-send-btn" style="background:#FFD700; color:#222; border:none; border-radius:6px; margin-left:8px; padding:8px 14px; font-size:15px; cursor:pointer;">Enviar</button>
+                </div>
+            `;
+            privateChatsContainer.appendChild(win);
+            privateChatsContainer.style.pointerEvents = 'auto';
+            privateChatWindows[alias] = win;
+            // Cerrar ventana
+            win.querySelector('button[title="Cerrar"]').onclick = () => closePrivateChatWindow(alias);
+            // Enviar mensaje
+            const input = win.querySelector('.private-chat-input');
+            const sendBtn = win.querySelector('.private-chat-send-btn');
+            sendBtn.onclick = () => {
+                const msg = input.value.trim();
+                if (msg) {
+                    sendPrivateMessage(alias, msg);
+                    input.value = '';
+                }
+            };
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') sendBtn.onclick();
+            });
+            // Cargar historial y escuchar nuevos mensajes
+            loadPrivateChatHistory(alias, win.querySelector('.private-chat-messages'));
+        }
+        function closePrivateChatWindow(alias) {
+            if (privateChatWindows[alias]) {
+                privateChatsContainer.removeChild(privateChatWindows[alias]);
+                delete privateChatWindows[alias];
+            }
+            if (privateChatListeners[alias]) {
+                privateChatListeners[alias]();
+                delete privateChatListeners[alias];
+            }
+            // Si no quedan ventanas, desactivar pointer-events
+            if (Object.keys(privateChatWindows).length === 0) {
+                privateChatsContainer.style.pointerEvents = 'none';
+            }
+        }
+        function loadPrivateChatHistory(alias, messagesDiv) {
+            // Limpiar mensajes previos
+            messagesDiv.innerHTML = '';
+            const chatId = getPrivateChatId(userAlias, alias);
+            const privateRef = firebase.database().ref('privateMessages').child(chatId);
+            // Cargar últimos 20 mensajes
+            privateRef.limitToLast(20).once('value', snapshot => {
+                const msgs = [];
+                snapshot.forEach(child => {
+                    msgs.push(child.val());
+                });
+                msgs.forEach(msg => {
+                    appendPrivateMessage(messagesDiv, msg, alias);
+                });
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+            // Escuchar nuevos mensajes
+            const listener = privateRef.limitToLast(1).on('child_added', snap => {
+                const msg = snap.val();
+                appendPrivateMessage(messagesDiv, msg, alias);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+            // Guardar función para limpiar listener
+            privateChatListeners[alias] = () => privateRef.off('child_added', listener);
+        }
+        function appendPrivateMessage(messagesDiv, msg, otherAlias) {
+            const isOwn = msg.from === userAlias;
+            const div = document.createElement('div');
+            div.className = isOwn ? 'chat-message own' : 'chat-message';
+            div.style.margin = '6px 0';
+            div.style.textAlign = isOwn ? 'right' : 'left';
+            div.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${isOwn ? 'Tú' : otherAlias}:</span> <span style="color:#fff;">${msg.message}</span> <span style="color:#aaa; font-size:11px; margin-left:8px;">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>`;
+            messagesDiv.appendChild(div);
+            // Limitar a los últimos 20 mensajes
+            while (messagesDiv.children.length > 20) {
+                messagesDiv.removeChild(messagesDiv.firstChild);
+            }
+        }
+        // UI: Al hacer clic en un usuario, abrir ventana privada
+        usersList.addEventListener('click', function(e) {
+            const userItem = e.target.closest('.user-item');
+            if (userItem && !userItem.classList.contains('own')) {
+                const alias = userItem.textContent.replace(' (Tú)', '').trim();
+                openPrivateChatWindow(alias);
+            }
+        });
     </script>
 </body>
 </html>
