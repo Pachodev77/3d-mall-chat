@@ -509,42 +509,43 @@
             pointer-events: auto;
         }
         
-        #mobile-controls .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
         #mobile-controls .movement-controls {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
         
-        #mobile-controls .rotation-controls {
-            position: absolute;
-            right: -80px;
-            top: 0;
+        /* Controles de rotación móviles (separados a la derecha) */
+        #mobile-rotation-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: none;
+            pointer-events: auto;
+        }
+        
+        #mobile-rotation-controls .rotation-controls {
             display: flex;
             flex-direction: row;
-            gap: 8px;
+            gap: 12px;
         }
         
         .mobile-btn {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             background: rgba(75, 0, 0, 0.8);
             color: white;
-            font-size: 20px;
+            font-size: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 215, 0, 0.3);
+            border: 3px solid rgba(255, 215, 0, 0.3);
         }
         
         .mobile-btn:hover {
@@ -579,6 +580,9 @@
             #mobile-controls {
                 display: block;
             }
+            #mobile-rotation-controls {
+                display: block;
+            }
         }
         .chat-message {
             padding: 6px 10px;
@@ -603,6 +607,27 @@
             z-index: 20000; /* Debe estar debajo del panel de personalización */
             pointer-events: none; /* Solo se activa cuando el panel está abierto */
             display: none; /* Solo se muestra cuando el panel está abierto */
+        }
+        
+        /* Panel de personalización siempre por encima del overlay */
+        #simple-panel.customization-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1100px;
+            max-width: 99vw;
+            height: 700px;
+            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 31000; /* Siempre por encima del overlay */
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            border: 2px solid #4B0000;
+            pointer-events: auto;
         }
         /* Panel de personalización siempre por encima del overlay */
         #simple-panel.customization-panel {
@@ -637,15 +662,17 @@
     
     <!-- Controles móviles -->
     <div id="mobile-controls">
-        <div class="control-group">
-            <div class="movement-controls">
-                <button class="mobile-btn forward" id="mobile-forward" title="Mover adelante">▲</button>
-                <button class="mobile-btn backward" id="mobile-backward" title="Mover atrás">▼</button>
-            </div>
-            <div class="rotation-controls">
-                <button class="mobile-btn left" id="mobile-left" title="Rotar izquierda">◀</button>
-                <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
-            </div>
+        <div class="movement-controls">
+            <button class="mobile-btn forward" id="mobile-forward" title="Mover adelante">▲</button>
+            <button class="mobile-btn backward" id="mobile-backward" title="Mover atrás">▼</button>
+        </div>
+    </div>
+    
+    <!-- Controles de rotación móviles (separados a la derecha) -->
+    <div id="mobile-rotation-controls">
+        <div class="rotation-controls">
+            <button class="mobile-btn left" id="mobile-left" title="Rotar izquierda">◀</button>
+            <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
         </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
@@ -2831,24 +2858,24 @@
                     });
                 }
                 
-                // Mostrar el panel
+                // Mostrar el panel primero
                 simplePanel.style.display = 'block';
+                simplePanel.style.zIndex = '31000';
+                simplePanel.style.pointerEvents = 'auto';
                 customizationPanelOpen = true;
                 
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
                 
                 console.log('✅ Panel simple mostrado');
-                            // Mostrar overlay y bloquear clics
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'block';
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '20000';
-            }
-            // Asegurar que el panel esté por encima
-            simplePanel.style.zIndex = '21000';
-            simplePanel.style.pointerEvents = 'auto';
+                
+                // Mostrar overlay después del panel, pero con pointer-events: none para el panel
+                const overlay = document.getElementById('ui-overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.style.pointerEvents = 'none'; // Cambiar a none para que no interfiera
+                    overlay.style.zIndex = '20000';
+                }
             } else {
                 console.log('❌ Panel simple no encontrado');
             }
@@ -3462,11 +3489,21 @@
         // Función para mostrar/ocultar controles móviles
         function toggleMobileControls() {
             const mobileControls = document.getElementById('mobile-controls');
+            const mobileRotationControls = document.getElementById('mobile-rotation-controls');
+            
             if (mobileControls) {
                 if (isMobileDevice()) {
                     mobileControls.style.display = 'block';
                 } else {
                     mobileControls.style.display = 'none';
+                }
+            }
+            
+            if (mobileRotationControls) {
+                if (isMobileDevice()) {
+                    mobileRotationControls.style.display = 'block';
+                } else {
+                    mobileRotationControls.style.display = 'none';
                 }
             }
         }
