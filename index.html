@@ -3243,7 +3243,7 @@
             }
             if (avatar) {
                 const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep + 1.0; // Ajustado para estar al nivel del suelo
+                const targetY = floor * floorStep + 0.2; // Reducido para estar más cerca del suelo
                 avatar.targetPosition.set(position.x, targetY, position.z);
                 avatar.currentFloor = floor;
                 avatar.group.position.y = targetY;
