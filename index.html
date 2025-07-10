@@ -3973,21 +3973,26 @@
             const chatId = getPrivateChatId(userAlias, alias);
             const privateRef = firebase.database().ref('privateMessages').child(chatId);
             // Cargar últimos 20 mensajes
+            const loadedTimestamps = new Set();
             privateRef.limitToLast(20).once('value', snapshot => {
                 const msgs = [];
                 snapshot.forEach(child => {
-                    msgs.push(child.val());
+                    const msg = child.val();
+                    msgs.push(msg);
+                    if (msg.timestamp) loadedTimestamps.add(msg.timestamp);
                 });
                 msgs.forEach(msg => {
                     appendPrivateMessage(messagesDiv, msg, alias);
                 });
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             });
-            // Escuchar nuevos mensajes
+            // Escuchar nuevos mensajes (solo si no están ya en el historial)
             const listener = privateRef.limitToLast(1).on('child_added', snap => {
                 const msg = snap.val();
-                appendPrivateMessage(messagesDiv, msg, alias);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                if (!msg.timestamp || !loadedTimestamps.has(msg.timestamp)) {
+                    appendPrivateMessage(messagesDiv, msg, alias);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
             });
             // Guardar función para limpiar listener
             privateChatListeners[alias] = () => privateRef.off('child_added', listener);
