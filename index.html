@@ -940,8 +940,25 @@
         }
 
         function init() {
-}
+            scene = new THREE.Scene();
+            scene.background = getSkyColor(); // Color dinámico del cielo
             scene.fog = new THREE.Fog(0x1a1a1a, 15, 105); // Ajustado para el nuevo tamaño
+
+            // --- Configuración de la Escena, Cámara y Renderer ---
+            setupScene();
+            setupLighting();
+            createMall();
+
+            // --- Event Listeners ---
+            setupEventListeners();
+            setupMobileControls();
+            
+            // --- Configurar botones de UI ---
+            setupUIButtons();
+
+            // --- Iniciar Animación ---
+            animate();
+        }
 
 // --- Manejadores de Eventos ---
 function setupEventListeners() {
