@@ -65,6 +65,10 @@ function sendMessage(message) {
         timestamp: Date.now()
     };
     messagesRef.push(messageData);
+    // Mostrar el mensaje propio inmediatamente
+    if (typeof window.addMessageToChat === 'function') {
+        window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, false, null);
+    }
 }
 
 function sendPosition(position, floor, rotation) {
