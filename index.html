@@ -59,11 +59,12 @@
             background: rgba(30,30,30,0.85);
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            z-index: 22000;
+            z-index: 31000;
             display: none;
             flex-direction: column;
             overflow: hidden;
             backdrop-filter: blur(10px);
+            pointer-events: auto;
         }
         #chat-header {
             background: rgba(24,24,24,0.9);
@@ -247,7 +248,7 @@
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 21000; /* Siempre por encima del overlay */
+            z-index: 31000; /* Siempre por encima del overlay */
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -533,7 +534,7 @@
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 21000; /* Siempre por encima del overlay */
+            z-index: 31000; /* Siempre por encima del overlay */
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -544,10 +545,13 @@
     </style>
 </head>
 <body>
-    <div id="ui-overlay"></div>
-    <div id="crosshair"></div>
-    <button id="chat-toggle-btn" title="Abrir chat">💬</button>
-    <button id="change-alias-btn" title="Personalizar avatar">👤</button>
+    <!-- Contenedor de UI completamente separado del canvas -->
+    <div id="ui-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 30000;">
+        <div id="ui-overlay"></div>
+        <div id="crosshair"></div>
+        <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
+        <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
+    </div>
         <!-- Panel de personalización completamente rediseñado -->
     <div id="simple-panel" class="customization-panel">
         <!-- Header elegante -->
@@ -2291,6 +2295,20 @@
         }
         
         function onMouseDown(event) {
+            // CRÍTICO: Verificar si el clic es en un elemento de UI - NO procesar en ese caso
+            const target = event.target;
+            const isUIElement = target.closest('#ui-container') || 
+                               target.closest('#chat-panel') || 
+                               target.closest('#simple-panel') ||
+                               target.closest('#ui-overlay') ||
+                               target.closest('button') ||
+                               target.closest('input') ||
+                               target.closest('select');
+            
+            if (isUIElement) {
+                return; // NO procesar clics en elementos de UI
+            }
+            
             // Si el overlay está activo, no procesar ningún clic del juego
             const overlay = document.getElementById('ui-overlay');
             if (overlay && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
@@ -3568,6 +3586,19 @@
                 if (avatar.group.children[3]) avatar.group.children[3].rotation.x = avatar.group.children[3].rotation.x;
                 if (avatar.group.children[4]) avatar.group.children[4].rotation.x = avatar.group.children[4].rotation.x;
                 if (avatar.group.children[5]) avatar.group.children[5].rotation.x = avatar.group.children[5].rotation.x;
+            }
+        }
+
+        // Función para controlar los eventos del canvas según el estado de la UI
+        function updateCanvasPointerEvents() {
+            const canvas = renderer.domElement;
+            const chatOpen = document.getElementById('chat-panel').style.display === 'flex';
+            const panelOpen = document.getElementById('simple-panel').style.display === 'block';
+            
+            if (chatOpen || panelOpen) {
+                canvas.style.pointerEvents = 'none';
+            } else {
+                canvas.style.pointerEvents = 'auto';
             }
         }
     </script>
