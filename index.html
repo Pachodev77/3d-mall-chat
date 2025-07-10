@@ -2810,12 +2810,16 @@
                 chatInput.value = '';
             }
         }
-        chatSendBtn.onclick = handleSendMessage;
-        chatInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                handleSendMessage();
-            }
-        });
+        if (chatSendBtn && chatInput) {
+            chatSendBtn.onclick = handleSendMessage;
+            chatInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    handleSendMessage();
+                }
+            });
+        } else {
+            console.warn('chatSendBtn o chatInput no existen en el DOM al inicializar.');
+        }
 
         // Alias setup and connect to chat
         if (!userAlias) {
