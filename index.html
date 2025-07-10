@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3626,6 +3626,7 @@
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+        window.addMessageToChat = addMessageToChat;
 
         // Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
         // El listener principal está en firebase-config.js
