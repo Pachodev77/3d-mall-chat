@@ -4063,6 +4063,8 @@
         }
 
         function notifyPrivateMessage(fromAlias) {
+            // Log visual para depuración
+            console.log('[NOTIFICACIÓN PRIVADA] Mensaje de:', fromAlias);
             // Círculo rojo sobre el botón del chat
             let badge = document.getElementById('private-msg-badge');
             if (!badge) {
@@ -4076,7 +4078,20 @@
             const audio = document.getElementById('private-msg-audio');
             if (audio && typeof audio.play === 'function') {
                 audio.currentTime = 0;
-                audio.play();
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn('[NOTIFICACIÓN PRIVADA] El navegador bloqueó el audio:', err);
+                        // Fallback: alerta visual
+                        alert('¡Tienes un mensaje privado! (El navegador bloqueó el sonido)');
+                    });
+                }
+            } else {
+                alert('¡Tienes un mensaje privado! (No se pudo reproducir el sonido)');
+            }
+            // Vibración en móvil si está disponible
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
             }
         }
     </script>
