@@ -42,17 +42,15 @@ function connectToChat(alias) {
             addMessageToChat(message.alias, message.message, 'user');
         }
     });
-    // Eliminar el listener de posiciones para evitar duplicidad y problemas de sincronización de avatares
-    // positionsRef.on('value', (snapshot) => {
-    //     const positions = snapshot.val() || {};
-    //     Object.keys(positions).forEach(alias => {
-    //         if (alias !== currentUser.alias) {
-    //             const userData = positions[alias];
-    //             const customization = userData.customization || null;
-    //             updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation, customization);
-    //         }
-    //     });
-    // });
+    positionsRef.on('value', (snapshot) => {
+        const positions = snapshot.val() || {};
+        Object.keys(positions).forEach(alias => {
+            if (alias !== currentUser.alias) {
+                const userData = positions[alias];
+                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+            }
+        });
+    });
     isConnected = true;
     console.log('Connected as:', currentUser.alias);
 }
@@ -67,7 +65,7 @@ function sendMessage(message) {
     messagesRef.push(messageData);
 }
 
-function sendPosition(position, floor, rotation, customization = null) {
+function sendPosition(position, floor, rotation) {
     if (!isConnected || !currentUser) return;
     const positionData = {
         position: position,
@@ -75,12 +73,6 @@ function sendPosition(position, floor, rotation, customization = null) {
         rotation: rotation,
         timestamp: Date.now()
     };
-    
-    // Agregar datos de personalización si están disponibles
-    if (customization) {
-        positionData.customization = customization;
-    }
-    
     positionsRef.child(currentUser.alias).set(positionData);
 }
 
