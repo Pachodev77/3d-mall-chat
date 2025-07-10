@@ -1058,33 +1058,79 @@
         }
 
         function createFloorLevel(yOffset, floorMaterial, wallMaterial, separatorMaterial, startLinkIndex) {
-            // --- Suelo con patrón de tablero de ajedrez optimizado ---
-            // Crear textura de tablero de ajedrez
+            // --- Suelo con textura de madera realista ---
+            // Crear textura de madera usando canvas
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 512;
             const ctx = canvas.getContext('2d');
             
-            const tileSize = 64; // Tamaño de cada cuadrado en la textura
-            const tilesPerTexture = 8; // 8x8 cuadrados en la textura
+            // Configuración de la textura de madera
+            const boardWidth = 64; // Ancho de cada tabla de madera
+            const boardHeight = 512; // Altura de cada tabla
+            const numBoards = 8; // Número de tablas de madera
             
-            for (let x = 0; x < tilesPerTexture; x++) {
-                for (let y = 0; y < tilesPerTexture; y++) {
-                    const isBlack = (x + y) % 2 === 0;
-                    ctx.fillStyle = isBlack ? '#000000' : '#FFFFFF';
-                    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            // Colores de madera
+            const woodColors = [
+                '#8B4513', // Saddle Brown
+                '#A0522D', // Sienna
+                '#CD853F', // Peru
+                '#D2691E', // Chocolate
+                '#B8860B', // Dark Goldenrod
+                '#DAA520', // Goldenrod
+                '#F4A460', // Sandy Brown
+                '#DEB887'  // Burly Wood
+            ];
+            
+            // Crear patrón de tablas de madera
+            for (let i = 0; i < numBoards; i++) {
+                const x = i * boardWidth;
+                const woodColor = woodColors[i % woodColors.length];
+                
+                // Color base de la tabla
+                ctx.fillStyle = woodColor;
+                ctx.fillRect(x, 0, boardWidth, boardHeight);
+                
+                // Agregar vetas de madera
+                ctx.strokeStyle = '#654321'; // Color más oscuro para las vetas
+                ctx.lineWidth = 1;
+                
+                // Vetas horizontales
+                for (let v = 0; v < 20; v++) {
+                    const y = v * 25 + Math.random() * 10;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + boardWidth, y);
+                    ctx.stroke();
                 }
+                
+                // Vetas verticales sutiles
+                ctx.strokeStyle = '#5D4037';
+                ctx.lineWidth = 0.5;
+                for (let v = 0; v < 5; v++) {
+                    const vx = x + v * 15 + Math.random() * 10;
+                    ctx.beginPath();
+                    ctx.moveTo(vx, 0);
+                    ctx.lineTo(vx, boardHeight);
+                    ctx.stroke();
+                }
+                
+                // Agregar variación de color para realismo
+                ctx.fillStyle = 'rgba(139, 69, 19, 0.1)';
+                ctx.fillRect(x, 0, boardWidth, boardHeight);
             }
             
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(8, 8); // Repetir la textura 8x8 veces
+            texture.repeat.set(4, 2); // Repetir la textura para cubrir el área
             
-            const chessboardMaterial = new THREE.MeshStandardMaterial({ 
+            const woodFloorMaterial = new THREE.MeshStandardMaterial({ 
                 map: texture,
-                roughness: 0.8, 
-                metalness: 0.1 
+                roughness: 0.7, 
+                metalness: 0.0,
+                bumpMap: texture,
+                bumpScale: 0.1
             });
             
             // Calcular el tamaño del área central (sin tiendas ni corredores)
@@ -1094,8 +1140,8 @@
             // Hacer el área central más pequeña para que se vea mejor la separación
             const areaCentralSize = HALL_SIZE - 2 * (storeDepth + sueloOffset + 4); // Agregar 4 unidades más de margen
             
-            // Crear suelo de ajedrez solo para el área central
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(areaCentralSize, areaCentralSize), chessboardMaterial);
+            // Crear suelo de madera solo para el área central
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(areaCentralSize, areaCentralSize), woodFloorMaterial);
             floor.rotation.x = -Math.PI / 2;
             floor.position.set(HALL_SIZE / 2, yOffset, HALL_SIZE / 2);
             floor.receiveShadow = true;
