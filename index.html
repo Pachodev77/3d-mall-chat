@@ -2977,7 +2977,7 @@
                 const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Cabeza esférica -->
                         <div style="width: 30px; height: 30px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; position: relative; margin-bottom: 0;">
                             <!-- Ojos -->
@@ -2994,35 +2994,61 @@
                         <div style="width: 10px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 5px; margin-top: 0;"></div>
                         <!-- Torso -->
                         <div style="width: 26px; height: 35px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 13px; margin-top: 0;"></div>
-                        <!-- Hombros y brazos -->
-                        <div style="display: flex; flex-direction: row; align-items: center; height: 25px; margin-top: -20px;">
-                            <!-- Brazo izquierdo -->
-                            <div style="width: 10px; height: 25px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 5px; margin-right: 0; transform: rotate(-10deg);"></div>
-                            <!-- Brazo derecho -->
-                            <div style="width: 10px; height: 25px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 5px; margin-left: 0; transform: rotate(10deg);"></div>
+                        <!-- Hombros (articulaciones) -->
+                        <div style="display: flex; flex-direction: row; align-items: center; height: 16px; margin-top: -25px;">
+                            <!-- Hombro izquierdo -->
+                            <div style="width: 8px; height: 8px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 50%; margin-right: 0;"></div>
+                            <!-- Hombro derecho -->
+                            <div style="width: 8px; height: 8px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 50%; margin-left: 0;"></div>
+                        </div>
+                        <!-- Brazos conectados -->
+                        <div style="display: flex; flex-direction: row; align-items: center; height: 30px; margin-top: 0;">
+                            <!-- Brazo izquierdo completo -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-right: 0;">
+                                <div style="width: 10px; height: 15px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 5px; transform: rotate(-15deg);"></div>
+                                <div style="width: 6px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 8px; height: 12px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 4px; transform: rotate(-25deg);"></div>
+                                <div style="width: 5px; height: 5px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 6px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%;"></div>
+                            </div>
+                            <!-- Brazo derecho completo -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-left: 0;">
+                                <div style="width: 10px; height: 15px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 5px; transform: rotate(15deg);"></div>
+                                <div style="width: 6px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 8px; height: 12px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 4px; transform: rotate(25deg);"></div>
+                                <div style="width: 5px; height: 5px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 6px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%;"></div>
+                            </div>
                         </div>
                         <!-- Cintura -->
                         <div style="width: 28px; height: 8px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 4px; margin-top: 0;"></div>
-                        <!-- Piernas -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 45px; margin-top: 0;">
-                            <!-- Pierna izquierda -->
-                            <div style="width: 12px; height: 45px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 6px; margin-right: 4px;"></div>
-                            <!-- Pierna derecha -->
-                            <div style="width: 12px; height: 45px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 6px; margin-left: 4px;"></div>
+                        <!-- Caderas (articulaciones) -->
+                        <div style="display: flex; flex-direction: row; align-items: center; height: 12px; margin-top: 0;">
+                            <!-- Cadera izquierda -->
+                            <div style="width: 10px; height: 10px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 50%; margin-right: 0;"></div>
+                            <!-- Cadera derecha -->
+                            <div style="width: 10px; height: 10px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 50%; margin-left: 0;"></div>
                         </div>
-                        <!-- Pies -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 6px; margin-top: -2px;">
-                            <!-- Pie izquierdo -->
-                            <div style="width: 12px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 3px; margin-right: 4px;"></div>
-                            <!-- Pie derecho -->
-                            <div style="width: 12px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 3px; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Zapatos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 8px; margin-top: 0;">
-                            <!-- Zapato izquierdo -->
-                            <div style="width: 14px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 4px; margin-right: 4px;"></div>
-                            <!-- Zapato derecho -->
-                            <div style="width: 14px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 4px; margin-left: 4px;"></div>
+                        <!-- Piernas conectadas -->
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
+                            <!-- Pierna izquierda completa -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-right: 4px;">
+                                <div style="width: 12px; height: 20px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 6px;"></div>
+                                <div style="width: 10px; height: 10px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 10px; height: 20px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 5px;"></div>
+                                <div style="width: 8px; height: 8px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 10px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 3px;"></div>
+                                <div style="width: 12px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
+                            </div>
+                            <!-- Pierna derecha completa -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-left: 4px;">
+                                <div style="width: 12px; height: 20px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 6px;"></div>
+                                <div style="width: 10px; height: 10px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 10px; height: 20px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 5px;"></div>
+                                <div style="width: 8px; height: 8px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; margin: 2px 0;"></div>
+                                <div style="width: 10px; height: 6px; background: #FFE4C4; border: 2px solid #333; border-radius: 3px;"></div>
+                                <div style="width: 12px; height: 8px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 4px;"></div>
+                            </div>
                         </div>
                         <!-- Nombre del avatar -->
                         <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
@@ -3865,58 +3891,84 @@
             body.position.set(0, 0.95, 0);
             group.add(body);
             
-            // Hombros (conectores)
-            const shoulderGeometry = new THREE.CylinderGeometry(0.06, 0.06, 0.25, 8);
+            // === SISTEMA DE BRAZOS PROFESIONAL ===
+            
+            // Hombros (esféricos para articulación)
+            const shoulderGeometry = new THREE.SphereGeometry(0.08, 12, 12);
             const shoulderMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             
             const leftShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
             leftShoulder.position.set(-0.35, 1.1, 0);
-            leftShoulder.rotation.z = Math.PI / 2;
             group.add(leftShoulder);
             
             const rightShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
             rightShoulder.position.set(0.35, 1.1, 0);
-            rightShoulder.rotation.z = -Math.PI / 2;
             group.add(rightShoulder);
             
-            // Brazos superiores
+            // Brazos superiores (conectados a hombros)
             const upperArmGeometry = new THREE.CylinderGeometry(0.07, 0.06, 0.35, 12);
             const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             
             const leftUpperArm = new THREE.Mesh(upperArmGeometry, armMaterial);
-            leftUpperArm.position.set(-0.5, 0.9, 0);
-            leftUpperArm.rotation.z = Math.PI / 8;
+            leftUpperArm.position.set(-0.35, 0.9, 0);
+            leftUpperArm.rotation.z = Math.PI / 6;
             group.add(leftUpperArm);
             
             const rightUpperArm = new THREE.Mesh(upperArmGeometry, armMaterial);
-            rightUpperArm.position.set(0.5, 0.9, 0);
-            rightUpperArm.rotation.z = -Math.PI / 8;
+            rightUpperArm.position.set(0.35, 0.9, 0);
+            rightUpperArm.rotation.z = -Math.PI / 6;
             group.add(rightUpperArm);
             
-            // Antebrazos
+            // Codos (articulaciones esféricas)
+            const elbowGeometry = new THREE.SphereGeometry(0.06, 10, 10);
+            const elbowMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftElbow = new THREE.Mesh(elbowGeometry, elbowMaterial);
+            leftElbow.position.set(-0.52, 0.7, 0);
+            group.add(leftElbow);
+            
+            const rightElbow = new THREE.Mesh(elbowGeometry, elbowMaterial);
+            rightElbow.position.set(0.52, 0.7, 0);
+            group.add(rightElbow);
+            
+            // Antebrazos (conectados a codos)
             const forearmGeometry = new THREE.CylinderGeometry(0.06, 0.05, 0.35, 12);
             
             const leftForearm = new THREE.Mesh(forearmGeometry, armMaterial);
-            leftForearm.position.set(-0.65, 0.65, 0);
-            leftForearm.rotation.z = Math.PI / 6;
+            leftForearm.position.set(-0.52, 0.5, 0);
+            leftForearm.rotation.z = Math.PI / 4;
             group.add(leftForearm);
             
             const rightForearm = new THREE.Mesh(forearmGeometry, armMaterial);
-            rightForearm.position.set(0.65, 0.65, 0);
-            rightForearm.rotation.z = -Math.PI / 6;
+            rightForearm.position.set(0.52, 0.5, 0);
+            rightForearm.rotation.z = -Math.PI / 4;
             group.add(rightForearm);
             
-            // Manos
+            // Muñecas (articulaciones pequeñas)
+            const wristGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const wristMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftWrist = new THREE.Mesh(wristGeometry, wristMaterial);
+            leftWrist.position.set(-0.7, 0.3, 0);
+            group.add(leftWrist);
+            
+            const rightWrist = new THREE.Mesh(wristGeometry, wristMaterial);
+            rightWrist.position.set(0.7, 0.3, 0);
+            group.add(rightWrist);
+            
+            // Manos (conectadas a muñecas)
             const handGeometry = new THREE.SphereGeometry(0.06, 12, 12);
             const handMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             
             const leftHand = new THREE.Mesh(handGeometry, handMaterial);
-            leftHand.position.set(-0.8, 0.4, 0);
+            leftHand.position.set(-0.7, 0.15, 0);
             group.add(leftHand);
             
             const rightHand = new THREE.Mesh(handGeometry, handMaterial);
-            rightHand.position.set(0.8, 0.4, 0);
+            rightHand.position.set(0.7, 0.15, 0);
             group.add(rightHand);
+            
+            // === SISTEMA DE PIERNAS PROFESIONAL ===
             
             // Cintura
             const waistGeometry = new THREE.CylinderGeometry(0.25, 0.3, 0.2, 16);
@@ -3925,7 +3977,19 @@
             waist.position.set(0, 0.55, 0);
             group.add(waist);
             
-            // Muslos
+            // Caderas (articulaciones)
+            const hipGeometry = new THREE.SphereGeometry(0.12, 10, 10);
+            const hipMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
+            
+            const leftHip = new THREE.Mesh(hipGeometry, hipMaterial);
+            leftHip.position.set(-0.12, 0.45, 0);
+            group.add(leftHip);
+            
+            const rightHip = new THREE.Mesh(hipGeometry, hipMaterial);
+            rightHip.position.set(0.12, 0.45, 0);
+            group.add(rightHip);
+            
+            // Muslos (conectados a caderas)
             const thighGeometry = new THREE.CylinderGeometry(0.12, 0.1, 0.4, 12);
             const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
             
@@ -3937,27 +4001,51 @@
             rightThigh.position.set(0.12, 0.25, 0);
             group.add(rightThigh);
             
-            // Pantorrillas
+            // Rodillas (articulaciones)
+            const kneeGeometry = new THREE.SphereGeometry(0.1, 10, 10);
+            const kneeMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftKnee = new THREE.Mesh(kneeGeometry, kneeMaterial);
+            leftKnee.position.set(-0.12, 0.05, 0);
+            group.add(leftKnee);
+            
+            const rightKnee = new THREE.Mesh(kneeGeometry, kneeMaterial);
+            rightKnee.position.set(0.12, 0.05, 0);
+            group.add(rightKnee);
+            
+            // Pantorrillas (conectadas a rodillas)
             const calfGeometry = new THREE.CylinderGeometry(0.1, 0.08, 0.4, 12);
             
             const leftCalf = new THREE.Mesh(calfGeometry, legMaterial);
-            leftCalf.position.set(-0.12, -0.05, 0);
+            leftCalf.position.set(-0.12, -0.15, 0);
             group.add(leftCalf);
             
             const rightCalf = new THREE.Mesh(calfGeometry, legMaterial);
-            rightCalf.position.set(0.12, -0.05, 0);
+            rightCalf.position.set(0.12, -0.15, 0);
             group.add(rightCalf);
             
-            // Pies
+            // Tobillos (articulaciones)
+            const ankleGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const ankleMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftAnkle = new THREE.Mesh(ankleGeometry, ankleMaterial);
+            leftAnkle.position.set(-0.12, -0.35, 0.06);
+            group.add(leftAnkle);
+            
+            const rightAnkle = new THREE.Mesh(ankleGeometry, ankleMaterial);
+            rightAnkle.position.set(0.12, -0.35, 0.06);
+            group.add(rightAnkle);
+            
+            // Pies (conectados a tobillos)
             const footGeometry = new THREE.BoxGeometry(0.1, 0.06, 0.22);
             const footMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             
             const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
-            leftFoot.position.set(-0.12, -0.3, 0.06);
+            leftFoot.position.set(-0.12, -0.4, 0.06);
             group.add(leftFoot);
             
             const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
-            rightFoot.position.set(0.12, -0.3, 0.06);
+            rightFoot.position.set(0.12, -0.4, 0.06);
             group.add(rightFoot);
             
             // Zapatos
@@ -3965,11 +4053,11 @@
             const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
             
             const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            leftShoe.position.set(-0.12, -0.35, 0.06);
+            leftShoe.position.set(-0.12, -0.45, 0.06);
             group.add(leftShoe);
             
             const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            rightShoe.position.set(0.12, -0.35, 0.06);
+            rightShoe.position.set(0.12, -0.45, 0.06);
             group.add(rightShoe);
             
             // Materiales para personalización en tiempo real
@@ -4019,36 +4107,42 @@
                 const legSwing = Math.sin(time * 8) * 0.2;
                 const armSwing = Math.sin(time * 8) * 0.3;
                 
-                // Brazos superiores (índices 10 y 11 después de cabeza, cabello, ojos, nariz, boca, cuello, torso, hombros)
-                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 8 + armSwing; // leftUpperArm
-                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 8 - armSwing; // rightUpperArm
+                // Brazos superiores (índices 10 y 11 después de cabeza, cabello, ojos, nariz, boca, cuello, torso)
+                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 6 + armSwing; // leftUpperArm
+                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 6 - armSwing; // rightUpperArm
                 
-                // Antebrazos (índices 12 y 13)
-                if (avatar.group.children[12]) avatar.group.children[12].rotation.z = Math.PI / 6 + armSwing * 0.7; // leftForearm
-                if (avatar.group.children[13]) avatar.group.children[13].rotation.z = -Math.PI / 6 - armSwing * 0.7; // rightForearm
+                // Antebrazos (índices 14 y 15 después de codos)
+                if (avatar.group.children[14]) avatar.group.children[14].rotation.z = Math.PI / 4 + armSwing * 0.7; // leftForearm
+                if (avatar.group.children[15]) avatar.group.children[15].rotation.z = -Math.PI / 4 - armSwing * 0.7; // rightForearm
                 
-                // Muslos (índices 16 y 17 después de manos y cintura)
-                if (avatar.group.children[16]) avatar.group.children[16].rotation.x = -legSwing; // leftThigh
-                if (avatar.group.children[17]) avatar.group.children[17].rotation.x = legSwing; // rightThigh
+                // Muslos (índices 20 y 21 después de manos, cintura, caderas)
+                if (avatar.group.children[20]) avatar.group.children[20].rotation.x = -legSwing; // leftThigh
+                if (avatar.group.children[21]) avatar.group.children[21].rotation.x = legSwing; // rightThigh
                 
-                // Pantorrillas (índices 18 y 19)
-                if (avatar.group.children[18]) avatar.group.children[18].rotation.x = legSwing * 0.6; // leftCalf
-                if (avatar.group.children[19]) avatar.group.children[19].rotation.x = -legSwing * 0.6; // rightCalf
+                // Pantorrillas (índices 24 y 25 después de rodillas)
+                if (avatar.group.children[24]) avatar.group.children[24].rotation.x = legSwing * 0.6; // leftCalf
+                if (avatar.group.children[25]) avatar.group.children[25].rotation.x = -legSwing * 0.6; // rightCalf
                 
                 // Ligero balanceo del torso
                 if (avatar.group.children[7]) avatar.group.children[7].rotation.z = swing * 0.1; // torso
                 
+                // Rotación sutil de hombros
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.y = armSwing * 0.2; // leftShoulder
+                if (avatar.group.children[9]) avatar.group.children[9].rotation.y = -armSwing * 0.2; // rightShoulder
+                
             } else {
                 // Si está quieto, resetear a posición neutral
-                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 8;
-                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 8;
-                if (avatar.group.children[12]) avatar.group.children[12].rotation.z = Math.PI / 6;
-                if (avatar.group.children[13]) avatar.group.children[13].rotation.z = -Math.PI / 6;
-                if (avatar.group.children[16]) avatar.group.children[16].rotation.x = 0;
-                if (avatar.group.children[17]) avatar.group.children[17].rotation.x = 0;
-                if (avatar.group.children[18]) avatar.group.children[18].rotation.x = 0;
-                if (avatar.group.children[19]) avatar.group.children[19].rotation.x = 0;
+                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 6;
+                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 6;
+                if (avatar.group.children[14]) avatar.group.children[14].rotation.z = Math.PI / 4;
+                if (avatar.group.children[15]) avatar.group.children[15].rotation.z = -Math.PI / 4;
+                if (avatar.group.children[20]) avatar.group.children[20].rotation.x = 0;
+                if (avatar.group.children[21]) avatar.group.children[21].rotation.x = 0;
+                if (avatar.group.children[24]) avatar.group.children[24].rotation.x = 0;
+                if (avatar.group.children[25]) avatar.group.children[25].rotation.x = 0;
                 if (avatar.group.children[7]) avatar.group.children[7].rotation.z = 0;
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.y = 0;
+                if (avatar.group.children[9]) avatar.group.children[9].rotation.y = 0;
             }
         }
 
