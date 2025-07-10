@@ -2977,37 +2977,48 @@
                 const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Cabeza esférica -->
-                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; position: relative; margin-bottom: 0;">
+                        <div style="width: 36px; height: 36px; background: #FFE4C4; border: 2px solid #333; border-radius: 50%; position: relative; margin-bottom: 0;">
                             <!-- Ojos -->
-                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 50%;"></div>
-                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 50%;"></div>
+                            <div style="position: absolute; top: 10px; left: 8px; width: 5px; height: 5px; background: #222; border-radius: 50%;"></div>
+                            <div style="position: absolute; top: 10px; right: 8px; width: 5px; height: 5px; background: #222; border-radius: 50%;"></div>
                             <!-- Sonrisa -->
-                            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 16px; height: 8px; border: 2px solid #222; border-top: none; border-radius: 0 0 16px 16px;"></div>
+                            <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 14px; height: 6px; border: 2px solid #222; border-top: none; border-radius: 0 0 14px 14px;"></div>
                         </div>
-                        <!-- Torso y brazos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
+                        <!-- Cuello -->
+                        <div style="width: 12px; height: 8px; background: #FFE4C4; border: 2px solid #333; border-radius: 6px; margin-bottom: 0;"></div>
+                        <!-- Torso y hombros -->
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 60px; margin-top: 0;">
                             <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 8px; margin-right: 0;"></div>
+                            <div style="width: 14px; height: 60px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 7px; margin-right: 0; transform: rotate(-15deg);"></div>
                             <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 14px; margin: 0 0;"></div>
+                            <div style="width: 32px; height: 60px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 16px; margin: 0 0;"></div>
                             <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 8px; margin-left: 0;"></div>
+                            <div style="width: 14px; height: 60px; background: #${shirtColorHex}; border: 2px solid #333; border-radius: 7px; margin-left: 0; transform: rotate(15deg);"></div>
                         </div>
+                        <!-- Caderas -->
+                        <div style="width: 36px; height: 12px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 6px; margin-top: 0;"></div>
                         <!-- Piernas -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 60px; margin-top: 0;">
                             <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-right: 4px;"></div>
+                            <div style="width: 16px; height: 60px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-right: 4px;"></div>
                             <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-left: 4px;"></div>
+                            <div style="width: 16px; height: 60px; background: #${pantsColorHex}; border: 2px solid #333; border-radius: 8px; margin-left: 4px;"></div>
+                        </div>
+                        <!-- Pies -->
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 8px; margin-top: -2px;">
+                            <!-- Pie izquierdo -->
+                            <div style="width: 16px; height: 8px; background: #FFE4C4; border: 2px solid #333; border-radius: 4px; margin-right: 4px;"></div>
+                            <!-- Pie derecho -->
+                            <div style="width: 16px; height: 8px; background: #FFE4C4; border: 2px solid #333; border-radius: 4px; margin-left: 4px;"></div>
                         </div>
                         <!-- Zapatos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
-                            <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 6px; margin-right: 4px;"></div>
-                            <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 6px; margin-left: 4px;"></div>
+                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 10px; margin-top: 0;">
+                            <!-- Zapato izquierdo -->
+                            <div style="width: 18px; height: 10px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 5px; margin-right: 4px;"></div>
+                            <!-- Zapato derecho -->
+                            <div style="width: 18px; height: 10px; background: #${shoesColorHex}; border: 2px solid #333; border-radius: 5px; margin-left: 4px;"></div>
                         </div>
                         <!-- Nombre del avatar -->
                         <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
@@ -3794,76 +3805,155 @@
             const eyeColor = 0x000000;
             const smileColor = 0x000000;
             
-            // Cabeza (esférica)
-            const headGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+            // Cabeza (más realista con forma ovalada)
+            const headGeometry = new THREE.SphereGeometry(0.35, 20, 20);
             const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.set(0, 1.7, 0);
+            head.position.set(0, 1.8, 0);
+            head.scale.set(1, 1.1, 0.9); // Hacer la cabeza más ovalada
             group.add(head);
             
-            // Ojos
-            const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            // Cuello
+            const neckGeometry = new THREE.CylinderGeometry(0.12, 0.15, 0.2, 12);
+            const neckMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            const neck = new THREE.Mesh(neckGeometry, neckMaterial);
+            neck.position.set(0, 1.6, 0);
+            group.add(neck);
+            
+            // Ojos (más realistas)
+            const eyeGeometry = new THREE.SphereGeometry(0.04, 8, 8);
             const eyeMaterial = new THREE.MeshStandardMaterial({ color: eyeColor });
             
             // Ojo izquierdo
             const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            leftEye.position.set(-0.15, 1.75, 0.35);
+            leftEye.position.set(-0.12, 1.85, 0.32);
             group.add(leftEye);
             
             // Ojo derecho
             const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            rightEye.position.set(0.15, 1.75, 0.35);
+            rightEye.position.set(0.12, 1.85, 0.32);
             group.add(rightEye);
             
-            // Sonrisa (arco)
-            const smileGeometry = new THREE.TorusGeometry(0.12, 0.02, 8, 16, Math.PI);
+            // Sonrisa (más natural)
+            const smileGeometry = new THREE.TorusGeometry(0.1, 0.015, 8, 16, Math.PI);
             const smileMaterial = new THREE.MeshStandardMaterial({ color: smileColor });
             const smile = new THREE.Mesh(smileGeometry, smileMaterial);
-            smile.position.set(0, 1.6, 0.35);
+            smile.position.set(0, 1.7, 0.32);
             smile.rotation.x = Math.PI / 2;
             group.add(smile);
             
-            // Torso (cilíndrico)
-            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 1.2, 16);
+            // Torso (más anatómico con pecho y cintura)
+            const torsoGeometry = new THREE.CylinderGeometry(0.45, 0.35, 1.4, 16);
             const bodyMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.position.set(0, 0.9, 0);
+            const body = new THREE.Mesh(torsoGeometry, bodyMaterial);
+            body.position.set(0, 0.8, 0);
             group.add(body);
             
-            // Brazos (cilíndricos)
-            const armGeometry = new THREE.CylinderGeometry(0.175, 0.175, 1, 12);
+            // Hombros
+            const shoulderGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.3, 12);
+            const shoulderMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
+            
+            const leftShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
+            leftShoulder.position.set(-0.6, 1.3, 0);
+            leftShoulder.rotation.z = Math.PI / 2;
+            group.add(leftShoulder);
+            
+            const rightShoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
+            rightShoulder.position.set(0.6, 1.3, 0);
+            rightShoulder.rotation.z = -Math.PI / 2;
+            group.add(rightShoulder);
+            
+            // Brazos superiores (hombros)
+            const upperArmGeometry = new THREE.CylinderGeometry(0.12, 0.1, 0.4, 12);
             const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             
-            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-            leftArm.position.set(-0.7, 1.1, 0);
-            group.add(leftArm);
+            const leftUpperArm = new THREE.Mesh(upperArmGeometry, armMaterial);
+            leftUpperArm.position.set(-0.8, 1.1, 0);
+            leftUpperArm.rotation.z = Math.PI / 6;
+            group.add(leftUpperArm);
             
-            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-            rightArm.position.set(0.7, 1.1, 0);
-            group.add(rightArm);
+            const rightUpperArm = new THREE.Mesh(upperArmGeometry, armMaterial);
+            rightUpperArm.position.set(0.8, 1.1, 0);
+            rightUpperArm.rotation.z = -Math.PI / 6;
+            group.add(rightUpperArm);
             
-            // Piernas (cilíndricas)
-            const legGeometry = new THREE.CylinderGeometry(0.19, 0.19, 1, 12);
+            // Antebrazos
+            const forearmGeometry = new THREE.CylinderGeometry(0.1, 0.08, 0.4, 12);
+            
+            const leftForearm = new THREE.Mesh(forearmGeometry, armMaterial);
+            leftForearm.position.set(-1.0, 0.8, 0);
+            leftForearm.rotation.z = Math.PI / 4;
+            group.add(leftForearm);
+            
+            const rightForearm = new THREE.Mesh(forearmGeometry, armMaterial);
+            rightForearm.position.set(1.0, 0.8, 0);
+            rightForearm.rotation.z = -Math.PI / 4;
+            group.add(rightForearm);
+            
+            // Manos
+            const handGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const handMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftHand = new THREE.Mesh(handGeometry, handMaterial);
+            leftHand.position.set(-1.2, 0.5, 0);
+            group.add(leftHand);
+            
+            const rightHand = new THREE.Mesh(handGeometry, handMaterial);
+            rightHand.position.set(1.2, 0.5, 0);
+            group.add(rightHand);
+            
+            // Caderas
+            const hipGeometry = new THREE.CylinderGeometry(0.4, 0.35, 0.3, 16);
+            const hipMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
+            const hips = new THREE.Mesh(hipGeometry, hipMaterial);
+            hips.position.set(0, 0.1, 0);
+            group.add(hips);
+            
+            // Muslos
+            const thighGeometry = new THREE.CylinderGeometry(0.15, 0.12, 0.5, 12);
             const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
             
-            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-            leftLeg.position.set(-0.25, 0.0, 0);
-            group.add(leftLeg);
+            const leftThigh = new THREE.Mesh(thighGeometry, legMaterial);
+            leftThigh.position.set(-0.2, -0.2, 0);
+            group.add(leftThigh);
             
-            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-            rightLeg.position.set(0.25, 0.0, 0);
-            group.add(rightLeg);
+            const rightThigh = new THREE.Mesh(thighGeometry, legMaterial);
+            rightThigh.position.set(0.2, -0.2, 0);
+            group.add(rightThigh);
             
-            // Zapatos (cilíndricos)
-            const shoeGeometry = new THREE.CylinderGeometry(0.19, 0.19, 0.18, 12);
+            // Pantorrillas
+            const calfGeometry = new THREE.CylinderGeometry(0.12, 0.1, 0.5, 12);
+            
+            const leftCalf = new THREE.Mesh(calfGeometry, legMaterial);
+            leftCalf.position.set(-0.2, -0.7, 0);
+            group.add(leftCalf);
+            
+            const rightCalf = new THREE.Mesh(calfGeometry, legMaterial);
+            rightCalf.position.set(0.2, -0.7, 0);
+            group.add(rightCalf);
+            
+            // Pies
+            const footGeometry = new THREE.BoxGeometry(0.12, 0.08, 0.25);
+            const footMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+            
+            const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
+            leftFoot.position.set(-0.2, -1.0, 0.05);
+            group.add(leftFoot);
+            
+            const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
+            rightFoot.position.set(0.2, -1.0, 0.05);
+            group.add(rightFoot);
+            
+            // Zapatos
+            const shoeGeometry = new THREE.BoxGeometry(0.14, 0.1, 0.28);
             const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
             
             const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            leftShoe.position.set(-0.25, -0.5, 0);
+            leftShoe.position.set(-0.2, -1.05, 0.05);
             group.add(leftShoe);
             
             const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            rightShoe.position.set(0.25, -0.5, 0);
+            rightShoe.position.set(0.2, -1.05, 0.05);
             group.add(rightShoe);
             
             // Materiales para personalización en tiempo real
@@ -3909,19 +3999,35 @@
             // Si se está moviendo, animar
             if (velocity > 0.01) {
                 const time = performance.now() * 0.002 + avatar.group.position.x * 0.1;
-                const swing = Math.sin(time * 8) * 0.4;
-                // Brazos (ahora en índices 5 y 6 después de cabeza, ojos y sonrisa)
-                if (avatar.group.children[5]) avatar.group.children[5].rotation.x = swing; // leftArm
-                if (avatar.group.children[6]) avatar.group.children[6].rotation.x = -swing; // rightArm
-                // Piernas (ahora en índices 7 y 8)
-                if (avatar.group.children[7]) avatar.group.children[7].rotation.x = -swing; // leftLeg
-                if (avatar.group.children[8]) avatar.group.children[8].rotation.x = swing; // rightLeg
+                const swing = Math.sin(time * 8) * 0.3;
+                const legSwing = Math.sin(time * 8) * 0.2;
+                
+                // Brazos superiores (índices 8 y 9 después de cabeza, cuello, ojos, sonrisa, torso, hombros)
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.z = Math.PI / 6 + swing; // leftUpperArm
+                if (avatar.group.children[9]) avatar.group.children[9].rotation.z = -Math.PI / 6 - swing; // rightUpperArm
+                
+                // Antebrazos (índices 10 y 11)
+                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 4 + swing * 0.5; // leftForearm
+                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 4 - swing * 0.5; // rightForearm
+                
+                // Muslos (índices 16 y 17 después de manos y caderas)
+                if (avatar.group.children[16]) avatar.group.children[16].rotation.x = -legSwing; // leftThigh
+                if (avatar.group.children[17]) avatar.group.children[17].rotation.x = legSwing; // rightThigh
+                
+                // Pantorrillas (índices 18 y 19)
+                if (avatar.group.children[18]) avatar.group.children[18].rotation.x = legSwing * 0.5; // leftCalf
+                if (avatar.group.children[19]) avatar.group.children[19].rotation.x = -legSwing * 0.5; // rightCalf
+                
             } else {
-                // Si está quieto, mantener la rotación actual
-                if (avatar.group.children[5]) avatar.group.children[5].rotation.x = avatar.group.children[5].rotation.x;
-                if (avatar.group.children[6]) avatar.group.children[6].rotation.x = avatar.group.children[6].rotation.x;
-                if (avatar.group.children[7]) avatar.group.children[7].rotation.x = avatar.group.children[7].rotation.x;
-                if (avatar.group.children[8]) avatar.group.children[8].rotation.x = avatar.group.children[8].rotation.x;
+                // Si está quieto, mantener la rotación actual o resetear a posición neutral
+                if (avatar.group.children[8]) avatar.group.children[8].rotation.z = Math.PI / 6;
+                if (avatar.group.children[9]) avatar.group.children[9].rotation.z = -Math.PI / 6;
+                if (avatar.group.children[10]) avatar.group.children[10].rotation.z = Math.PI / 4;
+                if (avatar.group.children[11]) avatar.group.children[11].rotation.z = -Math.PI / 4;
+                if (avatar.group.children[16]) avatar.group.children[16].rotation.x = 0;
+                if (avatar.group.children[17]) avatar.group.children[17].rotation.x = 0;
+                if (avatar.group.children[18]) avatar.group.children[18].rotation.x = 0;
+                if (avatar.group.children[19]) avatar.group.children[19].rotation.x = 0;
             }
         }
 
