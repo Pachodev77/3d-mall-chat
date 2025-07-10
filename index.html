@@ -1073,7 +1073,7 @@
             // Color único de madera
             const woodColor = '#8B4513'; // Saddle Brown - tono uniforme
             
-            // Crear patrón de tablas de madera con un solo tono
+            // Crear patrón de tablas de madera organizadas
             for (let i = 0; i < numBoards; i++) {
                 const x = i * boardWidth;
                 
@@ -1081,24 +1081,24 @@
                 ctx.fillStyle = woodColor;
                 ctx.fillRect(x, 0, boardWidth, boardHeight);
                 
-                // Agregar vetas de madera
+                // Agregar vetas de madera organizadas
                 ctx.strokeStyle = '#654321'; // Color más oscuro para las vetas
                 ctx.lineWidth = 1;
                 
-                // Vetas horizontales
+                // Vetas horizontales organizadas (espaciado uniforme)
                 for (let v = 0; v < 20; v++) {
-                    const y = v * 25 + Math.random() * 10;
+                    const y = v * 25 + 12; // Espaciado uniforme sin variación aleatoria
                     ctx.beginPath();
                     ctx.moveTo(x, y);
                     ctx.lineTo(x + boardWidth, y);
                     ctx.stroke();
                 }
                 
-                // Vetas verticales sutiles
+                // Vetas verticales organizadas (espaciado uniforme)
                 ctx.strokeStyle = '#5D4037';
                 ctx.lineWidth = 0.5;
                 for (let v = 0; v < 5; v++) {
-                    const vx = x + v * 15 + Math.random() * 10;
+                    const vx = x + v * 15 + 8; // Espaciado uniforme sin variación aleatoria
                     ctx.beginPath();
                     ctx.moveTo(vx, 0);
                     ctx.lineTo(vx, boardHeight);
@@ -3588,11 +3588,16 @@
             const pantsColor = custom.pantsColor || 0x2C3E50;
             const shoesColor = custom.shoesColor || 0x8B4513;
             const avatarGroup = createRobloxAvatar({ shirtColor, pantsColor, shoesColor });
-            avatarGroup.position.set(position.x, position.y, position.z);
+            
+            // Calcular la posición Y correcta para el piso
+            const floorStep = HALL_HEIGHT + 1;
+            const correctY = floor * floorStep + 1.0;
+            
+            avatarGroup.position.set(position.x, correctY, position.z);
             scene.add(avatarGroup);
             userAvatars.set(alias, {
                 group: avatarGroup,
-                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
                 bodyMaterial: avatarGroup.bodyMaterial,
