@@ -2374,21 +2374,19 @@
                     return;
                 }
                 
-                // Verificar si es un clic en una tienda - CON VERIFICACIÓN DE PROXIMIDAD
+                // Verificar si es un clic en una tienda
                 if (clickedObject.userData && clickedObject.userData.URL) {
                     // Calcular distancia entre el usuario y la tienda
                     const storePosition = clickedObject.position;
                     const userPosition = camera.position;
                     const distance = userPosition.distanceTo(storePosition);
                     
-                    // Solo permitir clic si está a menos de 8 unidades de distancia
-                    const maxClickDistance = 8;
+                    // Solo permitir clic si está a menos de 15 unidades de distancia
+                    const maxClickDistance = 15;
                     if (distance <= maxClickDistance) {
                         window.open(clickedObject.userData.URL, '_blank');
                     } else {
                         // Mostrar mensaje de que está muy lejos
-                        console.log(`Estás muy lejos de la tienda. Distancia: ${distance.toFixed(1)} unidades`);
-                        // Opcional: mostrar notificación visual
                         showProximityMessage(`Acércate más a la tienda para hacer clic (${distance.toFixed(1)}m)`);
                     }
                 }
@@ -3644,19 +3642,6 @@
             }
         }
 
-        // Función para controlar los eventos del canvas según el estado de la UI
-        function updateCanvasPointerEvents() {
-            const canvas = renderer.domElement;
-            const chatOpen = document.getElementById('chat-panel').style.display === 'flex';
-            const panelOpen = document.getElementById('simple-panel').style.display === 'block';
-            
-            if (chatOpen || panelOpen) {
-                canvas.style.pointerEvents = 'none';
-            } else {
-                canvas.style.pointerEvents = 'auto';
-            }
-        }
-
         // Función para mostrar mensajes de proximidad
         function showProximityMessage(message) {
             // Crear o actualizar el elemento de mensaje
@@ -3690,6 +3675,21 @@
                 messageElement.style.opacity = '0';
             }, 3000);
         }
+
+        // Función para controlar los eventos del canvas según el estado de la UI
+        function updateCanvasPointerEvents() {
+            const canvas = renderer.domElement;
+            const chatOpen = document.getElementById('chat-panel').style.display === 'flex';
+            const panelOpen = document.getElementById('simple-panel').style.display === 'block';
+            
+            if (chatOpen || panelOpen) {
+                canvas.style.pointerEvents = 'none';
+            } else {
+                canvas.style.pointerEvents = 'auto';
+            }
+        }
+
+
     </script>
 </body>
 </html>
