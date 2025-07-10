@@ -42,16 +42,17 @@ function connectToChat(alias) {
             addMessageToChat(message.alias, message.message, 'user');
         }
     });
-    positionsRef.on('value', (snapshot) => {
-        const positions = snapshot.val() || {};
-        Object.keys(positions).forEach(alias => {
-            if (alias !== currentUser.alias) {
-                const userData = positions[alias];
-                const customization = userData.customization || null;
-                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation, customization);
-            }
-        });
-    });
+    // Eliminar el listener de posiciones para evitar duplicidad y problemas de sincronización de avatares
+    // positionsRef.on('value', (snapshot) => {
+    //     const positions = snapshot.val() || {};
+    //     Object.keys(positions).forEach(alias => {
+    //         if (alias !== currentUser.alias) {
+    //             const userData = positions[alias];
+    //             const customization = userData.customization || null;
+    //             updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation, customization);
+    //         }
+    //     });
+    // });
     isConnected = true;
     console.log('Connected as:', currentUser.alias);
 }
