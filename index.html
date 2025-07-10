@@ -3978,6 +3978,18 @@
             };
         }
 
+        // --- Función para actualizar todas las posiciones de avatares ---
+        function updateAvatarPositions() {
+            userAvatars.forEach((avatar, alias) => {
+                // Interpolación suave hacia la posición objetivo
+                avatar.group.position.lerp(avatar.targetPosition, 0.2);
+                // Interpolación suave de rotación
+                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+                // Animación de movimiento estilo Roblox
+                animateRobloxAvatar(avatar, alias);
+            });
+        }
+
         // --- Materiales PBR Realistas ---
         function createSkinMaterial(color) {
             return new THREE.MeshStandardMaterial({
