@@ -4038,6 +4038,51 @@
                 openPrivateChatWindow(alias);
             }
         });
+
+        // --- Notificación visual y sonora para mensajes privados ---
+        // Añadir audio oculto si no existe
+        if (!document.getElementById('private-msg-audio')) {
+            const audio = document.createElement('audio');
+            audio.id = 'private-msg-audio';
+            audio.src = 'https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa1c82.mp3'; // Sonido simple, puedes cambiarlo
+            audio.preload = 'auto';
+            audio.style.display = 'none';
+            document.body.appendChild(audio);
+        }
+
+        function notifyPrivateMessage(fromAlias) {
+            // Círculo rojo sobre el botón del chat
+            let badge = document.getElementById('private-msg-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.id = 'private-msg-badge';
+                badge.style.cssText = 'position:absolute;top:2px;right:2px;width:14px;height:14px;background:#FF3333;border-radius:50%;z-index:2;border:2px solid #fff;box-shadow:0 0 4px #000a;';
+                const btn = document.getElementById('chat-toggle-btn');
+                if (btn) btn.appendChild(badge);
+            }
+            // Sonido
+            const audio = document.getElementById('private-msg-audio');
+            if (audio && typeof audio.play === 'function') {
+                audio.currentTime = 0;
+                audio.play();
+            }
+        }
+
+        // Al abrir cualquier ventana de chat privado, eliminar el círculo rojo y pausar el sonido
+        const originalOpenPrivateChatWindow = openPrivateChatWindow;
+        openPrivateChatWindow = function(alias) {
+            // Eliminar círculo rojo
+            const badge = document.getElementById('private-msg-badge');
+            if (badge) badge.remove();
+            // Pausar sonido
+            const audio = document.getElementById('private-msg-audio');
+            if (audio && typeof audio.pause === 'function') {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            // Llamar a la función original
+            return originalOpenPrivateChatWindow.apply(this, arguments);
+        };
     </script>
 </body>
 </html>
