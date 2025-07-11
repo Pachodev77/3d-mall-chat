@@ -3557,6 +3557,12 @@
             deselectFurniture();
             selectedFurniture = furniture;
             
+            // Ocultar la ventana de la habitación cuando se selecciona un mueble
+            const roomNavigationPanel = document.getElementById('room-navigation-panel');
+            if (roomNavigationPanel) {
+                roomNavigationPanel.style.display = 'none';
+            }
+            
             // Resaltar el mueble seleccionado (aplicar a todos los materiales del grupo)
             if (furniture.mesh && furniture.mesh.children) {
                 furniture.mesh.children.forEach(child => {
@@ -3581,6 +3587,12 @@
             }
             selectedFurniture = null;
             updateFurnitureList();
+            
+            // Mostrar la ventana de la habitación cuando se deselecciona un mueble
+            const roomNavigationPanel = document.getElementById('room-navigation-panel');
+            if (roomNavigationPanel && roomNavigationPanelOpen) {
+                roomNavigationPanel.style.display = 'flex';
+            }
         }
         
         function moveSelectedFurniture(direction) {
@@ -3632,6 +3644,12 @@
                 // Aquí se podría guardar en localStorage o en una base de datos
                 console.log('Posiciones de muebles guardadas');
                 deselectFurniture();
+                
+                // Mostrar la ventana de la habitación después de guardar
+                const roomNavigationPanel = document.getElementById('room-navigation-panel');
+                if (roomNavigationPanel && roomNavigationPanelOpen) {
+                    roomNavigationPanel.style.display = 'flex';
+                }
             }
         }
         
