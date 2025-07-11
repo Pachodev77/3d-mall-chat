@@ -3055,20 +3055,18 @@
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
-            // Puerta mejorada (paneles y manija)
-            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
-            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
+            // Puerta mejorada con franja de cristal
+            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.08);
+            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera cálida
             const door = new THREE.Mesh(doorGeometry, doorMaterial);
             door.position.set(0, 1.1, roomDepth/2);
             personalRoomScene.add(door);
-            // Paneles de la puerta (relieve)
-            const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
-            for (let i = 0; i < 3; i++) {
-                const panelGeo = new THREE.BoxGeometry(0.7, 0.4, 0.04);
-                const panel = new THREE.Mesh(panelGeo, panelMat);
-                panel.position.set(0, 1.7 - i * 0.7, roomDepth/2 + 0.055);
-                personalRoomScene.add(panel);
-            }
+            // Franja de cristal en la puerta
+            const doorGlassGeo = new THREE.BoxGeometry(0.25, 1.2, 0.02);
+            const doorGlassMat = new THREE.MeshPhysicalMaterial({ color: 0xBFEFFF, transparent: true, opacity: 0.35, roughness: 0.05, metalness: 0.1, reflectivity: 0.5, clearcoat: 0.7, clearcoatRoughness: 0.05, transmission: 0.95, ior: 1.45 });
+            const doorGlass = new THREE.Mesh(doorGlassGeo, doorGlassMat);
+            doorGlass.position.set(0, 1.1, roomDepth/2 + 0.045);
+            personalRoomScene.add(doorGlass);
             // Manija de la puerta
             const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
             const handleMat = getCachedMaterial(0xCCCCCC, 0.4, 0.7);
@@ -3076,32 +3074,38 @@
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
             personalRoomScene.add(handle);
-            // --- Ventanas grandes mejoradas ---
+            // --- Ventanas grandes mejoradas y totalmente transparentes ---
             const skyColor = getSkyColorByHour();
-            // Ventana trasera grande (con bisel y reflejo)
+            // Plano de cielo exterior visible desde las ventanas
+            const skyPlaneGeo = new THREE.PlaneGeometry(40, 12);
+            const skyPlaneMat = new THREE.MeshBasicMaterial({ color: skyColor, side: THREE.BackSide });
+            const skyPlane = new THREE.Mesh(skyPlaneGeo, skyPlaneMat);
+            skyPlane.position.set(0, 6, -22);
+            personalRoomScene.add(skyPlane);
+            // Ventana trasera grande
             const windowW = 4.5, windowH = 2.2;
-            const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.08);
-            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: skyColor, transparent: true, opacity: 0.82, roughness: 0.15, metalness: 0.2, reflectivity: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
+            const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.03);
+            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: 0xBFEFFF, transparent: true, opacity: 0.18, roughness: 0.04, metalness: 0.1, reflectivity: 0.5, clearcoat: 0.7, clearcoatRoughness: 0.05, transmission: 0.98, ior: 1.45 });
             const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
+            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.03);
             personalRoomScene.add(backWindow);
-            // Bisel y marco ventana trasera
-            const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
+            // Marco ventana trasera (más delgado)
+            const frameGeometry = new THREE.BoxGeometry(windowW + 0.08, windowH + 0.08, 0.06);
             const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
             const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             backFrame.position.copy(backWindow.position);
             personalRoomScene.add(backFrame);
-            // Cruces del marco (vertical y horizontal)
+            // Cruces del marco (vertical y horizontal, más delgados)
             const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
-            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, windowH + 0.04, 0.07), crossMat);
             crossV.position.copy(backWindow.position);
             personalRoomScene.add(crossV);
-            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.04, 0.04, 0.07), crossMat);
             crossH.position.copy(backWindow.position);
             personalRoomScene.add(crossH);
             // Ventana izquierda grande
             const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
-            leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
+            leftWindow.position.set(-roomWidth/2 + 0.03, 1.7, 0);
             leftWindow.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWindow);
             const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
@@ -3109,17 +3113,17 @@
             leftFrame.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftFrame);
             // Cruces marco izquierdo
-            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, windowH + 0.04, 0.07), crossMat);
             leftCrossV.position.copy(leftWindow.position);
             leftCrossV.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftCrossV);
-            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.04, 0.04, 0.07), crossMat);
             leftCrossH.position.copy(leftWindow.position);
             leftCrossH.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftCrossH);
             // Ventana derecha grande
             const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
-            rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
+            rightWindow.position.set(roomWidth/2 - 0.03, 1.7, 0);
             rightWindow.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWindow);
             const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
@@ -3127,18 +3131,18 @@
             rightFrame.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightFrame);
             // Cruces marco derecho
-            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, windowH + 0.04, 0.07), crossMat);
             rightCrossV.position.copy(rightWindow.position);
             rightCrossV.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightCrossV);
-            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.04, 0.04, 0.07), crossMat);
             rightCrossH.position.copy(rightWindow.position);
             rightCrossH.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightCrossH);
             // Actualizar color del cielo cada minuto
             setInterval(() => {
                 const newSky = getSkyColorByHour();
-                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
+                skyPlane.material.color.set(newSky);
             }, 60000);
             // Muebles básicos
             createRoomFurniture(roomWidth, roomHeight, roomDepth);
