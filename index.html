@@ -3048,12 +3048,12 @@
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
-            // Pared frontal (con puerta)
-            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
-            frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
+            // Pared frontal (con hueco totalmente libre para la puerta)
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((roomWidth/2 - 1.1), roomHeight, 0.2), wallMaterial);
+            frontWallLeft.position.set(-roomWidth/4 - 0.55, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
-            frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((roomWidth/2 - 1.1), roomHeight, 0.2), wallMaterial);
+            frontWallRight.position.set(roomWidth/4 + 0.55, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
             // Puerta mejorada (solo hoja y manija, sin paneles frontales)
             const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
