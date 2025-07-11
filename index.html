@@ -3031,94 +3031,86 @@
             const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro
             const floorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1); // Marrón madera
             const ceilingMaterial = getCachedMaterial(0xF5F5F5, 0.9); // Blanco
-            const furnitureMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1); // Marrón madera
             
             // Paredes
             const wallGeometry = new THREE.BoxGeometry(roomWidth, roomHeight, 0.2);
-            
             // Pared trasera
             const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
             personalRoomScene.add(backWall);
-            
-            // Ventana trasera (centrada)
-            const windowWidth = 1.2, windowHeight = 0.8;
-            const skyColor = getSkyColorByHour();
-            const backWindowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, 0.05);
-            const backWindowMaterial = new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 });
-            const backWindow = new THREE.Mesh(backWindowGeometry, backWindowMaterial);
-            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
-            personalRoomScene.add(backWindow);
-            // Marco ventana trasera
-            const backFrameGeometry = new THREE.BoxGeometry(windowWidth + 0.1, windowHeight + 0.1, 0.08);
-            const backFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
-            const backFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
-            backFrame.position.copy(backWindow.position);
-            personalRoomScene.add(backFrame);
-            
             // Pared izquierda
             const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
             leftWall.position.set(-roomWidth/2, roomHeight/2, 0);
             leftWall.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWall);
-            // Ventana izquierda (centrada)
-            const leftWindow = new THREE.Mesh(backWindowGeometry, new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 }));
-            leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
-            leftWindow.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftWindow);
-            // Marco ventana izquierda
-            const leftFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
-            leftFrame.position.copy(leftWindow.position);
-            leftFrame.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftFrame);
-            
             // Pared derecha
             const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
-            // Ventana derecha (centrada)
-            const rightWindow = new THREE.Mesh(backWindowGeometry, new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 }));
-            rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
-            rightWindow.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWindow);
-            // Marco ventana derecha
-            const rightFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
-            rightFrame.position.copy(rightWindow.position);
-            rightFrame.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightFrame);
-            
             // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-            
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
-            
             // Puerta
             const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
             const doorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1);
             const door = new THREE.Mesh(doorGeometry, doorMaterial);
             door.position.set(0, 1.1, roomDepth/2);
             personalRoomScene.add(door);
-            
             // Suelo
             const floorGeometry = new THREE.BoxGeometry(roomWidth, 0.1, roomDepth);
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
             floor.position.set(0, 0, 0);
             personalRoomScene.add(floor);
-            
             // Techo
             const ceilingGeometry = new THREE.BoxGeometry(roomWidth, 0.1, roomDepth);
             const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
             ceiling.position.set(0, roomHeight, 0);
             personalRoomScene.add(ceiling);
-            
+            // --- Ventanas grandes y realistas con cielo dinámico ---
+            const skyColor = getSkyColorByHour();
+            // Ventana trasera grande
+            const windowW = 4.5, windowH = 2.2;
+            const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.08);
+            const windowMaterial = new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.82 });
+            const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
+            personalRoomScene.add(backWindow);
+            // Marco ventana trasera
+            const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
+            const frameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            backFrame.position.copy(backWindow.position);
+            personalRoomScene.add(backFrame);
+            // Ventana izquierda grande
+            const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
+            leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
+            leftWindow.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWindow);
+            const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            leftFrame.position.copy(leftWindow.position);
+            leftFrame.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftFrame);
+            // Ventana derecha grande
+            const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
+            rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
+            rightWindow.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWindow);
+            const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            rightFrame.position.copy(rightWindow.position);
+            rightFrame.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightFrame);
+            // Actualizar color del cielo cada minuto
+            setInterval(() => {
+                const newSky = getSkyColorByHour();
+                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
+            }, 60000);
             // Muebles básicos
             createRoomFurniture(roomWidth, roomHeight, roomDepth);
-            
             // Cargar posiciones guardadas de muebles
             loadFurniturePositions();
         }
