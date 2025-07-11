@@ -3074,7 +3074,7 @@
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
             personalRoomScene.add(handle);
-            // --- Ventanas grandes mejoradas y totalmente transparentes ---
+            // --- Ventanas grandes restauradas y bien visibles ---
             const skyColor = getSkyColorByHour();
             // Plano de cielo exterior visible desde las ventanas
             const skyPlaneGeo = new THREE.PlaneGeometry(40, 12);
@@ -3085,17 +3085,17 @@
             // Ventana trasera grande
             const windowW = 4.5, windowH = 2.2;
             const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.03);
-            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: 0xBFEFFF, transparent: true, opacity: 0.18, roughness: 0.04, metalness: 0.1, reflectivity: 0.5, clearcoat: 0.7, clearcoatRoughness: 0.05, transmission: 0.98, ior: 1.45 });
+            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: 0xBFEFFF, transparent: true, opacity: 0.55, roughness: 0.08, metalness: 0.15, reflectivity: 0.35, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
             const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
             backWindow.position.set(0, 1.7, -roomDepth/2 + 0.03);
             personalRoomScene.add(backWindow);
-            // Marco ventana trasera (más delgado)
+            // Marco ventana trasera (elegante)
             const frameGeometry = new THREE.BoxGeometry(windowW + 0.08, windowH + 0.08, 0.06);
             const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
             const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             backFrame.position.copy(backWindow.position);
             personalRoomScene.add(backFrame);
-            // Cruces del marco (vertical y horizontal, más delgados)
+            // Cruces del marco (vertical y horizontal)
             const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
             const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.04, windowH + 0.04, 0.07), crossMat);
             crossV.position.copy(backWindow.position);
