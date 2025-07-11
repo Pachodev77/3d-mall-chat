@@ -5094,10 +5094,15 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             // Calcular la posición Y correcta para el piso
             const floorStep = HALL_HEIGHT + 1;
             const correctY = floor * floorStep + 0.6;
+            if (userAvatars.has(alias)) {
+                console.warn('[createRobloxAvatar] Ya existe avatar para alias:', alias, '- NO se crea de nuevo.');
+                return;
+            }
             loader.load(modelPath, function(gltf) {
                 const avatar = gltf.scene;
                 avatar.position.set(position.x, correctY, position.z);
                 avatar.scale.set(1.5, 1.5, 1.5); // Ajusta el tamaño si es necesario
+                removeUserAvatar(alias);
                 scene.add(avatar);
                 userAvatars.set(alias, {
                     group: avatar,
@@ -5105,6 +5110,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                     targetRotation: 0,
                     currentFloor: floor
                 });
+                console.log('[createRobloxAvatar] Avatar creado para alias:', alias);
             }, undefined, function(error) {
                 console.error('Error cargando avatar GLTF:', error);
             });
