@@ -2990,51 +2990,57 @@
         }
         
         function updatePersonalRoomMovement() {
-            // Límites de la habitación (8x8 metros)
-            const roomBounds = {
-                minX: -3.5,
-                maxX: 3.5,
-                minZ: -3.5,
-                maxZ: 3.5
-            };
-            
-            // Calcular dirección de movimiento
-            let moveX = 0;
-            let moveZ = 0;
-            
-            // Controles de teclado
-            if (keys.W || keys.ArrowUp) moveZ -= 1;
-            if (keys.S || keys.ArrowDown) moveZ += 1;
-            if (keys.A || keys.ArrowLeft) moveX -= 1;
-            if (keys.D || keys.ArrowRight) moveX += 1;
-            
-            // Controles móviles
-            if (mobileForward) moveZ -= 1;
-            if (mobileBackward) moveZ += 1;
-            if (mobileLeft) moveX -= 1;
-            if (mobileRight) moveX += 1;
-            
-            // Normalizar movimiento diagonal
-            if (moveX !== 0 && moveZ !== 0) {
-                moveX *= 0.707;
-                moveZ *= 0.707;
+            // Si el chat está abierto, no actualizar movimiento
+            if (chatOpen) {
+                return;
             }
             
-            // Aplicar movimiento
-            if (moveX !== 0 || moveZ !== 0) {
-                const moveSpeed = MOVE_SPEED * 0.016; // Ajustar velocidad
+            // --- Rotación con flechas izquierda/derecha y controles móviles ---
+            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY -= ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY += ROTATE_SPEED;
+
+            // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
+            const direction = new THREE.Vector3();
+            personalRoomCamera.getWorldDirection(direction);
+            direction.y = 0;
+            direction.normalize();
+            
+            const velocity = new THREE.Vector3();
+            
+            // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
+            if (keys.ArrowUp || mobileForward) velocity.add(direction);
+            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            
+            // Movimiento lateral con A y D (teclas)
+            const rightDirection = new THREE.Vector3();
+            rightDirection.setFromMatrixColumn(personalRoomCamera.matrix, 0);
+            rightDirection.y = 0;
+            rightDirection.normalize();
+            
+            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
+            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            
+            if (velocity.length() > 0) {
+                velocity.normalize().multiplyScalar(MOVE_SPEED);
+                const newPosition = personalRoomTargetPosition.clone().add(velocity);
                 
-                // Calcular nueva posición
-                const newX = personalRoomTargetPosition.x + moveX * moveSpeed;
-                const newZ = personalRoomTargetPosition.z + moveZ * moveSpeed;
+                // --- Límites de la habitación (8x8 metros) ---
+                const roomBounds = {
+                    minX: -3.5,
+                    maxX: 3.5,
+                    minZ: -3.5,
+                    maxZ: 3.5
+                };
                 
                 // Aplicar límites de la habitación
-                personalRoomTargetPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newX));
-                personalRoomTargetPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newZ));
+                newPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newPosition.x));
+                newPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newPosition.z));
+                
+                personalRoomTargetPosition.copy(newPosition);
             }
-            
-            // Rotación con mouse (si se implementa)
-            // Por ahora, la rotación se mantiene fija
+
+            // --- Mantener altura fija en la habitación ---
+            personalRoomTargetPosition.y = CAMERA_HEIGHT;
         }
         
         function animatePersonalRoom() {
