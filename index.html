@@ -4891,25 +4891,41 @@
             });
         });
 
-        // --- Función para crear un avatar de usuario ---
-        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
-            if (userAvatars.has(alias)) return;
-            const avatarGroup = new THREE.Group();
-            avatarGroup.position.set(position.x, position.y, position.z);
-            // Geometría visible para el avatar (cubo simple)
-            const geometry = new THREE.BoxGeometry(1, 2, 1);
-            const material = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.castShadow = false;
-            avatarGroup.add(mesh);
-            scene.add(avatarGroup);
+        // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
+function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
+    if (userAvatars.has(alias)) return;
+    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    const texturePath = 'assets/kenney 3d characters/Skins/humanMaleA.png'; // Puedes cambiar el skin aquí
+    const loader = new THREE.FBXLoader();
+    const texLoader = new THREE.TextureLoader();
+    // Calcular la posición Y correcta para el piso
+    const floorStep = HALL_HEIGHT + 1;
+    const correctY = floor * floorStep + 0.6;
+    texLoader.load(texturePath, function(texture) {
+        loader.load(modelPath, function(avatar) {
+            avatar.traverse(function(child) {
+                if (child.isMesh) {
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                }
+            });
+            avatar.position.set(position.x, correctY, position.z);
+            avatar.scale.set(0.012, 0.012, 0.012); // Ajusta la escala según sea necesario
+            scene.add(avatar);
             userAvatars.set(alias, {
-                group: avatarGroup,
-                targetPosition: new THREE.Vector3(position.x, position.y, position.z),
+                group: avatar,
+                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor
             });
-        }
+        }, undefined, function(error) {
+            console.error('Error cargando avatar FBX:', error);
+        });
+    }, undefined, function(error) {
+        console.error('Error cargando textura PNG:', error);
+    });
+}
+
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
             userAvatars.forEach((avatar, alias) => {
