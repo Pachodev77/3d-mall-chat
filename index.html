@@ -3764,8 +3764,8 @@
             selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
             updateFurnitureList();
             
-            // Guardar automáticamente la posición
-            saveFurniturePositions();
+            // Guardar automáticamente la posición sin deseleccionar
+            saveFurniturePositionsSilently();
         }
         
         function rotateSelectedFurniture() {
@@ -3774,8 +3774,8 @@
             selectedFurniture.mesh.rotation.y += Math.PI / 4; // Rotar 45 grados
             updateFurnitureList();
             
-            // Guardar automáticamente la rotación
-            saveFurniturePositions();
+            // Guardar automáticamente la rotación sin deseleccionar
+            saveFurniturePositionsSilently();
         }
         
         function saveFurniturePositions() {
@@ -3807,6 +3807,25 @@
                     roomNavigationPanel.style.display = 'flex';
                 }
             }
+        }
+        
+        function saveFurniturePositionsSilently() {
+            // Guardar todas las posiciones de muebles en localStorage sin deseleccionar
+            const furniturePositions = {};
+            furnitureObjects.forEach(furniture => {
+                furniturePositions[furniture.id] = {
+                    position: {
+                        x: furniture.mesh.position.x,
+                        y: furniture.mesh.position.y,
+                        z: furniture.mesh.position.z
+                    },
+                    rotation: {
+                        y: furniture.mesh.rotation.y
+                    }
+                };
+            });
+            
+            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
         }
         
         function animate(currentTime) {
