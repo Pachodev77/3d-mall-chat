@@ -4892,7 +4892,16 @@
             }
         });
 
-        // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
+        // --- Eliminar avatar de usuario de la escena y del mapa ---
+function removeUserAvatar(alias) {
+    const avatar = userAvatars.get(alias);
+    if (avatar && avatar.group) {
+        scene.remove(avatar.group);
+    }
+    userAvatars.delete(alias);
+}
+
+// --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     if (userAvatars.has(alias)) return;
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
