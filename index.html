@@ -3032,82 +3032,69 @@
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
             personalRoomScene.add(backWall);
             
+            // Ventana trasera (centrada)
+            const windowWidth = 1.2, windowHeight = 0.8;
+            const skyColor = getSkyColorByHour();
+            const backWindowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, 0.05);
+            const backWindowMaterial = new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 });
+            const backWindow = new THREE.Mesh(backWindowGeometry, backWindowMaterial);
+            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
+            personalRoomScene.add(backWindow);
+            // Marco ventana trasera
+            const backFrameGeometry = new THREE.BoxGeometry(windowWidth + 0.1, windowHeight + 0.1, 0.08);
+            const backFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const backFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
+            backFrame.position.copy(backWindow.position);
+            personalRoomScene.add(backFrame);
+            
             // Pared izquierda
             const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
             leftWall.position.set(-roomWidth/2, roomHeight/2, 0);
             leftWall.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWall);
+            // Ventana izquierda (centrada)
+            const leftWindow = new THREE.Mesh(backWindowGeometry, new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 }));
+            leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
+            leftWindow.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWindow);
+            // Marco ventana izquierda
+            const leftFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
+            leftFrame.position.copy(leftWindow.position);
+            leftFrame.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftFrame);
             
             // Pared derecha
             const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
+            // Ventana derecha (centrada)
+            const rightWindow = new THREE.Mesh(backWindowGeometry, new THREE.MeshStandardMaterial({ color: skyColor, transparent: true, opacity: 0.7 }));
+            rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
+            rightWindow.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWindow);
+            // Marco ventana derecha
+            const rightFrame = new THREE.Mesh(backFrameGeometry, backFrameMaterial);
+            rightFrame.position.copy(rightWindow.position);
+            rightFrame.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightFrame);
             
-            // Pared frontal (con puerta y ventanal)
+            // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-
-            // VENTANAL FRONTAL (a la derecha de la puerta)
-            const frontWindowGeometry = new THREE.BoxGeometry(roomWidth/2 - 1.5, roomHeight - 0.5, 0.08);
-            const frontWindowMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x87CEEB,
-                transparent: true,
-                opacity: 0.35,
-                roughness: 0.1,
-                metalness: 0.2,
-                transmission: 0.85,
-                thickness: 0.2
-            });
-            const frontWindow = new THREE.Mesh(frontWindowGeometry, frontWindowMaterial);
-            frontWindow.position.set(roomWidth/4 + 0.75, roomHeight/2, roomDepth/2 + 0.01);
-            personalRoomScene.add(frontWindow);
-
-            // Marco del ventanal frontal
-            const frontFrameGeometry = new THREE.BoxGeometry(roomWidth/2 - 1.5 + 0.1, roomHeight - 0.5 + 0.1, 0.1);
-            const frontFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
-            const frontFrame = new THREE.Mesh(frontFrameGeometry, frontFrameMaterial);
-            frontFrame.position.set(roomWidth/4 + 0.75, roomHeight/2, roomDepth/2 + 0.06);
-            personalRoomScene.add(frontFrame);
-
-            // Pared frontal izquierda (mantiene la puerta)
-            // (ya agregada como frontWallLeft)
-
-            // Pared derecha (con ventanal)
-            const rightWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 0.5, 0.2), wallMaterial);
-            rightWallTop.position.set(roomWidth/2, roomHeight - 0.25, 0);
-            rightWallTop.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWallTop);
-
-            const rightWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 0.5, 0.2), wallMaterial);
-            rightWallBottom.position.set(roomWidth/2, 0.25, 0);
-            rightWallBottom.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWallBottom);
-
-            // VENTANAL DERECHO (gran ventanal central)
-            const rightWindowGeometry = new THREE.BoxGeometry(roomWidth, roomHeight - 1, 0.08);
-            const rightWindowMaterial = new THREE.MeshPhysicalMaterial({
-                color: 0x87CEEB,
-                transparent: true,
-                opacity: 0.32,
-                roughness: 0.1,
-                metalness: 0.2,
-                transmission: 0.85,
-                thickness: 0.2
-            });
-            const rightWindow = new THREE.Mesh(rightWindowGeometry, rightWindowMaterial);
-            rightWindow.position.set(roomWidth/2 + 0.01, roomHeight/2, 0);
-            rightWindow.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWindow);
-
-            // Marco del ventanal derecho
-            const rightFrameGeometry = new THREE.BoxGeometry(roomWidth + 0.1, roomHeight - 1 + 0.1, 0.1);
-            const rightFrame = new THREE.Mesh(rightFrameGeometry, frontFrameMaterial);
-            rightFrame.position.set(roomWidth/2 + 0.06, roomHeight/2, 0);
-            rightFrame.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightFrame);
-
+            
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
+            frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
+            personalRoomScene.add(frontWallRight);
+            
+            // Puerta
+            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
+            const doorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1);
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1.1, roomDepth/2);
+            personalRoomScene.add(door);
+            
             // Suelo
             const floorGeometry = new THREE.BoxGeometry(roomWidth, 0.1, roomDepth);
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -5214,6 +5201,18 @@
                 openPrivateChatWindow(alias);
             }
         });
+
+        // Devuelve el color del cielo según la hora actual (día, atardecer, noche)
+        function getSkyColorByHour() {
+            const hour = new Date().getHours();
+            if (hour >= 7 && hour < 18) {
+                return 0x87CEEB; // Día: azul claro
+            } else if (hour >= 18 && hour < 20) {
+                return 0xFFA07A; // Atardecer: naranja/rojo suave
+            } else {
+                return 0x223366; // Noche: azul oscuro
+            }
+        }
     </script>
 </body>
 </html>
