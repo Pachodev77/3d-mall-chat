@@ -3346,8 +3346,8 @@
             }
             
             // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY += ROTATE_SPEED;
+            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY += ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY -= ROTATE_SPEED;
 
             // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
