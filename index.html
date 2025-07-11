@@ -4862,6 +4862,14 @@
         // Listener de posiciones de avatares en Firebase
         positionsRef.on('value', (snapshot) => {
             const positions = snapshot.val() || {};
+            // --- Limpieza automática de posiciones huérfanas (más de 1 minuto sin actualizar) ---
+            const now = Date.now();
+            Object.entries(positions).forEach(([alias, data]) => {
+                if (data.timestamp && now - data.timestamp > 60 * 1000) {
+                    console.log('[Limpieza] Eliminando posición antigua de alias:', alias);
+                    positionsRef.child(alias).remove();
+                }
+            });
             Object.keys(positions).forEach(alias => {
                 const userData = positions[alias];
                 if (
