@@ -3028,7 +3028,7 @@
             const roomDepth = 12;
             
             // Materiales
-            const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro
+            const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro real, NO café
             const floorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1); // Marrón madera
             const ceilingMaterial = getCachedMaterial(0xF5F5F5, 0.9); // Blanco
             
@@ -3049,11 +3049,12 @@
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
             // Pared frontal (con puerta)
-            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
-            frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
+            // Dejar un hueco central de 1.2m para la puerta (más ancho)
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1.2) / 2, roomHeight, 0.2), wallMaterial);
+            frontWallLeft.position.set(-((1.2 + (roomWidth - 1.2)) / 4), roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
-            frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1.2) / 2, roomHeight, 0.2), wallMaterial);
+            frontWallRight.position.set(((1.2 + (roomWidth - 1.2)) / 4), roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
             // Puerta mejorada (paneles y manija)
             // (Eliminado todos los objetos en la posición de la puerta para dejar el hueco completamente abierto)
