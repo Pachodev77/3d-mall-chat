@@ -3056,7 +3056,7 @@
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
             // Puerta mejorada (paneles y manija)
-            // (Eliminado el mesh principal de la puerta para dejar solo los paneles y la manija)
+            // (Eliminado todos los objetos en la posición de la puerta para dejar el hueco completamente abierto)
             // Paneles de la puerta (relieve)
             const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
             for (let i = 0; i < 3; i++) {
