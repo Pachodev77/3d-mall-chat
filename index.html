@@ -4913,6 +4913,11 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             avatar.scale.set(0.012, 0.012, 0.012); // Ajusta la escala según sea necesario
             scene.add(avatar);
             userAvatars.set(alias, {
+                group: avatar,
+                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
+                targetRotation: 0,
+                currentFloor: floor
+            });
 
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
