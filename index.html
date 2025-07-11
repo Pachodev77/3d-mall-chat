@@ -3007,6 +3007,11 @@
             
             // Crear habitación
             createPersonalRoom();
+            // Crear y actualizar cielo visible desde las ventanas
+            createPersonalRoomSky();
+            if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
+            personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
+            updatePersonalRoomSky();
             
             // Iniciar animación de la habitación
             animatePersonalRoom();
@@ -5212,6 +5217,122 @@
             } else {
                 return 0x223366; // Noche: azul oscuro
             }
+        }
+
+        // --- Variables globales para el cielo de la habitación personal ---
+        let personalRoomSkyPlanes = [];
+        let personalRoomSkyInterval = null;
+
+        function createPersonalRoomSky() {
+            // Eliminar sky planes previos si existen
+            if (personalRoomSkyPlanes.length > 0) {
+                personalRoomSkyPlanes.forEach(plane => personalRoomScene.remove(plane));
+                personalRoomSkyPlanes = [];
+            }
+            // Dimensiones y posiciones para cada pared con ventana
+            const roomWidth = 12, roomHeight = 3.5, roomDepth = 12;
+            const skyPlaneWidth = 8, skyPlaneHeight = 3;
+            // Trasera (Z-)
+            const backSky = new THREE.Mesh(
+                new THREE.PlaneGeometry(skyPlaneWidth, skyPlaneHeight),
+                new THREE.MeshBasicMaterial({ color: getSkyColor(), side: THREE.BackSide })
+            );
+            backSky.position.set(0, 1.75, -roomDepth/2 - 0.05);
+            personalRoomScene.add(backSky);
+            personalRoomSkyPlanes.push(backSky);
+            // Izquierda (X-)
+            const leftSky = new THREE.Mesh(
+                new THREE.PlaneGeometry(skyPlaneWidth, skyPlaneHeight),
+                new THREE.MeshBasicMaterial({ color: getSkyColor(), side: THREE.BackSide })
+            );
+            leftSky.position.set(-roomWidth/2 - 0.05, 1.75, 0);
+            leftSky.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftSky);
+            personalRoomSkyPlanes.push(leftSky);
+            // Derecha (X+)
+            const rightSky = new THREE.Mesh(
+                new THREE.PlaneGeometry(skyPlaneWidth, skyPlaneHeight),
+                new THREE.MeshBasicMaterial({ color: getSkyColor(), side: THREE.BackSide })
+            );
+            rightSky.position.set(roomWidth/2 + 0.05, 1.75, 0);
+            rightSky.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightSky);
+            personalRoomSkyPlanes.push(rightSky);
+        }
+        function updatePersonalRoomSky() {
+            const color = getSkyColor();
+            personalRoomSkyPlanes.forEach(plane => {
+                plane.material.color.copy(color);
+                plane.material.needsUpdate = true;
+            });
+        }
+
+        function createPersonalRoom() {
+            // ... existing code ...
+            // Ventanas grandes a media altura, con marco realista
+            const windowWidth = 3.5, windowHeight = 2.0, windowY = 1.75;
+            // --- Ventana trasera ---
+            createWindowWithFrame(0, windowY, -roomDepth/2 + 0.11, 0, windowWidth, windowHeight, 'back');
+            // --- Ventana izquierda ---
+            createWindowWithFrame(-roomWidth/2 + 0.11, windowY, 0, Math.PI/2, windowWidth, windowHeight, 'left');
+            // --- Ventana derecha ---
+            createWindowWithFrame(roomWidth/2 - 0.11, windowY, 0, -Math.PI/2, windowWidth, windowHeight, 'right');
+            // ... existing code ...
+        }
+
+        // Crea una ventana con marco realista (4 barras) en la posición y orientación dadas
+        function createWindowWithFrame(x, y, z, rotY, width, height, side) {
+            // Vidrio (transparente)
+            const glass = new THREE.Mesh(
+                new THREE.PlaneGeometry(width, height),
+                new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.15,
+                    roughness: 0.1,
+                    metalness: 0.0,
+                    transmission: 0.95,
+                    thickness: 0.1
+                })
+            );
+            glass.position.set(x, y, z);
+            glass.rotation.y = rotY;
+            personalRoomScene.add(glass);
+            // Marco (4 barras)
+            const frameColor = 0xeeeeee;
+            const frameThickness = 0.08, frameDepth = 0.15;
+            // Superior
+            const topBar = new THREE.Mesh(
+                new THREE.BoxGeometry(width + frameThickness*2, frameThickness, frameDepth),
+                getCachedMaterial(frameColor, 0.7, 0.1)
+            );
+            topBar.position.set(x, y + height/2 + frameThickness/2, z);
+            topBar.rotation.y = rotY;
+            personalRoomScene.add(topBar);
+            // Inferior
+            const bottomBar = new THREE.Mesh(
+                new THREE.BoxGeometry(width + frameThickness*2, frameThickness, frameDepth),
+                getCachedMaterial(frameColor, 0.7, 0.1)
+            );
+            bottomBar.position.set(x, y - height/2 - frameThickness/2, z);
+            bottomBar.rotation.y = rotY;
+            personalRoomScene.add(bottomBar);
+            // Izquierda
+            const leftBar = new THREE.Mesh(
+                new THREE.BoxGeometry(frameThickness, height, frameDepth),
+                getCachedMaterial(frameColor, 0.7, 0.1)
+            );
+            leftBar.position.set(x - width/2 - frameThickness/2, y, z);
+            leftBar.rotation.y = rotY;
+            personalRoomScene.add(leftBar);
+            // Derecha
+            const rightBar = new THREE.Mesh(
+                new THREE.BoxGeometry(frameThickness, height, frameDepth),
+                getCachedMaterial(frameColor, 0.7, 0.1)
+            );
+            rightBar.position.set(x + width/2 + frameThickness/2, y, z);
+            rightBar.rotation.y = rotY;
+            personalRoomScene.add(rightBar);
         }
     </script>
 </body>
