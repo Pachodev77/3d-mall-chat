@@ -2875,10 +2875,10 @@
         }
         
         function createPersonalRoom() {
-            // Dimensiones de la habitación
-            const roomWidth = 8;
-            const roomHeight = 3;
-            const roomDepth = 8;
+            // Dimensiones de la habitación (más grande)
+            const roomWidth = 12;
+            const roomHeight = 3.5;
+            const roomDepth = 12;
             
             // Materiales
             const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro
@@ -2939,54 +2939,251 @@
         }
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
-            // Cama
-            const bedGeometry = new THREE.BoxGeometry(2, 0.3, 3);
-            const bedMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
-            const bed = new THREE.Mesh(bedGeometry, bedMaterial);
-            bed.position.set(-2.5, 0.15, -2);
-            personalRoomScene.add(bed);
+            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
             
-            // Mesa de noche
-            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.8);
+            // Cama principal (más grande y realista)
+            const bedFrameGeometry = new THREE.BoxGeometry(2.2, 0.4, 3.2);
+            const bedFrameMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1); // Marco de madera
+            const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
+            bedFrame.position.set(-4, 0.2, -3);
+            personalRoomScene.add(bedFrame);
+            
+            // Colchón
+            const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
+            const mattressMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
+            const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+            mattress.position.set(-4, 0.5, -3);
+            personalRoomScene.add(mattress);
+            
+            // Almohadas
+            const pillowGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.8);
+            const pillowMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const pillow1 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow1.position.set(-4.3, 0.65, -4.2);
+            personalRoomScene.add(pillow1);
+            
+            const pillow2 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow2.position.set(-3.7, 0.65, -4.2);
+            personalRoomScene.add(pillow2);
+            
+            // Mesa de noche izquierda
+            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
             const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const nightstand = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
-            nightstand.position.set(-3.5, 0.3, -2);
-            personalRoomScene.add(nightstand);
+            const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandLeft.position.set(-5.5, 0.35, -3);
+            personalRoomScene.add(nightstandLeft);
             
-            // Escritorio
-            const deskGeometry = new THREE.BoxGeometry(2, 0.1, 1);
+            // Mesa de noche derecha
+            const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandRight.position.set(-2.5, 0.35, -3);
+            personalRoomScene.add(nightstandRight);
+            
+            // Lámpara de mesa
+            const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.1, 8);
+            const lampBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
+            lampBase.position.set(-5.5, 0.75, -3);
+            personalRoomScene.add(lampBase);
+            
+            const lampPoleGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.4, 6);
+            const lampPoleMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const lampPole = new THREE.Mesh(lampPoleGeometry, lampPoleMaterial);
+            lampPole.position.set(-5.5, 1, -3);
+            personalRoomScene.add(lampPole);
+            
+            const lampShadeGeometry = new THREE.ConeGeometry(0.3, 0.2, 8);
+            const lampShadeMaterial = getCachedMaterial(0xECF0F1, 0.9, 0.1);
+            const lampShade = new THREE.Mesh(lampShadeGeometry, lampShadeMaterial);
+            lampShade.position.set(-5.5, 1.25, -3);
+            lampShade.rotation.x = Math.PI;
+            personalRoomScene.add(lampShade);
+            
+            // ===== ZONA DE TRABAJO (Lado derecho) =====
+            
+            // Escritorio principal (más grande)
+            const deskGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.2);
             const deskMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
             const desk = new THREE.Mesh(deskGeometry, deskMaterial);
-            desk.position.set(2.5, 0.7, -2);
+            desk.position.set(4, 0.7, -3);
             personalRoomScene.add(desk);
             
-            // Silla del escritorio
-            const chairGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.6);
-            const chairMaterial = getCachedMaterial(0x654321, 0.7, 0.1);
-            const chair = new THREE.Mesh(chairGeometry, chairMaterial);
-            chair.position.set(2.5, 0.4, -1);
-            personalRoomScene.add(chair);
+            // Patas del escritorio
+            for (let i = 0; i < 4; i++) {
+                const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6);
+                const legMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+                const leg = new THREE.Mesh(legGeometry, legMaterial);
+                const x = 4 + (i % 2 === 0 ? -1 : 1) * 1.2;
+                const z = -3 + (i < 2 ? -1 : 1) * 0.5;
+                leg.position.set(x, 0.35, z);
+                personalRoomScene.add(leg);
+            }
             
-            // Computadora (monitor)
-            const monitorGeometry = new THREE.BoxGeometry(1.2, 0.8, 0.1);
+            // Silla ergonómica del escritorio
+            const chairSeatGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.7);
+            const chairSeatMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+            const chairSeat = new THREE.Mesh(chairSeatGeometry, chairSeatMaterial);
+            chairSeat.position.set(4, 0.45, -1.8);
+            personalRoomScene.add(chairSeat);
+            
+            const chairBackGeometry = new THREE.BoxGeometry(0.7, 0.8, 0.1);
+            const chairBackMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+            const chairBack = new THREE.Mesh(chairBackGeometry, chairBackMaterial);
+            chairBack.position.set(4, 0.85, -2.2);
+            personalRoomScene.add(chairBack);
+            
+            // Patas de la silla
+            for (let i = 0; i < 4; i++) {
+                const chairLegGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.45, 6);
+                const chairLegMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+                const chairLeg = new THREE.Mesh(chairLegGeometry, chairLegMaterial);
+                const x = 4 + (i % 2 === 0 ? -1 : 1) * 0.3;
+                const z = -1.8 + (i < 2 ? -1 : 1) * 0.3;
+                chairLeg.position.set(x, 0.225, z);
+                personalRoomScene.add(chairLeg);
+            }
+            
+            // Computadora completa
+            const monitorGeometry = new THREE.BoxGeometry(1.4, 0.9, 0.1);
             const monitorMaterial = getCachedMaterial(0x000000, 0.8, 0.2);
             const monitor = new THREE.Mesh(monitorGeometry, monitorMaterial);
-            monitor.position.set(2.5, 1.2, -2);
+            monitor.position.set(4, 1.3, -3);
             personalRoomScene.add(monitor);
             
-            // Estantería
-            const shelfGeometry = new THREE.BoxGeometry(1.5, 2, 0.4);
+            // Base del monitor
+            const monitorBaseGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.1, 8);
+            const monitorBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const monitorBase = new THREE.Mesh(monitorBaseGeometry, monitorBaseMaterial);
+            monitorBase.position.set(4, 0.8, -3);
+            personalRoomScene.add(monitorBase);
+            
+            // CPU/Torre
+            const cpuGeometry = new THREE.BoxGeometry(0.4, 0.6, 0.2);
+            const cpuMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const cpu = new THREE.Mesh(cpuGeometry, cpuMaterial);
+            cpu.position.set(5.5, 0.7, -3);
+            personalRoomScene.add(cpu);
+            
+            // Teclado
+            const keyboardGeometry = new THREE.BoxGeometry(1.2, 0.05, 0.4);
+            const keyboardMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
+            const keyboard = new THREE.Mesh(keyboardGeometry, keyboardMaterial);
+            keyboard.position.set(4, 0.75, -2.5);
+            personalRoomScene.add(keyboard);
+            
+            // Mouse
+            const mouseGeometry = new THREE.BoxGeometry(0.12, 0.05, 0.2);
+            const mouseMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
+            const mouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
+            mouse.position.set(5.2, 0.75, -2.5);
+            personalRoomScene.add(mouse);
+            
+            // ===== ZONA DE ALMACENAMIENTO =====
+            
+            // Estantería grande
+            const shelfGeometry = new THREE.BoxGeometry(2, 2.2, 0.5);
             const shelfMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
             const shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
-            shelf.position.set(3.5, 1, 0);
+            shelf.position.set(5.5, 1.1, 0);
             personalRoomScene.add(shelf);
             
-            // Ventana
-            const windowGeometry = new THREE.BoxGeometry(2, 1.5, 0.1);
-            const windowMaterial = getCachedMaterial(0x87CEEB, 0.3, 0.8); // Azul claro transparente
+            // Estantes de la estantería
+            for (let i = 0; i < 4; i++) {
+                const shelfLevelGeometry = new THREE.BoxGeometry(2, 0.05, 0.5);
+                const shelfLevel = new THREE.Mesh(shelfLevelGeometry, shelfMaterial);
+                shelfLevel.position.set(5.5, 0.3 + i * 0.5, 0);
+                personalRoomScene.add(shelfLevel);
+            }
+            
+            // Libros en la estantería
+            for (let i = 0; i < 8; i++) {
+                const bookGeometry = new THREE.BoxGeometry(0.15, 0.25, 0.4);
+                const bookMaterial = getCachedMaterial(0xE74C3C + i * 0x111111, 0.8, 0.1);
+                const book = new THREE.Mesh(bookGeometry, bookMaterial);
+                const row = Math.floor(i / 4);
+                const col = i % 4;
+                book.position.set(5.5 + (col - 1.5) * 0.2, 0.4 + row * 0.5, 0);
+                personalRoomScene.add(book);
+            }
+            
+            // ===== ZONA DE RELAX (Centro) =====
+            
+            // Sofá pequeño
+            const sofaGeometry = new THREE.BoxGeometry(2.5, 0.8, 1);
+            const sofaMaterial = getCachedMaterial(0x3498DB, 0.8, 0.1);
+            const sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
+            sofa.position.set(0, 0.4, 2);
+            personalRoomScene.add(sofa);
+            
+            // Cojines del sofá
+            for (let i = 0; i < 3; i++) {
+                const cushionGeometry = new THREE.BoxGeometry(0.7, 0.2, 0.8);
+                const cushionMaterial = getCachedMaterial(0x2980B9, 0.8, 0.1);
+                const cushion = new THREE.Mesh(cushionGeometry, cushionMaterial);
+                cushion.position.set(-0.8 + i * 0.8, 0.6, 2);
+                personalRoomScene.add(cushion);
+            }
+            
+            // Mesa de centro
+            const coffeeTableGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.8);
+            const coffeeTableMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const coffeeTable = new THREE.Mesh(coffeeTableGeometry, coffeeTableMaterial);
+            coffeeTable.position.set(0, 0.5, 3.5);
+            personalRoomScene.add(coffeeTable);
+            
+            // Patas de la mesa de centro
+            for (let i = 0; i < 4; i++) {
+                const tableLegGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 6);
+                const tableLegMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+                const tableLeg = new THREE.Mesh(tableLegGeometry, tableLegMaterial);
+                const x = (i % 2 === 0 ? -1 : 1) * 0.5;
+                const z = 3.5 + (i < 2 ? -1 : 1) * 0.3;
+                tableLeg.position.set(x, 0.25, z);
+                personalRoomScene.add(tableLeg);
+            }
+            
+            // ===== ELEMENTOS DECORATIVOS =====
+            
+            // Ventana principal (más grande)
+            const windowGeometry = new THREE.BoxGeometry(3, 2, 0.1);
+            const windowMaterial = getCachedMaterial(0x87CEEB, 0.3, 0.8);
             const window = new THREE.Mesh(windowGeometry, windowMaterial);
             window.position.set(0, 1.75, roomDepth/2 - 0.1);
             personalRoomScene.add(window);
+            
+            // Marco de la ventana
+            const windowFrameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
+            const windowFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const windowFrame = new THREE.Mesh(windowFrameGeometry, windowFrameMaterial);
+            windowFrame.position.set(0, 1.75, roomDepth/2 - 0.05);
+            personalRoomScene.add(windowFrame);
+            
+            // Cortinas
+            const curtainGeometry = new THREE.BoxGeometry(3.5, 2.5, 0.05);
+            const curtainMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1);
+            const curtain = new THREE.Mesh(curtainGeometry, curtainMaterial);
+            curtain.position.set(0, 1.75, roomDepth/2 - 0.2);
+            personalRoomScene.add(curtain);
+            
+            // Alfombra
+            const carpetGeometry = new THREE.BoxGeometry(8, 0.05, 6);
+            const carpetMaterial = getCachedMaterial(0xE67E22, 0.8, 0.1);
+            const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
+            carpet.position.set(0, 0.025, 0);
+            personalRoomScene.add(carpet);
+            
+            // Lámpara de techo
+            const ceilingLampGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 8);
+            const ceilingLampMaterial = getCachedMaterial(0xF1C40F, 0.8, 0.2);
+            const ceilingLamp = new THREE.Mesh(ceilingLampGeometry, ceilingLampMaterial);
+            ceilingLamp.position.set(0, roomHeight - 0.1, 0);
+            personalRoomScene.add(ceilingLamp);
+            
+            // Cable de la lámpara
+            const lampCableGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6);
+            const lampCableMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+            const lampCable = new THREE.Mesh(lampCableGeometry, lampCableMaterial);
+            lampCable.position.set(0, roomHeight - 0.35, 0);
+            personalRoomScene.add(lampCable);
         }
         
         function updatePersonalRoomMovement() {
@@ -3024,12 +3221,12 @@
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
                 const newPosition = personalRoomTargetPosition.clone().add(velocity);
                 
-                // --- Límites de la habitación (8x8 metros) ---
+                // --- Límites de la habitación (12x12 metros) ---
                 const roomBounds = {
-                    minX: -3.5,
-                    maxX: 3.5,
-                    minZ: -3.5,
-                    maxZ: 3.5
+                    minX: -5.5,
+                    maxX: 5.5,
+                    minZ: -5.5,
+                    maxZ: 5.5
                 };
                 
                 // Aplicar límites de la habitación
