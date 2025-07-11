@@ -3074,6 +3074,9 @@
             
             // Muebles básicos
             createRoomFurniture(roomWidth, roomHeight, roomDepth);
+            
+            // Cargar posiciones guardadas de muebles
+            loadFurniturePositions();
         }
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
@@ -3544,6 +3547,8 @@
             furnitureEditMode = !furnitureEditMode;
             
             if (furnitureEditMode) {
+                // Limpiar todos los resaltados al entrar en modo de edición
+                clearAllFurnitureHighlights();
                 openFurnitureEditPanel();
                 setupFurnitureSelection();
             } else {
@@ -3568,6 +3573,8 @@
                 furnitureEditPanelOpen = false;
             }
             furnitureEditMode = false;
+            // Limpiar todos los resaltados al cerrar el panel
+            clearAllFurnitureHighlights();
             deselectFurniture();
         }
         
@@ -3608,11 +3615,38 @@
             });
         }
         
+        function loadFurniturePositions() {
+            const savedPositions = localStorage.getItem('furniturePositions');
+            if (savedPositions) {
+                try {
+                    const furniturePositions = JSON.parse(savedPositions);
+                    furnitureObjects.forEach(furniture => {
+                        const savedData = furniturePositions[furniture.id];
+                        if (savedData && furniture.mesh) {
+                            // Aplicar posición guardada
+                            furniture.mesh.position.set(
+                                savedData.position.x,
+                                savedData.position.y,
+                                savedData.position.z
+                            );
+                            // Aplicar rotación guardada
+                            furniture.mesh.rotation.y = savedData.rotation.y;
+                        }
+                    });
+                    console.log('Posiciones de muebles cargadas desde localStorage');
+                } catch (error) {
+                    console.error('Error al cargar posiciones de muebles:', error);
+                }
+            }
+        }
+        
         function selectFurniture(furnitureId) {
             const furniture = furnitureObjects.find(f => f.id === furnitureId);
             if (!furniture) return;
             
-            deselectFurniture();
+            // Limpiar todos los resaltados primero
+            clearAllFurnitureHighlights();
+            
             selectedFurniture = furniture;
             
             // Ocultar la ventana de la habitación cuando se selecciona un mueble
@@ -3621,7 +3655,7 @@
                 roomNavigationPanel.style.display = 'none';
             }
             
-            // Resaltar el mueble seleccionado
+            // Resaltar SOLO el mueble seleccionado
             if (furniture.mesh) {
                 if (furniture.mesh.children && furniture.mesh.children.length > 0) {
                     // Si es un grupo, resaltar todos los hijos
@@ -3641,6 +3675,29 @@
             }
             
             updateFurnitureList();
+        }
+        
+        function clearAllFurnitureHighlights() {
+            // Limpiar resaltado de todos los muebles
+            furnitureObjects.forEach(furniture => {
+                if (furniture.mesh) {
+                    if (furniture.mesh.children && furniture.mesh.children.length > 0) {
+                        // Si es un grupo, quitar resaltado de todos los hijos
+                        furniture.mesh.children.forEach(child => {
+                            if (child.material) {
+                                child.material.emissive = new THREE.Color(0x000000);
+                                child.material.emissiveIntensity = 0;
+                            }
+                        });
+                    } else {
+                        // Si es un mueble individual, quitar resaltado directamente
+                        if (furniture.mesh.material) {
+                            furniture.mesh.material.emissive = new THREE.Color(0x000000);
+                            furniture.mesh.material.emissiveIntensity = 0;
+                        }
+                    }
+                }
+            });
         }
         
         function deselectFurniture() {
@@ -3706,6 +3763,9 @@
             // Mover el grupo completo
             selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
             updateFurnitureList();
+            
+            // Guardar automáticamente la posición
+            saveFurniturePositions();
         }
         
         function rotateSelectedFurniture() {
@@ -3713,12 +3773,32 @@
             
             selectedFurniture.mesh.rotation.y += Math.PI / 4; // Rotar 45 grados
             updateFurnitureList();
+            
+            // Guardar automáticamente la rotación
+            saveFurniturePositions();
         }
         
         function saveFurniturePositions() {
+            // Guardar todas las posiciones de muebles en localStorage
+            const furniturePositions = {};
+            furnitureObjects.forEach(furniture => {
+                furniturePositions[furniture.id] = {
+                    position: {
+                        x: furniture.mesh.position.x,
+                        y: furniture.mesh.position.y,
+                        z: furniture.mesh.position.z
+                    },
+                    rotation: {
+                        y: furniture.mesh.rotation.y
+                    }
+                };
+            });
+            
+            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
+            console.log('Posiciones de muebles guardadas en localStorage');
+            
+            // Si hay un mueble seleccionado, deseleccionarlo
             if (selectedFurniture) {
-                // Aquí se podría guardar en localStorage o en una base de datos
-                console.log('Posiciones de muebles guardadas');
                 deselectFurniture();
                 
                 // Mostrar la ventana de la habitación después de guardar
