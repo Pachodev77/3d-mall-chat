@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -932,6 +932,7 @@
     <!-- Panel de personalización de avatar -->
     <!-- Eliminado: <div id="customization-panel">...</div> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -4991,85 +4992,93 @@
             disconnectFromChat();
         });
 
-        // --- Función reutilizable para crear un avatar estilo Roblox ---
+        // --- Función reutilizable para crear un avatar estilo Kenney ---
         function createRobloxAvatar(options) {
             const group = new THREE.Group();
-            // Opciones y colores
+            // Colores personalizables
             const shirtColor = options.shirtColor || 0x4ECDC4;
             const pantsColor = options.pantsColor || 0x2C3E50;
             const shoesColor = options.shoesColor || 0x8B4513;
             const skinColor = 0xFFE4C4;
-            // Cabeza
-            const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            // --- Cabeza grande y redonda (esfera) ---
+            const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
             const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
             const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.set(0, 1.7, 0);
+            head.position.set(0, 1.75, 0);
             group.add(head);
-            // Torso
-            const bodyGeometry = new THREE.BoxGeometry(1, 1.2, 0.5);
+            // --- Ojos (esferas negras) ---
+            const eyeGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+            const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.15, 1.85, 0.42);
+            group.add(leftEye);
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.15, 1.85, 0.42);
+            group.add(rightEye);
+            // --- Boca (cilindro plano) ---
+            const mouthGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.02, 16);
+            const mouthMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
+            mouth.position.set(0, 1.68, 0.43);
+            mouth.rotation.x = Math.PI / 2;
+            group.add(mouth);
+            // --- Cuerpo cilíndrico ---
+            const bodyGeometry = new THREE.CylinderGeometry(0.28, 0.32, 0.7, 24);
             const bodyMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.position.set(0, 0.9, 0);
+            body.position.set(0, 1.18, 0);
             group.add(body);
-            // Brazos
-            const armGeometry = new THREE.BoxGeometry(0.35, 1, 0.35);
+            // --- Brazos cilíndricos ---
+            const armGeometry = new THREE.CylinderGeometry(0.10, 0.11, 0.55, 16);
             const armMaterial = new THREE.MeshStandardMaterial({ color: shirtColor });
             const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-            leftArm.position.set(-0.7, 1.1, 0);
+            leftArm.position.set(-0.38, 1.28, 0);
+            leftArm.rotation.z = Math.PI / 11;
             group.add(leftArm);
             const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-            rightArm.position.set(0.7, 1.1, 0);
+            rightArm.position.set(0.38, 1.28, 0);
+            rightArm.rotation.z = -Math.PI / 11;
             group.add(rightArm);
-            // Piernas
-            const legGeometry = new THREE.BoxGeometry(0.38, 1, 0.38);
+            // --- Piernas cilíndricas ---
+            const legGeometry = new THREE.CylinderGeometry(0.12, 0.13, 0.6, 16);
             const legMaterial = new THREE.MeshStandardMaterial({ color: pantsColor });
             const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-            leftLeg.position.set(-0.25, 0.0, 0);
+            leftLeg.position.set(-0.13, 0.57, 0);
             group.add(leftLeg);
             const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-            rightLeg.position.set(0.25, 0.0, 0);
+            rightLeg.position.set(0.13, 0.57, 0);
             group.add(rightLeg);
-            // Zapatos
-            const shoeGeometry = new THREE.BoxGeometry(0.38, 0.18, 0.38);
+            // --- Zapatos (esferas achatadas) ---
+            const shoeGeometry = new THREE.SphereGeometry(0.13, 16, 16);
             const shoeMaterial = new THREE.MeshStandardMaterial({ color: shoesColor });
             const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            leftShoe.position.set(-0.25, -0.5, 0);
+            leftShoe.scale.set(1, 0.5, 1.2);
+            leftShoe.position.set(-0.13, 0.27, 0.05);
             group.add(leftShoe);
             const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
-            rightShoe.position.set(0.25, -0.5, 0);
+            rightShoe.scale.set(1, 0.5, 1.2);
+            rightShoe.position.set(0.13, 0.27, 0.05);
             group.add(rightShoe);
-            // Materiales para personalización en tiempo real
+            // Materiales para personalización
             group.bodyMaterial = bodyMaterial;
             group.armMaterial = armMaterial;
             group.pantsMaterial = legMaterial;
-            group.shoeMaterial = shoeMaterial;
-            return group;
-        }
-
-        // --- Función para crear un avatar de usuario (propio o de otros) ---
-        function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
-            if (userAvatars.has(alias)) return;
-            // Obtener colores personalizados si existen
-            const shirtColor = custom.shirtColor || 0x4ECDC4;
-            const pantsColor = custom.pantsColor || 0x2C3E50;
-            const shoesColor = custom.shoesColor || 0x8B4513;
-            const avatarGroup = createRobloxAvatar({ shirtColor, pantsColor, shoesColor });
-            
             // Calcular la posición Y correcta para el piso
             const floorStep = HALL_HEIGHT + 1;
-            const correctY = floor * floorStep + 0.6; // Punto intermedio entre 0.2 y 1.0
-            
-            avatarGroup.position.set(position.x, correctY, position.z);
-            scene.add(avatarGroup);
-            userAvatars.set(alias, {
-                group: avatarGroup,
-                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
-                targetRotation: 0,
-                currentFloor: floor,
-                bodyMaterial: avatarGroup.bodyMaterial,
-                armMaterial: avatarGroup.armMaterial,
-                pantsMaterial: avatarGroup.pantsMaterial,
-                shoeMaterial: avatarGroup.shoeMaterial
+            const correctY = floor * floorStep + 0.6;
+            loader.load(modelPath, function(gltf) {
+                const avatar = gltf.scene;
+                avatar.position.set(position.x, correctY, position.z);
+                avatar.scale.set(1.5, 1.5, 1.5); // Ajusta el tamaño si es necesario
+                scene.add(avatar);
+                userAvatars.set(alias, {
+                    group: avatar,
+                    targetPosition: new THREE.Vector3(position.x, correctY, position.z),
+                    targetRotation: 0,
+                    currentFloor: floor
+                });
+            }, undefined, function(error) {
+                console.error('Error cargando avatar GLTF:', error);
             });
         }
 
