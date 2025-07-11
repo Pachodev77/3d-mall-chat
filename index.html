@@ -2623,29 +2623,6 @@
                 }
             }
         }
-            
-            const key = event.code.replace('Key', '');
-            if (key in keys) keys[key] = true;
-            if (event.code === 'ArrowUp') keys.W = true;
-            if (event.code === 'ArrowDown') keys.S = true;
-            if (event.code === 'ArrowLeft') keys.A = true;
-            if (event.code === 'ArrowRight') keys.D = true;
-            
-            if (event.code === 'KeyW' && !keyW) { // W para subir de piso (solo una vez)
-                if (currentFloor < MAX_FLOOR) currentFloor++;
-                keyW = true;
-            }
-            if (event.code === 'KeyS' && !keyS) { // S para bajar de piso (solo una vez)
-                if (currentFloor > MIN_FLOOR) currentFloor--;
-                keyS = true;
-            }
-            if (event.code === 'KeyA') { // A para moverse hacia la izquierda
-                keyA = true;
-            }
-            if (event.code === 'KeyD') { // D para moverse hacia la derecha
-                keyD = true;
-            }
-        }
 
         function onKeyUp(event) {
             const key = event.code.replace('Key', '');
