@@ -3010,10 +3010,12 @@
             // Crear habitación
             createPersonalRoom();
             // Crear y actualizar cielo visible desde las ventanas
-            createPersonalRoomSky();
-            if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
-            personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
-            updatePersonalRoomSky();
+            // Eliminar la línea:
+            // createPersonalRoomSky();
+            // Y también:
+            // if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
+            // personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
+            // updatePersonalRoomSky();
             
             // Iniciar animación de la habitación
             animatePersonalRoom();
