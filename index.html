@@ -3492,19 +3492,27 @@
             deselectFurniture();
             selectedFurniture = furniture;
             
-            // Resaltar el mueble seleccionado
-            if (furniture.mesh) {
-                furniture.mesh.material.emissive = new THREE.Color(0x27ae60);
-                furniture.mesh.material.emissiveIntensity = 0.3;
+            // Resaltar el mueble seleccionado (aplicar a todos los materiales del grupo)
+            if (furniture.mesh && furniture.mesh.children) {
+                furniture.mesh.children.forEach(child => {
+                    if (child.material) {
+                        child.material.emissive = new THREE.Color(0x27ae60);
+                        child.material.emissiveIntensity = 0.3;
+                    }
+                });
             }
             
             updateFurnitureList();
         }
         
         function deselectFurniture() {
-            if (selectedFurniture && selectedFurniture.mesh) {
-                selectedFurniture.mesh.material.emissive = new THREE.Color(0x000000);
-                selectedFurniture.mesh.material.emissiveIntensity = 0;
+            if (selectedFurniture && selectedFurniture.mesh && selectedFurniture.mesh.children) {
+                selectedFurniture.mesh.children.forEach(child => {
+                    if (child.material) {
+                        child.material.emissive = new THREE.Color(0x000000);
+                        child.material.emissiveIntensity = 0;
+                    }
+                });
             }
             selectedFurniture = null;
             updateFurnitureList();
@@ -3514,20 +3522,20 @@
             if (!selectedFurniture || !selectedFurniture.mesh) return;
             
             const moveSpeed = 0.2;
-            const newPosition = selectedFurniture.mesh.position.clone();
+            const currentPosition = selectedFurniture.mesh.position.clone();
             
             switch (direction) {
                 case 'forward':
-                    newPosition.z -= moveSpeed;
+                    currentPosition.z -= moveSpeed;
                     break;
                 case 'backward':
-                    newPosition.z += moveSpeed;
+                    currentPosition.z += moveSpeed;
                     break;
                 case 'left':
-                    newPosition.x -= moveSpeed;
+                    currentPosition.x -= moveSpeed;
                     break;
                 case 'right':
-                    newPosition.x += moveSpeed;
+                    currentPosition.x += moveSpeed;
                     break;
             }
             
@@ -3539,10 +3547,11 @@
                 maxZ: 5.5
             };
             
-            newPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newPosition.x));
-            newPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newPosition.z));
+            currentPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, currentPosition.x));
+            currentPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, currentPosition.z));
             
-            selectedFurniture.mesh.position.copy(newPosition);
+            // Mover el grupo completo
+            selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
             updateFurnitureList();
         }
         
