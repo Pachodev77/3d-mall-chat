@@ -974,6 +974,7 @@
         let currentScene = 'mall'; // 'mall' o 'personal-room'
         let personalRoomScene, personalRoomCamera, personalRoomRenderer;
         let roomNavigationPanelOpen = false;
+        let personalRoomTargetPosition, personalRoomTargetRotationY;
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -2596,10 +2597,32 @@
                 return;
             }
             
-            // Si estamos en la habitación personal, no procesar controles del mall
-            if (currentScene === 'personal-room') {
-                return;
+            // Procesar controles para ambas escenas
+            const key = event.code.replace('Key', '');
+            if (key in keys) keys[key] = true;
+            if (event.code === 'ArrowUp') keys.W = true;
+            if (event.code === 'ArrowDown') keys.S = true;
+            if (event.code === 'ArrowLeft') keys.A = true;
+            if (event.code === 'ArrowRight') keys.D = true;
+            
+            // Controles específicos del mall (cambio de pisos)
+            if (currentScene === 'mall') {
+                if (event.code === 'KeyW' && !keyW) { // W para subir de piso (solo una vez)
+                    if (currentFloor < MAX_FLOOR) currentFloor++;
+                    keyW = true;
+                }
+                if (event.code === 'KeyS' && !keyS) { // S para bajar de piso (solo una vez)
+                    if (currentFloor > MIN_FLOOR) currentFloor--;
+                    keyS = true;
+                }
+                if (event.code === 'KeyA') { // A para moverse hacia la izquierda
+                    keyA = true;
+                }
+                if (event.code === 'KeyD') { // D para moverse hacia la derecha
+                    keyD = true;
+                }
             }
+        }
             
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = true;
@@ -2631,10 +2654,14 @@
             if (event.code === 'ArrowDown') keys.S = false;
             if (event.code === 'ArrowLeft') keys.A = false;
             if (event.code === 'ArrowRight') keys.D = false;
-            if (event.code === 'KeyA') keyA = false;
-            if (event.code === 'KeyD') keyD = false;
-            if (event.code === 'KeyW') keyW = false;
-            if (event.code === 'KeyS') keyS = false;
+            
+            // Controles específicos del mall
+            if (currentScene === 'mall') {
+                if (event.code === 'KeyA') keyA = false;
+                if (event.code === 'KeyD') keyD = false;
+                if (event.code === 'KeyW') keyW = false;
+                if (event.code === 'KeyS') keyS = false;
+            }
         }
 
         function onWindowResize() {
@@ -2840,8 +2867,12 @@
             
             // Crear cámara para la habitación
             personalRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            personalRoomCamera.position.set(0, 1.6, 5);
-            personalRoomCamera.lookAt(0, 1.6, 0);
+            personalRoomCamera.position.set(0, CAMERA_HEIGHT, 3); // Posición inicial en la habitación
+            personalRoomCamera.lookAt(0, CAMERA_HEIGHT, 0);
+            
+            // Configurar posición y rotación objetivo para movimiento suave
+            personalRoomTargetPosition = personalRoomCamera.position.clone();
+            personalRoomTargetRotationY = personalRoomCamera.rotation.y;
             
             // Crear renderer para la habitación
             personalRoomRenderer = new THREE.WebGLRenderer({ antialias: true });
@@ -2981,8 +3012,64 @@
             personalRoomScene.add(window);
         }
         
+        function updatePersonalRoomMovement() {
+            // Límites de la habitación (8x8 metros)
+            const roomBounds = {
+                minX: -3.5,
+                maxX: 3.5,
+                minZ: -3.5,
+                maxZ: 3.5
+            };
+            
+            // Calcular dirección de movimiento
+            let moveX = 0;
+            let moveZ = 0;
+            
+            // Controles de teclado
+            if (keys.W || keys.ArrowUp) moveZ -= 1;
+            if (keys.S || keys.ArrowDown) moveZ += 1;
+            if (keys.A || keys.ArrowLeft) moveX -= 1;
+            if (keys.D || keys.ArrowRight) moveX += 1;
+            
+            // Controles móviles
+            if (mobileForward) moveZ -= 1;
+            if (mobileBackward) moveZ += 1;
+            if (mobileLeft) moveX -= 1;
+            if (mobileRight) moveX += 1;
+            
+            // Normalizar movimiento diagonal
+            if (moveX !== 0 && moveZ !== 0) {
+                moveX *= 0.707;
+                moveZ *= 0.707;
+            }
+            
+            // Aplicar movimiento
+            if (moveX !== 0 || moveZ !== 0) {
+                const moveSpeed = MOVE_SPEED * 0.016; // Ajustar velocidad
+                
+                // Calcular nueva posición
+                const newX = personalRoomTargetPosition.x + moveX * moveSpeed;
+                const newZ = personalRoomTargetPosition.z + moveZ * moveSpeed;
+                
+                // Aplicar límites de la habitación
+                personalRoomTargetPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newX));
+                personalRoomTargetPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newZ));
+            }
+            
+            // Rotación con mouse (si se implementa)
+            // Por ahora, la rotación se mantiene fija
+        }
+        
         function animatePersonalRoom() {
             requestAnimationFrame(animatePersonalRoom);
+            
+            // Actualizar movimiento en la habitación personal
+            updatePersonalRoomMovement();
+            
+            // Aplicar movimiento suave a la cámara
+            personalRoomCamera.position.lerp(personalRoomTargetPosition, 0.2);
+            personalRoomCamera.rotation.y = lerpAngle(personalRoomCamera.rotation.y, personalRoomTargetRotationY, 0.2);
+            
             personalRoomRenderer.render(personalRoomScene, personalRoomCamera);
         }
         
