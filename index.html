@@ -701,7 +701,7 @@
     </div>
     
     <!-- Panel de navegación de habitaciones -->
-    <div id="room-navigation-panel" style="position: fixed; top: 60px; left: 16px; width: 300px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
+    <div id="room-navigation-panel" style="position: fixed; top: 60px; left: 16px; width: 380px; height: 500px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
     
     <!-- Botón para regresar al mall desde la habitación -->
     <button id="return-to-mall-btn" title="Regresar al centro comercial" style="position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; background: #4B0000; color: #fff; border: none; border-radius: 50%; cursor: pointer; z-index: 22000; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 16px; transition: background 0.2s; pointer-events: auto;">🏢</button>
@@ -733,14 +733,14 @@
             <span>🏠 Mi Habitación</span>
             <button onclick="closeRoomNavigation()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
         </div>
-        <div style="padding: 16px; color: #eee;">
-            <div style="margin-bottom: 16px;">
-                <h3 style="margin: 0 0 8px 0; color: #FFD700;">Bienvenido a tu espacio personal</h3>
-                <p style="margin: 0; font-size: 14px; color: #ccc;">Aquí puedes personalizar tu habitación y relajarte en tu espacio privado.</p>
+        <div style="padding: 20px; color: #eee;">
+            <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 12px 0; color: #FFD700; font-size: 20px;">Bienvenido a tu espacio personal</h3>
+                <p style="margin: 0; font-size: 16px; color: #ccc; line-height: 1.5;">Aquí puedes personalizar tu habitación y relajarte en tu espacio privado.</p>
             </div>
-            <button onclick="enterPersonalRoom()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 8px;">🚪 Entrar a mi habitación</button>
-            <button onclick="toggleFurnitureEditMode()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 8px;">🪑 Mover muebles</button>
-            <button onclick="customizeRoom()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
+            <button onclick="enterPersonalRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🚪 Entrar a mi habitación</button>
+            <button onclick="toggleFurnitureEditMode()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🪑 Mover muebles</button>
+            <button onclick="customizeRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
         </div>
     </div>
     
