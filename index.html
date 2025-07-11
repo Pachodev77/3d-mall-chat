@@ -687,6 +687,71 @@
             #chat-main, #users-sidebar {
                 min-width: 320px;
             }
+            
+            /* Responsive para paneles de habitación en móvil */
+            #room-navigation-panel {
+                width: 95vw !important;
+                height: auto !important;
+                max-height: 80vh !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                border-radius: 16px !important;
+            }
+            
+            #furniture-edit-panel {
+                width: 95vw !important;
+                height: auto !important;
+                max-height: 80vh !important;
+                top: 50% !important;
+                right: auto !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                border-radius: 16px !important;
+            }
+            
+            /* Ajustar contenido interno para móvil */
+            #room-navigation-panel > div:last-child {
+                padding: 16px !important;
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+            }
+            
+            #furniture-edit-panel > div:last-child {
+                padding: 16px !important;
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Botones más pequeños en móvil */
+            #room-navigation-panel button,
+            #furniture-edit-panel button {
+                padding: 12px !important;
+                font-size: 16px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            /* Texto más pequeño en móvil */
+            #room-navigation-panel h3,
+            #furniture-edit-panel h3 {
+                font-size: 18px !important;
+            }
+            
+            #room-navigation-panel p,
+            #furniture-edit-panel p {
+                font-size: 14px !important;
+            }
+            
+            /* Lista de muebles más compacta en móvil */
+            #furniture-list {
+                max-height: 200px !important;
+            }
+            
+            #furniture-list > div {
+                padding: 8px !important;
+                margin: 4px 0 !important;
+                font-size: 14px !important;
+            }
         }
     </style>
 </head>
@@ -701,7 +766,7 @@
     </div>
     
     <!-- Panel de navegación de habitaciones -->
-    <div id="room-navigation-panel" style="position: fixed; top: 60px; left: 16px; width: 380px; height: 500px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
+    <div id="room-navigation-panel" style="position: fixed; top: 60px; left: 16px; width: 450px; height: 600px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
     
     <!-- Botón para regresar al mall desde la habitación -->
     <button id="return-to-mall-btn" title="Regresar al centro comercial" style="position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; background: #4B0000; color: #fff; border: none; border-radius: 50%; cursor: pointer; z-index: 22000; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 16px; transition: background 0.2s; pointer-events: auto;">🏢</button>
