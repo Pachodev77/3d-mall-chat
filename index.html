@@ -3049,26 +3049,25 @@
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
             // Pared frontal (con hueco totalmente libre para la puerta)
-            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((roomWidth/2 - 1.1), roomHeight, 0.2), wallMaterial);
-            frontWallLeft.position.set(-roomWidth/4 - 0.55, roomHeight/2, roomDepth/2);
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1) / 2, roomHeight, 0.2), wallMaterial);
+            frontWallLeft.position.set(-((roomWidth - 1) / 4), roomHeight / 2, roomDepth / 2);
             personalRoomScene.add(frontWallLeft);
-            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((roomWidth/2 - 1.1), roomHeight, 0.2), wallMaterial);
-            frontWallRight.position.set(roomWidth/4 + 0.55, roomHeight/2, roomDepth/2);
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1) / 2, roomHeight, 0.2), wallMaterial);
+            frontWallRight.position.set(((roomWidth - 1) / 4), roomHeight / 2, roomDepth / 2);
             personalRoomScene.add(frontWallRight);
-            // Puerta eliminada: dejar solo el hueco completamente libre
-            // (No se crea ninguna geometría de puerta ni manija)
-            // const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
-            // const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
-            // const door = new THREE.Mesh(doorGeometry, doorMaterial);
-            // door.position.set(0, 1.1, roomDepth/2);
-            // personalRoomScene.add(door);
+            // Dintel superior de la puerta
+            const frontWallTop = new THREE.Mesh(
+                new THREE.BoxGeometry(1, roomHeight - 2.2, 0.2),
+                wallMaterial
+            );
+            frontWallTop.position.set(0, roomHeight - (roomHeight - 2.2) / 2, roomDepth / 2);
+            personalRoomScene.add(frontWallTop);
             // Manija de la puerta
-            // const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
-            // const handleMat = getCachedMaterial(0xCCCCCC, 0.4, 0.7);
-            // const handle = new THREE.Mesh(handleGeo, handleMat);
-            // handle.rotation.z = Math.PI / 2;
-            // handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
-            // personalRoomScene.add(handle);
+            const doorGeometry = new THREE.BoxGeometry(0.2, 2.2, 0.1);
+            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1.1, roomDepth / 2);
+            personalRoomScene.add(door);
             // --- Ventanas grandes mejoradas ---
             const skyColor = getSkyColorByHour();
             // Ventana trasera grande (con bisel y reflejo)
