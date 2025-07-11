@@ -3028,7 +3028,7 @@
             const roomDepth = 12;
             
             // Materiales
-            const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro real, NO café
+            const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro
             const floorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1); // Marrón madera
             const ceilingMaterial = getCachedMaterial(0xF5F5F5, 0.9); // Blanco
             
@@ -3049,15 +3049,18 @@
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
             // Pared frontal (con puerta)
-            // Dejar un hueco central de 1.2m para la puerta (más ancho)
-            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1.2) / 2, roomHeight, 0.2), wallMaterial);
-            frontWallLeft.position.set(-((1.2 + (roomWidth - 1.2)) / 4), roomHeight/2, roomDepth/2);
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
+            frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((roomWidth - 1.2) / 2, roomHeight, 0.2), wallMaterial);
-            frontWallRight.position.set(((1.2 + (roomWidth - 1.2)) / 4), roomHeight/2, roomDepth/2);
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
+            frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
             // Puerta mejorada (paneles y manija)
-            // (Eliminado todos los objetos en la posición de la puerta para dejar el hueco completamente abierto)
+            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
+            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1.1, roomDepth/2);
+            personalRoomScene.add(door);
             // Paneles de la puerta (relieve)
             const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
             for (let i = 0; i < 3; i++) {
@@ -3499,13 +3502,6 @@
             const windowFrame = new THREE.Mesh(windowFrameGeometry, windowFrameMaterial);
             windowFrame.position.set(0, 1.75, roomDepth/2 - 0.05);
             personalRoomScene.add(windowFrame);
-            
-            // Cortinas
-            const curtainGeometry = new THREE.BoxGeometry(3.5, 2.5, 0.05);
-            const curtainMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1);
-            const curtain = new THREE.Mesh(curtainGeometry, curtainMaterial);
-            curtain.position.set(0, 1.75, roomDepth/2 - 0.2);
-            personalRoomScene.add(curtain);
             
             // Alfombra
             const carpetGeometry = new THREE.BoxGeometry(8, 0.05, 6);
