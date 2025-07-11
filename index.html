@@ -4884,11 +4884,11 @@
                 }
             });
             // Eliminar avatares de usuarios que ya no están
-            Object.keys(userAvatars).forEach(alias => {
+            for (const [alias] of userAvatars) {
                 if (!positions[alias] && alias !== userAlias) {
                     removeUserAvatar(alias);
                 }
-            });
+            }
         });
 
         // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
@@ -4913,18 +4913,6 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             avatar.scale.set(0.012, 0.012, 0.012); // Ajusta la escala según sea necesario
             scene.add(avatar);
             userAvatars.set(alias, {
-                group: avatar,
-                targetPosition: new THREE.Vector3(position.x, correctY, position.z),
-                targetRotation: 0,
-                currentFloor: floor
-            });
-        }, undefined, function(error) {
-            console.error('Error cargando avatar FBX:', error);
-        });
-    }, undefined, function(error) {
-        console.error('Error cargando textura PNG:', error);
-    });
-}
 
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
