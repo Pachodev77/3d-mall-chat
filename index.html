@@ -1073,7 +1073,6 @@
         let selectedFurniture = null;
         let furnitureObjects = [];
         let furnitureEditPanelOpen = false;
-        let furnitureId = 1;
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -3049,14 +3048,170 @@
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
-            // Pared frontal (sin puerta)
+            // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
-            // (Puerta y todo lo relacionado eliminado a petición del usuario)
+            // Puerta mejorada (solo hoja y manija, sin paneles frontales)
+            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
+            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1.1, roomDepth/2);
+            personalRoomScene.add(door);
+            // Manija de la puerta
+            const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
+            const handleMat = getCachedMaterial(0xCCCCCC, 0.4, 0.7);
+            const handle = new THREE.Mesh(handleGeo, handleMat);
+            handle.rotation.z = Math.PI / 2;
+            handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
+            personalRoomScene.add(handle);
+            // --- Ventanas grandes mejoradas ---
+            const skyColor = getSkyColorByHour();
+            // Ventana trasera grande (con bisel y reflejo)
+            const windowW = 4.5, windowH = 2.2;
+            const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.08);
+            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: skyColor, transparent: true, opacity: 0.82, roughness: 0.15, metalness: 0.2, reflectivity: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
+            const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+            backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
+            personalRoomScene.add(backWindow);
+            // Bisel y marco ventana trasera
+            const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
+            const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
+            const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            backFrame.position.copy(backWindow.position);
+            personalRoomScene.add(backFrame);
+            // Cruces del marco (vertical y horizontal)
+            const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
+            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            crossV.position.copy(backWindow.position);
+            personalRoomScene.add(crossV);
+            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            crossH.position.copy(backWindow.position);
+            personalRoomScene.add(crossH);
+            // Ventana izquierda grande
+            const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
+            leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
+            leftWindow.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWindow);
+            const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            leftFrame.position.copy(leftWindow.position);
+            leftFrame.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftFrame);
+            // Cruces marco izquierdo
+            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            leftCrossV.position.copy(leftWindow.position);
+            leftCrossV.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftCrossV);
+            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            leftCrossH.position.copy(leftWindow.position);
+            leftCrossH.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftCrossH);
+            // Ventana derecha grande
+            const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
+            rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
+            rightWindow.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWindow);
+            const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
+            rightFrame.position.copy(rightWindow.position);
+            rightFrame.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightFrame);
+            // Cruces marco derecho
+            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            rightCrossV.position.copy(rightWindow.position);
+            rightCrossV.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightCrossV);
+            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            rightCrossH.position.copy(rightWindow.position);
+            rightCrossH.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightCrossH);
+            // Actualizar color del cielo cada minuto
+            setInterval(() => {
+                const newSky = getSkyColorByHour();
+                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
+            }, 60000);
+            // Muebles básicos
+            createRoomFurniture(roomWidth, roomHeight, roomDepth);
+            // Cargar posiciones guardadas de muebles
+            loadFurniturePositions();
+        }
+        
+        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+            // Limpiar array de muebles
+            furnitureObjects = [];
+            let furnitureId = 1;
+            
+            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
+            
+            // Cama principal - Crear grupo para todas las partes
+            const bedGroup = new THREE.Group();
+            bedGroup.position.set(-4, 0, -3);
+            
+            // Marco de la cama
+            const bedFrameGeometry = new THREE.BoxGeometry(2.2, 0.4, 3.2);
+            const bedFrameMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
+            bedFrame.position.set(0, 0.2, 0);
+            bedGroup.add(bedFrame);
+            
+            // Registrar grupo de cama en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Cama',
+                mesh: bedGroup,
+                type: 'bed'
+            });
+            
+            // Colchón
+            const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
+            const mattressMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
+            const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+            mattress.position.set(0, 0.5, 0);
+            bedGroup.add(mattress);
+            
+            // Almohadas
+            const pillowGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.8);
+            const pillowMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const pillow1 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow1.position.set(-0.3, 0.65, -1.2);
+            bedGroup.add(pillow1);
+            
+            const pillow2 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow2.position.set(0.3, 0.65, -1.2);
+            bedGroup.add(pillow2);
+            
+            // Agregar el grupo completo a la escena
+            personalRoomScene.add(bedGroup);
+            
+            // Mesa de noche izquierda
+            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
+            const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandLeft.position.set(-5.5, 0.35, -3);
+            personalRoomScene.add(nightstandLeft);
+            
+            // Registrar mesa de noche izquierda en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Mesa de Noche Izquierda',
+                mesh: nightstandLeft,
+                type: 'nightstand'
+            });
+            
+            // Mesa de noche derecha
+            const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandRight.position.set(-2.5, 0.35, -3);
+            personalRoomScene.add(nightstandRight);
+            
+            // Registrar mesa de noche derecha en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Mesa de Noche Derecha',
+                mesh: nightstandRight,
+                type: 'nightstand'
+            });
             
             // Lámpara de mesa - Crear grupo para todas las partes
             const lampGroup = new THREE.Group();
