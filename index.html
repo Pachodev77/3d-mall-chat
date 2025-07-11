@@ -2927,10 +2927,10 @@
             personalRoomScene.add(ceiling);
             
             // Muebles básicos
-            createRoomFurniture();
+            createRoomFurniture(roomWidth, roomHeight, roomDepth);
         }
         
-        function createRoomFurniture() {
+        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
             // Cama
             const bedGeometry = new THREE.BoxGeometry(2, 0.3, 3);
             const bedMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
