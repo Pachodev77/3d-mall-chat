@@ -4918,6 +4918,9 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 targetRotation: 0,
                 currentFloor: floor
             });
+        }); // <-- close loader.load
+    }); // <-- close texLoader.load
+} // <-- close createUserAvatar
 
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
