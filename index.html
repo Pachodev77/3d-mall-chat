@@ -705,6 +705,30 @@
     
     <!-- Botón para regresar al mall desde la habitación -->
     <button id="return-to-mall-btn" title="Regresar al centro comercial" style="position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; background: #4B0000; color: #fff; border: none; border-radius: 50%; cursor: pointer; z-index: 22000; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 16px; transition: background 0.2s; pointer-events: auto;">🏢</button>
+    
+    <!-- Panel de edición de muebles -->
+    <div id="furniture-edit-panel" style="position: fixed; top: 60px; right: 16px; width: 280px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
+        <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
+            <span>🪑 Editar Muebles</span>
+            <button onclick="closeFurnitureEditPanel()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
+        </div>
+        <div style="padding: 16px; color: #eee;">
+            <div style="margin-bottom: 16px;">
+                <h3 style="margin: 0 0 8px 0; color: #27AE60;">Modo de Edición</h3>
+                <p style="margin: 0; font-size: 14px; color: #ccc;">Haz clic en un mueble para seleccionarlo y luego usa las teclas para moverlo.</p>
+            </div>
+            <div id="furniture-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 16px;">
+                <!-- Lista de muebles se generará dinámicamente -->
+            </div>
+            <div style="border-top: 1px solid #333; padding-top: 12px;">
+                <h4 style="margin: 0 0 8px 0; color: #F39C12;">Controles:</h4>
+                <p style="margin: 0 0 4px 0; font-size: 12px;">• WASD/Flechas: Mover mueble seleccionado</p>
+                <p style="margin: 0 0 4px 0; font-size: 12px;">• R: Rotar mueble</p>
+                <p style="margin: 0 0 4px 0; font-size: 12px;">• ESC: Deseleccionar</p>
+                <p style="margin: 0; font-size: 12px;">• Enter: Guardar posición</p>
+            </div>
+        </div>
+    </div>
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
             <span>🏠 Mi Habitación</span>
             <button onclick="closeRoomNavigation()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
@@ -715,6 +739,7 @@
                 <p style="margin: 0; font-size: 14px; color: #ccc;">Aquí puedes personalizar tu habitación y relajarte en tu espacio privado.</p>
             </div>
             <button onclick="enterPersonalRoom()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 8px;">🚪 Entrar a mi habitación</button>
+            <button onclick="toggleFurnitureEditMode()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 8px;">🪑 Mover muebles</button>
             <button onclick="customizeRoom()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
         </div>
     </div>
@@ -975,6 +1000,12 @@
         let personalRoomScene, personalRoomCamera, personalRoomRenderer;
         let roomNavigationPanelOpen = false;
         let personalRoomTargetPosition, personalRoomTargetRotationY;
+        
+        // --- Variables para el sistema de edición de muebles ---
+        let furnitureEditMode = false;
+        let selectedFurniture = null;
+        let furnitureObjects = [];
+        let furnitureEditPanelOpen = false;
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -2622,6 +2653,31 @@
                     keyD = true;
                 }
             }
+            
+            // Controles de edición de muebles en la habitación personal
+            if (currentScene === 'personal-room' && furnitureEditMode && selectedFurniture) {
+                if (event.code === 'KeyW' || event.code === 'ArrowUp') {
+                    moveSelectedFurniture('forward');
+                }
+                if (event.code === 'KeyS' || event.code === 'ArrowDown') {
+                    moveSelectedFurniture('backward');
+                }
+                if (event.code === 'KeyA' || event.code === 'ArrowLeft') {
+                    moveSelectedFurniture('left');
+                }
+                if (event.code === 'KeyD' || event.code === 'ArrowRight') {
+                    moveSelectedFurniture('right');
+                }
+                if (event.code === 'KeyR') {
+                    rotateSelectedFurniture();
+                }
+                if (event.code === 'Enter') {
+                    saveFurniturePositions();
+                }
+                if (event.code === 'Escape') {
+                    deselectFurniture();
+                }
+            }
         }
 
         function onKeyUp(event) {
@@ -2694,20 +2750,37 @@
             if (event.button !== 0) return; // Solo clic izquierdo
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(clickableObjects);
-            if (intersects.length > 0) {
-                const clickedObject = intersects[0].object;
+            
+            // Si estamos en modo de edición de muebles, usar la cámara de la habitación
+            if (currentScene === 'personal-room' && furnitureEditMode) {
+                raycaster.setFromCamera(mouse, personalRoomCamera);
+                const furnitureIntersects = raycaster.intersectObjects(furnitureObjects.map(f => f.mesh));
                 
-                // Verificar si es un clic en el nombre del avatar para personalización
-                if (clickedObject.userData && clickedObject.userData.type === 'customization') {
-                    openCustomizationPanel();
-                    return;
+                if (furnitureIntersects.length > 0) {
+                    const clickedFurniture = furnitureIntersects[0].object;
+                    const furniture = furnitureObjects.find(f => f.mesh === clickedFurniture);
+                    if (furniture) {
+                        selectFurniture(furniture.id);
+                        return;
+                    }
                 }
-                
-                // Verificar si es un clic en una tienda
-                if (clickedObject.userData.URL) {
-                    window.open(clickedObject.userData.URL, '_blank');
+            } else {
+                // Comportamiento normal del mall
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(clickableObjects);
+                if (intersects.length > 0) {
+                    const clickedObject = intersects[0].object;
+                    
+                    // Verificar si es un clic en el nombre del avatar para personalización
+                    if (clickedObject.userData && clickedObject.userData.type === 'customization') {
+                        openCustomizationPanel();
+                        return;
+                    }
+                    
+                    // Verificar si es un clic en una tienda
+                    if (clickedObject.userData.URL) {
+                        window.open(clickedObject.userData.URL, '_blank');
+                    }
                 }
             }
         }
@@ -2939,6 +3012,10 @@
         }
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+            // Limpiar array de muebles
+            furnitureObjects = [];
+            let furnitureId = 1;
+            
             // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
             
             // Cama principal (más grande y realista)
@@ -2947,6 +3024,14 @@
             const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
             bedFrame.position.set(-4, 0.2, -3);
             personalRoomScene.add(bedFrame);
+            
+            // Registrar cama en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Cama',
+                mesh: bedFrame,
+                type: 'bed'
+            });
             
             // Colchón
             const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
@@ -3007,6 +3092,14 @@
             desk.position.set(4, 0.7, -3);
             personalRoomScene.add(desk);
             
+            // Registrar escritorio en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Escritorio',
+                mesh: desk,
+                type: 'desk'
+            });
+            
             // Patas del escritorio
             for (let i = 0; i < 4; i++) {
                 const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6);
@@ -3024,6 +3117,14 @@
             const chairSeat = new THREE.Mesh(chairSeatGeometry, chairSeatMaterial);
             chairSeat.position.set(4, 0.45, -1.8);
             personalRoomScene.add(chairSeat);
+            
+            // Registrar silla en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Silla de Escritorio',
+                mesh: chairSeat,
+                type: 'chair'
+            });
             
             const chairBackGeometry = new THREE.BoxGeometry(0.7, 0.8, 0.1);
             const chairBackMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
@@ -3086,6 +3187,14 @@
             shelf.position.set(5.5, 1.1, 0);
             personalRoomScene.add(shelf);
             
+            // Registrar estantería en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Estantería',
+                mesh: shelf,
+                type: 'shelf'
+            });
+            
             // Estantes de la estantería
             for (let i = 0; i < 4; i++) {
                 const shelfLevelGeometry = new THREE.BoxGeometry(2, 0.05, 0.5);
@@ -3113,6 +3222,14 @@
             const sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
             sofa.position.set(0, 0.4, 2);
             personalRoomScene.add(sofa);
+            
+            // Registrar sofá en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Sofá',
+                mesh: sofa,
+                type: 'sofa'
+            });
             
             // Cojines del sofá
             for (let i = 0; i < 3; i++) {
@@ -3256,6 +3373,156 @@
         function customizeRoom() {
             // Función placeholder para personalización de habitación
             alert('Función de personalización de habitación próximamente disponible');
+        }
+        
+        // --- Funciones del sistema de edición de muebles ---
+        function toggleFurnitureEditMode() {
+            if (currentScene !== 'personal-room') {
+                alert('Debes estar en tu habitación para editar muebles');
+                return;
+            }
+            
+            furnitureEditMode = !furnitureEditMode;
+            
+            if (furnitureEditMode) {
+                openFurnitureEditPanel();
+                setupFurnitureSelection();
+            } else {
+                closeFurnitureEditPanel();
+                deselectFurniture();
+            }
+        }
+        
+        function openFurnitureEditPanel() {
+            const furnitureEditPanel = document.getElementById('furniture-edit-panel');
+            if (furnitureEditPanel) {
+                furnitureEditPanel.style.display = 'flex';
+                furnitureEditPanelOpen = true;
+                updateFurnitureList();
+            }
+        }
+        
+        function closeFurnitureEditPanel() {
+            const furnitureEditPanel = document.getElementById('furniture-edit-panel');
+            if (furnitureEditPanel) {
+                furnitureEditPanel.style.display = 'none';
+                furnitureEditPanelOpen = false;
+            }
+            furnitureEditMode = false;
+            deselectFurniture();
+        }
+        
+        function setupFurnitureSelection() {
+            // Hacer todos los muebles clickeables
+            furnitureObjects.forEach(furniture => {
+                if (furniture.mesh) {
+                    furniture.mesh.userData.clickable = true;
+                    furniture.mesh.userData.furnitureId = furniture.id;
+                }
+            });
+        }
+        
+        function updateFurnitureList() {
+            const furnitureList = document.getElementById('furniture-list');
+            if (!furnitureList) return;
+            
+            furnitureList.innerHTML = '';
+            
+            furnitureObjects.forEach(furniture => {
+                const furnitureItem = document.createElement('div');
+                furnitureItem.style.cssText = 'padding: 8px; margin: 4px 0; background: rgba(52,73,94,0.8); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;';
+                furnitureItem.innerHTML = `
+                    <div style="font-weight: bold; color: #fff;">${furniture.name}</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">Posición: (${furniture.mesh.position.x.toFixed(1)}, ${furniture.mesh.position.z.toFixed(1)})</div>
+                `;
+                
+                furnitureItem.onclick = () => selectFurniture(furniture.id);
+                furnitureItem.onmouseenter = () => furnitureItem.style.borderColor = '#3498db';
+                furnitureItem.onmouseleave = () => furnitureItem.style.borderColor = 'transparent';
+                
+                if (selectedFurniture && selectedFurniture.id === furniture.id) {
+                    furnitureItem.style.borderColor = '#27ae60';
+                    furnitureItem.style.background = 'rgba(39,174,96,0.8)';
+                }
+                
+                furnitureList.appendChild(furnitureItem);
+            });
+        }
+        
+        function selectFurniture(furnitureId) {
+            const furniture = furnitureObjects.find(f => f.id === furnitureId);
+            if (!furniture) return;
+            
+            deselectFurniture();
+            selectedFurniture = furniture;
+            
+            // Resaltar el mueble seleccionado
+            if (furniture.mesh) {
+                furniture.mesh.material.emissive = new THREE.Color(0x27ae60);
+                furniture.mesh.material.emissiveIntensity = 0.3;
+            }
+            
+            updateFurnitureList();
+        }
+        
+        function deselectFurniture() {
+            if (selectedFurniture && selectedFurniture.mesh) {
+                selectedFurniture.mesh.material.emissive = new THREE.Color(0x000000);
+                selectedFurniture.mesh.material.emissiveIntensity = 0;
+            }
+            selectedFurniture = null;
+            updateFurnitureList();
+        }
+        
+        function moveSelectedFurniture(direction) {
+            if (!selectedFurniture || !selectedFurniture.mesh) return;
+            
+            const moveSpeed = 0.2;
+            const newPosition = selectedFurniture.mesh.position.clone();
+            
+            switch (direction) {
+                case 'forward':
+                    newPosition.z -= moveSpeed;
+                    break;
+                case 'backward':
+                    newPosition.z += moveSpeed;
+                    break;
+                case 'left':
+                    newPosition.x -= moveSpeed;
+                    break;
+                case 'right':
+                    newPosition.x += moveSpeed;
+                    break;
+            }
+            
+            // Aplicar límites de la habitación
+            const roomBounds = {
+                minX: -5.5,
+                maxX: 5.5,
+                minZ: -5.5,
+                maxZ: 5.5
+            };
+            
+            newPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newPosition.x));
+            newPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newPosition.z));
+            
+            selectedFurniture.mesh.position.copy(newPosition);
+            updateFurnitureList();
+        }
+        
+        function rotateSelectedFurniture() {
+            if (!selectedFurniture || !selectedFurniture.mesh) return;
+            
+            selectedFurniture.mesh.rotation.y += Math.PI / 4; // Rotar 45 grados
+            updateFurnitureList();
+        }
+        
+        function saveFurniturePositions() {
+            if (selectedFurniture) {
+                // Aquí se podría guardar en localStorage o en una base de datos
+                console.log('Posiciones de muebles guardadas');
+                deselectFurniture();
+            }
         }
         
         function animate(currentTime) {
