@@ -4873,6 +4873,10 @@
                     typeof userData.floor === 'number' &&
                     typeof userData.rotation === 'number'
                 ) {
+                    console.log('[Firebase positionsRef] updateAvatarPosition:', {
+                        alias,
+                        userData: JSON.parse(JSON.stringify(userData))
+                    });
                     updateAvatarPosition(
                         alias,
                         userData.position,
@@ -4882,11 +4886,14 @@
                         userData.pantsColor,
                         userData.shoesColor
                     );
+                } else {
+                    console.warn('[Firebase positionsRef] Datos inválidos recibidos para alias:', alias, userData);
                 }
             });
             // Eliminar avatares de usuarios que ya no están
             for (const [alias] of userAvatars) {
                 if (!positions[alias] && alias !== userAlias) {
+                    console.log('[Avatar] Eliminando avatar desconectado:', alias);
                     removeUserAvatar(alias);
                 }
             }

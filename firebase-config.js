@@ -33,6 +33,8 @@ function connectToChat(alias) {
         timestamp: Date.now()
     };
     usersRef.child(currentUser.alias).set(currentUser);
+// Eliminar posición al desconectarse
+positionsRef.child(currentUser.alias).onDisconnect().remove();
     usersRef.on('value', (snapshot) => {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
