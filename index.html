@@ -4903,6 +4903,7 @@ function removeUserAvatar(alias) {
 
 // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
+    if (alias === userAlias) return; // No crear el avatar propio en tercera persona
     if (userAvatars.has(alias)) return;
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
     const texturePath = 'assets/kenney 3d characters/Skins/humanMaleA.png'; // Puedes cambiar el skin aquí
