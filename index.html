@@ -3044,22 +3044,70 @@
             rightWall.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWall);
             
-            // Pared frontal (con puerta)
+            // Pared frontal (con puerta y ventanal)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallLeft);
-            
-            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
-            frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
-            personalRoomScene.add(frontWallRight);
-            
-            // Puerta
-            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
-            const doorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1);
-            const door = new THREE.Mesh(doorGeometry, doorMaterial);
-            door.position.set(0, 1.1, roomDepth/2);
-            personalRoomScene.add(door);
-            
+
+            // VENTANAL FRONTAL (a la derecha de la puerta)
+            const frontWindowGeometry = new THREE.BoxGeometry(roomWidth/2 - 1.5, roomHeight - 0.5, 0.08);
+            const frontWindowMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x87CEEB,
+                transparent: true,
+                opacity: 0.35,
+                roughness: 0.1,
+                metalness: 0.2,
+                transmission: 0.85,
+                thickness: 0.2
+            });
+            const frontWindow = new THREE.Mesh(frontWindowGeometry, frontWindowMaterial);
+            frontWindow.position.set(roomWidth/4 + 0.75, roomHeight/2, roomDepth/2 + 0.01);
+            personalRoomScene.add(frontWindow);
+
+            // Marco del ventanal frontal
+            const frontFrameGeometry = new THREE.BoxGeometry(roomWidth/2 - 1.5 + 0.1, roomHeight - 0.5 + 0.1, 0.1);
+            const frontFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const frontFrame = new THREE.Mesh(frontFrameGeometry, frontFrameMaterial);
+            frontFrame.position.set(roomWidth/4 + 0.75, roomHeight/2, roomDepth/2 + 0.06);
+            personalRoomScene.add(frontFrame);
+
+            // Pared frontal izquierda (mantiene la puerta)
+            // (ya agregada como frontWallLeft)
+
+            // Pared derecha (con ventanal)
+            const rightWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 0.5, 0.2), wallMaterial);
+            rightWallTop.position.set(roomWidth/2, roomHeight - 0.25, 0);
+            rightWallTop.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallTop);
+
+            const rightWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 0.5, 0.2), wallMaterial);
+            rightWallBottom.position.set(roomWidth/2, 0.25, 0);
+            rightWallBottom.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallBottom);
+
+            // VENTANAL DERECHO (gran ventanal central)
+            const rightWindowGeometry = new THREE.BoxGeometry(roomWidth, roomHeight - 1, 0.08);
+            const rightWindowMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x87CEEB,
+                transparent: true,
+                opacity: 0.32,
+                roughness: 0.1,
+                metalness: 0.2,
+                transmission: 0.85,
+                thickness: 0.2
+            });
+            const rightWindow = new THREE.Mesh(rightWindowGeometry, rightWindowMaterial);
+            rightWindow.position.set(roomWidth/2 + 0.01, roomHeight/2, 0);
+            rightWindow.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWindow);
+
+            // Marco del ventanal derecho
+            const rightFrameGeometry = new THREE.BoxGeometry(roomWidth + 0.1, roomHeight - 1 + 0.1, 0.1);
+            const rightFrame = new THREE.Mesh(rightFrameGeometry, frontFrameMaterial);
+            rightFrame.position.set(roomWidth/2 + 0.06, roomHeight/2, 0);
+            rightFrame.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightFrame);
+
             // Suelo
             const floorGeometry = new THREE.BoxGeometry(roomWidth, 0.1, roomDepth);
             const floor = new THREE.Mesh(floorGeometry, floorMaterial);
