@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3954,14 +3954,13 @@ validAliases.forEach(alias => {
                         userData.shoesColor
                     );
                 }
-            });
 // Eliminar avatares de userAvatars que no estén en los aliases válidos
             for (const [alias] of userAvatars) {
     if (!validAliases.includes(alias) && alias !== userAlias) {
         console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
-                    removeUserAvatar(alias);
+        removeUserAvatar(alias);
     }
-});
+}
 
 // ...
 
@@ -4126,10 +4125,6 @@ function updateSkinPreview(idx) {
     // Actualizar selección de skin
     updateSelectedSkin();
 }
-                // Actualizar selección de skin
-                updateSelectedSkin();
-            }
-        }
 
         // Inicialización robusta de colores de avatar
         if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
