@@ -1048,13 +1048,41 @@
             return shopNumberCounter++;
         };
 
-        // --- Variables de rendimiento ---
+        // --- Variables de rendimiento y timing centralizado ---
         let lastTime = 0;
         let frameCount = 0;
         let fps = 60;
         const targetFPS = 60;
         const frameInterval = 1000 / targetFPS;
-        let lastSkyUpdate = 0; // Para actualizar el cielo cada minuto
+        
+        // Variables de timing para actualizaciones periódicas
+        let lastSkyUpdate = 0;
+        let lastPositionUpdate = 0;
+        let lastRotatingSignUpdate = 0;
+        let lastClockUpdate = 0;
+        
+        // Configuración de intervalos (en milisegundos)
+        const UPDATE_INTERVALS = {
+            SKY: 60000,        // 1 minuto
+            POSITION: 500,     // 500ms
+            ROTATING_SIGN: 2500, // 2.5 segundos
+            CLOCK: 1000        // 1 segundo
+        };
+        
+        // Sistema de timing centralizado
+        const timingSystem = {
+            shouldUpdate: (lastUpdate, interval) => {
+                return Date.now() - lastUpdate >= interval;
+            },
+            updateLastTime: (type) => {
+                switch(type) {
+                    case 'SKY': lastSkyUpdate = Date.now(); break;
+                    case 'POSITION': lastPositionUpdate = Date.now(); break;
+                    case 'ROTATING_SIGN': lastRotatingSignUpdate = Date.now(); break;
+                    case 'CLOCK': lastClockUpdate = Date.now(); break;
+                }
+            }
+        };
 
         // --- Cache de materiales para reutilización ---
         const materialCache = new Map();
@@ -2301,11 +2329,15 @@
         function createRotatingSign(url, texts, width, height, colorIdx) {
             const plane = createImagePlane(url, texts[0], width, height, colorIdx, false);
             plane.material.transparent = true;
-            let textIndex = 0;
-            setInterval(() => {
-                textIndex = (textIndex + 1) % texts.length;
-                updateRotatingSign(plane.material, texts[textIndex]);
-            }, 2500);
+            
+            // Agregar al sistema centralizado en lugar de usar setInterval
+            const signIndex = rotatingSigns.length;
+            rotatingSigns.push({
+                material: plane.material,
+                texts: texts
+            });
+            rotatingSignTextIndexes[signIndex] = 0;
+            
             return plane;
         }
 
@@ -2370,9 +2402,12 @@
             group.updateMatrixWorld(true);
             collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
-            setInterval(() => {
-                planes.forEach(plane => updateClockPlane(plane.material));
-            }, 1000);
+            // Agregar al sistema centralizado en lugar de usar setInterval
+            planes.forEach(plane => {
+                digitalClocks.push({
+                    material: plane.material
+                });
+            });
         }
 
         function createClockPlane(width, height) {
@@ -3758,11 +3793,8 @@
             lastTime = currentTime - (frameDeltaTime % frameInterval);
             frameCount++;
             
-            // Actualizar el color del cielo cada minuto (60000 ms)
-            if (currentTime - lastSkyUpdate > 60000) {
-                scene.background = getSkyColor();
-                lastSkyUpdate = currentTime;
-            }
+            // Sistema de timing centralizado para actualizaciones periódicas
+            updatePeriodicSystems(currentTime);
             
             // Solo actualizar y renderizar si estamos en la escena del mall
             if (currentScene === 'mall') {
@@ -3772,13 +3804,59 @@
                 // Actualizar animaciones de avatares con el delta time correcto
                 updateAvatarAnimations(deltaTime);
                 
-                // Enviar posición del usuario cada 100ms (10 veces por segundo)
-                if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
-                    sendUserPosition();
-                }
-                
                 renderer.render(scene, camera);
             }
+        }
+        
+        // Función centralizada para manejar todas las actualizaciones periódicas
+        function updatePeriodicSystems(currentTime) {
+            // Actualizar el color del cielo
+            if (timingSystem.shouldUpdate(lastSkyUpdate, UPDATE_INTERVALS.SKY)) {
+                scene.background = getSkyColor();
+                timingSystem.updateLastTime('SKY');
+            }
+            
+            // Enviar posición del usuario
+            if (timingSystem.shouldUpdate(lastPositionUpdate, UPDATE_INTERVALS.POSITION)) {
+                sendUserPosition();
+                timingSystem.updateLastTime('POSITION');
+            }
+            
+            // Actualizar carteles rotativos
+            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
+                updateRotatingSigns();
+                timingSystem.updateLastTime('ROTATING_SIGN');
+            }
+            
+            // Actualizar relojes digitales
+            if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
+                updateDigitalClocks();
+                timingSystem.updateLastTime('CLOCK');
+            }
+        }
+        
+        // Variables globales para carteles rotativos y relojes
+        let rotatingSigns = [];
+        let digitalClocks = [];
+        let rotatingSignTextIndexes = {};
+        
+        // Función para actualizar carteles rotativos
+        function updateRotatingSigns() {
+            rotatingSigns.forEach((sign, index) => {
+                if (sign.texts && sign.texts.length > 0) {
+                    const textIndex = rotatingSignTextIndexes[index] || 0;
+                    const nextIndex = (textIndex + 1) % sign.texts.length;
+                    rotatingSignTextIndexes[index] = nextIndex;
+                    updateRotatingSign(sign.material, sign.texts[nextIndex]);
+                }
+            });
+        }
+        
+        // Función para actualizar relojes digitales
+        function updateDigitalClocks() {
+            digitalClocks.forEach(clock => {
+                updateClockPlane(clock.material);
+            });
         }
         
         // Función para limpiar recursos
@@ -3814,6 +3892,11 @@
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
             });
+            
+            // Limpiar arrays del sistema centralizado
+            rotatingSigns = [];
+            digitalClocks = [];
+            rotatingSignTextIndexes = {};
         }
         
         // Limpiar al cerrar la página
@@ -4944,41 +5027,33 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
         window.addMessageToChat = addMessageToChat;
 
-        // --- Enviar posición del usuario periódicamente SOLO si está conectado y sin duplicados ---
-        let positionInterval = null;
-        function startPositionUpdates() {
-            if (positionInterval) clearInterval(positionInterval);
-            positionInterval = setInterval(() => {
-                if (
-                    typeof camera !== 'undefined' &&
-                    camera.position &&
-                    typeof camera.position.x !== 'undefined' &&
-                    typeof camera.position.y !== 'undefined' &&
-                    typeof camera.position.z !== 'undefined'
-                ) {
-                    const position = {
-                        x: camera.position.x,
-                        y: camera.position.y,
-                        z: camera.position.z
-                    };
-                    const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                    const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                    sendPosition(position, floor, rotation);
-                }
-            }, 500);
+        // --- Sistema de posición centralizado ---
+        function sendUserPosition() {
+            if (
+                typeof camera !== 'undefined' &&
+                camera.position &&
+                typeof camera.position.x !== 'undefined' &&
+                typeof camera.position.y !== 'undefined' &&
+                typeof camera.position.z !== 'undefined'
+            ) {
+                const position = {
+                    x: camera.position.x,
+                    y: camera.position.y,
+                    z: camera.position.z
+                };
+                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
+                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
+                sendPosition(position, floor, rotation);
+            }
         }
-        function stopPositionUpdates() {
-            if (positionInterval) clearInterval(positionInterval);
-            positionInterval = null;
-        }
+        
         // Iniciar al conectar
         document.addEventListener('DOMContentLoaded', () => {
             connectToChat(userAlias);
-            startPositionUpdates();
         });
+        
         // Limpiar al cerrar la página
         window.addEventListener('beforeunload', () => {
-            stopPositionUpdates();
             disconnectFromChat();
         });
 
