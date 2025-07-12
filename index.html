@@ -4943,7 +4943,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const texLoader = new THREE.TextureLoader();
     // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
-    const correctY = floor * floorStep + 0.6;
+    const correctY = floor * floorStep + 0.2; // Más cerca del suelo
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
