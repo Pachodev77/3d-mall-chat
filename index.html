@@ -4922,15 +4922,21 @@ function removeUserAvatar(alias) {
         scene.remove(avatar.group);
     }
     userAvatars.delete(alias);
+    pendingAvatarLoads.delete(alias);
 }
 
+// --- Control de cargas pendientes para evitar duplicados por race conditions ---
+const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom, '\nStack:', new Error().stack);
+    // Si ya hay una carga pendiente para este alias, no la repitas
+    if (pendingAvatarLoads.has(alias)) return;
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     // Si por alguna razón sigue existiendo, no continuar
     if (userAvatars.has(alias)) return;
+    pendingAvatarLoads.add(alias);
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
     const texturePath = 'assets/kenney 3d characters/Skins/humanMaleA.png'; // Puedes cambiar el skin aquí
     const loader = new THREE.FBXLoader();
@@ -4940,6 +4946,9 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const correctY = floor * floorStep + 0.6;
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
+            pendingAvatarLoads.delete(alias);
+            // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
+            if (userAvatars.has(alias)) return;
             avatar.traverse(function(child) {
                 if (child.isMesh) {
                     child.material.map = texture;
