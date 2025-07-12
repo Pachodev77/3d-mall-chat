@@ -4991,10 +4991,10 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight) {
                 avatar.group.traverse(child => {
                     if (child.isBone) {
-                        if (/arm_L/i.test(child.name)) avatar.armLeft = child;
-                        if (/arm_R/i.test(child.name)) avatar.armRight = child;
-                        if (/leg_L/i.test(child.name)) avatar.legLeft = child;
-                        if (/leg_R/i.test(child.name)) avatar.legRight = child;
+                        if (child.name === 'LeftArm') avatar.armLeft = child;
+                        if (child.name === 'RightArm') avatar.armRight = child;
+                        if (child.name === 'LeftUpLeg') avatar.legLeft = child;
+                        if (child.name === 'RightUpLeg') avatar.legRight = child;
                     }
                 });
             }
