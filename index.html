@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -1042,12 +1042,33 @@
         
         // --- Variables para Avatares de Usuarios ---
         const userAvatars = new Map(); // Mapa de alias -> avatar
-
+        const avatarColors = [
+            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
+            0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
+            0xF8C471, 0x82E0AA, 0xF1948A, 0x85C1E9, 0xD7BDE2,
+            0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1, 0xF5B7B1
+        ];
 
         // --- Variables de personalización de avatar ---
-
+        const customizationColors = [
+            // Colores vibrantes para camisas
+            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
+            0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
+            0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
+            // Colores más oscuros para pantalones
+            0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
+            0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
+            0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
+            // Colores para zapatos
+            0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
+            0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
+            0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
+        ];
         
         let currentCustomization = {
+            shirtColor: 0x4ECDC4, // Color por defecto
+            pantsColor: 0x2C3E50, // Color por defecto
+            shoesColor: 0x8B4513, // Color por defecto
             skin: 'humanMaleA' // Skin por defecto
         };
         
@@ -3899,16 +3920,15 @@
             
             // Solo actualizar y renderizar si estamos en la escena del mall
             if (currentScene === 'mall') {
-                updateMovement();
-                const deltaSec = deltaTime / 1000;
-                updateAvatarPositions(deltaSec); // Actualizar posiciones y animaciones de avatares
-                
-                // Enviar posición del usuario cada 100ms (10 veces por segundo)
-                if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
-                    sendUserPosition();
-                }
-                
-                renderer.render(scene, camera);
+            updateMovement();
+            updateAvatarPositions(); // Actualizar posiciones de avatares
+            
+            // Enviar posición del usuario cada 100ms (10 veces por segundo)
+            if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
+                sendUserPosition();
+            }
+            
+            renderer.render(scene, camera);
             }
         }
         
@@ -4539,7 +4559,8 @@ function createColorGrids() {
             updateSelectedColors();
         }
 
-
+        // Inicializar los grids de colores al cargar
+        document.addEventListener('DOMContentLoaded', createColorGrids);
 
 
 
@@ -5025,34 +5046,13 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
             scene.add(avatar);
             printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
-            // --- AnimationMixer para animaciones FBX ---
-            let mixer = null;
-            let actions = {};
-            if (avatar.animations && avatar.animations.length > 0) {
-                mixer = new THREE.AnimationMixer(avatar);
-                avatar.animations.forEach(clip => {
-                    if (clip.name.toLowerCase().includes('idle')) {
-                        actions.idle = mixer.clipAction(clip);
-                    } else if (clip.name.toLowerCase().includes('walk')) {
-                        actions.walk = mixer.clipAction(clip);
-                    }
-                });
-                // Iniciar en idle
-                if (actions.idle) {
-                    actions.idle.play();
-                }
-            }
+            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             userAvatars.set(alias, {
                 group: avatar,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
-                currentFloor: floor,
-                mixer: mixer,
-                actions: actions,
-                currentAction: actions.idle || null
+                currentFloor: floor
             });
-            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
-
         }); // <-- close loader.load
     }); // <-- close texLoader.load
 } // <-- close createUserAvatar
@@ -5068,25 +5068,79 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             });
         }
         // --- Animación simple para avatares tipo Roblox ---
-        // --- Animación manual SOLO para modelos antiguos o sin AnimationMixer ---
-function animateRobloxAvatar(avatar, alias) {
-    // Si el avatar tiene AnimationMixer (mixer) y actions, NO hacer animación manual
-    if (avatar && avatar.mixer) return;
+        function animateRobloxAvatar(avatar, alias) {
+            if (!avatar || !avatar.group) return;
+            // Detectar si el avatar está en movimiento
+            const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
+            // Buscar huesos relevantes (solo la primera vez)
+            if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight) {
+                avatar.group.traverse(child => {
+                    if (child.isBone) {
+                        if (child.name === 'LeftArm') avatar.armLeft = child;
+                        if (child.name === 'RightArm') avatar.armRight = child;
+                        if (child.name === 'LeftUpLeg') avatar.legLeft = child;
+                        if (child.name === 'RightUpLeg') avatar.legRight = child;
+                    }
+                });
+            }
+            // Parámetros de animación
+            const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
+            if (moving) {
+                // Animación de caminar: balanceo de brazos y piernas
+                const armSwing = Math.sin(t) * 0.6;
+                const legSwing = Math.cos(t) * 0.6;
+                if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
+                if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
+                if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
+                if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
+            } else {
+                // Quieto: brazos rectos hacia abajo
+                if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
+                if (avatar.armRight) avatar.armRight.rotation.x = 0;
+                if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
+                if (avatar.legRight) avatar.legRight.rotation.x = 0;
+            }
+        }
+        // Utilidad opcional para hashCode de string (alias)
+        if (!String.prototype.hashCode) {
+            String.prototype.hashCode = function() {
+                var hash = 0, i, chr;
+                if (this.length === 0) return hash;
+                for (i = 0; i < this.length; i++) {
+                    chr   = this.charCodeAt(i);
+                    hash  = ((hash << 5) - hash) + chr;
+                    hash |= 0; // Convert to 32bit integer
+        // --- Función para actualizar todas las posiciones de avatares ---
+function updateAvatarPositions() {
+    userAvatars.forEach((avatar, alias) => {
+        // Interpolación suave hacia la posición objetivo
+        avatar.group.position.lerp(avatar.targetPosition, 0.2);
+        // Interpolación suave de rotación
+        avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+        // Solo aplicar animación si el modelo es Kenney FBX y tiene huesos animables
+        if (avatar.group && avatar.group.type === 'Group' && avatar.group.children.some(child => child.isBone || child.type === 'Bone')) {
+            animateKenneyAvatar(avatar, alias);
+        }
+        // Si no tiene huesos animables, dejar la pose base
+    });
+}
+
+// --- Animación de movimiento para avatares Kenney FBX ---
+function animateKenneyAvatar(avatar, alias) {
     if (!avatar || !avatar.group) return;
-    // Detectar si el avatar está en movimiento
-    const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
     // Buscar huesos relevantes (solo la primera vez)
     if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight) {
         avatar.group.traverse(child => {
-            if (child.isBone) {
-                if (child.name === 'LeftArm') avatar.armLeft = child;
-                if (child.name === 'RightArm') avatar.armRight = child;
-                if (child.name === 'LeftUpLeg') avatar.legLeft = child;
-                if (child.name === 'RightUpLeg') avatar.legRight = child;
+            if (child.isBone || child.type === 'Bone') {
+                if (/arm_L/i.test(child.name) || /LeftArm/i.test(child.name)) avatar.armLeft = child;
+                if (/arm_R/i.test(child.name) || /RightArm/i.test(child.name)) avatar.armRight = child;
+                if (/leg_L/i.test(child.name) || /LeftUpLeg/i.test(child.name)) avatar.legLeft = child;
+                if (/leg_R/i.test(child.name) || /RightUpLeg/i.test(child.name)) avatar.legRight = child;
             }
         });
     }
-    // Parámetros de animación
+    // Detectar si el avatar está en movimiento
+    const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
     const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
     if (moving) {
         // Animación de caminar: balanceo de brazos y piernas
@@ -5104,58 +5158,29 @@ function animateRobloxAvatar(avatar, alias) {
         if (avatar.legRight) avatar.legRight.rotation.x = 0;
     }
 }
-        }
-        }
-        // Utilidad opcional para hashCode de string (alias)
-        if (!String.prototype.hashCode) {
-            String.prototype.hashCode = function() {
-                var hash = 0, i, chr;
-                if (this.length === 0) return hash;
-                for (i = 0; i < this.length; i++) {
-                    chr   = this.charCodeAt(i);
-                    hash  = ((hash << 5) - hash) + chr;
-                    hash |= 0; // Convert to 32bit integer
-                }
-                return hash;
-            };
-        }
-        // --- Función para actualizar todas las posiciones de avatares ---
-        function updateAvatarPositions(delta) {
-    userAvatars.forEach((avatar, alias) => {
-        // Interpolación suave hacia la posición objetivo
-        avatar.group.position.lerp(avatar.targetPosition, 0.2);
-        // Interpolación suave de rotación
-        avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-        // --- AnimationMixer para Kenney FBX ---
-        if (avatar.mixer && avatar.actions) {
-            avatar.mixer.update(delta || 1/60);
-            const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
-            let desiredAction = moving ? avatar.actions.walk : avatar.actions.idle;
-            if (desiredAction && avatar.currentAction !== desiredAction) {
-                if (avatar.currentAction) {
-                    avatar.currentAction.fadeOut(0.2);
-                }
-                desiredAction.reset().fadeIn(0.2).play();
-                avatar.currentAction = desiredAction;
-            }
-        } else {
-            // Si no tiene mixer, usar animación manual (solo para modelos antiguos)
-            animateRobloxAvatar(avatar, alias);
-        }
-    });
-}
 
         function openSimplePanel() {
             const panel = document.getElementById('simple-panel');
             if (panel) {
                 panel.style.display = 'block';
                 customizationPanelOpen = true;
-                // Solo inicializar vista previa y skin
+                // Inicializar vista previa del avatar
                 updateAvatarPreview();
+                // Inicializar los grids de colores
+                createColorGrids();
+                // Inicializar selección de skin
+                createSkinSelection();
+                // Actualizar selecciones de colores
+                updateSelectedColors();
+                // Actualizar selección de skin
+                updateSelectedSkin();
             }
         }
 
-
+        // Inicialización robusta de colores de avatar
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
+        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
+        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
         
         // UI: Al hacer clic en un usuario, activar modo privado
         usersList.addEventListener('click', function(e) {
