@@ -4937,20 +4937,22 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
             if (userAvatars.has(alias)) return;
-            avatar.traverse(function(child) {
+            // Clonar el avatar para asegurar instancia única
+            const avatarInstance = avatar.clone(true);
+            avatarInstance.traverse(function(child) {
                 if (child.isMesh) {
+                    child.material = child.material.clone();
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
-            // Solo al crear el avatar, igualar la posición real a la recibida
-            avatar.position.set(position.x, correctY, position.z);
-            avatar.scale.set(0.009, 0.009, 0.009);
-            scene.add(avatar);
-            printAllBones({ group: avatar });
-            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
+            avatarInstance.position.set(position.x, correctY, position.z);
+            avatarInstance.scale.set(0.009, 0.009, 0.009);
+            scene.add(avatarInstance);
+            printAllBones({ group: avatarInstance });
+            console.log('Avatar añadido:', alias, avatarInstance.position, avatarInstance.scale);
             userAvatars.set(alias, {
-                group: avatar,
+                group: avatarInstance,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor
@@ -5016,6 +5018,10 @@ function animateKenneyAvatar(avatar, alias) {
                 if (child.name === 'RightLeg') avatar.legRightLow = child;
             }
         });
+    }
+    // --- DEBUG: Imprimir rotaciones de huesos principales ---
+    if (avatar.armLeft && avatar.armRight && avatar.legLeft && avatar.legRight) {
+        console.log(`[${alias}] Rot armL:`, avatar.armLeft.rotation.x, 'armR:', avatar.armRight.rotation.x, 'legL:', avatar.legLeft.rotation.x, 'legR:', avatar.legRight.rotation.x);
     }
     // Forzar animación para depuración
     const moving = true;
