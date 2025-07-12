@@ -4689,20 +4689,6 @@
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                createUserAvatar(alias, position, floor, { shirtColor, pantsColor, shoesColor });
-                avatar = userAvatars.get(alias);
-            }
-            if (avatar) {
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep + 0.6;
-                avatar.targetPosition.set(position.x, targetY, position.z);
-                avatar.currentFloor = floor;
-                avatar.group.position.y = targetY;
-                let normalizedRotation = rotation;
-                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
-                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                avatar.targetRotation = normalizedRotation;
-                // --- Actualizar colores en tiempo real si cambian ---
                 if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
                     avatar.bodyMaterial.color.setHex(shirtColor);
                     avatar.bodyMaterial.needsUpdate = true;
@@ -4943,7 +4929,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const texLoader = new THREE.TextureLoader();
     // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
-    const correctY = floor * floorStep - 0.1; // Más abajo, nivel suelo
+    const correctY = floor * floorStep; // Justo al nivel del suelo
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
