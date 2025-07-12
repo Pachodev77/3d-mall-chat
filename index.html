@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3922,19 +3922,20 @@
                 scene.background = getSkyColor();
     }
     // Filtrar: solo alias válidos (objeto con position y floor numérico)
-    if (
-        data &&
-        typeof data === 'object' &&
-        data.position && typeof data.position.x === 'number' && typeof data.position.y === 'number' && typeof data.position.z === 'number' &&
-        typeof data.floor === 'number'
-    ) {
-        validAliases.push(alias);
-            } else {
-        // Eliminar claves basura
-        console.warn('[Limpieza] Eliminando clave inválida en positions:', alias, data);
-        positionsRef.child(alias).remove();
-    }
-});
+    Object.entries(positions).forEach(([alias, data]) => {
+        if (
+            data &&
+            typeof data === 'object' &&
+            data.position && typeof data.position.x === 'number' && typeof data.position.y === 'number' && typeof data.position.z === 'number' &&
+            typeof data.floor === 'number'
+        ) {
+            validAliases.push(alias);
+        } else {
+            // Eliminar claves basura
+            console.warn('[Limpieza] Eliminando clave inválida en positions:', alias, data);
+            positionsRef.child(alias).remove();
+        }
+    });
 // Procesar solo los aliases válidos
 validAliases.forEach(alias => {
                 const userData = positions[alias];
