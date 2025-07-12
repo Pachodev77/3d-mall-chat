@@ -3938,24 +3938,26 @@
     });
 // Procesar solo los aliases válidos
 validAliases.forEach(alias => {
-                const userData = positions[alias];
+    const userData = positions[alias];
     if (alias !== userAlias) {
         console.log('[Firebase positionsRef] updateAvatarPosition:', {
             alias,
             userData: JSON.parse(JSON.stringify(userData))
         });
-                    updateAvatarPosition(
-                        alias,
-                        userData.position,
-                        userData.floor,
-                        userData.rotation,
-                        userData.shirtColor,
-                        userData.pantsColor,
-                        userData.shoesColor
-                    );
-                }
+        updateAvatarPosition(
+            alias,
+            userData.position,
+            userData.floor,
+            userData.rotation,
+            userData.shirtColor,
+            userData.pantsColor,
+            userData.shoesColor
+        );
+    }
+});
+
 // Eliminar avatares de userAvatars que no estén en los aliases válidos
-            for (const [alias] of userAvatars) {
+for (const [alias] of userAvatars) {
     if (!validAliases.includes(alias) && alias !== userAlias) {
         console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
         removeUserAvatar(alias);
