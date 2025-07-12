@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -4582,7 +4582,32 @@ function updateSelectedSkin() {
             }
         }
 
-
+        function applyCustomizationToAvatar() {
+            if (!currentCustomization) return;
+            
+            // Actualizar colores del avatar
+            const shirtColor = currentCustomization.shirtColor || 0x4ECDC4;
+            const pantsColor = currentCustomization.pantsColor || 0x2C3E50;
+            const shoesColor = currentCustomization.shoesColor || 0x8B4513;
+            
+            // Buscar y actualizar materiales del avatar
+            if (userAvatars.has(userAlias)) {
+                const avatarData = userAvatars.get(userAlias);
+                if (avatarData && avatarData.group) {
+                    const group = avatarData.group;
+                    
+                    // Actualizar colores de materiales
+                    if (group.bodyMaterial) group.bodyMaterial.color.setHex(shirtColor);
+                    if (group.armMaterial) group.armMaterial.color.setHex(shirtColor);
+                    if (group.pantsMaterial) group.pantsMaterial.color.setHex(pantsColor);
+                    
+                    // Actualizar UI de selección de colores
+                    updateColorButtonSelection('shirt', shirtColor);
+                    updateColorButtonSelection('pants', pantsColor);
+                    updateColorButtonSelection('shoes', shoesColor);
+                }
+            }
+        }
 
         // Cerrar panel al hacer clic fuera - VERSIÓN MEJORADA
         document.addEventListener('click', (e) => {
