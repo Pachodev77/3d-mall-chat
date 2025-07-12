@@ -973,100 +973,164 @@
         // --- Dimensiones globales de la habitación personal ---
         const roomWidth = 12, roomHeight = 3.5, roomDepth = 12;
 
-        // --- Variables de la Escena ---
-        let scene, camera, renderer;
-        const clickableObjects = [];
-        const collisionObjects = [];
-        const keys = { W: false, S: false, A: false, D: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+        // --- SISTEMA DE ESTADO CENTRALIZADO ---
         
-        // Reloj para animaciones
-        const clock = new THREE.Clock();
-        
-        // --- Variables para Avatares de Usuarios ---
-        const userAvatars = new Map(); // Mapa de alias -> avatar
-        const avatarColors = [
-            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
-            0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
-            0xF8C471, 0x82E0AA, 0xF1948A, 0x85C1E9, 0xD7BDE2,
-            0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1, 0xF5B7B1
-        ];
-
-        // --- Variables de personalización de avatar ---
-        const customizationColors = [
-            // Colores vibrantes para camisas
-            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
-            0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
-            0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
-            // Colores más oscuros para pantalones
-            0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
-            0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
-            0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
-            // Colores para zapatos
-            0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
-            0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
-            0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
-        ];
-        
-        let currentCustomization = {
-            skin: 'humanMaleA' // Skin por defecto
+        // Estado del juego
+        const gameState = {
+            // Escena actual
+            currentScene: 'mall', // 'mall' o 'personal-room'
+            
+            // Posición y movimiento del jugador
+            player: {
+                position: { x: 0, y: 0, z: 0 },
+                targetPosition: { x: 0, y: 0, z: 0 },
+                rotation: 0,
+                targetRotation: 0,
+                floor: 0,
+                isMoving: false
+            },
+            
+            // Sistema de tiendas
+            shopCounter: 1,
+            
+            // Estado de muebles
+            furniture: {
+                editMode: false,
+                selected: null,
+                objects: []
+            }
         };
         
-        let customizationPanelOpen = false;
-        
-        // --- Variables para el sistema de habitaciones personales ---
-        let currentScene = 'mall'; // 'mall' o 'personal-room'
-        let personalRoomScene, personalRoomCamera, personalRoomRenderer;
-        let roomNavigationPanelOpen = false;
-        let personalRoomTargetPosition, personalRoomTargetRotationY;
-        
-        // --- Variables para el sistema de edición de muebles ---
-        let furnitureEditMode = false;
-        let selectedFurniture = null;
-        let furnitureObjects = [];
-        let furnitureEditPanelOpen = false;
-
-        // --- Variables de Interacción y Movimiento ---
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        let targetPosition;
-        let targetRotationY;
-        let currentFloor = 0;
-        let keyA = false;
-        let keyD = false;
-        let keyW = false;
-        let keyS = false;
-        let shopNumberCounter = 1; // Contador global para numerar las tiendas
-        
-        // --- Variables para controles móviles ---
-        let mobileForward = false;
-        let mobileBackward = false;
-        let mobileLeft = false;
-        let mobileRight = false;
-
-        // Función para obtener el siguiente número de tienda solo cuando se crea una
-        const getNextShopNumber = () => {
-            return shopNumberCounter++;
+        // Estado de la UI
+        const uiState = {
+            // Paneles activos
+            activePanel: null, // 'chat', 'customization', 'room', 'furniture'
+            overlayVisible: false,
+            
+            // Estados específicos de paneles
+            customization: {
+                panelOpen: false,
+                colors: [
+                    0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
+                    0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
+                    0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
+                    0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
+                    0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
+                    0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
+                    0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
+                    0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
+                    0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
+                ]
+            },
+            
+            room: {
+                navigationPanelOpen: false
+            },
+            
+            furniture: {
+                editPanelOpen: false
+            }
         };
-
-        // --- Variables de rendimiento y timing centralizado ---
-        let lastTime = 0;
-        let frameCount = 0;
-        let fps = 60;
-        const targetFPS = 60;
-        const frameInterval = 1000 / targetFPS;
         
-        // Variables de timing para actualizaciones periódicas
-        let lastSkyUpdate = 0;
-        let lastPositionUpdate = 0;
-        let lastRotatingSignUpdate = 0;
-        let lastClockUpdate = 0;
+        // Estado de entrada del usuario
+        const inputState = {
+            // Teclado
+            keyboard: {
+                W: false, S: false, A: false, D: false,
+                ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false
+            },
+            
+            // Controles móviles
+            mobile: {
+                forward: false,
+                backward: false,
+                left: false,
+                right: false
+            }
+        };
         
-        // Configuración de intervalos (en milisegundos)
-        const UPDATE_INTERVALS = {
-            SKY: 60000,        // 1 minuto
-            POSITION: 500,     // 500ms
-            ROTATING_SIGN: 2500, // 2.5 segundos
-            CLOCK: 1000        // 1 segundo
+        // Estado de personalización del avatar
+        const avatarState = {
+            // Colores del avatar
+            colors: {
+                shirt: 0x4ECDC4,
+                pants: 0x2C3E50,
+                shoes: 0x8B4513
+            },
+            
+            // Skin del avatar
+            skin: 'humanMaleA',
+            
+            // Colores predefinidos para selección
+            predefinedColors: [
+                { shirt: 0x4ECDC4, pants: 0x2C3E50, shoes: 0x8B4513 },
+                { shirt: 0xE74C3C, pants: 0x34495E, shoes: 0x2C3E50 },
+                { shirt: 0x3498DB, pants: 0x2980B9, shoes: 0x1F618D },
+                { shirt: 0xF39C12, pants: 0xE67E22, shoes: 0xD35400 },
+                { shirt: 0x9B59B6, pants: 0x8E44AD, shoes: 0x6C3483 }
+            ]
+        };
+        
+        // Estado del sistema de renderizado
+        const renderState = {
+            scene: null,
+            camera: null,
+            renderer: null,
+            personalRoom: {
+                scene: null,
+                camera: null,
+                renderer: null,
+                targetPosition: { x: 0, y: 0, z: 0 },
+                targetRotation: 0
+            }
+        };
+        
+        // Estado del sistema de animación
+        const animationState = {
+            clock: new THREE.Clock(),
+            lastTime: 0,
+            frameCount: 0,
+            fps: 60,
+            targetFPS: 60,
+            frameInterval: 1000 / 60
+        };
+        
+        // Estado del sistema de timing
+        const timingState = {
+            lastSkyUpdate: 0,
+            lastPositionUpdate: 0,
+            lastRotatingSignUpdate: 0,
+            lastClockUpdate: 0,
+            
+            intervals: {
+                SKY: 60000,        // 1 minuto
+                POSITION: 500,     // 500ms
+                ROTATING_SIGN: 2500, // 2.5 segundos
+                CLOCK: 1000        // 1 segundo
+            }
+        };
+        
+        // Colecciones del juego
+        const gameCollections = {
+            userAvatars: new Map(), // Mapa de alias -> avatar
+            clickableObjects: [],
+            collisionObjects: [],
+            rotatingSigns: [],
+            digitalClocks: [],
+            rotatingSignTextIndexes: {}
+        };
+        
+        // Sistema de raycasting
+        const raycastSystem = {
+            raycaster: new THREE.Raycaster(),
+            mouse: new THREE.Vector2()
+        };
+        
+        // Sistema de cache
+        const cacheSystem = {
+            materialCache: new Map(),
+            textureCache: new Map(),
+            logoTextureCache: new Map()
         };
         
         // Sistema de timing centralizado
@@ -1076,17 +1140,18 @@
             },
             updateLastTime: (type) => {
                 switch(type) {
-                    case 'SKY': lastSkyUpdate = Date.now(); break;
-                    case 'POSITION': lastPositionUpdate = Date.now(); break;
-                    case 'ROTATING_SIGN': lastRotatingSignUpdate = Date.now(); break;
-                    case 'CLOCK': lastClockUpdate = Date.now(); break;
+                    case 'SKY': timingState.lastSkyUpdate = Date.now(); break;
+                    case 'POSITION': timingState.lastPositionUpdate = Date.now(); break;
+                    case 'ROTATING_SIGN': timingState.lastRotatingSignUpdate = Date.now(); break;
+                    case 'CLOCK': timingState.lastClockUpdate = Date.now(); break;
                 }
             }
         };
 
-        // --- Cache de materiales para reutilización ---
-        const materialCache = new Map();
-        const textureCache = new Map();
+        // Función para obtener el siguiente número de tienda
+        const getNextShopNumber = () => {
+            return gameState.shopCounter++;
+        };
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
@@ -2547,31 +2612,31 @@
             // Procesar controles para ambas escenas
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = true;
-            if (event.code === 'ArrowUp') keys.W = true;
-            if (event.code === 'ArrowDown') keys.S = true;
-            if (event.code === 'ArrowLeft') keys.A = true;
-            if (event.code === 'ArrowRight') keys.D = true;
+            if (event.code === 'ArrowUp') inputState.keyboard.W = true;
+            if (event.code === 'ArrowDown') inputState.keyboard.S = true;
+            if (event.code === 'ArrowLeft') inputState.keyboard.A = true;
+            if (event.code === 'ArrowRight') inputState.keyboard.D = true;
             
             // Controles específicos del mall (cambio de pisos)
-            if (currentScene === 'mall') {
-            if (event.code === 'KeyW' && !keyW) { // W para subir de piso (solo una vez)
-                if (currentFloor < MAX_FLOOR) currentFloor++;
-                keyW = true;
+            if (gameState.currentScene === 'mall') {
+            if (event.code === 'KeyW' && !inputState.keyboard.W) { // W para subir de piso (solo una vez)
+                if (gameState.player.floor < MAX_FLOOR) gameState.player.floor++;
+                inputState.keyboard.W = true;
             }
-            if (event.code === 'KeyS' && !keyS) { // S para bajar de piso (solo una vez)
-                if (currentFloor > MIN_FLOOR) currentFloor--;
-                keyS = true;
+            if (event.code === 'KeyS' && !inputState.keyboard.S) { // S para bajar de piso (solo una vez)
+                if (gameState.player.floor > MIN_FLOOR) gameState.player.floor--;
+                inputState.keyboard.S = true;
             }
             if (event.code === 'KeyA') { // A para moverse hacia la izquierda
-                keyA = true;
+                inputState.keyboard.A = true;
             }
             if (event.code === 'KeyD') { // D para moverse hacia la derecha
-                keyD = true;
+                inputState.keyboard.D = true;
                 }
             }
             
             // Controles de edición de muebles en la habitación personal
-            if (currentScene === 'personal-room' && furnitureEditMode && selectedFurniture) {
+            if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode && gameState.furniture.selected) {
                 if (event.code === 'KeyW' || event.code === 'ArrowUp') {
                     moveSelectedFurniture('forward');
                 }
@@ -2599,17 +2664,17 @@
         function onKeyUp(event) {
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = false;
-            if (event.code === 'ArrowUp') keys.W = false;
-            if (event.code === 'ArrowDown') keys.S = false;
-            if (event.code === 'ArrowLeft') keys.A = false;
-            if (event.code === 'ArrowRight') keys.D = false;
+            if (event.code === 'ArrowUp') inputState.keyboard.W = false;
+            if (event.code === 'ArrowDown') inputState.keyboard.S = false;
+            if (event.code === 'ArrowLeft') inputState.keyboard.A = false;
+            if (event.code === 'ArrowRight') inputState.keyboard.D = false;
             
             // Controles específicos del mall
-            if (currentScene === 'mall') {
-            if (event.code === 'KeyA') keyA = false;
-            if (event.code === 'KeyD') keyD = false;
-            if (event.code === 'KeyW') keyW = false;
-            if (event.code === 'KeyS') keyS = false;
+            if (gameState.currentScene === 'mall') {
+            if (event.code === 'KeyA') inputState.keyboard.A = false;
+            if (event.code === 'KeyD') inputState.keyboard.D = false;
+            if (event.code === 'KeyW') inputState.keyboard.W = false;
+            if (event.code === 'KeyS') inputState.keyboard.S = false;
             }
         }
 
@@ -2704,7 +2769,7 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             
             // Si estamos en modo de edición de muebles, usar la cámara de la habitación
-            if (currentScene === 'personal-room' && furnitureEditMode) {
+            if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode) {
                 raycaster.setFromCamera(mouse, personalRoomCamera);
                 const furnitureIntersects = raycaster.intersectObjects(furnitureObjects.map(f => f.mesh));
                 
@@ -2749,8 +2814,8 @@
             }
             
             // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
+            if (inputState.keyboard.ArrowLeft || inputState.mobile.left) gameState.player.targetRotation -= ROTATE_SPEED;
+            if (inputState.keyboard.ArrowRight || inputState.mobile.right) gameState.player.targetRotation += ROTATE_SPEED;
 
             // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
@@ -2761,8 +2826,8 @@
             const velocity = new THREE.Vector3();
             
             // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (keys.ArrowUp || mobileForward) velocity.add(direction);
-            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            if (inputState.keyboard.ArrowUp || inputState.mobile.forward) velocity.add(direction);
+            if (inputState.keyboard.ArrowDown || inputState.mobile.backward) velocity.sub(direction);
             
             // Movimiento lateral con A y D (teclas)
             const rightDirection = new THREE.Vector3();
@@ -2770,12 +2835,12 @@
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            if (inputState.keyboard.A) velocity.sub(rightDirection); // Moverse hacia la izquierda
+            if (inputState.keyboard.D) velocity.add(rightDirection); // Moverse hacia la derecha
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
-                const newPosition = targetPosition.clone().add(velocity);
+                const newPosition = gameState.player.targetPosition.clone().add(velocity);
                 
                 // --- Colisiones optimizadas ---
                 const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
@@ -2795,18 +2860,18 @@
                 }
                 
                 if (!collision) {
-                    targetPosition.copy(newPosition);
+                    gameState.player.targetPosition.copy(newPosition);
                 }
             }
 
             // --- Cambio de Piso ---
             const floorStep = HALL_HEIGHT + 1;
-            const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
-            targetPosition.y = targetY;
+            const targetY = gameState.player.floor * floorStep + CAMERA_HEIGHT;
+            gameState.player.targetPosition.y = targetY;
 
             // --- Interpolación para suavidad ---
-            camera.position.lerp(targetPosition, 0.2);
-            camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            camera.position.lerp(gameState.player.targetPosition, 0.2);
+            camera.rotation.y = lerpAngle(camera.rotation.y, gameState.player.targetRotation, 0.2);
         }
 
         // --- Funciones del sistema de habitaciones personales ---
@@ -2832,9 +2897,9 @@
         }
         
         function enterPersonalRoom() {
-            if (currentScene === 'personal-room') return;
+            if (gameState.currentScene === 'personal-room') return;
             
-            currentScene = 'personal-room';
+            gameState.currentScene = 'personal-room';
             setupPersonalRoom();
             closeRoomNavigation();
             
@@ -2846,9 +2911,9 @@
         }
         
         function returnToMall() {
-            if (currentScene === 'mall') return;
+            if (gameState.currentScene === 'mall') return;
             
-            currentScene = 'mall';
+            gameState.currentScene = 'mall';
             // Limpiar escena de habitación personal
             if (personalRoomRenderer) {
                 document.body.removeChild(personalRoomRenderer.domElement);
@@ -3489,12 +3554,12 @@
         
         // --- Funciones del sistema de edición de muebles ---
         function toggleFurnitureEditMode() {
-            if (currentScene !== 'personal-room') {
+            if (gameState.currentScene !== 'personal-room') {
                 alert('Debes estar en tu habitación para editar muebles');
                 return;
             }
             
-            furnitureEditMode = !furnitureEditMode;
+            gameState.furniture.editMode = !gameState.furniture.editMode;
             
             if (furnitureEditMode) {
                 // Limpiar todos los resaltados al entrar en modo de edición
@@ -3797,7 +3862,7 @@
             updatePeriodicSystems(currentTime);
             
             // Solo actualizar y renderizar si estamos en la escena del mall
-            if (currentScene === 'mall') {
+            if (gameState.currentScene === 'mall') {
                 updateMovement();
                 updateAvatarPositions(); // Actualizar posiciones de avatares
                 
