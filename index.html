@@ -4693,6 +4693,18 @@
                 avatar = userAvatars.get(alias);
             }
             if (avatar) {
+                // Actualización de posición y rotación en tiempo real
+                const floorStep = HALL_HEIGHT + 1;
+                const targetY = floor * floorStep;
+                avatar.targetPosition.set(position.x, targetY, position.z);
+                avatar.currentFloor = floor;
+                // (Opcional) sincronizar Y real del grupo
+                // avatar.group.position.y = targetY;
+                let normalizedRotation = rotation;
+                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
+                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
+                avatar.targetRotation = normalizedRotation;
+                // Actualización de materiales
                 if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
                     avatar.bodyMaterial.color.setHex(shirtColor);
                     avatar.bodyMaterial.needsUpdate = true;
@@ -4959,6 +4971,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     }); // <-- close texLoader.load
 } // <-- close createUserAvatar
 
+        // --- Importar animación Roblox ---
+        import { animateRobloxAvatar } from './roblox_avatar_anim.js';
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
             userAvatars.forEach((avatar, alias) => {
