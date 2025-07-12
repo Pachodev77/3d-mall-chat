@@ -1020,6 +1020,9 @@
         const collisionObjects = [];
         const keys = { W: false, S: false, A: false, D: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
         
+        // Reloj para animaciones
+        const clock = new THREE.Clock();
+        
         // --- Variables para Avatares de Usuarios ---
         const userAvatars = new Map(); // Mapa de alias -> avatar
         const avatarColors = [
@@ -3880,13 +3883,16 @@
         function animate(currentTime) {
             requestAnimationFrame(animate);
             
+            // Obtener delta time del reloj para animaciones
+            const deltaTime = clock.getDelta();
+            
             // Control de FPS
-            const deltaTime = currentTime - lastTime;
-            if (deltaTime < frameInterval) {
+            const frameDeltaTime = currentTime - lastTime;
+            if (frameDeltaTime < frameInterval) {
                 return;
             }
             
-            lastTime = currentTime - (deltaTime % frameInterval);
+            lastTime = currentTime - (frameDeltaTime % frameInterval);
             frameCount++;
             
             // Actualizar el color del cielo cada minuto (60000 ms)
@@ -3897,15 +3903,18 @@
             
             // Solo actualizar y renderizar si estamos en la escena del mall
             if (currentScene === 'mall') {
-            updateMovement();
-            updateAvatarPositions(); // Actualizar posiciones de avatares
-            
-            // Enviar posición del usuario cada 100ms (10 veces por segundo)
-            if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
-                sendUserPosition();
-            }
-            
-            renderer.render(scene, camera);
+                updateMovement();
+                updateAvatarPositions(); // Actualizar posiciones de avatares
+                
+                // Actualizar animaciones de avatares con el delta time correcto
+                updateAvatarAnimations(deltaTime);
+                
+                // Enviar posición del usuario cada 100ms (10 veces por segundo)
+                if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
+                    sendUserPosition();
+                }
+                
+                renderer.render(scene, camera);
             }
         }
         
@@ -3934,6 +3943,14 @@
                 }
             });
             textureCache.clear();
+            
+            // Limpiar mixers de animación
+            userAvatars.forEach((avatar, alias) => {
+                if (avatar.mixer) {
+                    avatar.mixer.stopAllAction();
+                    avatar.mixer.uncacheRoot(avatar.group);
+                }
+            });
         }
         
         // Limpiar al cerrar la página
@@ -4904,8 +4921,15 @@ function updateSelectedSkin() {
         // --- Eliminar avatar de usuario de la escena y del mapa ---
 function removeUserAvatar(alias) {
     const avatar = userAvatars.get(alias);
-    if (avatar && avatar.group) {
-        scene.remove(avatar.group);
+    if (avatar) {
+        if (avatar.group) {
+            scene.remove(avatar.group);
+        }
+        // Limpiar mixer de animación
+        if (avatar.mixer) {
+            avatar.mixer.stopAllAction();
+            avatar.mixer.uncacheRoot(avatar.group);
+        }
     }
     userAvatars.delete(alias);
     pendingAvatarLoads.delete(alias);
@@ -4938,28 +4962,79 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
     const correctY = floor * floorStep; // Justo al nivel del suelo
+    
+    // Cargar animaciones
+    const idlePath = 'assets/kenney 3d characters/Animations/idle.fbx';
+    const runPath = 'assets/kenney 3d characters/Animations/run.fbx';
+    
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
             // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
             if (userAvatars.has(alias)) return;
+            
             avatar.traverse(function(child) {
                 if (child.isMesh) {
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
+            
             avatar.position.set(position.x, correctY, position.z);
             avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
             scene.add(avatar);
+            
+            // --- INICIO DE LA LÓGICA DE ANIMACIÓN ---
+            const mixer = new THREE.AnimationMixer(avatar);
+            const actions = {};
+            
+            // Buscar animaciones en el modelo cargado
+            if (avatar.animations && avatar.animations.length > 0) {
+                console.log('Animaciones encontradas en el modelo:', avatar.animations.map(anim => anim.name));
+                
+                // Buscar la animación de estar quieto
+                const idleClip = THREE.AnimationClip.findByName(avatar.animations, 'Idle');
+                if (idleClip) {
+                    actions.idle = mixer.clipAction(idleClip);
+                    actions.idle.play(); // Inicia en modo 'idle' por defecto
+                    console.log('Animación Idle cargada para:', alias);
+                }
+                
+                // Buscar la animación de caminar/correr
+                const walkClip = THREE.AnimationClip.findByName(avatar.animations, 'Walk') || 
+                                THREE.AnimationClip.findByName(avatar.animations, 'Run');
+                if (walkClip) {
+                    actions.walk = mixer.clipAction(walkClip);
+                    console.log('Animación Walk/Run cargada para:', alias);
+                }
+                
+                // Si no se encontraron animaciones con nombres específicos, usar la primera disponible
+                if (Object.keys(actions).length === 0 && avatar.animations.length > 0) {
+                    console.log('No se encontraron animaciones con nombres específicos, usando la primera disponible');
+                    const firstClip = avatar.animations[0];
+                    actions.default = mixer.clipAction(firstClip);
+                    actions.default.play();
+                    console.log('Animación por defecto cargada:', firstClip.name, 'para:', alias);
+                }
+            } else {
+                console.log('No se encontraron animaciones en el modelo FBX para:', alias);
+            }
+            
+            // --- FIN DE LA LÓGICA DE ANIMACIÓN ---
+            
             printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
+            
             userAvatars.set(alias, {
                 group: avatar,
+                mixer: mixer, // ¡Guardamos el mixer!
+                actions: actions, // ¡Y las acciones!
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
-                currentFloor: floor
+                currentFloor: floor,
+                isMoving: false // Estado para controlar la animación
             });
+            
         }); // <-- close loader.load
     }); // <-- close texLoader.load
 } // <-- close createUserAvatar
@@ -4991,64 +5066,50 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
             userAvatars.forEach((avatar, alias) => {
-                // Interpolación suave hacia la posición objetivo
+                // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
-                // Interpolación suave de rotación
-                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-        // Solo aplicar animación si el modelo es Kenney FBX y tiene huesos animables
-        if (avatar.group && avatar.group.type === 'Group' && avatar.group.children.some(child => child.isBone || child.type === 'Bone')) {
-            animateKenneyAvatar(avatar, alias);
-        }
-        // Si no tiene huesos animables, dejar la pose base
-    });
-}
+                avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
-// --- Animación de movimiento para avatares Kenney FBX ---
-function animateKenneyAvatar(avatar, alias) {
-    if (!avatar || !avatar.group) return;
-    // Buscar huesos relevantes (solo la primera vez)
-    if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight ||
-        !avatar.armLeftFore || !avatar.armRightFore || !avatar.legLeftLow || !avatar.legRightLow) {
-        avatar.group.traverse(child => {
-            if (child.isBone || child.type === 'Bone') {
-                if (child.name === 'LeftArm') avatar.armLeft = child;
-                if (child.name === 'RightArm') avatar.armRight = child;
-                if (child.name === 'LeftForeArm') avatar.armLeftFore = child;
-                if (child.name === 'RightForeArm') avatar.armRightFore = child;
-                if (child.name === 'LeftUpLeg') avatar.legLeft = child;
-                if (child.name === 'RightUpLeg') avatar.legRight = child;
-                if (child.name === 'LeftLeg') avatar.legLeftLow = child;
-                if (child.name === 'RightLeg') avatar.legRightLow = child;
-            }
-        });
-    }
-    // Detectar si el avatar está en movimiento
-    const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
-    const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
-    if (moving) {
-        // Animación de caminar: balanceo de brazos y piernas
-        const armSwing = Math.sin(t) * 0.6;
-        const legSwing = Math.cos(t) * 0.6;
-        if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
-        if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
-        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = armSwing * 0.5;
-        if (avatar.armRightFore) avatar.armRightFore.rotation.x = -armSwing * 0.5;
-        if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
-        if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
-        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = legSwing * 0.5;
-        if (avatar.legRightLow) avatar.legRightLow.rotation.x = -legSwing * 0.5;
-    } else {
-        // Quieto: brazos y piernas rectos hacia abajo
-        if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
-        if (avatar.armRight) avatar.armRight.rotation.x = 0;
-        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = 0;
-        if (avatar.armRightFore) avatar.armRightFore.rotation.x = 0;
-        if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
-        if (avatar.legRight) avatar.legRight.rotation.x = 0;
-        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = 0;
-        if (avatar.legRightLow) avatar.legRightLow.rotation.x = 0;
-    }
-}
+                // --- LÓGICA DE CONTROL DE ANIMACIÓN ---
+                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
+
+                if (isNowMoving && !avatar.isMoving) {
+                    // Empezó a moverse: cambia de 'idle' a 'walk'
+                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                        avatar.actions.idle.fadeOut(0.2);
+                        avatar.actions.walk.reset().fadeIn(0.2).play();
+                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                        // Si no hay idle, usar default
+                        avatar.actions.default.fadeOut(0.2);
+                        avatar.actions.walk.reset().fadeIn(0.2).play();
+                    }
+                    avatar.isMoving = true;
+                } else if (!isNowMoving && avatar.isMoving) {
+                    // Dejó de moverse: cambia de 'walk' a 'idle'
+                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                        avatar.actions.walk.fadeOut(0.2);
+                        avatar.actions.idle.reset().fadeIn(0.2).play();
+                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                        // Si no hay idle, usar default
+                        avatar.actions.walk.fadeOut(0.2);
+                        avatar.actions.default.reset().fadeIn(0.2).play();
+                    }
+                    avatar.isMoving = false;
+                }
+            });
+        }
+
+        // --- Función para actualizar animaciones de avatares ---
+        function updateAvatarAnimations(deltaTime) {
+            userAvatars.forEach((avatar, alias) => {
+                if (avatar.mixer) {
+                    // deltaTime ya está en segundos desde THREE.Clock
+                    avatar.mixer.update(deltaTime);
+                }
+            });
+        }
+
+        
 
         function openSimplePanel() {
             const panel = document.getElementById('simple-panel');
