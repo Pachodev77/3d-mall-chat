@@ -483,6 +483,36 @@
             justify-content: center;
             background-color: var(--color, #333);
         }
+        .skin-options-grid {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .skin-option {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 4px;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .skin-option.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px #FFD70088;
+            transform: scale(1.08);
+        }
+        .skin-option img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
         .color-option[data-color] {
             border: 2px solid #333;
         }
@@ -842,6 +872,27 @@
         <div class="panel-content">
             <!-- Columna izquierda - Opciones -->
             <div class="options-column">
+                <!-- Sección de Selección de Skin -->
+                <div class="option-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">🧑‍🎨</span>
+                        Diseño de Avatar
+                    </h3>
+                    <div id="skin-options" class="skin-options-grid">
+                        <button class="skin-option" data-skin="humanMaleA" title="Humano Masculino">
+                            <img src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Humano Masculino" />
+                        </button>
+                        <button class="skin-option" data-skin="humanFemaleA" title="Humano Femenino">
+                            <img src="assets/kenney 3d characters/Skins/humanFemaleA.png" alt="Humano Femenino" />
+                        </button>
+                        <button class="skin-option" data-skin="zombieMaleA" title="Zombie Masculino">
+                            <img src="assets/kenney 3d characters/Skins/zombieMaleA.png" alt="Zombie Masculino" />
+                        </button>
+                        <button class="skin-option" data-skin="zombieFemaleA" title="Zombie Femenino">
+                            <img src="assets/kenney 3d characters/Skins/zombieFemaleA.png" alt="Zombie Femenino" />
+                        </button>
+                    </div>
+                </div>
                 <!-- Sección de Alias -->
                 <div class="option-section">
                     <h3 class="section-title">
@@ -1060,7 +1111,8 @@
         let currentCustomization = {
             shirtColor: 0x4ECDC4, // Color por defecto
             pantsColor: 0x2C3E50, // Color por defecto
-            shoesColor: 0x8B4513  // Color por defecto
+            shoesColor: 0x8B4513, // Color por defecto
+            skin: 'humanMaleA' // Skin por defecto
         };
         
         let customizationPanelOpen = false;
@@ -4179,8 +4231,19 @@
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
             const aliasInput = document.getElementById('simple-alias-input');
-            // Eliminar referencia a preview-alias
             if (previewDiv) {
+                // Obtener el skin seleccionado
+                let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : (typeof skin !== 'undefined' ? skin : 'humanMaleA');
+                // Mapear nombre a archivo
+                const skinFileMap = {
+                    'humanMaleA': 'humanMaleA.png',
+                    'humanFemaleA': 'humanFemaleA.png',
+                    'zombieMaleA': 'zombieMaleA.png',
+                    'zombieFemaleA': 'zombieFemaleA.png'
+                };
+                const skinFile = skinFileMap[skinName] || 'humanMaleA.png';
+                const skinImgSrc = `assets/kenney 3d characters/Skins/${skinFile}`;
+
                 // Actualizar el alias en la vista previa
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
                 // Crear una vista previa visual del avatar más detallada
@@ -4188,7 +4251,9 @@
                 const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
                 const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 180px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
+                        <!-- Skin thumbnail -->
+                        <img src="${skinImgSrc}" alt="skin" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 2px; border-radius: 8px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" />
                         <!-- Cabeza cuadrada -->
                         <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
                             <!-- Ojos -->
@@ -4405,7 +4470,30 @@
             customizationPanelOpen = false;
         }
 
-        function createColorGrids() {
+        function createSkinSelection() {
+    const skinOptions = document.querySelectorAll('.skin-option');
+    skinOptions.forEach(btn => {
+        btn.onclick = () => {
+            const selectedSkin = btn.getAttribute('data-skin');
+            currentCustomization.skin = selectedSkin;
+            updateSelectedSkin();
+            updateAvatarPreview();
+        };
+    });
+}
+
+function updateSelectedSkin() {
+    const skinOptions = document.querySelectorAll('.skin-option');
+    skinOptions.forEach(btn => {
+        if (btn.getAttribute('data-skin') === currentCustomization.skin) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+}
+
+function createColorGrids() {
             // Limpiar grids existentes
             const shirtColorsGrid = document.getElementById('shirt-colors');
             const pantsColorsGrid = document.getElementById('pants-colors');
@@ -4522,32 +4610,25 @@
             const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
             
             if (shirtOption) shirtOption.classList.add('selected');
-            if (pantsOption) pantsOption.classList.add('selected');
-            if (shoesOption) shoesOption.classList.add('selected');
-        }
 
-        function applyCustomizationToAvatar() {
-            // Actualizar las variables globales
-            shirtColor = currentCustomization.shirtColor;
-            pantsColor = currentCustomization.pantsColor;
-            shoesColor = currentCustomization.shoesColor;
-            
-            // Actualizar la vista previa existente
-            updateAvatarPreview();
-            
-            // Actualizar los colores en el localStorage
-            const customizationData = {
-                shirtColor: currentCustomization.shirtColor,
-                pantsColor: currentCustomization.pantsColor,
-                shoesColor: currentCustomization.shoesColor
-            };
-            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
-        }
+    // Seleccionar nueva opción
+    const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+    }
 
-        function saveCustomization() {
-            // Obtener el nuevo alias del input
-            const aliasInput = document.getElementById('customization-alias-input');
-            const newAlias = aliasInput.value.trim();
+    // Actualizar color actual
+    switch (type) {
+        case 'shirt':
+            currentCustomization.shirtColor = color;
+            break;
+        case 'pants':
+            currentCustomization.pantsColor = color;
+            break;
+        case 'shoes':
+            currentCustomization.shoesColor = color;
+            break;
+    }
             
             // Validar el alias
             if (newAlias.length === 0) {
@@ -4584,12 +4665,14 @@
             currentCustomization = {
                 shirtColor: 0x4ECDC4,
                 pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513
+                shoesColor: 0x8B4513,
+                skin: 'humanMaleA'
             };
             
             // Aplicar cambios
             applyCustomizationToAvatar();
             updateSelectedColors();
+            updateSelectedSkin();
         }
 
         function loadCustomization() {
@@ -4597,6 +4680,8 @@
             if (saved) {
                 try {
                     currentCustomization = JSON.parse(saved);
+                    // Si falta la propiedad skin, asignar valor por defecto
+                    if (!currentCustomization.skin) currentCustomization.skin = 'humanMaleA';
                     applyCustomizationToAvatar();
                 } catch (error) {
                     console.error('Error cargando personalización:', error);
@@ -4908,7 +4993,7 @@
             );
         }
     });
-    // Eliminar avatares de userAvatars que no estén en los alias válidos
+    // Eliminar avatares de userAvatars que no estén en los aliases válidos
     for (const [alias] of userAvatars) {
         if (!validAliases.includes(alias) && alias !== userAlias) {
             console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
@@ -4940,7 +5025,15 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     if (userAvatars.has(alias)) return;
     pendingAvatarLoads.add(alias);
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
-    const texturePath = 'assets/kenney 3d characters/Skins/humanMaleA.png'; // Puedes cambiar el skin aquí
+    // Elegir el skin correcto
+    let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
+    const skinFileMap = {
+        'humanMaleA': 'humanMaleA.png',
+        'humanFemaleA': 'humanFemaleA.png',
+        'zombieMaleA': 'zombieMaleA.png',
+        'zombieFemaleA': 'zombieFemaleA.png'
+    };
+    const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     const loader = new THREE.FBXLoader();
     const texLoader = new THREE.TextureLoader();
     // Calcular la posición Y correcta para el piso
@@ -5050,8 +5143,12 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 updateAvatarPreview();
                 // Inicializar los grids de colores
                 createColorGrids();
+                // Inicializar selección de skin
+                createSkinSelection();
                 // Actualizar selecciones de colores
                 updateSelectedColors();
+                // Actualizar selección de skin
+                updateSelectedSkin();
             }
         }
 
