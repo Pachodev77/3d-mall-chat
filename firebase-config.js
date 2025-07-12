@@ -67,15 +67,86 @@ positionsRef.child(currentUser.alias).onDisconnect().remove();
     });
         messagesListenerSet = true;
     }
-    positionsRef.on('value', (snapshot) => {
+    // Cargar usuarios existentes al conectar (solo una vez)
+    positionsRef.once('value', (snapshot) => {
         const positions = snapshot.val() || {};
-        Object.keys(positions).forEach(alias => {
-            if (alias !== currentUser.alias) {
-                const userData = positions[alias];
-                updateAvatarPosition(alias, userData.position, userData.floor, userData.rotation);
+        Object.entries(positions).forEach(([alias, userData]) => {
+            if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+                console.log('[Firebase] Cargando usuario existente:', alias);
+                updateAvatarPosition(
+                    alias, 
+                    userData.position, 
+                    userData.floor, 
+                    userData.rotation,
+                    userData.shirtColor,
+                    userData.pantsColor,
+                    userData.shoesColor
+                );
             }
         });
     });
+    
+    // Sistema de listeners optimizado para posiciones
+    // Listener para nuevos usuarios que se conectan
+    positionsRef.on('child_added', (snapshot) => {
+        const alias = snapshot.key;
+        const userData = snapshot.val();
+        
+        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+            console.log('[Firebase] Nuevo usuario conectado:', alias);
+            updateAvatarPosition(
+                alias, 
+                userData.position, 
+                userData.floor, 
+                userData.rotation,
+                userData.shirtColor,
+                userData.pantsColor,
+                userData.shoesColor
+            );
+        }
+    });
+    
+    // Listener para actualizaciones de posición
+    positionsRef.on('child_changed', (snapshot) => {
+        const alias = snapshot.key;
+        const userData = snapshot.val();
+        
+        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+            console.log('[Firebase] Posición actualizada:', alias);
+            updateAvatarPosition(
+                alias, 
+                userData.position, 
+                userData.floor, 
+                userData.rotation,
+                userData.shirtColor,
+                userData.pantsColor,
+                userData.shoesColor
+            );
+        }
+    });
+    
+    // Listener para usuarios que se desconectan
+    positionsRef.on('child_removed', (snapshot) => {
+        const alias = snapshot.key;
+        
+        if (alias !== currentUser.alias) {
+            console.log('[Firebase] Usuario desconectado:', alias);
+            if (typeof window.removeUserAvatar === 'function') {
+                window.removeUserAvatar(alias);
+            }
+        }
+    });
+    
+    // Función auxiliar para validar datos de posición
+    function isValidPositionData(data) {
+        return data &&
+               typeof data === 'object' &&
+               data.position && 
+               typeof data.position.x === 'number' && 
+               typeof data.position.y === 'number' && 
+               typeof data.position.z === 'number' &&
+               typeof data.floor === 'number';
+    }
     isConnected = true;
     console.log('Connected as:', currentUser.alias);
 }
@@ -126,6 +197,11 @@ function disconnectFromChat() {
         currentUser = null;
     }
     isConnected = false;
+    
+    // Limpiar listeners específicos para evitar memory leaks
+    positionsRef.off('child_added');
+    positionsRef.off('child_changed');
+    positionsRef.off('child_removed');
 }
 
 function updateUsersList(users) {

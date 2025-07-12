@@ -4741,78 +4741,28 @@ function updateSelectedSkin() {
         // Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
         // El listener principal está en firebase-config.js
 
-        // Listener de posiciones de avatares en Firebase
-        positionsRef.on('value', (snapshot) => {
-            const positions = snapshot.val() || {};
-    // --- Limpieza automática de posiciones huérfanas (más de 1 minuto sin actualizar) ---
-    const now = Date.now();
-    // --- Filtrar solo alias válidos y limpiar basura ---
-    const validAliases = [];
-    Object.entries(positions).forEach(([alias, data]) => {
-        // Eliminar posiciones viejas
-        if (data.timestamp && now - data.timestamp > 60 * 1000) {
-            console.log('[Limpieza] Eliminando posición antigua de alias:', alias);
-            positionsRef.child(alias).remove();
-            return;
-        }
-        // Filtrar: solo alias válidos (objeto con position y floor numérico)
-        if (
-            data &&
-            typeof data === 'object' &&
-            data.position && typeof data.position.x === 'number' && typeof data.position.y === 'number' && typeof data.position.z === 'number' &&
-            typeof data.floor === 'number'
-        ) {
-            validAliases.push(alias);
-        } else {
-            // Eliminar claves basura
-            console.warn('[Limpieza] Eliminando clave inválida en positions:', alias, data);
-            positionsRef.child(alias).remove();
-        }
-    });
-    // Procesar solo los alias válidos
-    validAliases.forEach(alias => {
-        const userData = positions[alias];
-        if (alias !== userAlias) {
-            console.log('[Firebase positionsRef] updateAvatarPosition:', {
-                alias,
-                userData: JSON.parse(JSON.stringify(userData))
-            });
-                    updateAvatarPosition(
-                        alias,
-                        userData.position,
-                        userData.floor,
-                        userData.rotation,
-                        userData.shirtColor,
-                        userData.pantsColor,
-                        userData.shoesColor
-                    );
-                }
-            });
-    // Eliminar avatares de userAvatars que no estén en los aliases válidos
-            for (const [alias] of userAvatars) {
-        if (!validAliases.includes(alias) && alias !== userAlias) {
-            console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
-                    removeUserAvatar(alias);
-                }
-            }
-        });
+        // Sistema de Firebase listeners optimizado - manejado en firebase-config.js
+        // Los listeners específicos (child_added, child_changed, child_removed) están configurados allí
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
-function removeUserAvatar(alias) {
-    const avatar = userAvatars.get(alias);
-    if (avatar) {
-        if (avatar.group) {
-            scene.remove(avatar.group);
+        function removeUserAvatar(alias) {
+            const avatar = userAvatars.get(alias);
+            if (avatar) {
+                if (avatar.group) {
+                    scene.remove(avatar.group);
+                }
+                // Limpiar mixer de animación
+                if (avatar.mixer) {
+                    avatar.mixer.stopAllAction();
+                    avatar.mixer.uncacheRoot(avatar.group);
+                }
+            }
+            userAvatars.delete(alias);
+            pendingAvatarLoads.delete(alias);
         }
-        // Limpiar mixer de animación
-        if (avatar.mixer) {
-            avatar.mixer.stopAllAction();
-            avatar.mixer.uncacheRoot(avatar.group);
-        }
-    }
-    userAvatars.delete(alias);
-    pendingAvatarLoads.delete(alias);
-}
+        
+        // Exponer función para uso en firebase-config.js
+        window.removeUserAvatar = removeUserAvatar;
 
 // --- Control de cargas pendientes para evitar duplicados por race conditions ---
 const pendingAvatarLoads = new Set();
