@@ -4689,7 +4689,10 @@ function updateSelectedSkin() {
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                createUserAvatar(alias, position, floor, { shirtColor, pantsColor, shoesColor });
+                // Solo pasar skin si existe
+                let custom = {};
+                if (typeof skin !== 'undefined') custom.skin = skin;
+                createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
             }
             if (avatar) {
@@ -4698,29 +4701,10 @@ function updateSelectedSkin() {
                 const targetY = floor * floorStep;
                 avatar.targetPosition.set(position.x, targetY, position.z);
                 avatar.currentFloor = floor;
-                // (Opcional) sincronizar Y real del grupo
-                // avatar.group.position.y = targetY;
                 let normalizedRotation = rotation;
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
                 avatar.targetRotation = normalizedRotation;
-                // Actualización de materiales
-                if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
-                    avatar.bodyMaterial.color.setHex(shirtColor);
-                    avatar.bodyMaterial.needsUpdate = true;
-                }
-                if (typeof pantsColor === 'number' && avatar.pantsMaterial && avatar.pantsMaterial.color.getHex() !== pantsColor) {
-                    avatar.pantsMaterial.color.setHex(pantsColor);
-                    avatar.pantsMaterial.needsUpdate = true;
-                }
-                if (typeof shoesColor === 'number' && avatar.shoeMaterial && avatar.shoeMaterial.color.getHex() !== shoesColor) {
-                    avatar.shoeMaterial.color.setHex(shoesColor);
-                    avatar.shoeMaterial.needsUpdate = true;
-                }
-                if (typeof shirtColor === 'number' && avatar.armMaterial && avatar.armMaterial.color.getHex() !== shirtColor) {
-                    avatar.armMaterial.color.setHex(shirtColor);
-                    avatar.armMaterial.needsUpdate = true;
-                }
             }
         }
 
