@@ -877,7 +877,7 @@
                         <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
                             <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
                             <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
-                        </div>
+                </div>
                         <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
                     </div>
                 </div>
@@ -887,9 +887,9 @@
                         Nombre del Avatar
                     </h3>
                     <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
+                    </div>
                 </div>
-            </div>
-        </div>
+                    </div>
         <div class="panel-footer">
             <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
             <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
@@ -4325,7 +4325,7 @@
         }
         
         // --- SKIN SELECTION ARROWS LOGIC ---
-document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
     // Skins disponibles
     const skinList = [
         { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
@@ -4361,13 +4361,13 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSkinPreview(currentIdx);
 
     // Alias input para preview
-    const aliasInput = document.getElementById('simple-alias-input');
-    if (aliasInput) {
-        aliasInput.addEventListener('input', function() {
-            updateAvatarPreview();
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', function() {
+                    updateAvatarPreview();
+                });
+            }
         });
-    }
-});
 
         function closeWorkingPanel() {
             const panel = document.getElementById('working-customization-panel');
@@ -4847,7 +4847,7 @@ function updateSelectedSkin() {
 
         // Listener de posiciones de avatares en Firebase
         positionsRef.on('value', (snapshot) => {
-    const positions = snapshot.val() || {};
+            const positions = snapshot.val() || {};
     // --- Limpieza automática de posiciones huérfanas (más de 1 minuto sin actualizar) ---
     const now = Date.now();
     // --- Filtrar solo alias válidos y limpiar basura ---
@@ -4881,25 +4881,25 @@ function updateSelectedSkin() {
                 alias,
                 userData: JSON.parse(JSON.stringify(userData))
             });
-            updateAvatarPosition(
-                alias,
-                userData.position,
-                userData.floor,
-                userData.rotation,
-                userData.shirtColor,
-                userData.pantsColor,
-                userData.shoesColor
-            );
-        }
-    });
+                    updateAvatarPosition(
+                        alias,
+                        userData.position,
+                        userData.floor,
+                        userData.rotation,
+                        userData.shirtColor,
+                        userData.pantsColor,
+                        userData.shoesColor
+                    );
+                }
+            });
     // Eliminar avatares de userAvatars que no estén en los aliases válidos
-    for (const [alias] of userAvatars) {
+            for (const [alias] of userAvatars) {
         if (!validAliases.includes(alias) && alias !== userAlias) {
             console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
-            removeUserAvatar(alias);
-        }
-    }
-});
+                    removeUserAvatar(alias);
+                }
+            }
+        });
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
 function removeUserAvatar(alias) {
@@ -4916,11 +4916,15 @@ const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom, '\nStack:', new Error().stack);
+    // Si ya hay una carga pendiente para este alias, no la repitas
     if (pendingAvatarLoads.has(alias)) return;
+    // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
+    // Si por alguna razón sigue existiendo, no continuar
     if (userAvatars.has(alias)) return;
     pendingAvatarLoads.add(alias);
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
     const skinFileMap = {
         'humanMaleA': 'humanMaleA.png',
@@ -4931,34 +4935,33 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     const loader = new THREE.FBXLoader();
     const texLoader = new THREE.TextureLoader();
+    // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
-    const correctY = floor * floorStep;
+    const correctY = floor * floorStep; // Justo al nivel del suelo
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
+            // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
             if (userAvatars.has(alias)) return;
-            // Clonar el avatar para asegurar instancia única
-            const avatarInstance = avatar.clone(true);
-            avatarInstance.traverse(function(child) {
+            avatar.traverse(function(child) {
                 if (child.isMesh) {
-                    child.material = child.material.clone();
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
-            avatarInstance.position.set(position.x, correctY, position.z);
-            avatarInstance.scale.set(0.009, 0.009, 0.009);
-            scene.add(avatarInstance);
-            printAllBones({ group: avatarInstance });
-            console.log('Avatar añadido:', alias, avatarInstance.position, avatarInstance.scale);
+            avatar.position.set(position.x, correctY, position.z);
+            avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
+            scene.add(avatar);
+            printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
+            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             userAvatars.set(alias, {
-                group: avatarInstance,
+                group: avatar,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor
             });
-        });
-    });
+        }); // <-- close loader.load
+    }); // <-- close texLoader.load
 } // <-- close createUserAvatar
 
         // --- Utilidad para debug: imprimir huesos del modelo FBX ---
@@ -4986,12 +4989,12 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     };
 }
         // --- Función para actualizar todas las posiciones de avatares ---
-function updateAvatarPositions() {
-    userAvatars.forEach((avatar, alias) => {
-        // Interpolación suave hacia la posición objetivo
-        avatar.group.position.lerp(avatar.targetPosition, 0.2);
-        // Interpolación suave de rotación
-        avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
+        function updateAvatarPositions() {
+            userAvatars.forEach((avatar, alias) => {
+                // Interpolación suave hacia la posición objetivo
+                avatar.group.position.lerp(avatar.targetPosition, 0.2);
+                // Interpolación suave de rotación
+                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
         // Solo aplicar animación si el modelo es Kenney FBX y tiene huesos animables
         if (avatar.group && avatar.group.type === 'Group' && avatar.group.children.some(child => child.isBone || child.type === 'Bone')) {
             animateKenneyAvatar(avatar, alias);
@@ -5002,81 +5005,48 @@ function updateAvatarPositions() {
 
 // --- Animación de movimiento para avatares Kenney FBX ---
 function animateKenneyAvatar(avatar, alias) {
-    // DEPURACIÓN EXTREMA: loguear siempre que se llama, con todos los datos posibles
-    try {
-        console.log('[DEPURACIÓN EXTREMA] animateKenneyAvatar llamado para alias:', alias, 'avatar:', avatar);
-        if (!avatar || !avatar.group) {
-            console.warn('[DEPURACIÓN EXTREMA] avatar o avatar.group indefinido para alias:', alias);
-            return;
-        }
-        // Loguear si los huesos existen o no
-        const bones = {
-            armLeft: avatar.armLeft,
-            armRight: avatar.armRight,
-            legLeft: avatar.legLeft,
-            legRight: avatar.legRight,
-            armLeftFore: avatar.armLeftFore,
-            armRightFore: avatar.armRightFore,
-            legLeftLow: avatar.legLeftLow,
-            legRightLow: avatar.legRightLow
-        };
-        Object.entries(bones).forEach(([k, v]) => {
-            console.log(`[DEPURACIÓN EXTREMA] Bone ${k}:`, v ? v.name : 'NO DEFINIDO');
+    if (!avatar || !avatar.group) return;
+    // Buscar huesos relevantes (solo la primera vez)
+    if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight ||
+        !avatar.armLeftFore || !avatar.armRightFore || !avatar.legLeftLow || !avatar.legRightLow) {
+        avatar.group.traverse(child => {
+            if (child.isBone || child.type === 'Bone') {
+                if (child.name === 'LeftArm') avatar.armLeft = child;
+                if (child.name === 'RightArm') avatar.armRight = child;
+                if (child.name === 'LeftForeArm') avatar.armLeftFore = child;
+                if (child.name === 'RightForeArm') avatar.armRightFore = child;
+                if (child.name === 'LeftUpLeg') avatar.legLeft = child;
+                if (child.name === 'RightUpLeg') avatar.legRight = child;
+                if (child.name === 'LeftLeg') avatar.legLeftLow = child;
+                if (child.name === 'RightLeg') avatar.legRightLow = child;
+            }
         });
-        // Buscar huesos relevantes (solo la primera vez)
-        if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight ||
-            !avatar.armLeftFore || !avatar.armRightFore || !avatar.legLeftLow || !avatar.legRightLow) {
-            avatar.group.traverse(child => {
-                if (child.isBone || child.type === 'Bone') {
-                    if (child.name === 'LeftArm') avatar.armLeft = child;
-                    if (child.name === 'RightArm') avatar.armRight = child;
-                    if (child.name === 'LeftForeArm') avatar.armLeftFore = child;
-                    if (child.name === 'RightForeArm') avatar.armRightFore = child;
-                    if (child.name === 'LeftUpLeg') avatar.legLeft = child;
-                    if (child.name === 'RightUpLeg') avatar.legRight = child;
-                    if (child.name === 'LeftLeg') avatar.legLeftLow = child;
-                    if (child.name === 'RightLeg') avatar.legRightLow = child;
-                }
-            });
-            // Volver a loguear tras buscar huesos
-            Object.entries(bones).forEach(([k, v]) => {
-                console.log(`[DEPURACIÓN EXTREMA] (post-traverse) Bone ${k}:`, avatar[k] ? avatar[k].name : 'NO DEFINIDO');
-            });
-        }
-        // Loguear rotaciones de huesos principales si existen
-        if (avatar.armLeft && avatar.armRight && avatar.legLeft && avatar.legRight) {
-            console.log(`[DEPURACIÓN EXTREMA] [${alias}] Rot armL:`, avatar.armLeft.rotation.x, 'armR:', avatar.armRight.rotation.x, 'legL:', avatar.legLeft.rotation.x, 'legR:', avatar.legRight.rotation.x);
-        } else {
-            console.log(`[DEPURACIÓN EXTREMA] [${alias}] No todos los huesos principales definidos.`);
-        }
-        // Forzar animación para depuración
-        const moving = true;
-        const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
-        if (moving) {
-            // Animación de caminar: balanceo de brazos y piernas
-            const armSwing = Math.sin(t) * 0.6;
-            const legSwing = Math.cos(t) * 0.6;
-            if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
-            if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
-            if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = armSwing * 0.5;
-            if (avatar.armRightFore) avatar.armRightFore.rotation.x = -armSwing * 0.5;
-            if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
-            if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
-            if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = legSwing * 0.5;
-            if (avatar.legRightLow) avatar.legRightLow.rotation.x = -legSwing * 0.5;
-        } else {
-            // Quieto: brazos y piernas rectos hacia abajo
-            if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
-            if (avatar.armRight) avatar.armRight.rotation.x = 0;
-            if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = 0;
-            if (avatar.armRightFore) avatar.armRightFore.rotation.x = 0;
-            if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
-            if (avatar.legRight) avatar.legRight.rotation.x = 0;
-            if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = 0;
-            if (avatar.legRightLow) avatar.legRightLow.rotation.x = 0;
-        }
-    } catch (err) {
-        console.error('[DEPURACIÓN EXTREMA] Error en animateKenneyAvatar para alias', alias, err);
+    }
+    // Detectar si el avatar está en movimiento
+    const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
+    const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
+    if (moving) {
+        // Animación de caminar: balanceo de brazos y piernas
+        const armSwing = Math.sin(t) * 0.6;
+        const legSwing = Math.cos(t) * 0.6;
+        if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
+        if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
+        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = armSwing * 0.5;
+        if (avatar.armRightFore) avatar.armRightFore.rotation.x = -armSwing * 0.5;
+        if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
+        if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
+        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = legSwing * 0.5;
+        if (avatar.legRightLow) avatar.legRightLow.rotation.x = -legSwing * 0.5;
+    } else {
+        // Quieto: brazos y piernas rectos hacia abajo
+        if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
+        if (avatar.armRight) avatar.armRight.rotation.x = 0;
+        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = 0;
+        if (avatar.armRightFore) avatar.armRightFore.rotation.x = 0;
+        if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
+        if (avatar.legRight) avatar.legRight.rotation.x = 0;
+        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = 0;
+        if (avatar.legRightLow) avatar.legRightLow.rotation.x = 0;
     }
 }
 
