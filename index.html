@@ -4946,7 +4946,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 }
             });
             avatar.position.set(position.x, correctY, position.z);
-            avatar.scale.set(0.012, 0.012, 0.012); // Escala realista para el avatar
+            avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
             scene.add(avatar);
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             userAvatars.set(alias, {
