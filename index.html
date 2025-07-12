@@ -870,46 +870,26 @@
         
         <!-- Contenido principal -->
         <div class="panel-content">
-            <!-- Columna izquierda - Opciones -->
-            <div class="options-column">
-                <!-- Selección de Skin con flechas -->
-<div class="option-section" style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 24px;">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
-        <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
-            <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
-            <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
-        </div>
-        <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
-    </div>
-</div>
-<!-- Campo de nombre de avatar -->
-<div class="option-section" style="margin-top: 32px;">
-    <h3 class="section-title" style="margin-bottom: 8px;">
-        <span class="section-icon">📝</span>
-        Nombre del Avatar
-    </h3>
-    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
-</div>
-            </div>
-            
-            <!-- Columna derecha - Vista previa -->
-            <div class="preview-column">
-                <!-- Vista previa del avatar -->
-                <div class="preview-section">
-                    <h3 style="margin: 0 0 20px 0; color: #FFD700; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span style="font-size: 20px;">👤</span>
-                        Vista Previa
-                    </h3>
-                    <div id="avatar-preview" class="avatar-preview">
-                        <div style="color: #ccc; font-size: 14px;">Avatar en tiempo real</div>
+            <div class="options-column" style="width:100%;align-items:center;justify-content:center;">
+                <div class="option-section" style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
+                        <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
+                            <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
+                            <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
+                        </div>
+                        <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
                     </div>
                 </div>
-                <!-- Eliminada la tarjeta de 'Nombre Actual' y alias -->
+                <div class="option-section" style="margin-top: 32px; width: 100%;">
+                    <h3 class="section-title" style="margin-bottom: 8px; text-align:center;">
+                        <span class="section-icon">📝</span>
+                        Nombre del Avatar
+                    </h3>
+                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
+                </div>
             </div>
         </div>
-        
-        <!-- Footer con botones -->
         <div class="panel-footer">
             <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
             <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
