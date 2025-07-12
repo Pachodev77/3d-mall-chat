@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -5026,13 +5026,18 @@ function updateAvatarPositions() {
 function animateKenneyAvatar(avatar, alias) {
     if (!avatar || !avatar.group) return;
     // Buscar huesos relevantes (solo la primera vez)
-    if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight) {
+    if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight ||
+        !avatar.armLeftFore || !avatar.armRightFore || !avatar.legLeftLow || !avatar.legRightLow) {
         avatar.group.traverse(child => {
             if (child.isBone || child.type === 'Bone') {
-                if (/arm_L/i.test(child.name) || /LeftArm/i.test(child.name)) avatar.armLeft = child;
-                if (/arm_R/i.test(child.name) || /RightArm/i.test(child.name)) avatar.armRight = child;
-                if (/leg_L/i.test(child.name) || /LeftUpLeg/i.test(child.name)) avatar.legLeft = child;
-                if (/leg_R/i.test(child.name) || /RightUpLeg/i.test(child.name)) avatar.legRight = child;
+                if (child.name === 'LeftArm') avatar.armLeft = child;
+                if (child.name === 'RightArm') avatar.armRight = child;
+                if (child.name === 'LeftForeArm') avatar.armLeftFore = child;
+                if (child.name === 'RightForeArm') avatar.armRightFore = child;
+                if (child.name === 'LeftUpLeg') avatar.legLeft = child;
+                if (child.name === 'RightUpLeg') avatar.legRight = child;
+                if (child.name === 'LeftLeg') avatar.legLeftLow = child;
+                if (child.name === 'RightLeg') avatar.legRightLow = child;
             }
         });
     }
@@ -5045,14 +5050,22 @@ function animateKenneyAvatar(avatar, alias) {
         const legSwing = Math.cos(t) * 0.6;
         if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
         if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
+        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = armSwing * 0.5;
+        if (avatar.armRightFore) avatar.armRightFore.rotation.x = -armSwing * 0.5;
         if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
         if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
+        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = legSwing * 0.5;
+        if (avatar.legRightLow) avatar.legRightLow.rotation.x = -legSwing * 0.5;
     } else {
-        // Quieto: brazos rectos hacia abajo
+        // Quieto: brazos y piernas rectos hacia abajo
         if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
         if (avatar.armRight) avatar.armRight.rotation.x = 0;
+        if (avatar.armLeftFore) avatar.armLeftFore.rotation.x = 0;
+        if (avatar.armRightFore) avatar.armRightFore.rotation.x = 0;
         if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
         if (avatar.legRight) avatar.legRight.rotation.x = 0;
+        if (avatar.legLeftLow) avatar.legLeftLow.rotation.x = 0;
+        if (avatar.legRightLow) avatar.legRightLow.rotation.x = 0;
     }
 }
 
