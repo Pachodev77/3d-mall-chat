@@ -4685,28 +4685,7 @@ function updateSelectedSkin() {
 
         
 
-        // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
-        setInterval(() => {
-            if (
-                typeof camera !== 'undefined' &&
-                camera.position &&
-                typeof camera.position.x !== 'undefined' &&
-                typeof camera.position.y !== 'undefined' &&
-                typeof camera.position.z !== 'undefined'
-            ) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                // Invertir la rotación para que los avatares miren igual que la cámara
-                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                sendPosition(position, floor, rotation);
-            } else {
-                console.warn('Cámara o posición no definida:', camera);
-            }
-        }, 500);
+        // Sistema de posición centralizado - manejado por updatePeriodicSystems()
 
         // Función mejorada para mostrar mensajes en el chat
         function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
@@ -4766,17 +4745,24 @@ function updateSelectedSkin() {
 
 // --- Control de cargas pendientes para evitar duplicados por race conditions ---
 const pendingAvatarLoads = new Set();
-// --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
+
+// --- Función para crear un avatar de usuario con animaciones correctamente cargadas ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
-    console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom, '\nStack:', new Error().stack);
+    console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
+    
     // Si ya hay una carga pendiente para este alias, no la repitas
     if (pendingAvatarLoads.has(alias)) return;
+    
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
+    
     // Si por alguna razón sigue existiendo, no continuar
     if (userAvatars.has(alias)) return;
+    
     pendingAvatarLoads.add(alias);
+    
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    
     // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
     const skinFileMap = {
@@ -4786,67 +4772,65 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         'zombieFemaleA': 'zombieFemaleA.png'
     };
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
-    const loader = new THREE.FBXLoader();
-    const texLoader = new THREE.TextureLoader();
+    
+    const fbxLoader = new THREE.FBXLoader();
+    const textureLoader = new THREE.TextureLoader();
+    
     // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
-    const correctY = floor * floorStep; // Justo al nivel del suelo
+    const correctY = floor * floorStep;
     
-    // Cargar animaciones
-    const idlePath = 'assets/kenney 3d characters/Animations/idle.fbx';
-    const runPath = 'assets/kenney 3d characters/Animations/run.fbx';
+    // Usaremos Promises para manejar las cargas asíncronas de forma limpia
+    const modelPromise = new Promise(resolve => fbxLoader.load(modelPath, resolve));
+    const texturePromise = new Promise(resolve => textureLoader.load(texturePath, resolve));
+    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve));
+    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve));
     
-    texLoader.load(texturePath, function(texture) {
-        loader.load(modelPath, function(avatar) {
+    Promise.all([modelPromise, texturePromise, idleAnimPromise, runAnimPromise])
+        .then(([avatar, texture, idleAnimation, runAnimation]) => {
+            
             pendingAvatarLoads.delete(alias);
+            
             // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
             if (userAvatars.has(alias)) return;
             
-            avatar.traverse(function(child) {
+            // Aplicar la textura al modelo
+            avatar.traverse(child => {
                 if (child.isMesh) {
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
             
+            // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
-            avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
+            avatar.scale.set(0.009, 0.009, 0.009);
             scene.add(avatar);
             
-            // --- INICIO DE LA LÓGICA DE ANIMACIÓN ---
+            // --- LÓGICA DE ANIMACIÓN CORRECTA ---
             const mixer = new THREE.AnimationMixer(avatar);
             const actions = {};
             
-            // Buscar animaciones en el modelo cargado
-            if (avatar.animations && avatar.animations.length > 0) {
-                console.log('Animaciones encontradas en el modelo:', avatar.animations.map(anim => anim.name));
-                
-                // Buscar la animación de estar quieto
-                const idleClip = THREE.AnimationClip.findByName(avatar.animations, 'Idle');
-                if (idleClip) {
-                    actions.idle = mixer.clipAction(idleClip);
-                    actions.idle.play(); // Inicia en modo 'idle' por defecto
-                    console.log('Animación Idle cargada para:', alias);
-                }
-                
-                // Buscar la animación de caminar/correr
-                const walkClip = THREE.AnimationClip.findByName(avatar.animations, 'Walk') || 
-                                THREE.AnimationClip.findByName(avatar.animations, 'Run');
-                if (walkClip) {
-                    actions.walk = mixer.clipAction(walkClip);
-                    console.log('Animación Walk/Run cargada para:', alias);
-                }
-                
-                // Si no se encontraron animaciones con nombres específicos, usar la primera disponible
-                if (Object.keys(actions).length === 0 && avatar.animations.length > 0) {
-                    console.log('No se encontraron animaciones con nombres específicos, usando la primera disponible');
-                    const firstClip = avatar.animations[0];
-                    actions.default = mixer.clipAction(firstClip);
-                    actions.default.play();
-                    console.log('Animación por defecto cargada:', firstClip.name, 'para:', alias);
-                }
-            } else {
-                console.log('No se encontraron animaciones en el modelo FBX para:', alias);
+            // Los clips de animación vienen en el array `animations` de los archivos cargados
+            const idleClip = idleAnimation.animations[0];
+            const runClip = runAnimation.animations[0];
+            
+            if (idleClip) {
+                actions.idle = mixer.clipAction(idleClip);
+                actions.idle.play(); // Iniciar en 'idle' por defecto
+                console.log('Animación Idle cargada para:', alias);
+            }
+            
+            if (runClip) {
+                // Renombramos el clip para que coincida con lo que buscamos ('walk')
+                runClip.name = 'walk';
+                actions.walk = mixer.clipAction(runClip);
+                console.log('Animación Walk/Run cargada para:', alias);
+            }
+            
+            // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
+            if (Object.keys(actions).length === 0) {
+                console.warn(`No se cargaron clips de animación para el avatar ${alias}`);
             }
             
             // --- FIN DE LA LÓGICA DE ANIMACIÓN ---
@@ -4854,19 +4838,22 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             
+            // Guardar el avatar y su mixer
             userAvatars.set(alias, {
                 group: avatar,
-                mixer: mixer, // ¡Guardamos el mixer!
-                actions: actions, // ¡Y las acciones!
+                mixer: mixer,
+                actions: actions,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
-                isMoving: false // Estado para controlar la animación
+                isMoving: false
             });
             
-        }); // <-- close loader.load
-    }); // <-- close texLoader.load
-} // <-- close createUserAvatar
+        }).catch(error => {
+            console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
+            pendingAvatarLoads.delete(alias);
+        });
+}
 
         // --- Utilidad para debug: imprimir huesos del modelo FBX ---
         function printAllBones(avatar) {
