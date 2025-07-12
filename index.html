@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -4967,25 +4967,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                     console.log('Bone:', child.name);
                 }
             });
-            }
-            // Parámetros de animación
-            const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
-            if (moving) {
-                // Animación de caminar: balanceo de brazos y piernas
-                const armSwing = Math.sin(t) * 0.6;
-                const legSwing = Math.cos(t) * 0.6;
-                if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
-                if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
-                if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
-                if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
-            } else {
-                // Quieto: brazos rectos hacia abajo
-                if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
-                if (avatar.armRight) avatar.armRight.rotation.x = 0;
-                if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
-                if (avatar.legRight) avatar.legRight.rotation.x = 0;
-            }
         }
+       
         // Utilidad opcional para hashCode de string (alias)
         if (!String.prototype.hashCode) {
     String.prototype.hashCode = function() {
