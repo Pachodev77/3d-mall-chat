@@ -4960,6 +4960,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             avatar.position.set(position.x, correctY, position.z);
             avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
             scene.add(avatar);
+            printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             userAvatars.set(alias, {
                 group: avatar,
@@ -4971,6 +4972,16 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     }); // <-- close texLoader.load
 } // <-- close createUserAvatar
 
+        // --- Utilidad para debug: imprimir huesos del modelo FBX ---
+        function printAllBones(avatar) {
+            if (!avatar || !avatar.group) return;
+            console.log('--- Huesos del avatar:', avatar.group.name, '---');
+            avatar.group.traverse(child => {
+                if (child.isBone) {
+                    console.log('Bone:', child.name);
+                }
+            });
+        }
         // --- Animación simple para avatares tipo Roblox ---
         function animateRobloxAvatar(avatar, alias) {
             if (!avatar || !avatar.group) return;
