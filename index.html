@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -876,10 +876,15 @@
 <div class="option-section" style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 24px;">
     <div style="display: flex; align-items: center; gap: 12px;">
         <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
-        <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
-            <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
-            <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
-        </div>
+        <div id="skin-preview-container" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 16px;">
+    <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 32px; background: none; border: none; color: #FFD700; cursor: pointer; padding: 0 8px;">◀</button>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <!-- Canvas 3D para el avatar preview -->
+        <div id="avatar-preview-3d" style="width: 110px; height: 170px; background: #181818; border-radius: 14px; border: 2px solid #FFD700; box-shadow: 0 2px 12px rgba(0,0,0,0.4); margin-bottom: 8px;"></div>
+        <div id="skin-preview-label" style="color: #FFD700; font-size: 15px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
+    </div>
+    <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 32px; background: none; border: none; color: #FFD700; cursor: pointer; padding: 0 8px;">▶</button>
+</div>        </div>
         <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
     </div>
 </div>
@@ -3915,1097 +3920,50 @@
             // Actualizar el color del cielo cada minuto (60000 ms)
             if (currentTime - lastSkyUpdate > 60000) {
                 scene.background = getSkyColor();
-                lastSkyUpdate = currentTime;
-            }
-            
-            // Solo actualizar y renderizar si estamos en la escena del mall
-            if (currentScene === 'mall') {
-            updateMovement();
-            updateAvatarPositions(); // Actualizar posiciones de avatares
-            
-            // Enviar posición del usuario cada 100ms (10 veces por segundo)
-            if (frameCount % 6 === 0) { // 60 FPS / 6 = 10 veces por segundo
-                sendUserPosition();
-            }
-            
-            renderer.render(scene, camera);
-            }
-        }
-        
-        // Función para limpiar recursos
-        function cleanup() {
-            // Limpiar cache de texturas
-            logoTextureCache.forEach(texture => {
-                if (texture && texture.dispose) {
-                    texture.dispose();
-                }
-            });
-            logoTextureCache.clear();
-            
-            // Limpiar cache de materiales
-            materialCache.forEach(material => {
-                if (material && material.dispose) {
-                    material.dispose();
-                }
-            });
-            materialCache.clear();
-            
-            // Limpiar cache de texturas generadas
-            textureCache.forEach(texture => {
-                if (texture && texture.dispose) {
-                    texture.dispose();
-                }
-            });
-            textureCache.clear();
-        }
-        
-        // Limpiar al cerrar la página
-        window.addEventListener('beforeunload', cleanup);
-
-        function lerpAngle(a, b, t) {
-            let diff = b - a;
-            while (diff < -Math.PI) diff += Math.PI * 2;
-            while (diff > Math.PI) diff -= Math.PI * 2;
-            return a + diff * t;
-        }
-
-        // --- Chat UI Logic ---
-        const chatToggleBtn = document.getElementById('chat-toggle-btn');
-        const chatPanel = document.getElementById('chat-panel');
-        const chatCloseBtn = document.getElementById('chat-close-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatSendBtn = document.getElementById('chat-send-btn');
-        const emojiToggle = document.getElementById('emoji-toggle');
-        const emojiPanel = document.getElementById('emoji-panel');
-        const usersList = document.getElementById('users-list');
-        const changeAliasBtn = document.getElementById('change-alias-btn');
-        let userAlias = localStorage.getItem('userAlias') || '';
-        let chatOpen = false;
-        let connectedUsers = [];
-        
-        chatToggleBtn.onclick = () => {
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel && simplePanel.style.display === 'block') {
-                closeSimplePanel();
-            }
-            chatPanel.style.display = 'flex';
-            chatOpen = true;
-            chatInput.focus();
-            // Forzar scroll abajo al abrir
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 50);
-            // El overlay NO debe mostrarse al abrir el chat
-        };
-        chatCloseBtn.onclick = () => {
-            chatPanel.style.display = 'none';
-            chatOpen = false;
-            // El overlay NO debe ocultarse al cerrar el chat
-        };
-
-        // --- Emojis ---
-        const emojis = ['😊', '😂', '❤️', '👍', '🎉', '🔥', '😎', '🤔', '😢', '😡', '👋', '💪', '🎯', '⭐', '💯', '🚀', '💎', '🎮', '🍕', '☕', '🌮', '🍺', '🎵', '🎬', '⚽', '🏀', '🎾', '🏈', '⚡', '🌈', '🌙', '☀️'];
-        function createEmojiPanel() {
-            emojiPanel.innerHTML = '';
-            emojis.forEach(emoji => {
-                const btn = document.createElement('button');
-                btn.className = 'emoji-btn';
-                btn.textContent = emoji;
-                btn.onclick = () => {
-                    chatInput.value += emoji;
-                    chatInput.focus();
-                    emojiPanel.style.display = 'none';
-                };
-                emojiPanel.appendChild(btn);
-            });
-        }
-        emojiToggle.onclick = () => {
-            if (emojiPanel.style.display === 'none' || !emojiPanel.style.display) {
-                emojiPanel.style.display = 'flex';
-                createEmojiPanel();
-            } else {
-                emojiPanel.style.display = 'none';
-            }
-        };
-
-        document.addEventListener('click', (e) => {
-            if (!emojiPanel.contains(e.target) && !emojiToggle.contains(e.target)) {
-                emojiPanel.style.display = 'none';
-            }
-        });
-
-        // --- Firebase Chat Logic ---
-        function handleSendMessage() {
-            const message = chatInput.value.trim();
-            if (message.length > 0 && userAlias) {
-                    sendMessage(message);
-                chatInput.value = '';
-            }
-        }
-        if (chatSendBtn && chatInput) {
-            chatSendBtn.onclick = handleSendMessage;
-            chatInput.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    handleSendMessage();
-                }
-            });
-        } else {
-            console.warn('chatSendBtn o chatInput no existen en el DOM al inicializar.');
-        }
-
-        // Alias setup and connect to chat
-        if (!userAlias) {
-            userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
-            localStorage.setItem('userAlias', userAlias);
-        }
-        if (userAlias) {
-            changeAliasBtn.style.display = 'flex';
-        }
-        connectToChat(userAlias); // Provided by firebase-config.js
-
-        // --- Funciones de personalización de avatar ---
-        const saveCustomizationBtn = document.getElementById('save-customization-btn');
-        const resetCustomizationBtn = document.getElementById('reset-customization-btn');
-        const shirtColorsGrid = document.getElementById('shirt-colors');
-        const pantsColorsGrid = document.getElementById('pants-colors');
-        const shoesColorsGrid = document.getElementById('shoes-colors');
-        
-
-
-        function openCustomizationPanel() {
-            console.log('Abriendo panel simple de personalización');
-            
-            // Cerrar chat si está abierto
-            if (chatOpen) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-            }
-            
-            const simplePanel = document.getElementById('simple-panel');
-            if (simplePanel) {
-                // Actualizar el alias actual
-                const currentAliasElement = document.getElementById('current-alias');
-                if (currentAliasElement) {
-                    currentAliasElement.textContent = userAlias || 'Sin alias';
-                }
-                
-                // Poblar el input con el alias actual
-                const aliasInput = document.getElementById('simple-alias-input');
-                if (aliasInput) {
-                    aliasInput.value = userAlias || '';
-                    // Agregar event listener para actualizar vista previa en tiempo real
-                    aliasInput.addEventListener('input', function() {
-                        updateAvatarPreview();
-                    });
-                }
-                
-                // Mostrar el panel primero
-                simplePanel.style.display = 'block';
-                simplePanel.style.zIndex = '31000';
-                simplePanel.style.pointerEvents = 'auto';
-                customizationPanelOpen = true;
-                
-                // Inicializar vista previa del avatar
-                updateAvatarPreview();
-                
-                console.log('✅ Panel simple mostrado');
-                
-                // Mostrar overlay después del panel, pero con pointer-events: none para el panel
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.display = 'block';
-                    overlay.style.pointerEvents = 'none'; // Cambiar a none para que no interfiera
-                overlay.style.zIndex = '20000';
-            }
-            } else {
-                console.log('❌ Panel simple no encontrado');
-            }
-        }
-        
-
-        
-        function changeShirtColor(color) {
-            console.log('Cambiando color de camisa a:', color);
-            shirtColor = color;
-            currentCustomization.shirtColor = color;
-            updateAvatarPreview();
-            updateColorButtonSelection('shirt', color);
-        }
-        
-        function changePantsColor(color) {
-            console.log('Cambiando color de pantalón a:', color);
-            pantsColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.pantsMaterial) {
-                avatar.pantsMaterial.color.setHex(color);
-                avatar.pantsMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('pants', color);
-        }
-        
-        function changeShoesColor(color) {
-            console.log('Cambiando color de zapatos a:', color);
-            shoesColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.shoeMaterial) {
-                avatar.shoeMaterial.color.setHex(color);
-                avatar.shoeMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('shoes', color);
-        }
-        
-        function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-            });
-            
-            // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
-            if (selectedBtn) {
-                selectedBtn.style.borderColor = '#FFD700';
-                selectedBtn.style.transform = 'scale(1.1)';
-                selectedBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-            }
-        }
-        
-        function updateAvatarPreview() {
-            const previewDiv = document.getElementById('avatar-preview');
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (previewDiv) {
-                // Obtener el skin seleccionado
-                let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : (typeof skin !== 'undefined' ? skin : 'humanMaleA');
-                // Mapear nombre a archivo
-                const skinFileMap = {
-                    'humanMaleA': 'humanMaleA.png',
-                    'humanFemaleA': 'humanFemaleA.png',
-                    'zombieMaleA': 'zombieMaleA.png',
-                    'zombieFemaleA': 'zombieFemaleA.png'
-                };
-                const skinFile = skinFileMap[skinName] || 'humanMaleA.png';
-                const skinImgSrc = `assets/kenney 3d characters/Skins/${skinFile}`;
-
-                // Actualizar el alias en la vista previa
-                const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                // Crear una vista previa visual del avatar más detallada
-                const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
-                const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
-                const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
-                previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
-                        <!-- Skin thumbnail -->
-                        <img src="${skinImgSrc}" alt="skin" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 2px; border-radius: 8px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" />
-                        <!-- Cabeza cuadrada -->
-                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
-                            <!-- Ojos -->
-                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <!-- Boca -->
-                            <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
-                        </div>
-                        <!-- Torso y brazos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
-                            <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
-                            <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
-                            <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
-                        </div>
-                        <!-- Piernas -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
-                            <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Zapatos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
-                            <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Nombre del avatar -->
-                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
-                    </div>
-                `;
-            }
-        }
-        
-        function resetSimpleCustomization() {
-            console.log('Restableciendo personalización');
-            
-            // Restablecer colores por defecto
-            shirtColor = 0xFF6B6B;
-            pantsColor = 0x2C3E50;
-            shoesColor = 0x8B4513;
-            
-            // Restablecer alias
-            userAlias = '';
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.value = '';
-            }
-            
-            // Actualizar avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
-                
-                // Forzar actualización de materiales
-                if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
-                if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
-                if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Limpiar selección de botones
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-                btn.style.boxShadow = 'none';
-            });
-            
-            console.log('✅ Personalización restablecida');
-        }
-        
-        function saveSimpleCustomization() {
-            console.log('Guardando personalización');
-            const aliasInput = document.getElementById('simple-alias-input');
-            const newAlias = aliasInput ? aliasInput.value.trim() : '';
-            // Validar alias
-            if (newAlias.length > 20) {
-                alert('El nombre no puede tener más de 20 caracteres');
-                return;
-            }
-            // Guardar alias
-            userAlias = newAlias;
-            // Guardar en localStorage
-            const customizationData = {
-                alias: userAlias,
-                shirtColor: shirtColor,
-                pantsColor: pantsColor,
-                shoesColor: shoesColor
-            };
-            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
-            // Actualizar nombre en el avatar
-            updateAvatarName && updateAvatarName();
-            // Aplicar colores al avatar propio si existe
-            const myAvatar = userAvatars.get(userAlias);
-            if (myAvatar) {
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(shirtColor);
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(pantsColor);
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(shoesColor);
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.needsUpdate = true;
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.needsUpdate = true;
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.needsUpdate = true;
-            }
-            // Enviar alias al servidor si está conectado
-            if (typeof isConnected !== 'undefined' && isConnected) {
-                sendAlias && sendAlias();
-            }
-            // Cerrar panel
-            closeSimplePanel && closeSimplePanel();
-            console.log('✅ Personalización guardada:', customizationData);
-        }
-        
-        function closeSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            if (panel) {
-                panel.style.display = 'none';
-                customizationPanelOpen = false;
-                // Ocultar overlay y permitir clics
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.style.pointerEvents = 'none';
-                }
-                panel.style.zIndex = '21000';
-                panel.style.pointerEvents = 'auto';
-                console.log('Panel simple cerrado');
-            }
-        }
-        
-        // --- SKIN SELECTION ARROWS LOGIC ---
-document.addEventListener('DOMContentLoaded', function() {
-    // Skins disponibles
-    const skinList = [
-        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-    ];
-    // Obtener elementos
-    const prevBtn = document.getElementById('skin-prev-btn');
-    const nextBtn = document.getElementById('skin-next-btn');
-    const img = document.getElementById('skin-preview-img');
-    const label = document.getElementById('skin-preview-label');
-    // Inicializar índice
-    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
-    if (currentIdx === -1) currentIdx = 0;
-    // Función para actualizar preview
-    function updateSkinPreview(idx) {
-        img.src = skinList[idx].img;
-        label.textContent = skinList[idx].label;
-        currentCustomization.skin = skinList[idx].key;
-        updateAvatarPreview && updateAvatarPreview();
     }
-    // Asignar eventos
-    prevBtn && prevBtn.addEventListener('click', function() {
-        currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
-        updateSkinPreview(currentIdx);
-    });
-    nextBtn && nextBtn.addEventListener('click', function() {
-        currentIdx = (currentIdx + 1) % skinList.length;
-        updateSkinPreview(currentIdx);
-    });
-    // Inicializar preview
-    updateSkinPreview(currentIdx);
-
-    // Alias input para preview
-    const aliasInput = document.getElementById('simple-alias-input');
-    if (aliasInput) {
-        aliasInput.addEventListener('input', function() {
-            updateAvatarPreview();
+    // Filtrar: solo alias válidos (objeto con position y floor numérico)
+    if (
+        data &&
+        typeof data === 'object' &&
+        data.position && typeof data.position.x === 'number' && typeof data.position.y === 'number' && typeof data.position.z === 'number' &&
+        typeof data.floor === 'number'
+    ) {
+        validAliases.push(alias);
+    } else {
+        // Eliminar claves basura
+        console.warn('[Limpieza] Eliminando clave inválida en positions:', alias, data);
+        positionsRef.child(alias).remove();
+    }
+});
+// Procesar solo los aliases válidos
+validAliases.forEach(alias => {
+    const userData = positions[alias];
+    if (alias !== userAlias) {
+        console.log('[Firebase positionsRef] updateAvatarPosition:', {
+            alias,
+            userData: JSON.parse(JSON.stringify(userData))
         });
+        updateAvatarPosition(
+            alias,
+            userData.position,
+            userData.floor,
+            userData.rotation,
+            userData.shirtColor,
+            userData.pantsColor,
+            userData.shoesColor
+        );
+    }
+});
+// Eliminar avatares de userAvatars que no estén en los aliases válidos
+for (const [alias] of userAvatars) {
+    if (!validAliases.includes(alias) && alias !== userAlias) {
+        console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
+        removeUserAvatar(alias);
     }
 });
 
-        function closeWorkingPanel() {
-            const panel = document.getElementById('working-customization-panel');
-            if (panel) {
-                panel.remove();
-            }
-            customizationPanelOpen = false;
-        }
-        
-        function changeShirtColor(color) {
-            currentCustomization.shirtColor = color;
-            applyCustomizationToAvatar();
-            console.log('Color de camisa cambiado a:', color);
-        }
-        
-        function saveSimpleCustomization() {
-            const aliasInput = document.getElementById('simple-alias-input');
-            const newAlias = aliasInput.value.trim();
-            
-            if (newAlias.length > 0) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                if (isConnected) {
-                    sendAlias();
-                }
-                
-                console.log('Alias guardado:', newAlias);
-            }
-            
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeSimplePanel();
-            alert('¡Personalización guardada!');
-        }
-        
-        function createWorkingColorGrids() {
-            // Crear opciones de color para camisas (primeros 18 colores)
-            const shirtGrid = document.getElementById('working-shirt-colors');
-            for (let i = 0; i < 18; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
-                if (customizationColors[i] === currentCustomization.shirtColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                shirtGrid.appendChild(colorOption);
-            }
-            
+// ...
 
-        }
-        
-
-        
-
-        
-
-        
-
-
-        function closeCustomizationPanel() {
-            customizationPanel.style.display = 'none';
-            customizationPanelOpen = false;
-        }
-
-        function createSkinSelection() {
-    const skinOptions = document.querySelectorAll('.skin-option');
-    skinOptions.forEach(btn => {
-        btn.onclick = () => {
-            const selectedSkin = btn.getAttribute('data-skin');
-            currentCustomization.skin = selectedSkin;
-            updateSelectedSkin();
-            updateAvatarPreview();
-        };
-    });
-}
-
-function updateSelectedSkin() {
-    const skinOptions = document.querySelectorAll('.skin-option');
-    skinOptions.forEach(btn => {
-        if (btn.getAttribute('data-skin') === currentCustomization.skin) {
-            btn.classList.add('selected');
-        } else {
-            btn.classList.remove('selected');
-        }
-    });
-}
-
-function createColorGrids() {
-            // Limpiar grids existentes
-            const shirtColorsGrid = document.getElementById('shirt-colors');
-            const pantsColorsGrid = document.getElementById('pants-colors');
-            const shoesColorsGrid = document.getElementById('shoes-colors');
-
-            shirtColorsGrid.innerHTML = '';
-            pantsColorsGrid.innerHTML = '';
-            shoesColorsGrid.innerHTML = '';
-
-            // Definir los colores disponibles para cada tipo
-            // Colores para camisas (colores vibrantes y variados)
-            const shirtColors = [
-                { color: 0xFF6B6B, name: 'Rosado' },
-                { color: 0x4ECDC4, name: 'Turquesa' },
-                { color: 0x45B7D1, name: 'Azul Marino' },
-                { color: 0x96CEB4, name: 'Verde Claro' },
-                { color: 0xFFEAA7, name: 'Amarillo' },
-                { color: 0xDDA0DD, name: 'Lila' },
-                { color: 0x98D8C8, name: 'Verde Agua' },
-                { color: 0xF7DC6F, name: 'Amarillo Dorado' },
-                { color: 0xBB8FCE, name: 'Morado' },
-                { color: 0x85C1E9, name: 'Azul Cielo' },
-                { color: 0xF8C471, name: 'Naranja' },
-                { color: 0x82E0AA, name: 'Verde Hoja' }
-            ];
-
-            // Colores para pantalones (colores más sobrios y neutros)
-            const pantsColors = [
-                { color: 0x2C3E50, name: 'Gris Oscuro' },
-                { color: 0x3498DB, name: 'Azul' },
-                { color: 0xE74C3C, name: 'Rojo' },
-                { color: 0x9B59B6, name: 'Violeta' },
-                { color: 0x34495E, name: 'Azul Oscuro' },
-                { color: 0x2ECC71, name: 'Verde' },
-                { color: 0x16A085, name: 'Verde Agua' },
-                { color: 0x2980B9, name: 'Azul Marino' },
-                { color: 0x8E44AD, name: 'Morado' }
-            ];
-
-            // Colores para zapatos (colores oscuros y neutros)
-            const shoesColors = [
-                { color: 0x8B4513, name: 'Marrón' },
-                { color: 0x6E2C00, name: 'Marrón Oscuro' },
-                { color: 0x1A5276, name: 'Azul Marino' },
-                { color: 0x154360, name: 'Azul Oscuro' }
-            ];
-
-            // Crear opciones de color para cada tipo
-            const createOption = (colorObj, type) => {
-                const option = document.createElement('div');
-                option.className = 'color-option';
-                option.style.setProperty('--color', '#' + colorObj.color.toString(16).padStart(6, '0'));
-                option.dataset.color = colorObj.color;
-                option.dataset.type = type;
-                
-                // Agregar título al pasar el mouse
-                option.title = colorObj.name;
-                
-                // Agregar evento click
-                option.onclick = () => selectColor(colorObj.color, type);
-                
-                return option;
-            };
-
-            // Crear botones para cada tipo
-            shirtColors.forEach(color => shirtColorsGrid.appendChild(createOption(color, 'shirt')));
-            pantsColors.forEach(color => pantsColorsGrid.appendChild(createOption(color, 'pants')));
-            shoesColors.forEach(color => shoesColorsGrid.appendChild(createOption(color, 'shoes')));
-
-            // Actualizar selecciones iniciales
-            updateSelectedColors();
-        }
-
-        // Inicializar los grids de colores al cargar
-        document.addEventListener('DOMContentLoaded', createColorGrids);
-
-
-
-        function selectColor(color, type) {
-            // Remover selección previa del mismo tipo
-            const allSelected = document.querySelectorAll(`.color-option.selected[data-type="${type}"]`);
-            allSelected.forEach(btn => btn.classList.remove('selected'));
-            
-            // Seleccionar nueva opción
-            const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
-            
-            // Actualizar color actual
-            switch (type) {
-                case 'shirt':
-                    currentCustomization.shirtColor = color;
-                    break;
-                case 'pants':
-                    currentCustomization.pantsColor = color;
-                    break;
-                case 'shoes':
-                    currentCustomization.shoesColor = color;
-                    break;
-            }
-            
-            // Actualizar selecciones visuales
-            updateSelectedColors();
-            
-            // Aplicar cambios inmediatamente al avatar
-            applyCustomizationToAvatar();
-        }
-
-        function updateSelectedColors() {
-            // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
-            
-            if (shirtOption) shirtOption.classList.add('selected');
-
-    // Seleccionar nueva opción
-    const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-    if (selectedOption) {
-        selectedOption.classList.add('selected');
-    }
-
-    // Actualizar color actual
-    switch (type) {
-        case 'shirt':
-            currentCustomization.shirtColor = color;
-            break;
-        case 'pants':
-            currentCustomization.pantsColor = color;
-            break;
-        case 'shoes':
-            currentCustomization.shoesColor = color;
-            break;
-    }
-            
-            // Validar el alias
-            if (newAlias.length === 0) {
-                addMessageToChat('Sistema', 'El alias no puede estar vacío', 'system');
-                return;
-            }
-            
-            if (newAlias.length > 18) {
-                addMessageToChat('Sistema', 'El alias no puede tener más de 18 caracteres', 'system');
-                return;
-            }
-            
-            // Actualizar el alias si ha cambiado
-            if (newAlias !== userAlias) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                // Enviar nuevo alias al servidor
-                if (isConnected) {
-                    sendAlias();
-                }
-            }
-            
-            // Guardar personalización en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeCustomizationPanel();
-            
-            // Mostrar mensaje de confirmación
-            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
-        }
-
-        function resetCustomization() {
-            // Restablecer a colores por defecto
-            currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513,
-                skin: 'humanMaleA'
-            };
-            
-            // Aplicar cambios
-            applyCustomizationToAvatar();
-            updateSelectedColors();
-            updateSelectedSkin();
-        }
-
-        function loadCustomization() {
-            const saved = localStorage.getItem('avatarCustomization');
-            if (saved) {
-                try {
-                    currentCustomization = JSON.parse(saved);
-                    // Si falta la propiedad skin, asignar valor por defecto
-                    if (!currentCustomization.skin) currentCustomization.skin = 'humanMaleA';
-                    applyCustomizationToAvatar();
-                } catch (error) {
-                    console.error('Error cargando personalización:', error);
-                }
-            }
-        }
-
-
-
-        // Cerrar panel al hacer clic fuera - VERSIÓN MEJORADA
-        document.addEventListener('click', (e) => {
-            // Verificar si el clic es en un botón de UI - NO cerrar en ese caso
-            const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                              e.target.closest('#change-alias-btn') || 
-                              e.target.closest('#chat-panel') || 
-                              e.target.closest('#simple-panel') ||
-                              e.target.closest('#ui-overlay');
-            
-            if (isUIButton) {
-                return; // No hacer nada si el clic es en un elemento de UI
-            }
-            
-            // Cerrar chat si está abierto y se hace clic fuera
-            if (chatOpen && !chatPanel.contains(e.target) && !chatToggleBtn.contains(e.target)) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-                // Ocultar overlay
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.style.pointerEvents = 'none';
-                }
-            }
-            
-            if (customizationPanelOpen && !customizationPanel.contains(e.target)) {
-                closeCustomizationPanel();
-            }
-            
-            // Cerrar panel de trabajo al hacer clic fuera
-            const workingPanel = document.getElementById('working-customization-panel');
-            if (workingPanel && !workingPanel.contains(e.target)) {
-                closeWorkingPanel();
-            }
-        });
-
-        // Agregar event listener al overlay para bloquear clics - VERSIÓN MEJORADA
-        const overlay = document.getElementById('ui-overlay');
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
-                const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                                  e.target.closest('#change-alias-btn') || 
-                                  e.target.closest('#chat-panel') || 
-                                  e.target.closest('#simple-panel');
-                
-                if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                e.stopPropagation();
-                e.preventDefault();
-                return false;
-                }
-            });
-        }
-
-        // Cargar personalización al iniciar
-        loadCustomization();
-
-        function sendUserPosition() {
-            if (userAlias) {
-                // TODO: Enviar posición a Firebase
-                // firebase.database().ref('positions').child(userAlias).set({ ... })
-            }
-        }
-
-        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor) {
-            if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
-                console.warn('Posición inválida para alias:', alias, position);
-                return;
-            }
-            if (typeof floor !== 'number') {
-                console.warn('Floor inválido para alias:', alias, floor);
-                return;
-            }
-            if (typeof rotation !== 'number') {
-                console.warn('Rotación inválida para alias:', alias, rotation);
-                return;
-            }
-            // No crear avatar para el usuario propio
-            if (alias === userAlias) {
-                return;
-            }
-            let avatar = userAvatars.get(alias);
-            if (!avatar) {
-                createUserAvatar(alias, position, floor, { shirtColor, pantsColor, shoesColor });
-                avatar = userAvatars.get(alias);
-            }
-            if (avatar) {
-                // Actualización de posición y rotación en tiempo real
-                const floorStep = HALL_HEIGHT + 1;
-                const targetY = floor * floorStep;
-                avatar.targetPosition.set(position.x, targetY, position.z);
-                avatar.currentFloor = floor;
-                // (Opcional) sincronizar Y real del grupo
-                // avatar.group.position.y = targetY;
-                let normalizedRotation = rotation;
-                while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
-                while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
-                avatar.targetRotation = normalizedRotation;
-                // Actualización de materiales
-                if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
-                    avatar.bodyMaterial.color.setHex(shirtColor);
-                    avatar.bodyMaterial.needsUpdate = true;
-                }
-                if (typeof pantsColor === 'number' && avatar.pantsMaterial && avatar.pantsMaterial.color.getHex() !== pantsColor) {
-                    avatar.pantsMaterial.color.setHex(pantsColor);
-                    avatar.pantsMaterial.needsUpdate = true;
-                }
-                if (typeof shoesColor === 'number' && avatar.shoeMaterial && avatar.shoeMaterial.color.getHex() !== shoesColor) {
-                    avatar.shoeMaterial.color.setHex(shoesColor);
-                    avatar.shoeMaterial.needsUpdate = true;
-                }
-                if (typeof shirtColor === 'number' && avatar.armMaterial && avatar.armMaterial.color.getHex() !== shirtColor) {
-                    avatar.armMaterial.color.setHex(shirtColor);
-                    avatar.armMaterial.needsUpdate = true;
-                }
-            }
-        }
-
-        // Asegurar que el DOM esté completamente cargado antes de inicializar
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-        
-        // Función para detectar dispositivo móvil
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                   window.innerWidth <= 768;
-        }
-        
-        // Función para mostrar/ocultar controles móviles
-        function toggleMobileControls() {
-            const mobileControls = document.getElementById('mobile-controls');
-            const mobileRotationControls = document.getElementById('mobile-rotation-controls');
-            
-            if (mobileControls) {
-                if (isMobileDevice()) {
-                    mobileControls.style.display = 'block';
-                } else {
-                    mobileControls.style.display = 'none';
-                }
-            }
-            
-            if (mobileRotationControls) {
-                if (isMobileDevice()) {
-                    mobileRotationControls.style.display = 'block';
-                } else {
-                    mobileRotationControls.style.display = 'none';
-                }
-            }
-        }
-        
-        // Detectar cambios de tamaño de ventana
-        window.addEventListener('resize', toggleMobileControls);
-        
-        // Inicializar controles móviles al cargar
-        document.addEventListener('DOMContentLoaded', toggleMobileControls);
-
-        // Configurar overlay al cargar la página - VERSIÓN MEJORADA
-        document.addEventListener('DOMContentLoaded', () => {
-            const overlay = document.getElementById('ui-overlay');
-            if (overlay) {
-                overlay.style.pointerEvents = 'auto';
-                overlay.addEventListener('click', (e) => {
-                    // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
-                    const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                                      e.target.closest('#change-alias-btn') || 
-                                      e.target.closest('#chat-panel') || 
-                                      e.target.closest('#simple-panel');
-                    
-                    if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                    }
-                });
-            }
-        });
-
-        
-       
-
-        // Mostrar prompt de alias si no existe
-        if (!userAlias) {
-            userAlias = prompt('Ingresa tu alias:');
-            if (userAlias) {
-                localStorage.setItem('userAlias', userAlias);
-            } else {
-                userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
-                localStorage.setItem('userAlias', userAlias);
-            }
-        }
-
-        // Conectar al chat de Firebase
-        connectToChat(userAlias);
-
-        
-
-        // Enviar posición del usuario periódicamente (ejemplo cada 500ms)
-        setInterval(() => {
-            if (
-                typeof camera !== 'undefined' &&
-                camera.position &&
-                typeof camera.position.x !== 'undefined' &&
-                typeof camera.position.y !== 'undefined' &&
-                typeof camera.position.z !== 'undefined'
-            ) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                // Invertir la rotación para que los avatares miren igual que la cámara
-                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                sendPosition(position, floor, rotation);
-            } else {
-                console.warn('Cámara o posición no definida:', camera);
-            }
-        }, 500);
-
-        // Función mejorada para mostrar mensajes en el chat
-        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
-            const chatMessages = document.getElementById('chat-messages');
-            if (!chatMessages) return;
-            let timeStr = '';
-            if (timestamp) {
-                const date = new Date(timestamp);
-                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
-            }
-            const isOwn = (alias === userAlias || type === 'own');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
-            msgDiv.style.margin = '6px 0';
-            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
-            if (isPrivate) {
-                msgDiv.style.background = 'rgba(255,215,0,0.12)';
-                msgDiv.style.border = '1px solid #FFD700';
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
-            } else {
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
-            }
-            chatMessages.appendChild(msgDiv);
-            // Limitar a los últimos 10 mensajes
-            while (chatMessages.children.length > 10) {
-                chatMessages.removeChild(chatMessages.firstChild);
-            }
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        window.addMessageToChat = addMessageToChat;
-
-        // Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
-        // El listener principal está en firebase-config.js
-
-        // Listener de posiciones de avatares en Firebase
-        positionsRef.on('value', (snapshot) => {
-    const positions = snapshot.val() || {};
-    // --- Limpieza automática de posiciones huérfanas (más de 1 minuto sin actualizar) ---
-    const now = Date.now();
-    // --- Filtrar solo alias válidos y limpiar basura ---
-    const validAliases = [];
-    Object.entries(positions).forEach(([alias, data]) => {
-        // Eliminar posiciones viejas
-        if (data.timestamp && now - data.timestamp > 60 * 1000) {
-            console.log('[Limpieza] Eliminando posición antigua de alias:', alias);
-            positionsRef.child(alias).remove();
-            return;
-        }
-        // Filtrar: solo alias válidos (objeto con position y floor numérico)
-        if (
-            data &&
-            typeof data === 'object' &&
-            data.position && typeof data.position.x === 'number' && typeof data.position.y === 'number' && typeof data.position.z === 'number' &&
-            typeof data.floor === 'number'
-        ) {
-            validAliases.push(alias);
-        } else {
-            // Eliminar claves basura
-            console.warn('[Limpieza] Eliminando clave inválida en positions:', alias, data);
-            positionsRef.child(alias).remove();
-        }
-    });
-    // Procesar solo los alias válidos
-    validAliases.forEach(alias => {
-        const userData = positions[alias];
-        if (alias !== userAlias) {
-            console.log('[Firebase positionsRef] updateAvatarPosition:', {
-                alias,
-                userData: JSON.parse(JSON.stringify(userData))
-            });
-            updateAvatarPosition(
-                alias,
-                userData.position,
-                userData.floor,
-                userData.rotation,
-                userData.shirtColor,
-                userData.pantsColor,
-                userData.shoesColor
-            );
-        }
-    });
-    // Eliminar avatares de userAvatars que no estén en los aliases válidos
-    for (const [alias] of userAvatars) {
-        if (!validAliases.includes(alias) && alias !== userAlias) {
-            console.log('[Avatar] Eliminando avatar desconectado o fantasma:', alias);
-            removeUserAvatar(alias);
-        }
-    }
-});
-
-        // --- Eliminar avatar de usuario de la escena y del mapa ---
-function removeUserAvatar(alias) {
-    const avatar = userAvatars.get(alias);
-    if (avatar && avatar.group) {
-        scene.remove(avatar.group);
-    }
-    userAvatars.delete(alias);
-    pendingAvatarLoads.delete(alias);
-}
-
-// --- Control de cargas pendientes para evitar duplicados por race conditions ---
-const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom, '\nStack:', new Error().stack);
@@ -5016,16 +3974,23 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     // Si por alguna razón sigue existiendo, no continuar
     if (userAvatars.has(alias)) return;
     pendingAvatarLoads.add(alias);
-    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    const skinList = [
+        // Kenney 3D Characters (mall default)
+        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png', model: 'assets/kenney 3d characters/Model/characterMedium.fbx', folder: 'kenney 3d characters' },
+        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png', model: 'assets/kenney 3d characters/Model/characterMedium.fbx', folder: 'kenney 3d characters' },
+        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png', model: 'assets/kenney 3d characters/Model/characterMedium.fbx', folder: 'kenney 3d characters' },
+        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png', model: 'assets/kenney 3d characters/Model/characterMedium.fbx', folder: 'kenney 3d characters' },
+        // Kennei 3D Characters 1
+        { key: 'criminalMaleA', label: 'Criminal Masculino', img: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png', model: 'assets/kannei 3d characters 1/Model/characterMedium.fbx', folder: 'kannei 3d characters 1' },
+        { key: 'cyborgFemaleA', label: 'Cyborg Femenino', img: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png', model: 'assets/kannei 3d characters 1/Model/characterMedium.fbx', folder: 'kannei 3d characters 1' },
+        { key: 'skaterFemaleA', label: 'Skater Femenina', img: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png', model: 'assets/kannei 3d characters 1/Model/characterMedium.fbx', folder: 'kannei 3d characters 1' }
+    ];
     // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
-    const skinFileMap = {
-        'humanMaleA': 'humanMaleA.png',
-        'humanFemaleA': 'humanFemaleA.png',
-        'zombieMaleA': 'zombieMaleA.png',
-        'zombieFemaleA': 'zombieFemaleA.png'
-    };
-    const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
+    // Buscar skin en skinList global
+    const skin = (typeof skinList !== 'undefined' ? skinList : []).find(s => s.key === skinName);
+    const modelPath = skin ? skin.model : 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    const texturePath = skin ? skin.img : 'assets/kenney 3d characters/Skins/humanMaleA.png';
     const loader = new THREE.FBXLoader();
     const texLoader = new THREE.TextureLoader();
     // Calcular la posición Y correcta para el piso
@@ -5047,98 +4012,117 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             scene.add(avatar);
             printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
+            // --- Animación FBX ---
+            let mixer = null, idleAction = null, walkAction = null, currentAction = null;
+            if (avatar.animations && avatar.animations.length > 0 && THREE.AnimationMixer) {
+                mixer = new THREE.AnimationMixer(avatar);
+                avatar.animations.forEach(clip => {
+                    if (/idle/i.test(clip.name)) idleAction = mixer.clipAction(clip);
+                    if (/walk/i.test(clip.name)) walkAction = mixer.clipAction(clip);
+                });
+                if (idleAction) {
+                    idleAction.play();
+                    currentAction = idleAction;
+                }
+            }
             userAvatars.set(alias, {
                 group: avatar,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
-                currentFloor: floor
+                currentFloor: floor,
+                mixer,
+                idleAction,
+                walkAction,
+                currentAction
             });
         }); // <-- close loader.load
     }); // <-- close texLoader.load
 } // <-- close createUserAvatar
 
-        // --- Utilidad para debug: imprimir huesos del modelo FBX ---
-        function printAllBones(avatar) {
-            if (!avatar || !avatar.group) return;
-            console.log('--- Huesos del avatar:', avatar.group.name, '---');
-            avatar.group.traverse(child => {
-                if (child.isBone) {
-                    console.log('Bone:', child.name);
-                }
-            });
-        }
-        // --- Animación simple para avatares tipo Roblox ---
-        function animateRobloxAvatar(avatar, alias) {
-            if (!avatar || !avatar.group) return;
-            // Detectar si el avatar está en movimiento
-            const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
-            // Buscar huesos relevantes (solo la primera vez)
-            if (!avatar.armLeft || !avatar.armRight || !avatar.legLeft || !avatar.legRight) {
-                avatar.group.traverse(child => {
-                    if (child.isBone) {
-                        if (child.name === 'LeftArm') avatar.armLeft = child;
-                        if (child.name === 'RightArm') avatar.armRight = child;
-                        if (child.name === 'LeftUpLeg') avatar.legLeft = child;
-                        if (child.name === 'RightUpLeg') avatar.legRight = child;
-                    }
-                });
-            }
-            // Parámetros de animación
-            const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
-            if (moving) {
-                // Animación de caminar: balanceo de brazos y piernas
-                const armSwing = Math.sin(t) * 0.6;
-                const legSwing = Math.cos(t) * 0.6;
-                if (avatar.armLeft) avatar.armLeft.rotation.x = armSwing;
-                if (avatar.armRight) avatar.armRight.rotation.x = -armSwing;
-                if (avatar.legLeft) avatar.legLeft.rotation.x = legSwing;
-                if (avatar.legRight) avatar.legRight.rotation.x = -legSwing;
-            } else {
-                // Quieto: brazos rectos hacia abajo
-                if (avatar.armLeft) avatar.armLeft.rotation.x = 0;
-                if (avatar.armRight) avatar.armRight.rotation.x = 0;
-                if (avatar.legLeft) avatar.legLeft.rotation.x = 0;
-                if (avatar.legRight) avatar.legRight.rotation.x = 0;
-            }
-        }
-        // Utilidad opcional para hashCode de string (alias)
-        if (!String.prototype.hashCode) {
-            String.prototype.hashCode = function() {
-                var hash = 0, i, chr;
-                if (this.length === 0) return hash;
-                for (i = 0; i < this.length; i++) {
-                    chr   = this.charCodeAt(i);
-                    hash  = ((hash << 5) - hash) + chr;
-                    hash |= 0; // Convert to 32bit integer
-                }
-                return hash;
-            };
-        }
-        // --- Función para actualizar todas las posiciones de avatares ---
-        function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
-                // Interpolación suave hacia la posición objetivo
-                avatar.group.position.lerp(avatar.targetPosition, 0.2);
-                // Interpolación suave de rotación
-                avatar.group.rotation.y += (avatar.targetRotation - avatar.group.rotation.y) * 0.2;
-                // Animación de movimiento estilo Roblox
-                animateRobloxAvatar(avatar, alias);
-            });
-        }
+// ...
 
-        function openSimplePanel() {
-            const panel = document.getElementById('simple-panel');
-            if (panel) {
-                panel.style.display = 'block';
-                customizationPanelOpen = true;
-                // Inicializar vista previa del avatar
-                updateAvatarPreview();
-                // Inicializar los grids de colores
-                createColorGrids();
-                // Inicializar selección de skin
-                createSkinSelection();
-                // Actualizar selecciones de colores
-                updateSelectedColors();
+// --- Vista previa 3D de avatar en panel de personalización ---
+let avatarPreviewRenderer = null, avatarPreviewScene = null, avatarPreviewCamera = null, avatarPreviewModel = null, avatarPreviewMixer = null, avatarPreviewAnimFrame = null;
+
+function updateAvatarPreview() {
+    const preview3dDiv = document.getElementById('avatar-preview-3d');
+    const label = document.getElementById('skin-preview-label');
+    let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA';
+    const skin = (typeof skinList !== 'undefined' ? skinList : []).find(s => s.key === skinName);
+    if (label && skin) label.textContent = skin.label;
+    if (!preview3dDiv || !skin) return;
+
+    // Limpiar renderers/canvas/model previos
+    if (avatarPreviewAnimFrame) cancelAnimationFrame(avatarPreviewAnimFrame);
+    if (avatarPreviewRenderer && avatarPreviewRenderer.domElement && avatarPreviewRenderer.domElement.parentNode)
+        avatarPreviewRenderer.domElement.parentNode.removeChild(avatarPreviewRenderer.domElement);
+    avatarPreviewRenderer = null; avatarPreviewScene = null; avatarPreviewCamera = null; avatarPreviewModel = null; avatarPreviewMixer = null;
+
+    // Crear escena Three.js miniatura
+    avatarPreviewScene = new THREE.Scene();
+    avatarPreviewScene.background = new THREE.Color(0x181818);
+    avatarPreviewCamera = new THREE.PerspectiveCamera(40, 110/170, 0.1, 20);
+    avatarPreviewCamera.position.set(0, 1.2, 3.2);
+    avatarPreviewCamera.lookAt(0, 1, 0);
+    avatarPreviewRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    avatarPreviewRenderer.setSize(110, 170);
+    avatarPreviewRenderer.setPixelRatio(window.devicePixelRatio);
+    preview3dDiv.appendChild(avatarPreviewRenderer.domElement);
+
+    // Luz suave
+    avatarPreviewScene.add(new THREE.AmbientLight(0xffffff, 1.1));
+    let dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    dirLight.position.set(2, 6, 4);
+    avatarPreviewScene.add(dirLight);
+
+    // Cargar modelo y textura
+    const loader = new THREE.FBXLoader();
+    loader.load(skin.model, function(avatar) {
+        const texLoader = new THREE.TextureLoader();
+        texLoader.load(skin.img, function(texture) {
+            avatar.traverse(child => {
+                if (child.isMesh) {
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                }
+            });
+            avatar.position.set(0, 0, 0);
+            avatar.scale.set(1.1, 1.1, 1.1);
+            avatarPreviewScene.add(avatar);
+            avatarPreviewModel = avatar;
+            // Animación Idle
+            if (avatar.animations && avatar.animations.length > 0) {
+                avatarPreviewMixer = new THREE.AnimationMixer(avatar);
+                let idleClip = avatar.animations.find(c => /idle/i.test(c.name));
+                if (idleClip) {
+                    let idleAction = avatarPreviewMixer.clipAction(idleClip);
+                    idleAction.play();
+                }
+            }
+        });
+    });
+    // Animar
+    let lastTime = performance.now();
+    function animatePreview(now) {
+        avatarPreviewAnimFrame = requestAnimationFrame(animatePreview);
+        let dt = (now - lastTime) / 1000;
+        lastTime = now;
+        if (avatarPreviewMixer) avatarPreviewMixer.update(dt);
+        // Rotar lentamente para mejor vista
+        if (avatarPreviewModel) avatarPreviewModel.rotation.y += 0.01;
+        avatarPreviewRenderer.render(avatarPreviewScene, avatarPreviewCamera);
+    }
+    animatePreview(lastTime);
+}
+
+// ...
+
+function updateSkinPreview(idx) {
+    img.src = skinList[idx].img;
+    label.textContent = skinList[idx].label;
+    currentCustomization.skin = skinList[idx].key;
+    updateAvatarPreview && updateAvatarPreview();
+}
                 // Actualizar selección de skin
                 updateSelectedSkin();
             }
