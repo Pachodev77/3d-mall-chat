@@ -872,68 +872,25 @@
         <div class="panel-content">
             <!-- Columna izquierda - Opciones -->
             <div class="options-column">
-                <!-- Sección de Selección de Skin -->
-                <div class="option-section">
-                    <h3 class="section-title">
-                        <span class="section-icon">🧑‍🎨</span>
-                        Diseño de Avatar
-                    </h3>
-                    <div id="skin-options" class="skin-options-grid">
-                        <button class="skin-option" data-skin="humanMaleA" title="Humano Masculino">
-                            <img src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Humano Masculino" />
-                        </button>
-                        <button class="skin-option" data-skin="humanFemaleA" title="Humano Femenino">
-                            <img src="assets/kenney 3d characters/Skins/humanFemaleA.png" alt="Humano Femenino" />
-                        </button>
-                        <button class="skin-option" data-skin="zombieMaleA" title="Zombie Masculino">
-                            <img src="assets/kenney 3d characters/Skins/zombieMaleA.png" alt="Zombie Masculino" />
-                        </button>
-                        <button class="skin-option" data-skin="zombieFemaleA" title="Zombie Femenino">
-                            <img src="assets/kenney 3d characters/Skins/zombieFemaleA.png" alt="Zombie Femenino" />
-                        </button>
-                    </div>
-                </div>
-                <!-- Sección de Alias -->
-                <div class="option-section">
-                    <h3 class="section-title">
-                        <span class="section-icon">📝</span>
-                        Nombre del Avatar
-                    </h3>
-                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20">
-                </div>
-                
-                <!-- Sección de Colores de Camisa -->
-                <div class="option-section">
-                    <h3 class="section-title">
-                        <span class="section-icon">👕</span>
-                        Color de Camisa
-                    </h3>
-                    <div id="shirt-colors" class="color-grid">
-                        <!-- Los colores se agregarán dinámicamente -->
-                    </div>
-                </div>
-                
-                <!-- Sección de Colores de Pantalón -->
-                <div class="option-section">
-                    <h3 class="section-title">
-                        <span style="font-size: 20px;">👖</span>
-                        Color de Pantalón
-                    </h3>
-                    <div id="pants-colors" class="color-grid">
-                        <!-- Los colores se agregarán dinámicamente -->
-                    </div>
-                </div>
-                
-                <!-- Sección de Colores de Zapatos -->
-                <div class="option-section">
-                    <h3 class="section-title">
-                        <span style="font-size: 20px;">👞</span>
-                        Color de Zapatos
-                    </h3>
-                    <div id="shoes-colors" class="color-grid">
-                        <!-- Los colores se agregarán dinámicamente -->
-                    </div>
-                </div>
+                <!-- Selección de Skin con flechas -->
+<div class="option-section" style="display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 24px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
+        <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
+            <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
+            <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
+        </div>
+        <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
+    </div>
+</div>
+<!-- Campo de nombre de avatar -->
+<div class="option-section" style="margin-top: 32px;">
+    <h3 class="section-title" style="margin-bottom: 8px;">
+        <span class="section-icon">📝</span>
+        Nombre del Avatar
+    </h3>
+    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
+</div>
             </div>
             
             <!-- Columna derecha - Vista previa -->
@@ -4390,15 +4347,50 @@
             }
         }
         
-        // Event listeners para actualización en tiempo real
-        document.addEventListener('DOMContentLoaded', function() {
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.addEventListener('input', function() {
-                    updateAvatarPreview();
-                });
-            }
+        // --- SKIN SELECTION ARROWS LOGIC ---
+document.addEventListener('DOMContentLoaded', function() {
+    // Skins disponibles
+    const skinList = [
+        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
+    ];
+    // Obtener elementos
+    const prevBtn = document.getElementById('skin-prev-btn');
+    const nextBtn = document.getElementById('skin-next-btn');
+    const img = document.getElementById('skin-preview-img');
+    const label = document.getElementById('skin-preview-label');
+    // Inicializar índice
+    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
+    if (currentIdx === -1) currentIdx = 0;
+    // Función para actualizar preview
+    function updateSkinPreview(idx) {
+        img.src = skinList[idx].img;
+        label.textContent = skinList[idx].label;
+        currentCustomization.skin = skinList[idx].key;
+        updateAvatarPreview && updateAvatarPreview();
+    }
+    // Asignar eventos
+    prevBtn && prevBtn.addEventListener('click', function() {
+        currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
+        updateSkinPreview(currentIdx);
+    });
+    nextBtn && nextBtn.addEventListener('click', function() {
+        currentIdx = (currentIdx + 1) % skinList.length;
+        updateSkinPreview(currentIdx);
+    });
+    // Inicializar preview
+    updateSkinPreview(currentIdx);
+
+    // Alias input para preview
+    const aliasInput = document.getElementById('simple-alias-input');
+    if (aliasInput) {
+        aliasInput.addEventListener('input', function() {
+            updateAvatarPreview();
         });
+    }
+});
 
         function closeWorkingPanel() {
             const panel = document.getElementById('working-customization-panel');
