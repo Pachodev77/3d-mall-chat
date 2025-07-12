@@ -2413,7 +2413,9 @@
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
             window.addEventListener('resize', onWindowResize);
-            document.addEventListener('mousedown', onMouseDown);
+            // Sistema centralizado de eventos de clic
+        document.addEventListener('mousedown', handleGlobalClick);
+        document.addEventListener('click', handleGlobalClick);
         }
         
         function setupUIButtons() {
@@ -2479,83 +2481,26 @@
             const mobileLeftBtn = document.getElementById('mobile-left');
             const mobileRightBtn = document.getElementById('mobile-right');
             
-            // Eventos para movimiento hacia adelante/atrás
-            if (mobileForwardBtn) {
-                mobileForwardBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    mobileForward = true;
-                });
-                mobileForwardBtn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    mobileForward = false;
-                });
-                mobileForwardBtn.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    mobileForward = true;
-                });
-                mobileForwardBtn.addEventListener('mouseup', (e) => {
-                    e.preventDefault();
-                    mobileForward = false;
-                });
+            // Función auxiliar para configurar controles de botones móviles
+            function setupButtonControls(buttonId, flagSetter) {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    const setFlag = (value) => (e) => { 
+                        e.preventDefault(); 
+                        flagSetter(value); 
+                    };
+                    button.addEventListener('touchstart', setFlag(true));
+                    button.addEventListener('touchend', setFlag(false));
+                    button.addEventListener('mousedown', setFlag(true));
+                    button.addEventListener('mouseup', setFlag(false));
+                }
             }
             
-            if (mobileBackwardBtn) {
-                mobileBackwardBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    mobileBackward = true;
-                });
-                mobileBackwardBtn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    mobileBackward = false;
-                });
-                mobileBackwardBtn.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    mobileBackward = true;
-                });
-                mobileBackwardBtn.addEventListener('mouseup', (e) => {
-                    e.preventDefault();
-                    mobileBackward = false;
-                });
-            }
-            
-            // Eventos para rotación izquierda/derecha
-            if (mobileLeftBtn) {
-                mobileLeftBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    mobileLeft = true;
-                });
-                mobileLeftBtn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    mobileLeft = false;
-                });
-                mobileLeftBtn.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    mobileLeft = true;
-                });
-                mobileLeftBtn.addEventListener('mouseup', (e) => {
-                    e.preventDefault();
-                    mobileLeft = false;
-                });
-            }
-            
-            if (mobileRightBtn) {
-                mobileRightBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    mobileRight = true;
-                });
-                mobileRightBtn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    mobileRight = false;
-                });
-                mobileRightBtn.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    mobileRight = true;
-                });
-                mobileRightBtn.addEventListener('mouseup', (e) => {
-                    e.preventDefault();
-                    mobileRight = false;
-                });
-            }
+            // Configurar controles móviles usando la función auxiliar
+            setupButtonControls('mobile-forward', value => mobileForward = value);
+            setupButtonControls('mobile-backward', value => mobileBackward = value);
+            setupButtonControls('mobile-left', value => mobileLeft = value);
+            setupButtonControls('mobile-right', value => mobileRight = value);
         }
 
         function onKeyDown(event) {
@@ -2647,9 +2592,11 @@
             }
         }
         
-        function onMouseDown(event) {
-            // CRÍTICO: Verificar si el clic es en un elemento de UI - NO procesar en ese caso
+        // Sistema centralizado de manejo de eventos de clic
+        function handleGlobalClick(event) {
             const target = event.target;
+            
+            // 1. Verificar si es un clic en elementos de UI - NO procesar
             const isUIElement = target.closest('#ui-container') || 
                                target.closest('#chat-panel') || 
                                target.closest('#simple-panel') ||
@@ -2659,31 +2606,65 @@
                                target.closest('input') ||
                                target.closest('select');
             
+            // Manejo especial para emoji panel
+            const emojiPanel = document.getElementById('emoji-panel');
+            const emojiToggle = document.getElementById('emoji-toggle');
+            if (emojiPanel && emojiToggle && !emojiPanel.contains(target) && !emojiToggle.contains(target)) {
+                emojiPanel.style.display = 'none';
+            }
+            
             if (isUIElement) {
                 return; // NO procesar clics en elementos de UI
             }
             
-            // Si estamos en la habitación personal, no procesar clics del mall
-            if (currentScene === 'personal-room') {
+            // 2. Verificar estado de la aplicación
+            const overlay = document.getElementById('ui-overlay');
+            const simplePanel = document.getElementById('simple-panel');
+            const workingPanel = document.getElementById('working-customization-panel');
+            
+            // Si algún panel está abierto, cerrarlo al hacer clic fuera
+            if (chatOpen && !chatPanel.contains(target) && !chatToggleBtn.contains(target)) {
+                chatPanel.style.display = 'none';
+                chatOpen = false;
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.pointerEvents = 'none';
+                }
                 return;
             }
             
-            // Si el overlay está activo, no procesar ningún clic del juego
-            const overlay = document.getElementById('ui-overlay');
+            if (customizationPanelOpen && !customizationPanel.contains(target)) {
+                closeCustomizationPanel();
+                return;
+            }
+            
+            if (workingPanel && !workingPanel.contains(target)) {
+                closeWorkingPanel();
+                return;
+            }
+            
+            // Si el overlay está activo, no procesar clics del juego
             if (overlay && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
                 return;
             }
+            
             // Si el chat está abierto, no procesar controles del juego
             if (chatOpen) {
                 return;
             }
+            
             // Si el panel de personalización está abierto, no procesar clics del juego
-            const simplePanel = document.getElementById('simple-panel');
             if (simplePanel && simplePanel.style.display === 'block') {
                 return;
             }
             
+            // 3. Procesar clics del juego
+            handleGameClick(event);
+        }
+        
+        function handleGameClick(event) {
             if (event.button !== 0) return; // Solo clic izquierdo
+            
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             
@@ -2702,23 +2683,28 @@
                 }
             } else {
                 // Comportamiento normal del mall
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(clickableObjects);
-            if (intersects.length > 0) {
-                const clickedObject = intersects[0].object;
-                
-                // Verificar si es un clic en el nombre del avatar para personalización
-                if (clickedObject.userData && clickedObject.userData.type === 'customization') {
-                    openCustomizationPanel();
-                    return;
-                }
-                
-                // Verificar si es un clic en una tienda
-                if (clickedObject.userData.URL) {
-                    window.open(clickedObject.userData.URL, '_blank');
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(clickableObjects);
+                if (intersects.length > 0) {
+                    const clickedObject = intersects[0].object;
+                    
+                    // Verificar si es un clic en el nombre del avatar para personalización
+                    if (clickedObject.userData && clickedObject.userData.type === 'customization') {
+                        openCustomizationPanel();
+                        return;
+                    }
+                    
+                    // Verificar si es un clic en una tienda
+                    if (clickedObject.userData.URL) {
+                        window.open(clickedObject.userData.URL, '_blank');
                     }
                 }
             }
+        }
+        
+        // Función original onMouseDown ahora usa el sistema centralizado
+        function onMouseDown(event) {
+            handleGlobalClick(event);
         }
 
         function updateMovement() {
@@ -3900,11 +3886,7 @@
             }
         };
 
-        document.addEventListener('click', (e) => {
-            if (!emojiPanel.contains(e.target) && !emojiToggle.contains(e.target)) {
-                emojiPanel.style.display = 'none';
-            }
-        });
+        // El manejo de emoji panel ahora está integrado en handleGlobalClick
 
         // --- Firebase Chat Logic ---
         function handleSendMessage() {
@@ -4500,59 +4482,9 @@ function updateSelectedSkin() {
             }
         }
 
-        // Cerrar panel al hacer clic fuera - VERSIÓN MEJORADA
-        document.addEventListener('click', (e) => {
-            // Verificar si el clic es en un botón de UI - NO cerrar en ese caso
-            const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                              e.target.closest('#change-alias-btn') || 
-                              e.target.closest('#chat-panel') || 
-                              e.target.closest('#simple-panel') ||
-                              e.target.closest('#ui-overlay');
-            
-            if (isUIButton) {
-                return; // No hacer nada si el clic es en un elemento de UI
-            }
-            
-            // Cerrar chat si está abierto y se hace clic fuera
-            if (chatOpen && !chatPanel.contains(e.target) && !chatToggleBtn.contains(e.target)) {
-                chatPanel.style.display = 'none';
-                chatOpen = false;
-                // Ocultar overlay
-                const overlay = document.getElementById('ui-overlay');
-                if (overlay) {
-                    overlay.style.display = 'none';
-                    overlay.style.pointerEvents = 'none';
-                }
-            }
-            
-            if (customizationPanelOpen && !customizationPanel.contains(e.target)) {
-                closeCustomizationPanel();
-            }
-            
-            // Cerrar panel de trabajo al hacer clic fuera
-            const workingPanel = document.getElementById('working-customization-panel');
-            if (workingPanel && !workingPanel.contains(e.target)) {
-                closeWorkingPanel();
-            }
-        });
+        // El manejo de cierre de paneles ahora está integrado en handleGlobalClick
 
-        // Agregar event listener al overlay para bloquear clics - VERSIÓN MEJORADA
-        const overlay = document.getElementById('ui-overlay');
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
-                const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                                  e.target.closest('#change-alias-btn') || 
-                                  e.target.closest('#chat-panel') || 
-                                  e.target.closest('#simple-panel');
-                
-                if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                e.stopPropagation();
-                e.preventDefault();
-                return false;
-                }
-            });
-        }
+        // El manejo del overlay ahora está integrado en handleGlobalClick
 
         // Cargar personalización al iniciar
         loadCustomization();
@@ -4643,24 +4575,11 @@ function updateSelectedSkin() {
         // Inicializar controles móviles al cargar
         document.addEventListener('DOMContentLoaded', toggleMobileControls);
 
-        // Configurar overlay al cargar la página - VERSIÓN MEJORADA
+        // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('ui-overlay');
             if (overlay) {
                 overlay.style.pointerEvents = 'auto';
-                overlay.addEventListener('click', (e) => {
-                    // Solo bloquear clics si el overlay está activo y el clic no es en un botón de UI
-                    const isUIButton = e.target.closest('#chat-toggle-btn') || 
-                                      e.target.closest('#change-alias-btn') || 
-                                      e.target.closest('#chat-panel') || 
-                                      e.target.closest('#simple-panel');
-                    
-                    if (!isUIButton && overlay.style.display === 'block' && overlay.style.pointerEvents === 'auto') {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    return false;
-                    }
-                });
             }
         });
 
