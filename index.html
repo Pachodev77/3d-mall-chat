@@ -4689,6 +4689,10 @@
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
+                createUserAvatar(alias, position, floor, { shirtColor, pantsColor, shoesColor });
+                avatar = userAvatars.get(alias);
+            }
+            if (avatar) {
                 if (typeof shirtColor === 'number' && avatar.bodyMaterial && avatar.bodyMaterial.color.getHex() !== shirtColor) {
                     avatar.bodyMaterial.color.setHex(shirtColor);
                     avatar.bodyMaterial.needsUpdate = true;
