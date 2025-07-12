@@ -666,47 +666,6 @@
             pointer-events: none; /* Solo se activa cuando el panel está abierto */
             display: none; /* Solo se muestra cuando el panel está abierto */
         }
-        
-        /* Panel de personalización siempre por encima del overlay */
-        #simple-panel.customization-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1100px;
-            max-width: 99vw;
-            height: 700px;
-            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 31000; /* Siempre por encima del overlay */
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            border: 2px solid #4B0000;
-            pointer-events: auto;
-        }
-        /* Panel de personalización siempre por encima del overlay */
-        #simple-panel.customization-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1100px;
-            max-width: 99vw;
-            height: 700px;
-            background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            z-index: 31000; /* Siempre por encima del overlay */
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            border: 2px solid #4B0000;
-            pointer-events: auto;
-        }
         @media (max-width: 768px) {
             #chat-content {
                 flex-direction: row;
@@ -1344,6 +1303,108 @@
             }
         }
 
+        // --- Función refactorizada para crear filas de tiendas ---
+        function createStoreRow(axis, position, count, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, startLinkIndex, isCornerPosition) {
+            let linkIndex = startLinkIndex;
+            const stores = [];
+            
+            // Configuración según el eje
+            const config = {
+                'north': {
+                    position: (i) => new THREE.Vector3(initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2, yOffset + HALL_HEIGHT / 2, position),
+                    rotation: 0,
+                    direction: 1, // izquierda a derecha
+                    skipCorners: true
+                },
+                'south': {
+                    position: (i) => new THREE.Vector3(initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2, yOffset + HALL_HEIGHT / 2, position),
+                    rotation: Math.PI,
+                    direction: -1, // derecha a izquierda
+                    skipCorners: true
+                },
+                'east': {
+                    position: (i) => new THREE.Vector3(position, yOffset + HALL_HEIGHT / 2, initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2),
+                    rotation: -Math.PI / 2,
+                    direction: 1, // arriba hacia abajo
+                    skipCorners: true
+                },
+                'west': {
+                    position: (i) => new THREE.Vector3(position, yOffset + HALL_HEIGHT / 2, initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2),
+                    rotation: Math.PI / 2,
+                    direction: -1, // abajo hacia arriba
+                    skipCorners: true
+                }
+            };
+            
+            const axisConfig = config[axis];
+            if (!axisConfig) return { linkIndex, stores };
+            
+            const start = axisConfig.direction > 0 ? 0 : count - 1;
+            const end = axisConfig.direction > 0 ? count : -1;
+            const step = axisConfig.direction;
+            
+            for (let i = start; i !== end; i += step) {
+                if (axisConfig.skipCorners && isCornerPosition(i, axis)) continue;
+                
+                const storePos = axisConfig.position(i);
+                const currentLinkIndex = linkIndex % storeLinks.length;
+                
+                const store = createStore(
+                    storePos,
+                    new THREE.Vector2(storeWidth, HALL_HEIGHT),
+                    axisConfig.rotation,
+                    currentLinkIndex,
+                    12, // storeDepth
+                    wallMaterial,
+                    yOffset,
+                    getNextShopNumber()
+                );
+                
+                stores.push(store);
+                linkIndex++;
+            }
+            
+            return { linkIndex, stores };
+        }
+
+        // --- Función refactorizada para crear muros separadores ---
+        function createSeparatorWalls(axis, position, count, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial) {
+            const walls = [];
+            
+            // Configuración según el eje
+            const config = {
+                'north': {
+                    geometry: () => new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2),
+                    position: (i) => new THREE.Vector3(initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2, yOffset + (HALL_HEIGHT + 1) / 2, position)
+                },
+                'south': {
+                    geometry: () => new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2),
+                    position: (i) => new THREE.Vector3(initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2, yOffset + (HALL_HEIGHT + 1) / 2, position)
+                },
+                'east': {
+                    geometry: () => new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing),
+                    position: (i) => new THREE.Vector3(position, yOffset + (HALL_HEIGHT + 1) / 2, initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2)
+                },
+                'west': {
+                    geometry: () => new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing),
+                    position: (i) => new THREE.Vector3(position, yOffset + (HALL_HEIGHT + 1) / 2, initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2)
+                }
+            };
+            
+            const axisConfig = config[axis];
+            if (!axisConfig) return walls;
+            
+            for (let i = 0; i < count - 1; i++) {
+                const wall = new THREE.Mesh(axisConfig.geometry(), separatorMaterial);
+                wall.position.copy(axisConfig.position(i));
+                scene.add(wall);
+                collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                walls.push(wall);
+            }
+            
+            return walls;
+        }
+
         function createFloorLevel(yOffset, floorMaterial, wallMaterial, separatorMaterial, startLinkIndex) {
             // --- Suelo con textura de madera realista ---
             // Crear textura de madera usando canvas
@@ -1439,132 +1500,40 @@
                 return index === 0 || index === numStoresPerSide - 1;
             };
 
-            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
-            const createClockwiseStores = () => {
-                // Norte (de izquierda a derecha)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'north')) continue;
-                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                    new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                    0, // Rotación para mirar hacia el centro (sur)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                    yOffset,
-                    getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Este (de arriba hacia abajo)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'east')) continue;
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(HALL_SIZE - storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        -Math.PI / 2, // Rotación para mirar hacia el centro (oeste)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Sur (de derecha a izquierda)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'south')) continue;
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, HALL_SIZE - storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI, // Rotación para mirar hacia el centro (norte)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Oeste (de abajo hacia arriba)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'west')) continue;
-                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI / 2, // Rotación para mirar hacia el centro (este)
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-                }
+            // Crear tiendas usando la función refactorizada
+            const storePositions = {
+                north: storeDepth / 2,
+                south: HALL_SIZE - storeDepth / 2,
+                east: HALL_SIZE - storeDepth / 2,
+                west: storeDepth / 2
             };
-
-            // Crear tiendas en sentido horario
-            createClockwiseStores();
-
-            // --- Crear muros separadores entre tiendas ---
+            
+            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
+            let currentLinkIndex = linkIndex;
+            
             // Norte
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Sur
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, HALL_SIZE - storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Oeste
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
+            const northResult = createStoreRow('north', storePositions.north, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = northResult.linkIndex;
+            
             // Este
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(HALL_SIZE - storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
+            const eastResult = createStoreRow('east', storePositions.east, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = eastResult.linkIndex;
+            
+            // Sur
+            const southResult = createStoreRow('south', storePositions.south, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = southResult.linkIndex;
+            
+            // Oeste
+            const westResult = createStoreRow('west', storePositions.west, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = westResult.linkIndex;
+            
+            linkIndex = currentLinkIndex;
+
+            // --- Crear muros separadores entre tiendas usando la función refactorizada ---
+            createSeparatorWalls('north', storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('south', HALL_SIZE - storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('west', storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('east', HALL_SIZE - storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
 
             // --- Crear pasillos en la planta baja ---
             // Usar las variables ya declaradas arriba
@@ -1918,132 +1887,40 @@
                 collisionObjects.push(railBox);
             });
 
-            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
-            const createClockwiseStores = () => {
-                // Norte (de izquierda a derecha)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'north')) continue;
-                const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                    new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                    0, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Este (de arriba hacia abajo)
-            for (let i = 0; i < numStoresPerSide; i++) {
-                    if (isCornerPosition(i, 'east')) continue;
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(HALL_SIZE - storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        -Math.PI / 2, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Sur (de derecha a izquierda)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'south')) continue;
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(x, yOffset + HALL_HEIGHT / 2, HALL_SIZE - storeDepth / 2), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-            }
-
-                // Oeste (de abajo hacia arriba)
-                for (let i = numStoresPerSide - 1; i >= 0; i--) {
-                    if (isCornerPosition(i, 'west')) continue;
-                const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                const currentLinkIndex = linkIndex % storeLinks.length;
-                createStore(
-                        new THREE.Vector3(storeDepth / 2, yOffset + HALL_HEIGHT / 2, z), 
-                    new THREE.Vector2(storeWidth, HALL_HEIGHT), 
-                        Math.PI / 2, // Mirando hacia el centro
-                    currentLinkIndex, 
-                    storeDepth, 
-                    wallMaterial,
-                        yOffset,
-                        getNextShopNumber()
-                );
-                linkIndex++;
-                }
+            // Crear tiendas usando la función refactorizada
+            const storePositions = {
+                north: storeDepth / 2,
+                south: HALL_SIZE - storeDepth / 2,
+                east: HALL_SIZE - storeDepth / 2,
+                west: storeDepth / 2
             };
-
-            // Crear tiendas en sentido horario
-            createClockwiseStores();
-
-            // --- Crear muros separadores entre tiendas ---
+            
+            // Crear tiendas en sentido horario: Norte -> Este -> Sur -> Oeste
+            let currentLinkIndex = linkIndex;
+            
             // Norte
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Sur
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const x = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(storeSpacing, HALL_HEIGHT + 1, 0.2), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2, HALL_SIZE - storeDepth);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
-            // Oeste
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
-
+            const northResult = createStoreRow('north', storePositions.north, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = northResult.linkIndex;
+            
             // Este
-            for (let i = 0; i < numStoresPerSide - 1; i++) {
-                const z = initialOffset + (i + 1) * storeWidth + i * storeSpacing + storeSpacing / 2;
-                const separatorWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.2, HALL_HEIGHT + 1, storeSpacing), 
-                    separatorMaterial
-                );
-                separatorWall.position.set(HALL_SIZE - storeDepth, yOffset + (HALL_HEIGHT + 1) / 2, z);
-                scene.add(separatorWall);
-                collisionObjects.push(new THREE.Box3().setFromObject(separatorWall));
-            }
+            const eastResult = createStoreRow('east', storePositions.east, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = eastResult.linkIndex;
+            
+            // Sur
+            const southResult = createStoreRow('south', storePositions.south, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = southResult.linkIndex;
+            
+            // Oeste
+            const westResult = createStoreRow('west', storePositions.west, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
+            currentLinkIndex = westResult.linkIndex;
+            
+            linkIndex = currentLinkIndex;
+
+            // --- Crear muros separadores entre tiendas usando la función refactorizada ---
+            createSeparatorWalls('north', storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('south', HALL_SIZE - storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('west', storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
+            createSeparatorWalls('east', HALL_SIZE - storeDepth, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, separatorMaterial);
 
             return linkIndex;
         }
