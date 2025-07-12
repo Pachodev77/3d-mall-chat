@@ -4916,15 +4916,11 @@ const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario (propio o de otros) usando modelo FBX de Kenney y aplicando textura PNG ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom, '\nStack:', new Error().stack);
-    // Si ya hay una carga pendiente para este alias, no la repitas
     if (pendingAvatarLoads.has(alias)) return;
-    // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
-    // Si por alguna razón sigue existiendo, no continuar
     if (userAvatars.has(alias)) return;
     pendingAvatarLoads.add(alias);
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
-    // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
     const skinFileMap = {
         'humanMaleA': 'humanMaleA.png',
@@ -4935,13 +4931,11 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     const loader = new THREE.FBXLoader();
     const texLoader = new THREE.TextureLoader();
-    // Calcular la posición Y correcta para el piso
     const floorStep = HALL_HEIGHT + 1;
-    const correctY = floor * floorStep; // Justo al nivel del suelo
+    const correctY = floor * floorStep;
     texLoader.load(texturePath, function(texture) {
         loader.load(modelPath, function(avatar) {
             pendingAvatarLoads.delete(alias);
-            // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
             if (userAvatars.has(alias)) return;
             avatar.traverse(function(child) {
                 if (child.isMesh) {
@@ -4949,10 +4943,11 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                     child.material.needsUpdate = true;
                 }
             });
+            // Solo al crear el avatar, igualar la posición real a la recibida
             avatar.position.set(position.x, correctY, position.z);
-            avatar.scale.set(0.009, 0.009, 0.009); // Más pequeño
+            avatar.scale.set(0.009, 0.009, 0.009);
             scene.add(avatar);
-            printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
+            printAllBones({ group: avatar });
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             userAvatars.set(alias, {
                 group: avatar,
@@ -4960,8 +4955,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 targetRotation: 0,
                 currentFloor: floor
             });
-        }); // <-- close loader.load
-    }); // <-- close texLoader.load
+        });
+    });
 } // <-- close createUserAvatar
 
         // --- Utilidad para debug: imprimir huesos del modelo FBX ---
@@ -5022,8 +5017,8 @@ function animateKenneyAvatar(avatar, alias) {
             }
         });
     }
-    // Detectar si el avatar está en movimiento
-    const moving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.02;
+    // Forzar animación para depuración
+    const moving = true;
     const t = performance.now() * 0.002 + (alias.hashCode?.() || 0);
     if (moving) {
         // Animación de caminar: balanceo de brazos y piernas
