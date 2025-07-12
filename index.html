@@ -4815,17 +4815,30 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             const idleClip = idleAnimation.animations[0];
             const runClip = runAnimation.animations[0];
             
+            console.log(`[${alias}] Animaciones cargadas:`, {
+                idleAnimation: idleAnimation.animations.length,
+                runAnimation: runAnimation.animations.length,
+                idleClip: idleClip ? idleClip.name : 'null',
+                runClip: runClip ? runClip.name : 'null'
+            });
+            
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
+                actions.idle.setLoop(THREE.LoopRepeat);
                 actions.idle.play(); // Iniciar en 'idle' por defecto
-                console.log('Animación Idle cargada para:', alias);
+                console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
+            } else {
+                console.warn(`[${alias}] No se encontró clip de animación idle`);
             }
             
             if (runClip) {
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
                 runClip.name = 'walk';
                 actions.walk = mixer.clipAction(runClip);
-                console.log('Animación Walk/Run cargada para:', alias);
+                actions.walk.setLoop(THREE.LoopRepeat);
+                console.log(`[${alias}] Animación Walk/Run cargada como 'walk'`);
+            } else {
+                console.warn(`[${alias}] No se encontró clip de animación run`);
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -4891,24 +4904,34 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'walk'
+                    console.log(`[${alias}] Empezó a moverse - Cambiando a walk animation`);
                     if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        avatar.actions.idle.fadeOut(0.2);
-                        avatar.actions.walk.reset().fadeIn(0.2).play();
+                        console.log(`[${alias}] Transición: idle -> walk`);
+                        avatar.actions.idle.fadeOut(0.3);
+                        avatar.actions.walk.reset().fadeIn(0.3).play();
                     } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
                         // Si no hay idle, usar default
-                        avatar.actions.default.fadeOut(0.2);
-                        avatar.actions.walk.reset().fadeIn(0.2).play();
+                        console.log(`[${alias}] Transición: default -> walk`);
+                        avatar.actions.default.fadeOut(0.3);
+                        avatar.actions.walk.reset().fadeIn(0.3).play();
+                    } else {
+                        console.warn(`[${alias}] No se pudo cambiar a walk animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'walk' a 'idle'
+                    console.log(`[${alias}] Dejó de moverse - Cambiando a idle animation`);
                     if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        avatar.actions.walk.fadeOut(0.2);
-                        avatar.actions.idle.reset().fadeIn(0.2).play();
+                        console.log(`[${alias}] Transición: walk -> idle`);
+                        avatar.actions.walk.fadeOut(0.3);
+                        avatar.actions.idle.reset().fadeIn(0.3).play();
                     } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
                         // Si no hay idle, usar default
-                        avatar.actions.walk.fadeOut(0.2);
-                        avatar.actions.default.reset().fadeIn(0.2).play();
+                        console.log(`[${alias}] Transición: walk -> default`);
+                        avatar.actions.walk.fadeOut(0.3);
+                        avatar.actions.default.reset().fadeIn(0.3).play();
+                    } else {
+                        console.warn(`[${alias}] No se pudo cambiar a idle animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
                     }
                     avatar.isMoving = false;
                 }
@@ -4921,6 +4944,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
+                    
+
                 }
             });
         }
