@@ -4834,6 +4834,9 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
                 runClip.name = 'run';
                 actions.run = mixer.clipAction(runClip);
+                // Forzar loop infinito y velocidad lenta
+                actions.run.setLoop(THREE.LoopRepeat, Infinity);
+                actions.run.timeScale = 0.2; // 5x más lento
                 console.log('Animación Run cargada para:', alias, actions.run);
                 // Diagnóstico: información del clip y esqueleto
                 console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
