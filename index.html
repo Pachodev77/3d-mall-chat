@@ -4108,43 +4108,43 @@
         // Función centralizada para manejar todas las actualizaciones periódicas
         function updatePeriodicSystems(currentTime) {
             // Actualizar el color del cielo
-            if (timingSystem.shouldUpdate(lastSkyUpdate, UPDATE_INTERVALS.SKY)) {
+            if (timingSystem.shouldUpdate(timingState.lastSkyUpdate, timingState.intervals.SKY)) {
                 scene.background = getSkyColor();
                 timingSystem.updateLastTime('SKY');
             }
             
             // Enviar posición del usuario
-            if (timingSystem.shouldUpdate(lastPositionUpdate, UPDATE_INTERVALS.POSITION)) {
+            if (timingSystem.shouldUpdate(timingState.lastPositionUpdate, timingState.intervals.POSITION)) {
                 sendUserPosition();
                 timingSystem.updateLastTime('POSITION');
             }
             
             // Actualizar carteles rotativos
-            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
+            if (timingSystem.shouldUpdate(timingState.lastRotatingSignUpdate, timingState.intervals.ROTATING_SIGN)) {
                 updateRotatingSigns();
                 timingSystem.updateLastTime('ROTATING_SIGN');
             }
             
             // Actualizar relojes digitales
-            if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
+            if (timingSystem.shouldUpdate(timingState.lastClockUpdate, timingState.intervals.CLOCK)) {
                 updateDigitalClocks();
                 timingSystem.updateLastTime('CLOCK');
             }
             
             // Actualizar carteles centrales (reemplaza setInterval en createCentralCubeScreens)
-            if (timingSystem.shouldUpdate(lastCentralCubeUpdate, UPDATE_INTERVALS.CENTRAL_CUBE)) {
+            if (timingSystem.shouldUpdate(timingState.lastCentralCubeUpdate, timingState.intervals.CENTRAL_CUBE)) {
                 updateCentralCubeScreens();
                 timingSystem.updateLastTime('CENTRAL_CUBE');
             }
             
             // Actualizar cielo de habitación personal (reemplaza setInterval en createPersonalRoom)
-            if (timingSystem.shouldUpdate(lastPersonalRoomSkyUpdate, UPDATE_INTERVALS.PERSONAL_ROOM_SKY)) {
+            if (timingSystem.shouldUpdate(timingState.lastPersonalRoomSkyUpdate, timingState.intervals.PERSONAL_ROOM_SKY)) {
                 updatePersonalRoomSky();
                 timingSystem.updateLastTime('PERSONAL_ROOM_SKY');
             }
             
             // Limpieza de Firebase (reemplaza setInterval en firebase-config.js)
-            if (timingSystem.shouldUpdate(lastFirebaseCleanup, UPDATE_INTERVALS.FIREBASE_CLEANUP)) {
+            if (timingSystem.shouldUpdate(timingState.lastFirebaseCleanup, timingState.intervals.FIREBASE_CLEANUP)) {
                 if (typeof window.cleanupOldMessages === 'function') {
                     window.cleanupOldMessages();
                 }
@@ -4152,7 +4152,7 @@
             }
             
             // Limpieza de usuarios desconectados de Firebase
-            if (timingSystem.shouldUpdate(lastFirebaseUserCleanup, UPDATE_INTERVALS.FIREBASE_USER_CLEANUP)) {
+            if (timingSystem.shouldUpdate(timingState.lastFirebaseUserCleanup, timingState.intervals.FIREBASE_USER_CLEANUP)) {
                 if (typeof window.cleanupDisconnectedUsers === 'function') {
                     window.cleanupDisconnectedUsers();
                 }
@@ -4160,7 +4160,7 @@
             }
             
             // Actualizar timestamp de Firebase
-            if (timingSystem.shouldUpdate(lastFirebaseTimestampUpdate, UPDATE_INTERVALS.FIREBASE_TIMESTAMP)) {
+            if (timingSystem.shouldUpdate(timingState.lastFirebaseTimestampUpdate, timingState.intervals.FIREBASE_TIMESTAMP)) {
                 if (typeof window.updateFirebaseTimestamp === 'function') {
                     window.updateFirebaseTimestamp();
                 }
