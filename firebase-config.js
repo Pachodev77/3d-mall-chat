@@ -167,12 +167,16 @@ function sendMessage(message) {
 
 function sendPosition(position, floor, rotation) {
     if (!isConnected || !currentUser) return;
-    // Obtener colores actuales del avatar usando el sistema unificado
+    // Obtener colores actuales del avatar
     let shirtColor = 0x4ECDC4, pantsColor = 0x2C3E50, shoesColor = 0x8B4513;
-    if (typeof window.avatarState !== 'undefined' && window.avatarState.currentCustomization) {
-        shirtColor = window.avatarState.currentCustomization.shirtColor || shirtColor;
-        pantsColor = window.avatarState.currentCustomization.pantsColor || pantsColor;
-        shoesColor = window.avatarState.currentCustomization.shoesColor || shoesColor;
+    if (typeof window.currentCustomization === 'object') {
+        shirtColor = window.currentCustomization.shirtColor || shirtColor;
+        pantsColor = window.currentCustomization.pantsColor || pantsColor;
+        shoesColor = window.currentCustomization.shoesColor || shoesColor;
+    } else if (typeof window.shirtColor !== 'undefined') {
+        shirtColor = window.shirtColor;
+        pantsColor = window.pantsColor;
+        shoesColor = window.shoesColor;
     }
     const positionData = {
         position: position,

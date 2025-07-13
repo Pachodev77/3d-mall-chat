@@ -764,7 +764,7 @@
     <div id="furniture-edit-panel" style="position: fixed; top: 60px; right: 16px; width: 380px; height: 500px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
             <span>🪑 Editar Muebles</span>
-                            <button class="close-btn" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
+            <button onclick="closeFurnitureEditPanel()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
         </div>
         <div style="padding: 16px; color: #eee;">
             <div style="margin-bottom: 16px;">
@@ -785,16 +785,16 @@
     </div>
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
             <span>🏠 Mi Habitación</span>
-                            <button class="close-btn" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
+            <button onclick="closeRoomNavigation()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
         </div>
         <div style="padding: 20px; color: #eee;">
             <div style="margin-bottom: 24px;">
                 <h3 style="margin: 0 0 12px 0; color: #FFD700; font-size: 20px;">Bienvenido a tu espacio personal</h3>
                 <p style="margin: 0; font-size: 16px; color: #ccc; line-height: 1.5;">Aquí puedes personalizar tu habitación y relajarte en tu espacio privado.</p>
             </div>
-            <button id="enter-room-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🚪 Entrar a mi habitación</button>
-            <button id="toggle-furniture-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🪑 Mover muebles</button>
-            <button id="customize-room-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
+            <button onclick="enterPersonalRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🚪 Entrar a mi habitación</button>
+            <button onclick="toggleFurnitureEditMode()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🪑 Mover muebles</button>
+            <button onclick="customizeRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
         </div>
     </div>
     
@@ -824,7 +824,7 @@
                 <span>👤</span>
                 <span>Personalizar Avatar</span>
             </div>
-                            <button class="close-btn">✖</button>
+            <button onclick="closeSimplePanel()" class="close-btn">✖</button>
         </div>
         
         <!-- Contenido principal -->
@@ -850,8 +850,8 @@
                 </div>
                     </div>
         <div class="panel-footer">
-            <button id="reset-customization-btn" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
-            <button id="save-customization-btn" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
+            <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
+            <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
         </div>
     </div>
     <div id="chat-panel">
@@ -973,103 +973,26 @@
         // --- Dimensiones globales de la habitación personal ---
         const roomWidth = 12, roomHeight = 3.5, roomDepth = 12;
 
-        // --- SISTEMA DE ESTADO CENTRALIZADO ---
+        // --- Variables de la Escena ---
+        let scene, camera, renderer;
+        const clickableObjects = [];
+        const collisionObjects = [];
+        const keys = { W: false, S: false, A: false, D: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
         
-        // Estado del juego
-        const gameState = {
-            // Escena actual
-            currentScene: 'mall', // 'mall' o 'personal-room'
-            
-            // Posición y movimiento del jugador
-            player: {
-                position: { x: 0, y: 0, z: 0 },
-                targetPosition: { x: 0, y: 0, z: 0 },
-                rotation: 0,
-                targetRotation: 0,
-                floor: 0,
-                isMoving: false
-            },
-            
-            // Sistema de tiendas
-            shopCounter: 1,
-            
-            // Estado de muebles
-            furniture: {
-                editMode: false,
-                selected: null,
-                objects: []
-            }
-        };
+        // Reloj para animaciones
+        const clock = new THREE.Clock();
         
-        // Estado de la UI
-        const uiState = {
-            // Paneles activos
-            activePanel: null, // 'chat', 'customization', 'room', 'furniture'
-            overlayVisible: false,
-            
-            // Estados específicos de paneles
-            customization: {
-                panelOpen: false,
-                colors: [
-                    0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
-                    0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
-                    0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
-                    0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
-                    0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
-                    0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
-                    0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
-                    0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
-                    0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
-                ]
-            },
-            
-            room: {
-                navigationPanelOpen: false
-            },
-            
-            furniture: {
-                editPanelOpen: false
-            }
-        };
-        
-        // Estado de entrada del usuario
-        const inputState = {
-            // Teclado
-            keyboard: {
-                W: false, S: false, A: false, D: false,
-                ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false
-            },
-            
-            // Controles móviles
-            mobile: {
-                forward: false,
-                backward: false,
-                left: false,
-                right: false
-            }
-        };
-        
-        // Estado de personalización del avatar
-        const avatarState = {
-            // Objeto de personalización actual (sistema unificado)
-            currentCustomization: {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513,
-                skin: 'humanMaleA'
-            },
-            
-            // Colores predefinidos para selección
-            predefinedColors: [
-                { shirt: 0x4ECDC4, pants: 0x2C3E50, shoes: 0x8B4513 },
-                { shirt: 0xE74C3C, pants: 0x34495E, shoes: 0x2C3E50 },
-                { shirt: 0x3498DB, pants: 0x2980B9, shoes: 0x1F618D },
-                { shirt: 0xF39C12, pants: 0xE67E22, shoes: 0xD35400 },
-                { shirt: 0x9B59B6, pants: 0x8E44AD, shoes: 0x6C3483 }
-            ],
-            
-            // Colores disponibles para personalización
-            customizationColors: [
+        // --- Variables para Avatares de Usuarios ---
+        const userAvatars = new Map(); // Mapa de alias -> avatar
+        const avatarColors = [
+            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
+            0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
+            0xF8C471, 0x82E0AA, 0xF1948A, 0x85C1E9, 0xD7BDE2,
+            0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1, 0xF5B7B1
+        ];
+
+        // --- Variables de personalización de avatar ---
+        const customizationColors = [
             // Colores vibrantes para camisas
             0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
             0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
@@ -1082,72 +1005,68 @@
             0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
             0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
             0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
-            ]
+        ];
+        
+        let currentCustomization = {
+            skin: 'humanMaleA' // Skin por defecto
         };
         
-        // Hacer avatarState accesible globalmente para Firebase
-        window.avatarState = avatarState;
+        let customizationPanelOpen = false;
         
-        // Estado del sistema de renderizado
-        const renderState = {
-            scene: null,
-            camera: null,
-            renderer: null,
-            personalRoom: {
-                scene: null,
-                camera: null,
-                renderer: null,
-                targetPosition: { x: 0, y: 0, z: 0 },
-                targetRotation: 0
-            }
+        // --- Variables para el sistema de habitaciones personales ---
+        let currentScene = 'mall'; // 'mall' o 'personal-room'
+        let personalRoomScene, personalRoomCamera, personalRoomRenderer;
+        let roomNavigationPanelOpen = false;
+        let personalRoomTargetPosition, personalRoomTargetRotationY;
+        
+        // --- Variables para el sistema de edición de muebles ---
+        let furnitureEditMode = false;
+        let selectedFurniture = null;
+        let furnitureObjects = [];
+        let furnitureEditPanelOpen = false;
+
+        // --- Variables de Interacción y Movimiento ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let targetPosition;
+        let targetRotationY;
+        let currentFloor = 0;
+        let keyA = false;
+        let keyD = false;
+        let keyW = false;
+        let keyS = false;
+        let shopNumberCounter = 1; // Contador global para numerar las tiendas
+        
+        // --- Variables para controles móviles ---
+        let mobileForward = false;
+        let mobileBackward = false;
+        let mobileLeft = false;
+        let mobileRight = false;
+
+        // Función para obtener el siguiente número de tienda solo cuando se crea una
+        const getNextShopNumber = () => {
+            return shopNumberCounter++;
         };
+
+        // --- Variables de rendimiento y timing centralizado ---
+        let lastTime = 0;
+        let frameCount = 0;
+        let fps = 60;
+        const targetFPS = 60;
+        const frameInterval = 1000 / targetFPS;
         
-        // Estado del sistema de animación
-        const animationState = {
-            clock: new THREE.Clock(),
-            lastTime: 0,
-            frameCount: 0,
-            fps: 60,
-            targetFPS: 60,
-            frameInterval: 1000 / 60
-        };
+        // Variables de timing para actualizaciones periódicas
+        let lastSkyUpdate = 0;
+        let lastPositionUpdate = 0;
+        let lastRotatingSignUpdate = 0;
+        let lastClockUpdate = 0;
         
-        // Estado del sistema de timing
-        const timingState = {
-            lastSkyUpdate: 0,
-            lastPositionUpdate: 0,
-            lastRotatingSignUpdate: 0,
-            lastClockUpdate: 0,
-            
-            intervals: {
-                SKY: 60000,        // 1 minuto
-                POSITION: 500,     // 500ms
-                ROTATING_SIGN: 2500, // 2.5 segundos
-                CLOCK: 1000        // 1 segundo
-            }
-        };
-        
-        // Colecciones del juego
-        const gameCollections = {
-            userAvatars: new Map(), // Mapa de alias -> avatar
-            clickableObjects: [],
-            collisionObjects: [],
-            rotatingSigns: [],
-            digitalClocks: [],
-            rotatingSignTextIndexes: {}
-        };
-        
-        // Sistema de raycasting
-        const raycastSystem = {
-            raycaster: new THREE.Raycaster(),
-            mouse: new THREE.Vector2()
-        };
-        
-        // Sistema de cache
-        const cacheSystem = {
-            materialCache: new Map(),
-            textureCache: new Map(),
-            logoTextureCache: new Map()
+        // Configuración de intervalos (en milisegundos)
+        const UPDATE_INTERVALS = {
+            SKY: 60000,        // 1 minuto
+            POSITION: 500,     // 500ms
+            ROTATING_SIGN: 2500, // 2.5 segundos
+            CLOCK: 1000        // 1 segundo
         };
         
         // Sistema de timing centralizado
@@ -1157,34 +1076,33 @@
             },
             updateLastTime: (type) => {
                 switch(type) {
-                    case 'SKY': timingState.lastSkyUpdate = Date.now(); break;
-                    case 'POSITION': timingState.lastPositionUpdate = Date.now(); break;
-                    case 'ROTATING_SIGN': timingState.lastRotatingSignUpdate = Date.now(); break;
-                    case 'CLOCK': timingState.lastClockUpdate = Date.now(); break;
+                    case 'SKY': lastSkyUpdate = Date.now(); break;
+                    case 'POSITION': lastPositionUpdate = Date.now(); break;
+                    case 'ROTATING_SIGN': lastRotatingSignUpdate = Date.now(); break;
+                    case 'CLOCK': lastClockUpdate = Date.now(); break;
                 }
             }
         };
 
-        // Función para obtener el siguiente número de tienda
-        const getNextShopNumber = () => {
-            return gameState.shopCounter++;
-        };
+        // --- Cache de materiales para reutilización ---
+        const materialCache = new Map();
+        const textureCache = new Map();
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
-            if (!cacheSystem.materialCache.has(key)) {
-                cacheSystem.materialCache.set(key, new THREE.MeshStandardMaterial({ 
+            if (!materialCache.has(key)) {
+                materialCache.set(key, new THREE.MeshStandardMaterial({ 
                     color, 
                     roughness, 
                     metalness 
                 }));
             }
-            return cacheSystem.materialCache.get(key);
+            return materialCache.get(key);
         }
 
         function getCachedTexture(text, colorIdx, width, height) {
             const key = `${text}-${colorIdx}-${width}-${height}`;
-            if (!cacheSystem.textureCache.has(key)) {
+            if (!textureCache.has(key)) {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 const canvasW = Math.min(512, width * 64); // Reducir tamaño del canvas
@@ -1202,9 +1120,9 @@
                 context.fillText(text.charAt(0).toUpperCase() + text.slice(1), canvasW / 2, canvasH / 2);
 
                 const texture = new THREE.CanvasTexture(canvas);
-                cacheSystem.textureCache.set(key, texture);
+                textureCache.set(key, texture);
             }
-            return cacheSystem.textureCache.get(key);
+            return textureCache.get(key);
         }
 
         // --- Función para obtener el color del cielo según la hora ---
@@ -1240,8 +1158,8 @@
             // --- Event Listeners ---
             setupEventListeners();
             
-            // --- Configurar event listeners centralizados ---
-            setupEventListeners();
+            // --- Configurar botones de UI ---
+            setupUIButtons();
 
             // --- Iniciar Animación ---
             animate();
@@ -1508,7 +1426,7 @@
                 const wall = new THREE.Mesh(axisConfig.geometry(), separatorMaterial);
                 wall.position.copy(axisConfig.position(i));
                 scene.add(wall);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                collisionObjects.push(new THREE.Box3().setFromObject(wall));
                 walls.push(wall);
             }
             
@@ -1594,7 +1512,7 @@
             floor.position.set(HALL_SIZE / 2, yOffset, HALL_SIZE / 2);
             floor.receiveShadow = true;
             scene.add(floor);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(floor));
+            collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
             const storeWidth = 8; // Reducido para que las tiendas sean más estrechas
@@ -1673,7 +1591,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, norteZ)
             );
             scene.add(nortePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
             
             // Sur - pasillo rojo oscuro
             const surPasillo = createPasilloSueloPlantaBaja(
@@ -1681,7 +1599,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, surZ)
             );
             scene.add(surPasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
             
             // Oeste - pasillo rojo oscuro
             const oestePasillo = createPasilloSueloPlantaBaja(
@@ -1689,7 +1607,7 @@
                 new THREE.Vector3(oesteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(oestePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
             
             // Este - pasillo rojo oscuro
             const estePasillo = createPasilloSueloPlantaBaja(
@@ -1697,7 +1615,7 @@
                 new THREE.Vector3(esteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(estePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
             
             // Esquinas - pasillo rojo oscuro
             const createCornerPlantaBaja = (posX, posZ) => {
@@ -1706,7 +1624,7 @@
                     new THREE.Vector3(posX, yOffset - 0.1, posZ)
                 );
                 scene.add(corner);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCornerPlantaBaja(oesteX, norteZ); // NO
             createCornerPlantaBaja(esteX, norteZ); // NE
@@ -1785,7 +1703,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(norte);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(norte));
+            collisionObjects.push(new THREE.Box3().setFromObject(norte));
             
             // Sur - vinotinto arriba, blanco abajo
             const sur = createPasilloSuelo(
@@ -1795,7 +1713,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(sur);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(sur));
+            collisionObjects.push(new THREE.Box3().setFromObject(sur));
             
             // Oeste - vinotinto arriba, blanco abajo
             const oeste = createPasilloSuelo(
@@ -1805,7 +1723,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(oeste);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oeste));
+            collisionObjects.push(new THREE.Box3().setFromObject(oeste));
             
             // Este - vinotinto arriba, blanco abajo
             const este = createPasilloSuelo(
@@ -1815,7 +1733,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(este);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(este));
+            collisionObjects.push(new THREE.Box3().setFromObject(este));
             
             // Esquinas - vinotinto arriba, blanco abajo
             const createCorner = (posX, posZ) => {
@@ -1826,7 +1744,7 @@
                     pasilloMaterialBlanco
                 );
                 scene.add(corner);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCorner(oesteX, norteZ); // NO
             createCorner(esteX, norteZ); // NE
@@ -1994,7 +1912,7 @@
                 const railBox = new THREE.Box3().setFromObject(rail);
                 // Expandir la caja de colisión para hacer las barandas más efectivas
                 railBox.expandByScalar(0.2);
-                gameCollections.collisionObjects.push(railBox);
+                collisionObjects.push(railBox);
             });
 
             // Crear tiendas usando la función refactorizada
@@ -2236,7 +2154,7 @@
             // --- Actualizar colisiones ---
             storeGroup.updateMatrixWorld(true);
             [backWall, leftWall, rightWall].forEach(wall => {
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                collisionObjects.push(new THREE.Box3().setFromObject(wall));
             });
         }
 
@@ -2264,7 +2182,7 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             let offset = 0;
             setInterval(() => {
@@ -2286,7 +2204,7 @@
             );
             plane.userData.URL = url;
             updateImagePlane(plane, url, text, colorIdx, solid);
-            gameCollections.clickableObjects.push(plane);
+            clickableObjects.push(plane);
             return plane;
         }
 
@@ -2380,25 +2298,31 @@
                 } else {
                     domain = domainParts[0];
                 }
+                
                 const logoTexture = getLogoTexture(domain);
+                
+                if (plane.material.map) {
+                    plane.material.map.dispose();
+                }
+                
                 if (logoTexture) {
                     plane.material.map = logoTexture;
                 } else {
                     // Fallback a la textura generada si no hay logo
                     const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                    plane.material.map = texture;
+            plane.material.map = texture;
                 }
-                if (plane.material.map && plane.material.map.image) {
-                    plane.material.map.needsUpdate = true;
-                }
+                
+            plane.material.needsUpdate = true;
             } catch (error) {
                 console.error('Error en updateImagePlane:', error);
                 // Fallback seguro
+                if (plane.material.map) {
+                    plane.material.map.dispose();
+                }
                 const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
                 plane.material.map = texture;
-                if (plane.material.map && plane.material.map.image) {
-                    plane.material.map.needsUpdate = true;
-                }
+                plane.material.needsUpdate = true;
             }
         }
 
@@ -2418,21 +2342,24 @@
         }
 
         function updateRotatingSign(material, text) {
-            let canvas = material.map && material.map.image ? material.map.image : null;
+            // Create a new canvas if material.map doesn't exist or if it's not a canvas
+            let canvas = material.map ? material.map.image : null;
             if (!canvas || !canvas.getContext) {
                 canvas = document.createElement('canvas');
                 canvas.width = 256;
                 canvas.height = 128;
-                material.map = new THREE.CanvasTexture(canvas);
             }
+            
             const context = canvas.getContext('2d');
             const canvasW = canvas.width;
             const canvasH = canvas.height;
+            
             context.fillStyle = '#fff';
             context.fillRect(0, 0, canvasW, canvasH);
             context.strokeStyle = '#000';
             context.lineWidth = 8;
             context.strokeRect(4, 4, canvasW-8, canvasH-8);
+
             let fontSize = canvasH * 0.3;
             context.font = `bold ${fontSize}px Arial`;
             context.fillStyle = '#000';
@@ -2443,7 +2370,11 @@
                 context.font = `bold ${fontSize}px Arial`;
             }
             context.fillText(text, canvasW/2, canvasH/2);
-            if (material.map && material.map.image) {
+            
+            // Create or update the texture
+            if (!material.map) {
+                material.map = new THREE.CanvasTexture(canvas);
+            } else {
                 material.map.needsUpdate = true;
             }
         }
@@ -2469,7 +2400,7 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             // Agregar al sistema centralizado en lugar de usar setInterval
             planes.forEach(plane => {
@@ -2487,13 +2418,7 @@
         }
 
         function updateClockPlane(material) {
-            let canvas;
-            if (material.map && material.map.image) {
-                canvas = material.map.image;
-            } else {
-                canvas = document.createElement('canvas');
-                material.map = new THREE.CanvasTexture(canvas);
-            }
+            const canvas = material.map ? material.map.image : document.createElement('canvas');
             const context = canvas.getContext('2d');
             canvas.width = 800;
             canvas.height = 400;
@@ -2510,7 +2435,10 @@
             context.textAlign = 'center';
             context.textBaseline = 'middle';
             context.fillText(timeStr, 400, 200);
-            if (material.map) {
+
+            if (!material.map) {
+                material.map = new THREE.CanvasTexture(canvas);
+            } else {
                 material.map.needsUpdate = true;
             }
         }
@@ -2525,261 +2453,61 @@
         document.addEventListener('click', handleGlobalClick);
         }
         
-        // --- SISTEMA CENTRALIZADO DE EVENT LISTENERS ---
-        
-        function setupEventListeners() {
-            console.log('Configurando event listeners centralizados...');
+        function setupUIButtons() {
+            console.log('Configurando botones de UI...');
             
-            // Event listeners del documento
-            document.addEventListener('keydown', onKeyDown);
-            document.addEventListener('keyup', onKeyUp);
-            document.addEventListener('mousedown', handleGlobalClick);
-            document.addEventListener('click', handleGlobalClick);
-            window.addEventListener('resize', onWindowResize);
-            window.addEventListener('beforeunload', cleanup);
-            
-            // Event listeners de UI principal
-            setupUIEventListeners();
-            
-            // Event listeners de chat
-            setupChatEventListeners();
-            
-            // Event listeners de personalización
-            setupCustomizationEventListeners();
-            
-            // Event listeners de habitación personal
-            setupRoomEventListeners();
-            
-            // Event listeners de controles móviles
-            setupMobileControls();
-            
-            // Event listeners de usuarios
-            setupUserEventListeners();
-            
-            console.log('✅ Event listeners configurados');
-        }
-        
-        function setupUIEventListeners() {
-            // Botón de personalización
-            const customizationBtn = document.getElementById('customization-btn');
-            if (customizationBtn) {
-                customizationBtn.addEventListener('click', () => {
-                    console.log('Botón de personalización clickeado');
-                    openCustomizationPanel();
-                });
-            }
-            
-            // Botón de habitación personal
+            // Botón de habitaciones personales
             const roomToggleBtn = document.getElementById('room-toggle-btn');
             if (roomToggleBtn) {
-                roomToggleBtn.addEventListener('click', () => {
-                    console.log('Botón de habitación clickeado');
-                    if (gameState.currentScene === 'mall') {
-                        enterPersonalRoom();
+                console.log('Botón de habitaciones encontrado');
+                roomToggleBtn.onclick = () => {
+                    console.log('Botón de habitaciones clickeado');
+                    toggleRoomNavigation();
+                };
             } else {
-                        returnToMall();
-                    }
-                });
+                console.error('No se encontró el botón de habitaciones');
             }
             
-            // Botón de cambio de alias
-            const changeAliasBtn = document.getElementById('change-alias-btn');
+            // Verificar que el botón se encontró correctamente
             if (changeAliasBtn) {
-                changeAliasBtn.addEventListener('click', () => {
-                    const newAlias = prompt('Ingresa tu nuevo alias:');
-                    if (newAlias && newAlias.trim()) {
-                        userAlias = newAlias.trim();
-                        localStorage.setItem('userAlias', userAlias);
-                        if (isConnected) {
-                            sendAlias();
-                        }
-                    }
-                });
+                console.log('Botón de personalización encontrado');
+                changeAliasBtn.onclick = () => {
+                    console.log('Botón de personalización clickeado');
+                    // Mostrar el panel de personalización completo
+                    openCustomizationPanel();
+                };
+            } else {
+                console.error('No se encontró el botón de personalización');
+            }
+            
+            if (saveCustomizationBtn) {
+                console.log('Botón de guardar personalización encontrado');
+                saveCustomizationBtn.onclick = saveCustomization;
+            } else {
+                console.error('No se encontró el botón de guardar personalización');
+            }
+            
+            if (resetCustomizationBtn) {
+                console.log('Botón de resetear personalización encontrado');
+                resetCustomizationBtn.onclick = resetCustomization;
+            } else {
+                console.error('No se encontró el botón de resetear personalización');
             }
             
             // Botón para regresar al mall
             const returnToMallBtn = document.getElementById('return-to-mall-btn');
             if (returnToMallBtn) {
-                returnToMallBtn.addEventListener('click', () => {
+                console.log('Botón de regreso al mall encontrado');
+                returnToMallBtn.onclick = () => {
                     console.log('Botón de regreso al mall clickeado');
                     returnToMall();
-                });
-            }
-        }
-        
-        function setupChatEventListeners() {
-            // Botón de toggle del chat
-            const chatToggleBtn = document.getElementById('chat-toggle-btn');
-            if (chatToggleBtn) {
-                chatToggleBtn.addEventListener('click', () => {
-                    if (chatOpen) {
-                        chatPanel.style.display = 'none';
-                        chatOpen = false;
+                };
             } else {
-                        chatPanel.style.display = 'flex';
-                        chatOpen = true;
-                        chatInput.focus();
-                    }
-                });
+                console.error('No se encontró el botón de regreso al mall');
             }
             
-            // Botón de cerrar chat
-            const chatCloseBtn = document.getElementById('chat-close-btn');
-            if (chatCloseBtn) {
-                chatCloseBtn.addEventListener('click', () => {
-                    chatPanel.style.display = 'none';
-                    chatOpen = false;
-                });
-            }
-            
-            // Botón de enviar mensaje
-            const chatSendBtn = document.getElementById('chat-send-btn');
-            const chatInput = document.getElementById('chat-input');
-            if (chatSendBtn && chatInput) {
-                chatSendBtn.addEventListener('click', handleSendMessage);
-                chatInput.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') {
-                        handleSendMessage();
-                    }
-                });
-            }
-            
-            // Toggle de emojis
-            const emojiToggle = document.getElementById('emoji-toggle');
-            if (emojiToggle) {
-                emojiToggle.addEventListener('click', () => {
-                    if (emojiPanel.style.display === 'none' || !emojiPanel.style.display) {
-                        emojiPanel.style.display = 'flex';
-                        createEmojiPanel();
-                    } else {
-                        emojiPanel.style.display = 'none';
-                    }
-                });
-                }
-            }
-        
-        function setupCustomizationEventListeners() {
-            // Botones de personalización
-            const saveCustomizationBtn = document.getElementById('save-customization-btn');
-            const resetCustomizationBtn = document.getElementById('reset-customization-btn');
-            
-            if (saveCustomizationBtn) {
-                saveCustomizationBtn.addEventListener('click', saveSimpleCustomization);
-            }
-            
-            if (resetCustomizationBtn) {
-                resetCustomizationBtn.addEventListener('click', resetSimpleCustomization);
-            }
-            
-            // Botón de cerrar panel simple
-            const simplePanelCloseBtn = document.querySelector('#simple-panel .close-btn');
-            if (simplePanelCloseBtn) {
-                simplePanelCloseBtn.addEventListener('click', closeSimplePanel);
-            }
-            
-            // Input de alias para preview
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.addEventListener('input', () => {
-                    updateAvatarPreview();
-                });
-            }
-            
-            // Botones de navegación de skin
-            const prevBtn = document.getElementById('skin-prev-btn');
-            const nextBtn = document.getElementById('skin-next-btn');
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    const skinList = [
-                        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-                        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-                        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-                        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-                    ];
-                    let currentIdx = skinList.findIndex(s => s.key === avatarState.currentCustomization.skin);
-                    if (currentIdx === -1) currentIdx = 0;
-                    currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
-                    updateSkinPreview(currentIdx);
-                });
-            }
-            
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    const skinList = [
-                        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-                        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-                        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-                        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-                    ];
-                    let currentIdx = skinList.findIndex(s => s.key === avatarState.currentCustomization.skin);
-                    if (currentIdx === -1) currentIdx = 0;
-                    currentIdx = (currentIdx + 1) % skinList.length;
-                    updateSkinPreview(currentIdx);
-                });
-            }
-        }
-        
-        function setupRoomEventListeners() {
-            // Botón de cerrar panel de edición de muebles
-            const furnitureEditCloseBtn = document.querySelector('#furniture-edit-panel .close-btn');
-            if (furnitureEditCloseBtn) {
-                furnitureEditCloseBtn.addEventListener('click', closeFurnitureEditPanel);
-            }
-            
-            // Botón de cerrar navegación de habitación
-            const roomNavCloseBtn = document.querySelector('#room-navigation-panel .close-btn');
-            if (roomNavCloseBtn) {
-                roomNavCloseBtn.addEventListener('click', closeRoomNavigation);
-            }
-            
-            // Botones de habitación personal
-            const enterRoomBtn = document.getElementById('enter-room-btn');
-            if (enterRoomBtn) {
-                enterRoomBtn.addEventListener('click', enterPersonalRoom);
-            }
-            
-            const toggleFurnitureBtn = document.getElementById('toggle-furniture-btn');
-            if (toggleFurnitureBtn) {
-                toggleFurnitureBtn.addEventListener('click', toggleFurnitureEditMode);
-            }
-            
-            const customizeRoomBtn = document.getElementById('customize-room-btn');
-            if (customizeRoomBtn) {
-                customizeRoomBtn.addEventListener('click', customizeRoom);
-            }
-        }
-        
-        function setupUserEventListeners() {
-            // Lista de usuarios
-            const usersList = document.getElementById('users-list');
-            if (usersList) {
-                usersList.addEventListener('click', function(e) {
-                    const userItem = e.target.closest('.user-item');
-                    if (userItem && !userItem.classList.contains('own')) {
-                        const alias = userItem.textContent.replace(' (Tú)', '');
-                        openPrivateChatWindow(alias);
-                    }
-                });
-            }
-        }
-        
-        // Función auxiliar para actualizar preview de skin
-        function updateSkinPreview(idx) {
-            const skinList = [
-                { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-                { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-                { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-                { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-            ];
-            const img = document.getElementById('skin-preview-img');
-            const label = document.getElementById('skin-preview-label');
-            if (img && label) {
-                img.src = skinList[idx].img;
-                label.textContent = skinList[idx].label;
-                avatarState.currentCustomization.skin = skinList[idx].key;
-                updateAvatarPreview && updateAvatarPreview();
-            }
+            // Configurar controles móviles
+            setupMobileControls();
         }
         
         function setupMobileControls() {
@@ -2819,31 +2547,31 @@
             // Procesar controles para ambas escenas
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = true;
-            if (event.code === 'ArrowUp') inputState.keyboard.W = true;
-            if (event.code === 'ArrowDown') inputState.keyboard.S = true;
-            if (event.code === 'ArrowLeft') inputState.keyboard.A = true;
-            if (event.code === 'ArrowRight') inputState.keyboard.D = true;
+            if (event.code === 'ArrowUp') keys.W = true;
+            if (event.code === 'ArrowDown') keys.S = true;
+            if (event.code === 'ArrowLeft') keys.A = true;
+            if (event.code === 'ArrowRight') keys.D = true;
             
             // Controles específicos del mall (cambio de pisos)
-            if (gameState.currentScene === 'mall') {
-            if (event.code === 'KeyW' && !inputState.keyboard.W) { // W para subir de piso (solo una vez)
-                if (gameState.player.floor < MAX_FLOOR) gameState.player.floor++;
-                inputState.keyboard.W = true;
+            if (currentScene === 'mall') {
+            if (event.code === 'KeyW' && !keyW) { // W para subir de piso (solo una vez)
+                if (currentFloor < MAX_FLOOR) currentFloor++;
+                keyW = true;
             }
-            if (event.code === 'KeyS' && !inputState.keyboard.S) { // S para bajar de piso (solo una vez)
-                if (gameState.player.floor > MIN_FLOOR) gameState.player.floor--;
-                inputState.keyboard.S = true;
+            if (event.code === 'KeyS' && !keyS) { // S para bajar de piso (solo una vez)
+                if (currentFloor > MIN_FLOOR) currentFloor--;
+                keyS = true;
             }
             if (event.code === 'KeyA') { // A para moverse hacia la izquierda
-                inputState.keyboard.A = true;
+                keyA = true;
             }
             if (event.code === 'KeyD') { // D para moverse hacia la derecha
-                inputState.keyboard.D = true;
+                keyD = true;
                 }
             }
             
             // Controles de edición de muebles en la habitación personal
-            if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode && gameState.furniture.selected) {
+            if (currentScene === 'personal-room' && furnitureEditMode && selectedFurniture) {
                 if (event.code === 'KeyW' || event.code === 'ArrowUp') {
                     moveSelectedFurniture('forward');
                 }
@@ -2871,17 +2599,17 @@
         function onKeyUp(event) {
             const key = event.code.replace('Key', '');
             if (key in keys) keys[key] = false;
-            if (event.code === 'ArrowUp') inputState.keyboard.W = false;
-            if (event.code === 'ArrowDown') inputState.keyboard.S = false;
-            if (event.code === 'ArrowLeft') inputState.keyboard.A = false;
-            if (event.code === 'ArrowRight') inputState.keyboard.D = false;
+            if (event.code === 'ArrowUp') keys.W = false;
+            if (event.code === 'ArrowDown') keys.S = false;
+            if (event.code === 'ArrowLeft') keys.A = false;
+            if (event.code === 'ArrowRight') keys.D = false;
             
             // Controles específicos del mall
-            if (gameState.currentScene === 'mall') {
-            if (event.code === 'KeyA') inputState.keyboard.A = false;
-            if (event.code === 'KeyD') inputState.keyboard.D = false;
-            if (event.code === 'KeyW') inputState.keyboard.W = false;
-            if (event.code === 'KeyS') inputState.keyboard.S = false;
+            if (currentScene === 'mall') {
+            if (event.code === 'KeyA') keyA = false;
+            if (event.code === 'KeyD') keyD = false;
+            if (event.code === 'KeyW') keyW = false;
+            if (event.code === 'KeyS') keyS = false;
             }
         }
 
@@ -2976,7 +2704,7 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             
             // Si estamos en modo de edición de muebles, usar la cámara de la habitación
-            if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode) {
+            if (currentScene === 'personal-room' && furnitureEditMode) {
                 raycaster.setFromCamera(mouse, personalRoomCamera);
                 const furnitureIntersects = raycaster.intersectObjects(furnitureObjects.map(f => f.mesh));
                 
@@ -2991,7 +2719,7 @@
             } else {
                 // Comportamiento normal del mall
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(gameCollections.clickableObjects);
+            const intersects = raycaster.intersectObjects(clickableObjects);
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
                 
@@ -3021,8 +2749,8 @@
             }
             
             // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (inputState.keyboard.ArrowLeft || inputState.mobile.left) gameState.player.targetRotation -= ROTATE_SPEED;
-            if (inputState.keyboard.ArrowRight || inputState.mobile.right) gameState.player.targetRotation += ROTATE_SPEED;
+            if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
 
             // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
@@ -3033,8 +2761,8 @@
             const velocity = new THREE.Vector3();
             
             // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (inputState.keyboard.ArrowUp || inputState.mobile.forward) velocity.add(direction);
-            if (inputState.keyboard.ArrowDown || inputState.mobile.backward) velocity.sub(direction);
+            if (keys.ArrowUp || mobileForward) velocity.add(direction);
+            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
             
             // Movimiento lateral con A y D (teclas)
             const rightDirection = new THREE.Vector3();
@@ -3042,12 +2770,12 @@
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (inputState.keyboard.A) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (inputState.keyboard.D) velocity.add(rightDirection); // Moverse hacia la derecha
+            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
+            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
-                const newPosition = gameState.player.targetPosition.clone().add(velocity);
+                const newPosition = targetPosition.clone().add(velocity);
                 
                 // --- Colisiones optimizadas ---
                 const playerBox = new THREE.Box3().setFromCenterAndSize(newPosition, new THREE.Vector3(1.0, CAMERA_HEIGHT, 1.0));
@@ -3067,18 +2795,18 @@
                 }
                 
                 if (!collision) {
-                    gameState.player.targetPosition.copy(newPosition);
+                    targetPosition.copy(newPosition);
                 }
             }
 
             // --- Cambio de Piso ---
             const floorStep = HALL_HEIGHT + 1;
-            const targetY = gameState.player.floor * floorStep + CAMERA_HEIGHT;
-            gameState.player.targetPosition.y = targetY;
+            const targetY = currentFloor * floorStep + CAMERA_HEIGHT;
+            targetPosition.y = targetY;
 
             // --- Interpolación para suavidad ---
-            camera.position.lerp(gameState.player.targetPosition, 0.2);
-            camera.rotation.y = lerpAngle(camera.rotation.y, gameState.player.targetRotation, 0.2);
+            camera.position.lerp(targetPosition, 0.2);
+            camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
         }
 
         // --- Funciones del sistema de habitaciones personales ---
@@ -3104,9 +2832,9 @@
         }
         
         function enterPersonalRoom() {
-            if (gameState.currentScene === 'personal-room') return;
+            if (currentScene === 'personal-room') return;
             
-            gameState.currentScene = 'personal-room';
+            currentScene = 'personal-room';
             setupPersonalRoom();
             closeRoomNavigation();
             
@@ -3118,9 +2846,9 @@
         }
         
         function returnToMall() {
-            if (gameState.currentScene === 'mall') return;
+            if (currentScene === 'mall') return;
             
-            gameState.currentScene = 'mall';
+            currentScene = 'mall';
             // Limpiar escena de habitación personal
             if (personalRoomRenderer) {
                 document.body.removeChild(personalRoomRenderer.domElement);
@@ -3761,12 +3489,12 @@
         
         // --- Funciones del sistema de edición de muebles ---
         function toggleFurnitureEditMode() {
-            if (gameState.currentScene !== 'personal-room') {
+            if (currentScene !== 'personal-room') {
                 alert('Debes estar en tu habitación para editar muebles');
                 return;
             }
             
-            gameState.furniture.editMode = !gameState.furniture.editMode;
+            furnitureEditMode = !furnitureEditMode;
             
             if (furnitureEditMode) {
                 // Limpiar todos los resaltados al entrar en modo de edición
@@ -4053,25 +3781,28 @@
         function animate(currentTime) {
             requestAnimationFrame(animate);
             
+            // Obtener delta time del reloj para animaciones
+            const deltaTime = clock.getDelta();
+            
             // Control de FPS
-            const frameDeltaTime = currentTime - animationState.lastTime;
-            if (frameDeltaTime < animationState.frameInterval) {
+            const frameDeltaTime = currentTime - lastTime;
+            if (frameDeltaTime < frameInterval) {
                 return;
             }
             
-            animationState.lastTime = currentTime - (frameDeltaTime % animationState.frameInterval);
-            animationState.frameCount++;
+            lastTime = currentTime - (frameDeltaTime % frameInterval);
+            frameCount++;
             
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
             
             // Solo actualizar y renderizar si estamos en la escena del mall
-            if (gameState.currentScene === 'mall') {
+            if (currentScene === 'mall') {
             updateMovement();
             updateAvatarPositions(); // Actualizar posiciones de avatares
             
                 // Actualizar animaciones de avatares con el delta time correcto
-                updateAvatarAnimations(frameDeltaTime);
+                updateAvatarAnimations(deltaTime);
                 
                 renderer.render(scene, camera);
             }
@@ -4080,25 +3811,25 @@
         // Función centralizada para manejar todas las actualizaciones periódicas
         function updatePeriodicSystems(currentTime) {
             // Actualizar el color del cielo
-            if (timingSystem.shouldUpdate(timingState.lastSkyUpdate, timingState.intervals.SKY)) {
+            if (timingSystem.shouldUpdate(lastSkyUpdate, UPDATE_INTERVALS.SKY)) {
                 scene.background = getSkyColor();
                 timingSystem.updateLastTime('SKY');
             }
             
             // Enviar posición del usuario
-            if (timingSystem.shouldUpdate(timingState.lastPositionUpdate, timingState.intervals.POSITION)) {
+            if (timingSystem.shouldUpdate(lastPositionUpdate, UPDATE_INTERVALS.POSITION)) {
                 sendUserPosition();
                 timingSystem.updateLastTime('POSITION');
             }
             
             // Actualizar carteles rotativos
-            if (timingSystem.shouldUpdate(timingState.lastRotatingSignUpdate, timingState.intervals.ROTATING_SIGN)) {
+            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
                 updateRotatingSigns();
                 timingSystem.updateLastTime('ROTATING_SIGN');
             }
             
             // Actualizar relojes digitales
-            if (timingSystem.shouldUpdate(timingState.lastClockUpdate, timingState.intervals.CLOCK)) {
+            if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
                 updateDigitalClocks();
                 timingSystem.updateLastTime('CLOCK');
             }
@@ -4155,7 +3886,7 @@
             textureCache.clear();
             
             // Limpiar mixers de animación
-            gameCollections.userAvatars.forEach((avatar, alias) => {
+            userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
@@ -4332,17 +4063,18 @@
         
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
-            avatarState.currentCustomization.shirtColor = color;
+            shirtColor = color;
+            currentCustomization.shirtColor = color;
             updateAvatarPreview();
             updateColorButtonSelection('shirt', color);
         }
         
         function changePantsColor(color) {
             console.log('Cambiando color de pantalón a:', color);
-            avatarState.currentCustomization.pantsColor = color;
+            pantsColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = gameCollections.userAvatars.get(userAlias);
+            const avatar = userAvatars.get(userAlias);
             if (avatar && avatar.pantsMaterial) {
                 avatar.pantsMaterial.color.setHex(color);
                 avatar.pantsMaterial.needsUpdate = true;
@@ -4357,10 +4089,10 @@
         
         function changeShoesColor(color) {
             console.log('Cambiando color de zapatos a:', color);
-            avatarState.currentCustomization.shoesColor = color;
+            shoesColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = gameCollections.userAvatars.get(userAlias);
+            const avatar = userAvatars.get(userAlias);
             if (avatar && avatar.shoeMaterial) {
                 avatar.shoeMaterial.color.setHex(color);
                 avatar.shoeMaterial.needsUpdate = true;
@@ -4394,7 +4126,7 @@
             const aliasInput = document.getElementById('simple-alias-input');
             if (previewDiv) {
                 // Obtener el skin seleccionado
-                let skinName = avatarState.currentCustomization && avatarState.currentCustomization.skin ? avatarState.currentCustomization.skin : 'humanMaleA';
+                let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : (typeof skin !== 'undefined' ? skin : 'humanMaleA');
                 // Mapear nombre a archivo
                 const skinFileMap = {
                     'humanMaleA': 'humanMaleA.png',
@@ -4408,9 +4140,9 @@
                 // Actualizar el alias en la vista previa
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
                 // Crear una vista previa visual del avatar más detallada
-                const shirtColorHex = avatarState.currentCustomization.shirtColor.toString(16).padStart(6, '0');
-                const pantsColorHex = avatarState.currentCustomization.pantsColor.toString(16).padStart(6, '0');
-                const shoesColorHex = avatarState.currentCustomization.shoesColor.toString(16).padStart(6, '0');
+                const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
+                const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
+                const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Skin thumbnail -->
@@ -4456,13 +4188,10 @@
         function resetSimpleCustomization() {
             console.log('Restableciendo personalización');
             
-            // Restablecer colores por defecto usando el sistema unificado
-            avatarState.currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513,
-                skin: 'humanMaleA'
-            };
+            // Restablecer colores por defecto
+            shirtColor = 0xFF6B6B;
+            pantsColor = 0x2C3E50;
+            shoesColor = 0x8B4513;
             
             // Restablecer alias
             userAlias = '';
@@ -4472,11 +4201,11 @@
             }
             
             // Actualizar avatar en tiempo real usando el sistema correcto
-            const avatar = gameCollections.userAvatars.get(userAlias);
+            const avatar = userAvatars.get(userAlias);
             if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(avatarState.currentCustomization.shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(avatarState.currentCustomization.pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(avatarState.currentCustomization.shoesColor);
+                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
+                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
+                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
                 
                 // Forzar actualización de materiales
                 if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
@@ -4508,16 +4237,22 @@
             }
             // Guardar alias
             userAlias = newAlias;
-            // Guardar en localStorage usando el sistema unificado
-            localStorage.setItem('avatarCustomization', JSON.stringify(avatarState.currentCustomization));
+            // Guardar en localStorage
+            const customizationData = {
+                alias: userAlias,
+                shirtColor: shirtColor,
+                pantsColor: pantsColor,
+                shoesColor: shoesColor
+            };
+            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
             // Actualizar nombre en el avatar
             updateAvatarName && updateAvatarName();
             // Aplicar colores al avatar propio si existe
-            const myAvatar = gameCollections.userAvatars.get(userAlias);
+            const myAvatar = userAvatars.get(userAlias);
             if (myAvatar) {
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(avatarState.currentCustomization.shirtColor);
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(avatarState.currentCustomization.pantsColor);
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(avatarState.currentCustomization.shoesColor);
+                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(shirtColor);
+                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(pantsColor);
+                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(shoesColor);
                 if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.needsUpdate = true;
                 if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.needsUpdate = true;
                 if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.needsUpdate = true;
@@ -4528,7 +4263,7 @@
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
-            console.log('✅ Personalización guardada:', avatarState.currentCustomization);
+            console.log('✅ Personalización guardada:', customizationData);
         }
         
         function closeSimplePanel() {
@@ -4563,13 +4298,13 @@
     const img = document.getElementById('skin-preview-img');
     const label = document.getElementById('skin-preview-label');
     // Inicializar índice
-    let currentIdx = skinList.findIndex(s => s.key === (avatarState.currentCustomization && avatarState.currentCustomization.skin ? avatarState.currentCustomization.skin : 'humanMaleA'));
+    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
     if (currentIdx === -1) currentIdx = 0;
     // Función para actualizar preview
     function updateSkinPreview(idx) {
         img.src = skinList[idx].img;
         label.textContent = skinList[idx].label;
-        avatarState.currentCustomization.skin = skinList[idx].key;
+        currentCustomization.skin = skinList[idx].key;
         updateAvatarPreview && updateAvatarPreview();
     }
     // Asignar eventos
@@ -4602,7 +4337,7 @@
         }
         
         function changeShirtColor(color) {
-            avatarState.currentCustomization.shirtColor = color;
+            currentCustomization.shirtColor = color;
             applyCustomizationToAvatar();
             console.log('Color de camisa cambiado a:', color);
         }
@@ -4622,7 +4357,7 @@
                 console.log('Alias guardado:', newAlias);
             }
             
-            localStorage.setItem('avatarCustomization', JSON.stringify(avatarState.currentCustomization));
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
             closeSimplePanel();
             alert('¡Personalización guardada!');
         }
@@ -4638,10 +4373,10 @@
                     border: 3px solid transparent;
                     border-radius: 8px;
                     cursor: pointer;
-                    background-color: #${avatarState.customizationColors[i].toString(16).padStart(6, '0')};
+                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
                 `;
-                colorOption.onclick = () => selectWorkingColor(avatarState.customizationColors[i], 'shirt');
-                if (avatarState.customizationColors[i] === avatarState.currentCustomization.shirtColor) {
+                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
+                if (customizationColors[i] === currentCustomization.shirtColor) {
                     colorOption.style.borderColor = '#FFD700';
                 }
                 shirtGrid.appendChild(colorOption);
@@ -4668,7 +4403,7 @@
     skinOptions.forEach(btn => {
         btn.onclick = () => {
             const selectedSkin = btn.getAttribute('data-skin');
-            avatarState.currentCustomization.skin = selectedSkin;
+            currentCustomization.skin = selectedSkin;
             updateSelectedSkin();
             updateAvatarPreview();
         };
@@ -4678,7 +4413,7 @@
 function updateSelectedSkin() {
     const skinOptions = document.querySelectorAll('.skin-option');
     skinOptions.forEach(btn => {
-        if (btn.getAttribute('data-skin') === avatarState.currentCustomization.skin) {
+        if (btn.getAttribute('data-skin') === currentCustomization.skin) {
             btn.classList.add('selected');
         } else {
             btn.classList.remove('selected');
@@ -4700,13 +4435,13 @@ function updateSelectedSkin() {
             // Actualizar color actual
             switch (type) {
                 case 'shirt':
-                    avatarState.currentCustomization.shirtColor = color;
+                    currentCustomization.shirtColor = color;
                     break;
                 case 'pants':
-                    avatarState.currentCustomization.pantsColor = color;
+                    currentCustomization.pantsColor = color;
                     break;
                 case 'shoes':
-                    avatarState.currentCustomization.shoesColor = color;
+                    currentCustomization.shoesColor = color;
                     break;
             }
             
@@ -4719,9 +4454,9 @@ function updateSelectedSkin() {
 
         function updateSelectedColors() {
             // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${avatarState.currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${avatarState.currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${avatarState.currentCustomization.shoesColor}"][data-type="shoes"]`);
+            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
+            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
+            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
             
             if (shirtOption) shirtOption.classList.add('selected');
 
@@ -4734,13 +4469,13 @@ function updateSelectedSkin() {
     // Actualizar color actual
     switch (type) {
         case 'shirt':
-                    avatarState.currentCustomization.shirtColor = color;
+            currentCustomization.shirtColor = color;
             break;
         case 'pants':
-                    avatarState.currentCustomization.pantsColor = color;
+            currentCustomization.pantsColor = color;
             break;
         case 'shoes':
-                    avatarState.currentCustomization.shoesColor = color;
+            currentCustomization.shoesColor = color;
             break;
     }
             
@@ -4774,15 +4509,28 @@ function updateSelectedSkin() {
             addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
         }
 
-        // --- FUNCIONES UNIFICADAS DE PERSONALIZACIÓN ---
+        function resetCustomization() {
+            // Restablecer a colores por defecto
+            currentCustomization = {
+                shirtColor: 0x4ECDC4,
+                pantsColor: 0x2C3E50,
+                shoesColor: 0x8B4513,
+                skin: 'humanMaleA'
+            };
+            
+            // Aplicar cambios
+            applyCustomizationToAvatar();
+            updateSelectedColors();
+            updateSelectedSkin();
+        }
 
         function loadCustomization() {
             const saved = localStorage.getItem('avatarCustomization');
             if (saved) {
                 try {
-                    avatarState.currentCustomization = JSON.parse(saved);
+                    currentCustomization = JSON.parse(saved);
                     // Si falta la propiedad skin, asignar valor por defecto
-                    if (!avatarState.currentCustomization.skin) avatarState.currentCustomization.skin = 'humanMaleA';
+                    if (!currentCustomization.skin) currentCustomization.skin = 'humanMaleA';
                     applyCustomizationToAvatar();
                 } catch (error) {
                     console.error('Error cargando personalización:', error);
@@ -4791,16 +4539,16 @@ function updateSelectedSkin() {
         }
 
         function applyCustomizationToAvatar() {
-            if (!avatarState.currentCustomization) return;
+            if (!currentCustomization) return;
             
             // Actualizar colores del avatar
-            const shirtColor = avatarState.currentCustomization.shirtColor || 0x4ECDC4;
-            const pantsColor = avatarState.currentCustomization.pantsColor || 0x2C3E50;
-            const shoesColor = avatarState.currentCustomization.shoesColor || 0x8B4513;
+            const shirtColor = currentCustomization.shirtColor || 0x4ECDC4;
+            const pantsColor = currentCustomization.pantsColor || 0x2C3E50;
+            const shoesColor = currentCustomization.shoesColor || 0x8B4513;
             
             // Buscar y actualizar materiales del avatar
-            if (gameCollections.userAvatars.has(userAlias)) {
-                const avatarData = gameCollections.userAvatars.get(userAlias);
+            if (userAvatars.has(userAlias)) {
+                const avatarData = userAvatars.get(userAlias);
                 if (avatarData && avatarData.group) {
                     const group = avatarData.group;
                     
@@ -4848,13 +4596,13 @@ function updateSelectedSkin() {
             if (alias === userAlias) {
                 return;
             }
-            let avatar = gameCollections.userAvatars.get(alias);
+            let avatar = userAvatars.get(alias);
             if (!avatar) {
                 // Solo pasar skin si existe
                 let custom = {};
                 if (typeof skin !== 'undefined') custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
-                avatar = gameCollections.userAvatars.get(alias);
+                avatar = userAvatars.get(alias);
             }
             if (avatar) {
                 // Actualización de posición y rotación en tiempo real
@@ -4977,7 +4725,7 @@ function updateSelectedSkin() {
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
 function removeUserAvatar(alias) {
-    const avatar = gameCollections.userAvatars.get(alias);
+    const avatar = userAvatars.get(alias);
             if (avatar) {
                 if (avatar.group) {
         scene.remove(avatar.group);
@@ -4988,7 +4736,7 @@ function removeUserAvatar(alias) {
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
     }
-    gameCollections.userAvatars.delete(alias);
+    userAvatars.delete(alias);
     pendingAvatarLoads.delete(alias);
 }
         
@@ -5009,7 +4757,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (gameCollections.userAvatars.has(alias)) return;
+    if (userAvatars.has(alias)) return;
     
     pendingAvatarLoads.add(alias);
     
@@ -5044,7 +4792,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             pendingAvatarLoads.delete(alias);
             
             // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
-            if (gameCollections.userAvatars.has(alias)) return;
+            if (userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
             avatar.traverse(child => {
@@ -5067,30 +4815,17 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             const idleClip = idleAnimation.animations[0];
             const runClip = runAnimation.animations[0];
             
-            console.log(`[${alias}] Animaciones cargadas:`, {
-                idleAnimation: idleAnimation.animations.length,
-                runAnimation: runAnimation.animations.length,
-                idleClip: idleClip ? idleClip.name : 'null',
-                runClip: runClip ? runClip.name : 'null'
-            });
-            
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
-                actions.idle.setLoop(THREE.LoopRepeat);
                 actions.idle.play(); // Iniciar en 'idle' por defecto
-                console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
-            } else {
-                console.warn(`[${alias}] No se encontró clip de animación idle`);
+                console.log('Animación Idle cargada para:', alias);
             }
             
             if (runClip) {
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
                 runClip.name = 'walk';
                 actions.walk = mixer.clipAction(runClip);
-                actions.walk.setLoop(THREE.LoopRepeat);
-                console.log(`[${alias}] Animación Walk/Run cargada como 'walk'`);
-            } else {
-                console.warn(`[${alias}] No se encontró clip de animación run`);
+                console.log('Animación Walk/Run cargada para:', alias);
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -5104,7 +4839,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             
             // Guardar el avatar y su mixer
-            gameCollections.userAvatars.set(alias, {
+            userAvatars.set(alias, {
                 group: avatar,
                 mixer: mixer,
                 actions: actions,
@@ -5146,7 +4881,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 }
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
-            gameCollections.userAvatars.forEach((avatar, alias) => {
+            userAvatars.forEach((avatar, alias) => {
                 // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
@@ -5156,34 +4891,24 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'walk'
-                    console.log(`[${alias}] Empezó a moverse - Cambiando a walk animation`);
                     if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        console.log(`[${alias}] Transición: idle -> walk`);
-                        avatar.actions.idle.fadeOut(0.3);
-                        avatar.actions.walk.reset().fadeIn(0.3).play();
+                        avatar.actions.idle.fadeOut(0.2);
+                        avatar.actions.walk.reset().fadeIn(0.2).play();
                     } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
                         // Si no hay idle, usar default
-                        console.log(`[${alias}] Transición: default -> walk`);
-                        avatar.actions.default.fadeOut(0.3);
-                        avatar.actions.walk.reset().fadeIn(0.3).play();
-                    } else {
-                        console.warn(`[${alias}] No se pudo cambiar a walk animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
+                        avatar.actions.default.fadeOut(0.2);
+                        avatar.actions.walk.reset().fadeIn(0.2).play();
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'walk' a 'idle'
-                    console.log(`[${alias}] Dejó de moverse - Cambiando a idle animation`);
                     if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        console.log(`[${alias}] Transición: walk -> idle`);
-                        avatar.actions.walk.fadeOut(0.3);
-                        avatar.actions.idle.reset().fadeIn(0.3).play();
+                        avatar.actions.walk.fadeOut(0.2);
+                        avatar.actions.idle.reset().fadeIn(0.2).play();
                     } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
                         // Si no hay idle, usar default
-                        console.log(`[${alias}] Transición: walk -> default`);
-                        avatar.actions.walk.fadeOut(0.3);
-                        avatar.actions.default.reset().fadeIn(0.3).play();
-                    } else {
-                        console.warn(`[${alias}] No se pudo cambiar a idle animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
+                        avatar.actions.walk.fadeOut(0.2);
+                        avatar.actions.default.reset().fadeIn(0.2).play();
                     }
                     avatar.isMoving = false;
                 }
@@ -5192,12 +4917,10 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
-            gameCollections.userAvatars.forEach((avatar, alias) => {
+            userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
-                    
-
                 }
             });
         }
@@ -5223,8 +4946,9 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         }
 
         // Inicialización robusta de colores de avatar
-        // Los colores ahora se manejan a través del sistema unificado avatarState.currentCustomization
-        // No se necesitan verificaciones de variables globales
+        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
+        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
+        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
         
         // UI: Al hacer clic en un usuario, activar modo privado
         usersList.addEventListener('click', function(e) {
