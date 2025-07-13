@@ -1187,19 +1187,19 @@
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
-            if (!materialCache.has(key)) {
-                materialCache.set(key, new THREE.MeshStandardMaterial({ 
+            if (!cacheSystem.materialCache.has(key)) {
+                cacheSystem.materialCache.set(key, new THREE.MeshStandardMaterial({ 
                     color, 
                     roughness, 
                     metalness 
                 }));
             }
-            return materialCache.get(key);
+            return cacheSystem.materialCache.get(key);
         }
 
         function getCachedTexture(text, colorIdx, width, height) {
             const key = `${text}-${colorIdx}-${width}-${height}`;
-            if (!textureCache.has(key)) {
+            if (!cacheSystem.textureCache.has(key)) {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 const canvasW = Math.min(512, width * 64); // Reducir tamaño del canvas
@@ -1217,9 +1217,9 @@
                 context.fillText(text.charAt(0).toUpperCase() + text.slice(1), canvasW / 2, canvasH / 2);
 
                 const texture = new THREE.CanvasTexture(canvas);
-                textureCache.set(key, texture);
+                cacheSystem.textureCache.set(key, texture);
             }
-            return textureCache.get(key);
+            return cacheSystem.textureCache.get(key);
         }
 
         // --- Función para obtener el color del cielo según la hora ---
@@ -2306,9 +2306,6 @@
             return plane;
         }
 
-        // Cache para texturas de logos
-        const logoTextureCache = new Map();
-        
         function getLogoTexture(domain) {
             const logoFileName = domainToLogoMap[domain];
             if (!logoFileName) {
@@ -2316,8 +2313,8 @@
             }
             
             // Verificar si ya está en cache
-            if (logoTextureCache.has(domain)) {
-                return logoTextureCache.get(domain);
+            if (cacheSystem.logoTextureCache.has(domain)) {
+                return cacheSystem.logoTextureCache.get(domain);
             }
             
             try {
@@ -2336,12 +2333,12 @@
                     function(error) {
                         console.error(`Error cargando logo ${logoFileName}:`, error);
                         // Remover del cache si falla
-                        logoTextureCache.delete(domain);
+                        cacheSystem.logoTextureCache.delete(domain);
                     }
                 );
                 
                 // Guardar en cache
-                logoTextureCache.set(domain, texture);
+                cacheSystem.logoTextureCache.set(domain, texture);
                 return texture;
             } catch (error) {
                 console.error(`Error creando textura para ${domain}:`, error);
@@ -4221,29 +4218,29 @@
         
         // Función para limpiar recursos
         function cleanup() {
-            // Limpiar cache de texturas
-            logoTextureCache.forEach(texture => {
+            // Limpiar cache de texturas de logos
+            cacheSystem.logoTextureCache.forEach(texture => {
                 if (texture && texture.dispose) {
                     texture.dispose();
                 }
             });
-            logoTextureCache.clear();
+            cacheSystem.logoTextureCache.clear();
             
             // Limpiar cache de materiales
-            materialCache.forEach(material => {
+            cacheSystem.materialCache.forEach(material => {
                 if (material && material.dispose) {
                     material.dispose();
                 }
             });
-            materialCache.clear();
+            cacheSystem.materialCache.clear();
             
             // Limpiar cache de texturas generadas
-            textureCache.forEach(texture => {
+            cacheSystem.textureCache.forEach(texture => {
                 if (texture && texture.dispose) {
                     texture.dispose();
                 }
             });
-            textureCache.clear();
+            cacheSystem.textureCache.clear();
             
             // Limpiar mixers de animación
             userAvatars.forEach((avatar, alias) => {
