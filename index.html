@@ -4826,9 +4826,31 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 runClip.name = 'run';
                 actions.run = mixer.clipAction(runClip);
                 console.log('Animación Run cargada para:', alias, actions.run);
+                // Diagnóstico: información del clip y esqueleto
+                console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
+                console.log('Nombre del clip:', runClip.name);
+                console.log('Duración:', runClip.duration);
+                console.log('Tracks:', runClip.tracks ? runClip.tracks.length : 'N/A');
+                if (runClip.tracks) {
+                    runClip.tracks.forEach((track, i) => {
+                        console.log(`Track #${i}:`, track.name, 'Keyframes:', track.times.length);
+                    });
+                }
+                // Diagnóstico: huesos del modelo
+                let boneCount = 0;
+                let boneNames = [];
+                avatar.traverse(child => {
+                    if (child.isBone) {
+                        boneCount++;
+                        boneNames.push(child.name);
+                    }
+                });
+                console.log('Huesos encontrados en el modelo:', boneCount);
+                console.log('Nombres de huesos:', boneNames);
                 if (!actions.run) {
                     console.warn('No se pudo crear action para RUN:', alias);
                 }
+                console.log('--- FIN DIAGNÓSTICO ANIMACIÓN RUN ---');
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
