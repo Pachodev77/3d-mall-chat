@@ -4063,17 +4063,14 @@
         function animate(currentTime) {
             requestAnimationFrame(animate);
             
-            // Obtener delta time del reloj para animaciones
-            const deltaTime = animationState.clock.getDelta();
-            
             // Control de FPS
-            const frameDeltaTime = currentTime - lastTime;
-            if (frameDeltaTime < frameInterval) {
+            const frameDeltaTime = currentTime - animationState.lastTime;
+            if (frameDeltaTime < animationState.frameInterval) {
                 return;
             }
             
-            lastTime = currentTime - (frameDeltaTime % frameInterval);
-            frameCount++;
+            animationState.lastTime = currentTime - (frameDeltaTime % animationState.frameInterval);
+            animationState.frameCount++;
             
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
@@ -4084,7 +4081,7 @@
             updateAvatarPositions(); // Actualizar posiciones de avatares
             
                 // Actualizar animaciones de avatares con el delta time correcto
-                updateAvatarAnimations(deltaTime);
+                updateAvatarAnimations(frameDeltaTime);
                 
                 renderer.render(scene, camera);
             }
@@ -4093,25 +4090,25 @@
         // Función centralizada para manejar todas las actualizaciones periódicas
         function updatePeriodicSystems(currentTime) {
             // Actualizar el color del cielo
-            if (timingSystem.shouldUpdate(lastSkyUpdate, UPDATE_INTERVALS.SKY)) {
+            if (timingSystem.shouldUpdate(timingState.lastSkyUpdate, timingState.intervals.SKY)) {
                 scene.background = getSkyColor();
                 timingSystem.updateLastTime('SKY');
             }
             
             // Enviar posición del usuario
-            if (timingSystem.shouldUpdate(lastPositionUpdate, UPDATE_INTERVALS.POSITION)) {
+            if (timingSystem.shouldUpdate(timingState.lastPositionUpdate, timingState.intervals.POSITION)) {
                 sendUserPosition();
                 timingSystem.updateLastTime('POSITION');
             }
             
             // Actualizar carteles rotativos
-            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
+            if (timingSystem.shouldUpdate(timingState.lastRotatingSignUpdate, timingState.intervals.ROTATING_SIGN)) {
                 updateRotatingSigns();
                 timingSystem.updateLastTime('ROTATING_SIGN');
             }
             
             // Actualizar relojes digitales
-            if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
+            if (timingSystem.shouldUpdate(timingState.lastClockUpdate, timingState.intervals.CLOCK)) {
                 updateDigitalClocks();
                 timingSystem.updateLastTime('CLOCK');
             }
