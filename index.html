@@ -4825,7 +4825,10 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
                 runClip.name = 'run';
                 actions.run = mixer.clipAction(runClip);
-                console.log('Animación Run cargada para:', alias);
+                console.log('Animación Run cargada para:', alias, actions.run);
+                if (!actions.run) {
+                    console.warn('No se pudo crear action para RUN:', alias);
+                }
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -4892,10 +4895,14 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'walk'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
+                        console.log('Activando RUN para', alias);
+                        avatar.mixer.stopAllAction();
                         avatar.actions.idle.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
                         // Si no hay idle, usar default
+                        console.log('Activando RUN (sin idle) para', alias);
+                        avatar.mixer.stopAllAction();
                         avatar.actions.default.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     }
