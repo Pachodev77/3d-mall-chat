@@ -4813,8 +4813,17 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             
             // Los clips de animación vienen en el array `animations` de los archivos cargados
             const idleClip = idleAnimation.animations[0];
-            const runClip = runAnimation.animations[0];
-            
+            const runClip = runAnimation && runAnimation.animations ? runAnimation.animations[0] : undefined;
+            console.log('--- DIAGNÓSTICO RAW ---');
+            console.log('runAnimation:', runAnimation);
+            if (runAnimation && runAnimation.animations) {
+                console.log('runAnimation.animations:', runAnimation.animations);
+            } else {
+                console.warn('runAnimation.animations no existe o está vacío');
+            }
+            console.log('runClip:', runClip);
+            console.log('--- FIN DIAGNÓSTICO RAW ---');
+
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
                 actions.idle.play(); // Iniciar en 'idle' por defecto
