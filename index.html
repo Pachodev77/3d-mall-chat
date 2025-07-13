@@ -5238,7 +5238,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 }
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
@@ -5284,7 +5284,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
