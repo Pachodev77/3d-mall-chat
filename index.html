@@ -2318,7 +2318,14 @@
             
             // Verificar si ya está en cache
             if (cacheSystem.logoTextureCache.has(domain)) {
-                return cacheSystem.logoTextureCache.get(domain);
+                const cachedTexture = cacheSystem.logoTextureCache.get(domain);
+                // Verificar que la textura tenga una imagen válida
+                if (cachedTexture && cachedTexture.image && cachedTexture.image.complete) {
+                    return cachedTexture;
+                } else {
+                    // Remover textura inválida del cache
+                    cacheSystem.logoTextureCache.delete(domain);
+                }
             }
             
             try {
@@ -2328,6 +2335,10 @@
                     // onLoad callback
                     function(loadedTexture) {
                         console.log(`Logo cargado exitosamente: ${logoFileName}`);
+                        // Asegurar que la textura se marque para actualización solo cuando la imagen esté lista
+                        if (loadedTexture && loadedTexture.image && loadedTexture.image.complete) {
+                            loadedTexture.needsUpdate = true;
+                        }
                     },
                     // onProgress callback
                     function(xhr) {
@@ -2341,9 +2352,12 @@
                     }
                 );
                 
-                // Guardar en cache
-                cacheSystem.logoTextureCache.set(domain, texture);
-                return texture;
+                // Solo guardar en cache si la textura se creó correctamente
+                if (texture) {
+                    cacheSystem.logoTextureCache.set(domain, texture);
+                    return texture;
+                }
+                return null;
             } catch (error) {
                 console.error(`Error creando textura para ${domain}:`, error);
                 return null;
@@ -2400,28 +2414,35 @@
                 
                 const logoTexture = getLogoTexture(domain);
                 
+                // Limpiar textura anterior de forma segura
                 if (plane.material.map) {
                     plane.material.map.dispose();
+                    plane.material.map = null;
                 }
                 
-                if (logoTexture) {
+                if (logoTexture && logoTexture.image && logoTexture.image.complete) {
                     plane.material.map = logoTexture;
+                    plane.material.needsUpdate = true;
                 } else {
-                    // Fallback a la textura generada si no hay logo
+                    // Fallback a la textura generada si no hay logo o no está lista
                     const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-            plane.material.map = texture;
+                    if (texture) {
+                        plane.material.map = texture;
+                        plane.material.needsUpdate = true;
+                    }
                 }
-                
-            plane.material.needsUpdate = true;
             } catch (error) {
                 console.error('Error en updateImagePlane:', error);
                 // Fallback seguro
                 if (plane.material.map) {
                     plane.material.map.dispose();
+                    plane.material.map = null;
                 }
                 const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                plane.material.map = texture;
-                plane.material.needsUpdate = true;
+                if (texture) {
+                    plane.material.map = texture;
+                    plane.material.needsUpdate = true;
+                }
             }
         }
 
