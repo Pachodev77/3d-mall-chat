@@ -4165,7 +4165,7 @@
             textureCache.clear();
             
             // Limpiar mixers de animación
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
@@ -4858,13 +4858,13 @@ function updateSelectedSkin() {
             if (alias === userAlias) {
                 return;
             }
-            let avatar = userAvatars.get(alias);
+            let avatar = gameCollections.userAvatars.get(alias);
             if (!avatar) {
                 // Solo pasar skin si existe
                 let custom = {};
                 if (typeof skin !== 'undefined') custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
-                avatar = userAvatars.get(alias);
+                avatar = gameCollections.userAvatars.get(alias);
             }
             if (avatar) {
                 // Actualización de posición y rotación en tiempo real
@@ -4987,7 +4987,7 @@ function updateSelectedSkin() {
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
 function removeUserAvatar(alias) {
-    const avatar = userAvatars.get(alias);
+    const avatar = gameCollections.userAvatars.get(alias);
             if (avatar) {
                 if (avatar.group) {
         scene.remove(avatar.group);
@@ -4998,7 +4998,7 @@ function removeUserAvatar(alias) {
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
     }
-    userAvatars.delete(alias);
+    gameCollections.userAvatars.delete(alias);
     pendingAvatarLoads.delete(alias);
 }
         
@@ -5019,7 +5019,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (userAvatars.has(alias)) return;
+    if (gameCollections.userAvatars.has(alias)) return;
     
     pendingAvatarLoads.add(alias);
     
@@ -5054,7 +5054,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             pendingAvatarLoads.delete(alias);
             
             // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
-            if (userAvatars.has(alias)) return;
+            if (gameCollections.userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
             avatar.traverse(child => {
@@ -5114,7 +5114,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             
             // Guardar el avatar y su mixer
-            userAvatars.set(alias, {
+            gameCollections.userAvatars.set(alias, {
                 group: avatar,
                 mixer: mixer,
                 actions: actions,
@@ -5156,7 +5156,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 }
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
@@ -5202,7 +5202,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
