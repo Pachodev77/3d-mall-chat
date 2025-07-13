@@ -2500,7 +2500,13 @@
         }
 
         function updateClockPlane(material) {
-            const canvas = material.map ? material.map.image : document.createElement('canvas');
+            let canvas;
+            if (material.map && material.map.image) {
+                canvas = material.map.image;
+            } else {
+                canvas = document.createElement('canvas');
+                material.map = new THREE.CanvasTexture(canvas);
+            }
             const context = canvas.getContext('2d');
             canvas.width = 800;
             canvas.height = 400;
@@ -2517,10 +2523,7 @@
             context.textAlign = 'center';
             context.textBaseline = 'middle';
             context.fillText(timeStr, 400, 200);
-
-            if (!material.map && material.map.image) {
-                material.map = new THREE.CanvasTexture(canvas);
-            } else {
+            if (material.map) {
                 material.map.needsUpdate = true;
             }
         }
