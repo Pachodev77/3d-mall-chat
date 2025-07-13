@@ -1902,71 +1902,6 @@
                 createCeilingCorner(esteX - 2, surZ - 2); // SE
             }
 
-            // --- Crear techo trapezoidal sobre las tiendas del último piso ---
-            // ELIMINADO: Techos trapezoidales para mejorar rendimiento
-            // Ya no se necesitan porque solo tenemos 2 pisos
-            /*
-            if (currentFloor === 3) { // Solo para el último piso (piso 3)
-                const trapezoidMaterial = new THREE.MeshStandardMaterial({ 
-                    color: 0xA0522D, 
-                    roughness: 0.8,
-                    metalness: 0.1,
-                    side: THREE.DoubleSide
-                });
-                
-                // Crear techo trapezoidal para cada lado
-                const trapezoidHeight = 6; // Más alto y más grande
-                const baseWidth = storeWidth + 2; // Un poco más ancho que la tienda
-                
-                // Norte - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, storeDepth / 2);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Sur - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, HALL_SIZE - storeDepth / 2);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Oeste - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-                
-                // Este - techo trapezoidal
-                for (let i = 0; i < numStoresPerSide; i++) {
-                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
-                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
-                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
-                    trapezoid.position.set(HALL_SIZE - storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
-                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
-                    trapezoid.castShadow = true;
-                    trapezoid.receiveShadow = true;
-                    scene.add(trapezoid);
-                }
-            }
-            */
 
             // --- Crear barandas al borde exterior de los corredores ---
             const railingHeight = 0.8;
@@ -4961,16 +4896,24 @@
             if (alias === userAlias) {
                 return;
             }
+            
             let avatar = gameCollections.userAvatars.get(alias);
             if (!avatar) {
-                // Solo pasar skin si existe
+                // Crear avatar con datos de personalización si están disponibles
                 let custom = {};
-                if (typeof skin !== 'undefined') custom.skin = skin;
+                if (shirtColor !== undefined) custom.shirtColor = shirtColor;
+                if (pantsColor !== undefined) custom.pantsColor = pantsColor;
+                if (shoesColor !== undefined) custom.shoesColor = shoesColor;
+                
+                // Usar skin por defecto del usuario actual si está disponible
+                if (typeof avatarState !== 'undefined' && avatarState.currentCustomization && avatarState.currentCustomization.skin) {
+                    custom.skin = avatarState.currentCustomization.skin;
+                }
+                
                 createUserAvatar(alias, position, floor, custom);
                 avatar = gameCollections.userAvatars.get(alias);
-            }
-            if (avatar) {
-                // Actualización de posición y rotación en tiempo real
+            } else {
+                // Si el avatar ya existe, solo actualizar su posición y rotación
                 const floorStep = HALL_HEIGHT + 1;
                 const targetY = floor * floorStep;
                 avatar.targetPosition.set(position.x, targetY, position.z);
@@ -5092,15 +5035,33 @@
         function removeUserAvatar(alias) {
             const avatar = gameCollections.userAvatars.get(alias);
             if (avatar) {
+                console.log(`[${alias}] Eliminando avatar...`);
+                
+                // Remover el grupo de la escena
                 if (avatar.group) {
                     scene.remove(avatar.group);
+                    
+                    // Limpiar geometría y materiales si es un avatar de respaldo
+                    if (avatar.isFallback && avatar.group.geometry) {
+                        avatar.group.geometry.dispose();
+                        if (avatar.group.material) {
+                            avatar.group.material.dispose();
+                        }
+                    }
                 }
-                // Limpiar mixer de animación
+                
+                // Limpiar mixer de animación si existe
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
-                    avatar.mixer.uncacheRoot(avatar.group);
+                    if (avatar.group) {
+                        avatar.mixer.uncacheRoot(avatar.group);
+                    }
                 }
+                
+                console.log(`[${alias}] Avatar eliminado`);
             }
+            
+            // Limpiar de las colecciones
             gameCollections.userAvatars.delete(alias);
             pendingAvatarLoads.delete(alias);
         }
@@ -5116,26 +5077,39 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
-    if (pendingAvatarLoads.has(alias)) return;
+    if (pendingAvatarLoads.has(alias)) {
+        console.log(`[${alias}] Carga ya en progreso, saltando...`);
+        return;
+    }
     
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (gameCollections.userAvatars.has(alias)) return;
+    if (gameCollections.userAvatars.has(alias)) {
+        console.log(`[${alias}] Avatar ya existe, saltando...`);
+        return;
+    }
     
     pendingAvatarLoads.add(alias);
     
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
     
-    // Elegir el skin correcto
-    let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
+    // Elegir el skin correcto con fallback robusto
+    let skinName = 'humanMaleA'; // Valor por defecto
+    if (custom && custom.skin) {
+        skinName = custom.skin;
+    } else if (typeof avatarState !== 'undefined' && avatarState.currentCustomization && avatarState.currentCustomization.skin) {
+        skinName = avatarState.currentCustomization.skin;
+    }
+    
     const skinFileMap = {
         'humanMaleA': 'humanMaleA.png',
         'humanFemaleA': 'humanFemaleA.png',
         'zombieMaleA': 'zombieMaleA.png',
         'zombieFemaleA': 'zombieFemaleA.png'
     };
+    
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     
     const fbxLoader = new THREE.FBXLoader();
@@ -5145,94 +5119,167 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const floorStep = HALL_HEIGHT + 1;
     const correctY = floor * floorStep;
     
-    // Usaremos Promises para manejar las cargas asíncronas de forma limpia
-    const modelPromise = new Promise(resolve => fbxLoader.load(modelPath, resolve));
-    const texturePromise = new Promise(resolve => textureLoader.load(texturePath, resolve));
-    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve));
-    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve));
+    console.log(`[${alias}] Iniciando carga de recursos:`, {
+        model: modelPath,
+        texture: texturePath,
+        skin: skinName
+    });
     
-    Promise.all([modelPromise, texturePromise, idleAnimPromise, runAnimPromise])
-        .then(([avatar, texture, idleAnimation, runAnimation]) => {
+    // Cargar recursos con manejo de errores robusto
+    const loadModel = () => new Promise((resolve, reject) => {
+        fbxLoader.load(modelPath, resolve, undefined, reject);
+    });
+    
+    const loadTexture = () => new Promise((resolve, reject) => {
+        textureLoader.load(texturePath, resolve, undefined, reject);
+    });
+    
+    const loadIdleAnim = () => new Promise((resolve, reject) => {
+        fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve, undefined, reject);
+    });
+    
+    const loadRunAnim = () => new Promise((resolve, reject) => {
+        fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve, undefined, reject);
+    });
+    
+    // Cargar todos los recursos en paralelo
+    Promise.all([
+        loadModel(),
+        loadTexture(),
+        loadIdleAnim(),
+        loadRunAnim()
+    ]).then(([avatar, texture, idleAnimation, runAnimation]) => {
+        
+        pendingAvatarLoads.delete(alias);
+        
+        // Verificar que el avatar no fue eliminado durante la carga
+        if (gameCollections.userAvatars.has(alias)) {
+            console.log(`[${alias}] Avatar fue eliminado durante la carga, cancelando...`);
+            return;
+        }
+        
+        console.log(`[${alias}] Recursos cargados exitosamente`);
+        
+        // Aplicar la textura al modelo
+        avatar.traverse(child => {
+            if (child.isMesh && child.material) {
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+            }
+        });
+        
+        // Configurar posición y escala
+        avatar.position.set(position.x, correctY, position.z);
+        avatar.scale.set(0.009, 0.009, 0.009);
+        scene.add(avatar);
+        
+        // --- LÓGICA DE ANIMACIÓN MEJORADA ---
+        const mixer = new THREE.AnimationMixer(avatar);
+        const actions = {};
+        
+        // Verificar que las animaciones se cargaron correctamente
+        if (idleAnimation && idleAnimation.animations && idleAnimation.animations.length > 0) {
+            const idleClip = idleAnimation.animations[0];
+            actions.idle = mixer.clipAction(idleClip);
+            actions.idle.setLoop(THREE.LoopRepeat);
+            actions.idle.play();
+            console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
+        } else {
+            console.warn(`[${alias}] No se pudo cargar la animación idle`);
+        }
+        
+        if (runAnimation && runAnimation.animations && runAnimation.animations.length > 0) {
+            const runClip = runAnimation.animations[0];
+            runClip.name = 'walk'; // Renombrar para consistencia
+            actions.walk = mixer.clipAction(runClip);
+            actions.walk.setLoop(THREE.LoopRepeat);
+            console.log(`[${alias}] Animación Walk cargada`);
+        } else {
+            console.warn(`[${alias}] No se pudo cargar la animación walk`);
+        }
+        
+        // Crear el objeto avatar con toda la información necesaria
+        const avatarData = {
+            group: avatar,
+            mixer: mixer,
+            actions: actions,
+            targetPosition: new THREE.Vector3(position.x, correctY, position.z),
+            targetRotation: 0,
+            currentFloor: floor,
+            isMoving: false,
+            // Datos de personalización para futuras actualizaciones
+            customization: {
+                skin: skinName,
+                shirtColor: custom.shirtColor || 0x4ECDC4,
+                pantsColor: custom.pantsColor || 0x2C3E50,
+                shoesColor: custom.shoesColor || 0x8B4513
+            }
+        };
+        
+        // Guardar el avatar en la colección
+        gameCollections.userAvatars.set(alias, avatarData);
+        
+        console.log(`[${alias}] Avatar creado exitosamente:`, {
+            position: avatar.position,
+            scale: avatar.scale,
+            animations: Object.keys(actions),
+            skin: skinName
+        });
+        
+    }).catch(error => {
+        console.error(`[${alias}] Error al cargar recursos:`, error);
+        pendingAvatarLoads.delete(alias);
+        
+        // Crear avatar de respaldo simple si falla la carga
+        console.log(`[${alias}] Creando avatar de respaldo...`);
+        createFallbackAvatar(alias, position, floor, custom);
+    });
+}
+
+        // --- Función para crear avatar de respaldo simple ---
+        function createFallbackAvatar(alias, position, floor, custom) {
+            console.log(`[${alias}] Creando avatar de respaldo simple`);
             
-            pendingAvatarLoads.delete(alias);
+            const floorStep = HALL_HEIGHT + 1;
+            const correctY = floor * floorStep;
             
-            // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
-            if (gameCollections.userAvatars.has(alias)) return;
-            
-            // Aplicar la textura al modelo
-            avatar.traverse(child => {
-                if (child.isMesh) {
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
-                }
+            // Crear geometría simple para el avatar
+            const geometry = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: custom.shirtColor || 0x4ECDC4,
+                roughness: 0.8,
+                metalness: 0.1
             });
             
-            // Configurar posición y escala
+            const avatar = new THREE.Mesh(geometry, material);
             avatar.position.set(position.x, correctY, position.z);
-            avatar.scale.set(0.009, 0.009, 0.009);
+            avatar.castShadow = true;
+            avatar.receiveShadow = true;
+            
             scene.add(avatar);
             
-            // --- LÓGICA DE ANIMACIÓN CORRECTA ---
-            const mixer = new THREE.AnimationMixer(avatar);
-            const actions = {};
-            
-            // Los clips de animación vienen en el array `animations` de los archivos cargados
-            const idleClip = idleAnimation.animations[0];
-            const runClip = runAnimation.animations[0];
-            
-            console.log(`[${alias}] Animaciones cargadas:`, {
-                idleAnimation: idleAnimation.animations.length,
-                runAnimation: runAnimation.animations.length,
-                idleClip: idleClip ? idleClip.name : 'null',
-                runClip: runClip ? runClip.name : 'null'
-            });
-            
-            if (idleClip) {
-                actions.idle = mixer.clipAction(idleClip);
-                actions.idle.setLoop(THREE.LoopRepeat);
-                actions.idle.play(); // Iniciar en 'idle' por defecto
-                console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
-            } else {
-                console.warn(`[${alias}] No se encontró clip de animación idle`);
-            }
-            
-            if (runClip) {
-                // Renombramos el clip para que coincida con lo que buscamos ('walk')
-                runClip.name = 'walk';
-                actions.walk = mixer.clipAction(runClip);
-                actions.walk.setLoop(THREE.LoopRepeat);
-                console.log(`[${alias}] Animación Walk/Run cargada como 'walk'`);
-            } else {
-                console.warn(`[${alias}] No se encontró clip de animación run`);
-            }
-            
-            // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
-            if (Object.keys(actions).length === 0) {
-                console.warn(`No se cargaron clips de animación para el avatar ${alias}`);
-            }
-            
-            // --- FIN DE LA LÓGICA DE ANIMACIÓN ---
-            
-            printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
-            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
-            
-            // Guardar el avatar y su mixer
-            gameCollections.userAvatars.set(alias, {
+            // Crear datos del avatar sin animaciones
+            const avatarData = {
                 group: avatar,
-                mixer: mixer,
-                actions: actions,
+                mixer: null,
+                actions: {},
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
-                isMoving: false
-            });
+                isMoving: false,
+                isFallback: true,
+                customization: {
+                    skin: custom.skin || 'humanMaleA',
+                    shirtColor: custom.shirtColor || 0x4ECDC4,
+                    pantsColor: custom.pantsColor || 0x2C3E50,
+                    shoesColor: custom.shoesColor || 0x8B4513
+                }
+            };
             
-        }).catch(error => {
-            console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
-            pendingAvatarLoads.delete(alias);
-        });
-}
-
+            gameCollections.userAvatars.set(alias, avatarData);
+            console.log(`[${alias}] Avatar de respaldo creado`);
+        }
+        
         // --- Utilidad para debug: imprimir huesos del modelo FBX ---
         function printAllBones(avatar) {
             if (!avatar || !avatar.group) return;
@@ -5260,45 +5307,36 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
             gameCollections.userAvatars.forEach((avatar, alias) => {
+                // Solo actualizar si el avatar existe y tiene grupo
+                if (!avatar || !avatar.group) {
+                    console.warn(`[${alias}] Avatar sin grupo válido, eliminando...`);
+                    gameCollections.userAvatars.delete(alias);
+                    return;
+                }
+                
                 // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
-                // --- LÓGICA DE CONTROL DE ANIMACIÓN ---
-                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
+                // --- LÓGICA DE CONTROL DE ANIMACIÓN (solo para avatares con animaciones) ---
+                if (avatar.mixer && !avatar.isFallback) {
+                    const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
 
-                if (isNowMoving && !avatar.isMoving) {
-                    // Empezó a moverse: cambia de 'idle' a 'walk'
-                    console.log(`[${alias}] Empezó a moverse - Cambiando a walk animation`);
-                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        console.log(`[${alias}] Transición: idle -> walk`);
-                        avatar.actions.idle.fadeOut(0.3);
-                        avatar.actions.walk.reset().fadeIn(0.3).play();
-                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
-                        // Si no hay idle, usar default
-                        console.log(`[${alias}] Transición: default -> walk`);
-                        avatar.actions.default.fadeOut(0.3);
-                        avatar.actions.walk.reset().fadeIn(0.3).play();
-                    } else {
-                        console.warn(`[${alias}] No se pudo cambiar a walk animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
+                    if (isNowMoving && !avatar.isMoving) {
+                        // Empezó a moverse: cambia de 'idle' a 'walk'
+                        if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                            avatar.actions.idle.fadeOut(0.3);
+                            avatar.actions.walk.reset().fadeIn(0.3).play();
+                        }
+                        avatar.isMoving = true;
+                    } else if (!isNowMoving && avatar.isMoving) {
+                        // Dejó de moverse: cambia de 'walk' a 'idle'
+                        if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                            avatar.actions.walk.fadeOut(0.3);
+                            avatar.actions.idle.reset().fadeIn(0.3).play();
+                        }
+                        avatar.isMoving = false;
                     }
-                    avatar.isMoving = true;
-                } else if (!isNowMoving && avatar.isMoving) {
-                    // Dejó de moverse: cambia de 'walk' a 'idle'
-                    console.log(`[${alias}] Dejó de moverse - Cambiando a idle animation`);
-                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        console.log(`[${alias}] Transición: walk -> idle`);
-                        avatar.actions.walk.fadeOut(0.3);
-                        avatar.actions.idle.reset().fadeIn(0.3).play();
-                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
-                        // Si no hay idle, usar default
-                        console.log(`[${alias}] Transición: walk -> default`);
-                        avatar.actions.walk.fadeOut(0.3);
-                        avatar.actions.default.reset().fadeIn(0.3).play();
-                    } else {
-                        console.warn(`[${alias}] No se pudo cambiar a idle animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
-                    }
-                    avatar.isMoving = false;
                 }
             });
         }
@@ -5306,11 +5344,10 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
             gameCollections.userAvatars.forEach((avatar, alias) => {
-                if (avatar.mixer) {
+                // Solo actualizar animaciones si el avatar tiene mixer y no es un avatar de respaldo
+                if (avatar.mixer && !avatar.isFallback) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
-                    
-
                 }
             });
         }
