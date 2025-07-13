@@ -972,10 +972,6 @@
         const MIN_FLOOR = 0;
         // --- Dimensiones globales de la habitación personal ---
         const roomWidth = 12, roomHeight = 3.5, roomDepth = 12;
-        
-        // --- Variables globales de Three.js ---
-        let scene, camera, renderer;
-        let targetPosition, targetRotationY;
 
         // --- SISTEMA DE ESTADO CENTRALIZADO ---
         
@@ -986,8 +982,8 @@
             
             // Posición y movimiento del jugador
             player: {
-                position: new THREE.Vector3(0, 0, 0),
-                targetPosition: new THREE.Vector3(0, 0, 0),
+                position: { x: 0, y: 0, z: 0 },
+                targetPosition: { x: 0, y: 0, z: 0 },
                 rotation: 0,
                 targetRotation: 0,
                 floor: 0,
@@ -1063,6 +1059,30 @@
                 skin: 'humanMaleA'
             },
             
+            // Colores predefinidos para selección
+            predefinedColors: [
+                { shirt: 0x4ECDC4, pants: 0x2C3E50, shoes: 0x8B4513 },
+                { shirt: 0xE74C3C, pants: 0x34495E, shoes: 0x2C3E50 },
+                { shirt: 0x3498DB, pants: 0x2980B9, shoes: 0x1F618D },
+                { shirt: 0xF39C12, pants: 0xE67E22, shoes: 0xD35400 },
+                { shirt: 0x9B59B6, pants: 0x8E44AD, shoes: 0x6C3483 }
+            ],
+            
+            // Colores disponibles para personalización
+            customizationColors: [
+            // Colores vibrantes para camisas
+            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
+            0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
+            0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
+            // Colores más oscuros para pantalones
+            0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
+            0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
+            0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
+            // Colores para zapatos
+            0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
+            0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
+            0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
+            ]
         };
         
         // Hacer avatarState accesible globalmente para Firebase
@@ -1077,7 +1097,7 @@
                 scene: null,
                 camera: null,
                 renderer: null,
-                targetPosition: new THREE.Vector3(0, 0, 0),
+                targetPosition: { x: 0, y: 0, z: 0 },
                 targetRotation: 0
             }
         };
@@ -1098,22 +1118,12 @@
             lastPositionUpdate: 0,
             lastRotatingSignUpdate: 0,
             lastClockUpdate: 0,
-            lastCentralCubeUpdate: 0,
-            lastPersonalRoomSkyUpdate: 0,
-            lastFirebaseCleanup: 0,
-            lastFirebaseUserCleanup: 0,
-            lastFirebaseTimestampUpdate: 0,
             
             intervals: {
                 SKY: 60000,        // 1 minuto
                 POSITION: 500,     // 500ms
                 ROTATING_SIGN: 2500, // 2.5 segundos
-                CLOCK: 1000,       // 1 segundo
-                CENTRAL_CUBE: 2500, // 2.5 segundos para carteles centrales
-                PERSONAL_ROOM_SKY: 60000, // 1 minuto para cielo de habitación personal
-                FIREBASE_CLEANUP: 5 * 60 * 1000, // 5 minutos para limpieza de mensajes
-                FIREBASE_USER_CLEANUP: 10000, // 10 segundos para limpieza de usuarios
-                FIREBASE_TIMESTAMP: 10000 // 10 segundos para actualizar timestamp
+                CLOCK: 1000        // 1 segundo
             }
         };
         
@@ -1151,11 +1161,6 @@
                     case 'POSITION': timingState.lastPositionUpdate = Date.now(); break;
                     case 'ROTATING_SIGN': timingState.lastRotatingSignUpdate = Date.now(); break;
                     case 'CLOCK': timingState.lastClockUpdate = Date.now(); break;
-                    case 'CENTRAL_CUBE': timingState.lastCentralCubeUpdate = Date.now(); break;
-                    case 'PERSONAL_ROOM_SKY': timingState.lastPersonalRoomSkyUpdate = Date.now(); break;
-                    case 'FIREBASE_CLEANUP': timingState.lastFirebaseCleanup = Date.now(); break;
-                    case 'FIREBASE_USER_CLEANUP': timingState.lastFirebaseUserCleanup = Date.now(); break;
-                    case 'FIREBASE_TIMESTAMP': timingState.lastFirebaseTimestampUpdate = Date.now(); break;
                 }
             }
         };
@@ -1167,19 +1172,19 @@
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
-            if (!cacheSystem.materialCache.has(key)) {
-                cacheSystem.materialCache.set(key, new THREE.MeshStandardMaterial({ 
+            if (!materialCache.has(key)) {
+                materialCache.set(key, new THREE.MeshStandardMaterial({ 
                     color, 
                     roughness, 
                     metalness 
                 }));
             }
-            return cacheSystem.materialCache.get(key);
+            return materialCache.get(key);
         }
 
         function getCachedTexture(text, colorIdx, width, height) {
             const key = `${text}-${colorIdx}-${width}-${height}`;
-            if (!cacheSystem.textureCache.has(key)) {
+            if (!textureCache.has(key)) {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 const canvasW = Math.min(512, width * 64); // Reducir tamaño del canvas
@@ -1197,9 +1202,9 @@
                 context.fillText(text.charAt(0).toUpperCase() + text.slice(1), canvasW / 2, canvasH / 2);
 
                 const texture = new THREE.CanvasTexture(canvas);
-                cacheSystem.textureCache.set(key, texture);
+                textureCache.set(key, texture);
             }
-            return cacheSystem.textureCache.get(key);
+            return textureCache.get(key);
         }
 
         // --- Función para obtener el color del cielo según la hora ---
@@ -1251,8 +1256,8 @@
             camera.position.set(25, CAMERA_HEIGHT, 25); // Posición más cerca del centro
             camera.lookAt(HALL_SIZE / 2, CAMERA_HEIGHT, HALL_SIZE / 2);
 
-            gameState.player.targetPosition.copy(camera.position);
-            gameState.player.targetRotation = camera.rotation.y;
+            targetPosition = camera.position.clone();
+            targetRotationY = camera.rotation.y;
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1503,7 +1508,7 @@
                 const wall = new THREE.Mesh(axisConfig.geometry(), separatorMaterial);
                 wall.position.copy(axisConfig.position(i));
                 scene.add(wall);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                collisionObjects.push(new THREE.Box3().setFromObject(wall));
                 walls.push(wall);
             }
             
@@ -1589,7 +1594,7 @@
             floor.position.set(HALL_SIZE / 2, yOffset, HALL_SIZE / 2);
             floor.receiveShadow = true;
             scene.add(floor);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(floor));
+            collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
             const storeWidth = 8; // Reducido para que las tiendas sean más estrechas
@@ -1623,11 +1628,11 @@
             // Este
             const eastResult = createStoreRow('east', storePositions.east, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = eastResult.linkIndex;
-            
+
             // Sur
             const southResult = createStoreRow('south', storePositions.south, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = southResult.linkIndex;
-            
+
             // Oeste
             const westResult = createStoreRow('west', storePositions.west, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = westResult.linkIndex;
@@ -1668,7 +1673,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, norteZ)
             );
             scene.add(nortePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
             
             // Sur - pasillo rojo oscuro
             const surPasillo = createPasilloSueloPlantaBaja(
@@ -1676,7 +1681,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, surZ)
             );
             scene.add(surPasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
             
             // Oeste - pasillo rojo oscuro
             const oestePasillo = createPasilloSueloPlantaBaja(
@@ -1684,7 +1689,7 @@
                 new THREE.Vector3(oesteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(oestePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
             
             // Este - pasillo rojo oscuro
             const estePasillo = createPasilloSueloPlantaBaja(
@@ -1692,7 +1697,7 @@
                 new THREE.Vector3(esteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(estePasillo);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
+            collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
             
             // Esquinas - pasillo rojo oscuro
             const createCornerPlantaBaja = (posX, posZ) => {
@@ -1701,7 +1706,7 @@
                     new THREE.Vector3(posX, yOffset - 0.1, posZ)
                 );
                 scene.add(corner);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCornerPlantaBaja(oesteX, norteZ); // NO
             createCornerPlantaBaja(esteX, norteZ); // NE
@@ -1780,7 +1785,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(norte);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(norte));
+            collisionObjects.push(new THREE.Box3().setFromObject(norte));
             
             // Sur - vinotinto arriba, blanco abajo
             const sur = createPasilloSuelo(
@@ -1790,7 +1795,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(sur);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(sur));
+            collisionObjects.push(new THREE.Box3().setFromObject(sur));
             
             // Oeste - vinotinto arriba, blanco abajo
             const oeste = createPasilloSuelo(
@@ -1800,7 +1805,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(oeste);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oeste));
+            collisionObjects.push(new THREE.Box3().setFromObject(oeste));
             
             // Este - vinotinto arriba, blanco abajo
             const este = createPasilloSuelo(
@@ -1810,7 +1815,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(este);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(este));
+            collisionObjects.push(new THREE.Box3().setFromObject(este));
             
             // Esquinas - vinotinto arriba, blanco abajo
             const createCorner = (posX, posZ) => {
@@ -1821,7 +1826,7 @@
                     pasilloMaterialBlanco
                 );
                 scene.add(corner);
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCorner(oesteX, norteZ); // NO
             createCorner(esteX, norteZ); // NE
@@ -1878,6 +1883,71 @@
                 createCeilingCorner(esteX - 2, surZ - 2); // SE
             }
 
+            // --- Crear techo trapezoidal sobre las tiendas del último piso ---
+            // ELIMINADO: Techos trapezoidales para mejorar rendimiento
+            // Ya no se necesitan porque solo tenemos 2 pisos
+            /*
+            if (currentFloor === 3) { // Solo para el último piso (piso 3)
+                const trapezoidMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0xA0522D, 
+                    roughness: 0.8,
+                    metalness: 0.1,
+                    side: THREE.DoubleSide
+                });
+                
+                // Crear techo trapezoidal para cada lado
+                const trapezoidHeight = 6; // Más alto y más grande
+                const baseWidth = storeWidth + 2; // Un poco más ancho que la tienda
+                
+                // Norte - techo trapezoidal
+                for (let i = 0; i < numStoresPerSide; i++) {
+                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
+                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
+                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, storeDepth / 2);
+                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
+                    trapezoid.castShadow = true;
+                    trapezoid.receiveShadow = true;
+                    scene.add(trapezoid);
+                }
+                
+                // Sur - techo trapezoidal
+                for (let i = 0; i < numStoresPerSide; i++) {
+                    const x = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
+                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
+                    trapezoid.position.set(x, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, HALL_SIZE - storeDepth / 2);
+                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
+                    trapezoid.castShadow = true;
+                    trapezoid.receiveShadow = true;
+                    scene.add(trapezoid);
+                }
+                
+                // Oeste - techo trapezoidal
+                for (let i = 0; i < numStoresPerSide; i++) {
+                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
+                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
+                    trapezoid.position.set(storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
+                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
+                    trapezoid.castShadow = true;
+                    trapezoid.receiveShadow = true;
+                    scene.add(trapezoid);
+                }
+                
+                // Este - techo trapezoidal
+                for (let i = 0; i < numStoresPerSide; i++) {
+                    const z = initialOffset + i * (storeWidth + storeSpacing) + storeWidth / 2;
+                    const trapezoidGeometry = new THREE.ConeGeometry(baseWidth / 2, trapezoidHeight, 4);
+                    const trapezoid = new THREE.Mesh(trapezoidGeometry, trapezoidMaterial);
+                    trapezoid.position.set(HALL_SIZE - storeDepth / 2, yOffset + (HALL_HEIGHT + 1) / 2 + 3.5 + trapezoidHeight / 2, z);
+                    trapezoid.rotation.y = Math.PI / 4; // Rotar 45 grados
+                    trapezoid.castShadow = true;
+                    trapezoid.receiveShadow = true;
+                    scene.add(trapezoid);
+                }
+            }
+            */
 
             // --- Crear barandas al borde exterior de los corredores ---
             const railingHeight = 0.8;
@@ -1924,7 +1994,7 @@
                 const railBox = new THREE.Box3().setFromObject(rail);
                 // Expandir la caja de colisión para hacer las barandas más efectivas
                 railBox.expandByScalar(0.2);
-                gameCollections.collisionObjects.push(railBox);
+                collisionObjects.push(railBox);
             });
 
             // Crear tiendas usando la función refactorizada
@@ -1945,11 +2015,11 @@
             // Este
             const eastResult = createStoreRow('east', storePositions.east, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = eastResult.linkIndex;
-            
+
             // Sur
             const southResult = createStoreRow('south', storePositions.south, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = southResult.linkIndex;
-            
+
             // Oeste
             const westResult = createStoreRow('west', storePositions.west, numStoresPerSide, storeWidth, storeSpacing, initialOffset, yOffset, wallMaterial, currentLinkIndex, isCornerPosition);
             currentLinkIndex = westResult.linkIndex;
@@ -2166,7 +2236,7 @@
             // --- Actualizar colisiones ---
             storeGroup.updateMatrixWorld(true);
             [backWall, leftWall, rightWall].forEach(wall => {
-                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                collisionObjects.push(new THREE.Box3().setFromObject(wall));
             });
         }
 
@@ -2194,20 +2264,19 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             let offset = 0;
-            // Almacenar datos para el sistema de timing centralizado
-            if (!window.centralCubeOffsets) {
-                window.centralCubeOffsets = {};
-            }
-            const cubeKey = `cube_${Date.now()}_${Math.random()}`;
-            window.centralCubeOffsets[cubeKey] = {
-                planes: planes,
-                links: links,
-                colorOffset: colorOffset,
-                offset: offset
-            };
+            setInterval(() => {
+                planes.forEach((plane, i) => {
+                    const linkIdx = (offset + i) % links.length;
+                    const url = links[linkIdx];
+                    const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
+                    plane.userData.URL = url;
+                    updateImagePlane(plane, url, domain, colorOffset + linkIdx, true);
+                });
+                offset = (offset + 1) % links.length;
+            }, interval);
         }
 
         function createImagePlane(url, text, width, height, colorIdx, solid) {
@@ -2217,10 +2286,13 @@
             );
             plane.userData.URL = url;
             updateImagePlane(plane, url, text, colorIdx, solid);
-            gameCollections.clickableObjects.push(plane);
+            clickableObjects.push(plane);
             return plane;
         }
 
+        // Cache para texturas de logos
+        const logoTextureCache = new Map();
+        
         function getLogoTexture(domain) {
             const logoFileName = domainToLogoMap[domain];
             if (!logoFileName) {
@@ -2228,15 +2300,8 @@
             }
             
             // Verificar si ya está en cache
-            if (cacheSystem.logoTextureCache.has(domain)) {
-                const cachedTexture = cacheSystem.logoTextureCache.get(domain);
-                // Verificar que la textura tenga una imagen válida
-                if (cachedTexture && cachedTexture.image && cachedTexture.image.complete) {
-                    return cachedTexture;
-                } else {
-                    // Remover textura inválida del cache
-                    cacheSystem.logoTextureCache.delete(domain);
-                }
+            if (logoTextureCache.has(domain)) {
+                return logoTextureCache.get(domain);
             }
             
             try {
@@ -2246,10 +2311,6 @@
                     // onLoad callback
                     function(loadedTexture) {
                         console.log(`Logo cargado exitosamente: ${logoFileName}`);
-                        // Asegurar que la textura se marque para actualización solo cuando la imagen esté lista
-                        if (loadedTexture && loadedTexture.image && loadedTexture.image.complete) {
-                            loadedTexture.needsUpdate = true;
-                        }
                     },
                     // onProgress callback
                     function(xhr) {
@@ -2259,16 +2320,13 @@
                     function(error) {
                         console.error(`Error cargando logo ${logoFileName}:`, error);
                         // Remover del cache si falla
-                        cacheSystem.logoTextureCache.delete(domain);
+                        logoTextureCache.delete(domain);
                     }
                 );
                 
-                // Solo guardar en cache si la textura se creó correctamente
-                if (texture) {
-                    cacheSystem.logoTextureCache.set(domain, texture);
-                    return texture;
-                }
-                return null;
+                // Guardar en cache
+                logoTextureCache.set(domain, texture);
+                return texture;
             } catch (error) {
                 console.error(`Error creando textura para ${domain}:`, error);
                 return null;
@@ -2325,35 +2383,28 @@
                 
                 const logoTexture = getLogoTexture(domain);
                 
-                // Limpiar textura anterior de forma segura
                 if (plane.material.map) {
                     plane.material.map.dispose();
-                    plane.material.map = null;
                 }
                 
-                if (logoTexture && logoTexture.image && logoTexture.image.complete) {
+                if (logoTexture) {
                     plane.material.map = logoTexture;
-                    plane.material.needsUpdate = true;
                 } else {
-                    // Fallback a la textura generada si no hay logo o no está lista
+                    // Fallback a la textura generada si no hay logo
                     const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                    if (texture) {
-                        plane.material.map = texture;
-                        plane.material.needsUpdate = true;
-                    }
+            plane.material.map = texture;
                 }
+                
+            plane.material.needsUpdate = true;
             } catch (error) {
                 console.error('Error en updateImagePlane:', error);
                 // Fallback seguro
                 if (plane.material.map) {
                     plane.material.map.dispose();
-                    plane.material.map = null;
                 }
                 const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-                if (texture) {
-                    plane.material.map = texture;
-                    plane.material.needsUpdate = true;
-                }
+                plane.material.map = texture;
+                plane.material.needsUpdate = true;
             }
         }
 
@@ -2362,12 +2413,12 @@
             plane.material.transparent = true;
             
             // Agregar al sistema centralizado en lugar de usar setInterval
-            const signIndex = gameCollections.rotatingSigns.length;
-            gameCollections.rotatingSigns.push({
+            const signIndex = rotatingSigns.length;
+            rotatingSigns.push({
                 material: plane.material,
                 texts: texts
             });
-            gameCollections.rotatingSignTextIndexes[signIndex] = 0;
+            rotatingSignTextIndexes[signIndex] = 0;
             
             return plane;
         }
@@ -2431,11 +2482,11 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             // Agregar al sistema centralizado en lugar de usar setInterval
             planes.forEach(plane => {
-                gameCollections.digitalClocks.push({
+                digitalClocks.push({
                     material: plane.material
                 });
             });
@@ -2535,7 +2586,7 @@
                     console.log('Botón de habitación clickeado');
                     if (gameState.currentScene === 'mall') {
                         enterPersonalRoom();
-                    } else {
+            } else {
                         returnToMall();
                     }
                 });
@@ -2574,7 +2625,7 @@
                     if (chatOpen) {
                         chatPanel.style.display = 'none';
                         chatOpen = false;
-                    } else {
+            } else {
                         chatPanel.style.display = 'flex';
                         chatOpen = true;
                         chatInput.focus();
@@ -2752,7 +2803,7 @@
                 const button = document.getElementById(buttonId);
                 if (button) {
                     const setFlag = (value) => (e) => { 
-                        e.preventDefault(); 
+                    e.preventDefault();
                         flagSetter(value); 
                     };
                     button.addEventListener('touchstart', setFlag(true));
@@ -2777,7 +2828,7 @@
             
             // Procesar controles para ambas escenas
             const key = event.code.replace('Key', '');
-            if (key in inputState.keyboard) inputState.keyboard[key] = true;
+            if (key in keys) keys[key] = true;
             if (event.code === 'ArrowUp') inputState.keyboard.W = true;
             if (event.code === 'ArrowDown') inputState.keyboard.S = true;
             if (event.code === 'ArrowLeft') inputState.keyboard.A = true;
@@ -2829,7 +2880,7 @@
 
         function onKeyUp(event) {
             const key = event.code.replace('Key', '');
-            if (key in inputState.keyboard) inputState.keyboard[key] = false;
+            if (key in keys) keys[key] = false;
             if (event.code === 'ArrowUp') inputState.keyboard.W = false;
             if (event.code === 'ArrowDown') inputState.keyboard.S = false;
             if (event.code === 'ArrowLeft') inputState.keyboard.A = false;
@@ -2851,10 +2902,10 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             
             // Actualizar cámara y renderer de la habitación personal si existe
-            if (renderState.personalRoom.camera && renderState.personalRoom.renderer) {
-                renderState.personalRoom.camera.aspect = window.innerWidth / window.innerHeight;
-                renderState.personalRoom.camera.updateProjectionMatrix();
-                renderState.personalRoom.renderer.setSize(window.innerWidth, window.innerHeight);
+            if (personalRoomCamera && personalRoomRenderer) {
+                personalRoomCamera.aspect = window.innerWidth / window.innerHeight;
+                personalRoomCamera.updateProjectionMatrix();
+                personalRoomRenderer.setSize(window.innerWidth, window.innerHeight);
             }
         }
         
@@ -2899,7 +2950,7 @@
                 return;
             }
             
-            if (uiState.customization.panelOpen && !customizationPanel.contains(target)) {
+            if (customizationPanelOpen && !customizationPanel.contains(target)) {
                 closeCustomizationPanel();
                 return;
             }
@@ -2936,12 +2987,12 @@
             
             // Si estamos en modo de edición de muebles, usar la cámara de la habitación
             if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode) {
-                raycaster.setFromCamera(mouse, renderState.personalRoom.camera);
-                const furnitureIntersects = raycaster.intersectObjects(gameState.furniture.objects.map(f => f.mesh));
+                raycaster.setFromCamera(mouse, personalRoomCamera);
+                const furnitureIntersects = raycaster.intersectObjects(furnitureObjects.map(f => f.mesh));
                 
                 if (furnitureIntersects.length > 0) {
                     const clickedFurniture = furnitureIntersects[0].object;
-                    const furniture = gameState.furniture.objects.find(f => f.mesh === clickedFurniture);
+                    const furniture = furnitureObjects.find(f => f.mesh === clickedFurniture);
                     if (furniture) {
                         selectFurniture(furniture.id);
                         return;
@@ -2949,20 +3000,20 @@
                 }
             } else {
                 // Comportamiento normal del mall
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(gameCollections.clickableObjects);
-                if (intersects.length > 0) {
-                    const clickedObject = intersects[0].object;
-                    
-                    // Verificar si es un clic en el nombre del avatar para personalización
-                    if (clickedObject.userData && clickedObject.userData.type === 'customization') {
-                        openCustomizationPanel();
-                        return;
-                    }
-                    
-                    // Verificar si es un clic en una tienda
-                    if (clickedObject.userData.URL) {
-                        window.open(clickedObject.userData.URL, '_blank');
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(clickableObjects);
+            if (intersects.length > 0) {
+                const clickedObject = intersects[0].object;
+                
+                // Verificar si es un clic en el nombre del avatar para personalización
+                if (clickedObject.userData && clickedObject.userData.type === 'customization') {
+                    openCustomizationPanel();
+                    return;
+                }
+                
+                // Verificar si es un clic en una tienda
+                if (clickedObject.userData.URL) {
+                    window.open(clickedObject.userData.URL, '_blank');
                     }
                 }
             }
@@ -3013,7 +3064,7 @@
                 let collision = false;
                 
                 // Optimización: solo verificar colisiones cercanas
-                const nearbyCollisions = gameCollections.collisionObjects.filter(wallBox => {
+                const nearbyCollisions = collisionObjects.filter(wallBox => {
                     const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
                     return distance < 20; // Solo verificar objetos dentro de 20 unidades
                 });
@@ -3044,12 +3095,12 @@
         function toggleRoomNavigation() {
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
             if (roomNavigationPanel) {
-                if (uiState.room.navigationPanelOpen) {
+                if (roomNavigationPanelOpen) {
                     roomNavigationPanel.style.display = 'none';
-                    uiState.room.navigationPanelOpen = false;
+                    roomNavigationPanelOpen = false;
                 } else {
                     roomNavigationPanel.style.display = 'flex';
-                    uiState.room.navigationPanelOpen = true;
+                    roomNavigationPanelOpen = true;
                 }
             }
         }
@@ -3058,7 +3109,7 @@
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
             if (roomNavigationPanel) {
                 roomNavigationPanel.style.display = 'none';
-                uiState.room.navigationPanelOpen = false;
+                roomNavigationPanelOpen = false;
             }
         }
         
@@ -3080,20 +3131,11 @@
             if (gameState.currentScene === 'mall') return;
             
             gameState.currentScene = 'mall';
-            
             // Limpiar escena de habitación personal
-            if (renderState.personalRoom.renderer) {
-                document.body.removeChild(renderState.personalRoom.renderer.domElement);
-                renderState.personalRoom.renderer.dispose();
-                renderState.personalRoom.renderer = null;
+            if (personalRoomRenderer) {
+                document.body.removeChild(personalRoomRenderer.domElement);
+                personalRoomRenderer.dispose();
             }
-            
-            // Limpiar escena de habitación personal
-            if (renderState.personalRoom.scene) {
-                renderState.personalRoom.scene.clear();
-                renderState.personalRoom.scene = null;
-            }
-            
             // Mostrar escena del mall
             renderer.domElement.style.display = 'block';
             
@@ -3109,36 +3151,46 @@
             renderer.domElement.style.display = 'none';
             
             // Crear nueva escena para la habitación personal
-            renderState.personalRoom.scene = new THREE.Scene();
-            renderState.personalRoom.scene.background = new THREE.Color(0x2C3E50); // Azul oscuro
+            personalRoomScene = new THREE.Scene();
+            personalRoomScene.background = new THREE.Color(0x2C3E50); // Azul oscuro
             
             // Crear cámara para la habitación
-            renderState.personalRoom.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderState.personalRoom.camera.position.set(0, CAMERA_HEIGHT, 3); // Posición inicial en la habitación
-            renderState.personalRoom.camera.lookAt(0, CAMERA_HEIGHT, 0);
+            personalRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            personalRoomCamera.position.set(0, CAMERA_HEIGHT, 3); // Posición inicial en la habitación
+            personalRoomCamera.lookAt(0, CAMERA_HEIGHT, 0);
             
             // Configurar posición y rotación objetivo para movimiento suave
-            renderState.personalRoom.targetPosition.copy(renderState.personalRoom.camera.position);
-            renderState.personalRoom.targetRotation = renderState.personalRoom.camera.rotation.y;
+            personalRoomTargetPosition = personalRoomCamera.position.clone();
+            personalRoomTargetRotationY = personalRoomCamera.rotation.y;
             
             // Crear renderer para la habitación
-            renderState.personalRoom.renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderState.personalRoom.renderer.setSize(window.innerWidth, window.innerHeight);
-            renderState.personalRoom.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderState.personalRoom.renderer.shadowMap.enabled = false;
-            renderState.personalRoom.renderer.domElement.style.zIndex = '1';
-            document.body.appendChild(renderState.personalRoom.renderer.domElement);
+            personalRoomRenderer = new THREE.WebGLRenderer({ antialias: true });
+            personalRoomRenderer.setSize(window.innerWidth, window.innerHeight);
+            personalRoomRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            personalRoomRenderer.shadowMap.enabled = false;
+            personalRoomRenderer.domElement.style.zIndex = '1';
+            document.body.appendChild(personalRoomRenderer.domElement);
             
             // Crear iluminación para la habitación
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            renderState.personalRoom.scene.add(ambientLight);
+            personalRoomScene.add(ambientLight);
             
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(5, 10, 5);
-            renderState.personalRoom.scene.add(directionalLight);
+            personalRoomScene.add(directionalLight);
             
             // Crear habitación
             createPersonalRoom();
+            // Crear y actualizar cielo visible desde las ventanas
+            // Eliminar la línea:
+            // createPersonalRoomSky();
+            // Y también:
+            // if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
+            // personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
+            // updatePersonalRoomSky();
+            
+            // Iniciar animación de la habitación
+            animatePersonalRoom();
         }
         
         function createPersonalRoom() {
@@ -3157,37 +3209,37 @@
             // Pared trasera
             const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
-            renderState.personalRoom.scene.add(backWall);
+            personalRoomScene.add(backWall);
             // Pared izquierda
             const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
             leftWall.position.set(-roomWidth/2, roomHeight/2, 0);
             leftWall.rotation.y = Math.PI / 2;
-            renderState.personalRoom.scene.add(leftWall);
+            personalRoomScene.add(leftWall);
             // Pared derecha
             const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
-            renderState.personalRoom.scene.add(rightWall);
+            personalRoomScene.add(rightWall);
             // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
-            renderState.personalRoom.scene.add(frontWallLeft);
+            personalRoomScene.add(frontWallLeft);
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
-            renderState.personalRoom.scene.add(frontWallRight);
+            personalRoomScene.add(frontWallRight);
             // Puerta mejorada (paneles y manija)
             const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
             const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
             const door = new THREE.Mesh(doorGeometry, doorMaterial);
             door.position.set(0, 1.1, roomDepth/2);
-            renderState.personalRoom.scene.add(door);
+            personalRoomScene.add(door);
             // Paneles de la puerta (relieve)
             const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
             for (let i = 0; i < 3; i++) {
                 const panelGeo = new THREE.BoxGeometry(0.7, 0.4, 0.04);
                 const panel = new THREE.Mesh(panelGeo, panelMat);
                 panel.position.set(0, 1.7 - i * 0.7, roomDepth/2 + 0.055);
-                renderState.personalRoom.scene.add(panel);
+                personalRoomScene.add(panel);
             }
             // Manija de la puerta
             const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
@@ -3195,7 +3247,7 @@
             const handle = new THREE.Mesh(handleGeo, handleMat);
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
-            renderState.personalRoom.scene.add(handle);
+            personalRoomScene.add(handle);
             // --- Ventanas grandes mejoradas ---
             const skyColor = getSkyColorByHour();
             // Ventana trasera grande (con bisel y reflejo)
@@ -3204,60 +3256,62 @@
             const windowMaterial = new THREE.MeshPhysicalMaterial({ color: skyColor, transparent: true, opacity: 0.82, roughness: 0.15, metalness: 0.2, reflectivity: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
             const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
             backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
-            renderState.personalRoom.scene.add(backWindow);
+            personalRoomScene.add(backWindow);
             // Bisel y marco ventana trasera
             const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
             const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
             const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             backFrame.position.copy(backWindow.position);
-            renderState.personalRoom.scene.add(backFrame);
+            personalRoomScene.add(backFrame);
             // Cruces del marco (vertical y horizontal)
             const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
             const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             crossV.position.copy(backWindow.position);
-            renderState.personalRoom.scene.add(crossV);
+            personalRoomScene.add(crossV);
             const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             crossH.position.copy(backWindow.position);
-            renderState.personalRoom.scene.add(crossH);
+            personalRoomScene.add(crossH);
             // Ventana izquierda grande
             const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
             leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
             leftWindow.rotation.y = Math.PI / 2;
-            renderState.personalRoom.scene.add(leftWindow);
+            personalRoomScene.add(leftWindow);
             const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             leftFrame.position.copy(leftWindow.position);
             leftFrame.rotation.y = Math.PI / 2;
-            renderState.personalRoom.scene.add(leftFrame);
+            personalRoomScene.add(leftFrame);
             // Cruces marco izquierdo
             const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             leftCrossV.position.copy(leftWindow.position);
             leftCrossV.rotation.y = Math.PI / 2;
-            renderState.personalRoom.scene.add(leftCrossV);
+            personalRoomScene.add(leftCrossV);
             const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             leftCrossH.position.copy(leftWindow.position);
             leftCrossH.rotation.y = Math.PI / 2;
-            renderState.personalRoom.scene.add(leftCrossH);
+            personalRoomScene.add(leftCrossH);
             // Ventana derecha grande
             const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
             rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
             rightWindow.rotation.y = -Math.PI / 2;
-            renderState.personalRoom.scene.add(rightWindow);
+            personalRoomScene.add(rightWindow);
             const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             rightFrame.position.copy(rightWindow.position);
             rightFrame.rotation.y = -Math.PI / 2;
-            renderState.personalRoom.scene.add(rightFrame);
+            personalRoomScene.add(rightFrame);
             // Cruces marco derecho
             const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             rightCrossV.position.copy(rightWindow.position);
             rightCrossV.rotation.y = -Math.PI / 2;
-            renderState.personalRoom.scene.add(rightCrossV);
+            personalRoomScene.add(rightCrossV);
             const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             rightCrossH.position.copy(rightWindow.position);
             rightCrossH.rotation.y = -Math.PI / 2;
-            renderState.personalRoom.scene.add(rightCrossH);
+            personalRoomScene.add(rightCrossH);
             // Actualizar color del cielo cada minuto
-            // El setInterval se reemplaza con el sistema de timing centralizado
-            // La actualización se maneja en updatePeriodicSystems()
+            setInterval(() => {
+                const newSky = getSkyColorByHour();
+                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
+            }, 60000);
             // Muebles básicos
             createRoomFurniture(roomWidth, roomHeight, roomDepth);
             // Cargar posiciones guardadas de muebles
@@ -3309,14 +3363,14 @@
             bedGroup.add(pillow2);
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(bedGroup);
+            personalRoomScene.add(bedGroup);
             
             // Mesa de noche izquierda
             const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
             const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
             const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
             nightstandLeft.position.set(-5.5, 0.35, -3);
-            renderState.personalRoom.scene.add(nightstandLeft);
+            personalRoomScene.add(nightstandLeft);
             
             // Registrar mesa de noche izquierda en el array de muebles
             furnitureObjects.push({
@@ -3329,7 +3383,7 @@
             // Mesa de noche derecha
             const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
             nightstandRight.position.set(-2.5, 0.35, -3);
-            renderState.personalRoom.scene.add(nightstandRight);
+            personalRoomScene.add(nightstandRight);
             
             // Registrar mesa de noche derecha en el array de muebles
             furnitureObjects.push({
@@ -3371,7 +3425,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(lampGroup);
+            personalRoomScene.add(lampGroup);
             
             // ===== ZONA DE TRABAJO (Lado derecho) =====
             
@@ -3406,7 +3460,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(deskGroup);
+            personalRoomScene.add(deskGroup);
             
             // Silla ergonómica del escritorio - Crear grupo para todas las partes
             const chairGroup = new THREE.Group();
@@ -3446,7 +3500,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(chairGroup);
+            personalRoomScene.add(chairGroup);
             
             // Computadora completa - Crear grupo para todas las partes
             const computerGroup = new THREE.Group();
@@ -3495,7 +3549,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(computerGroup);
+            personalRoomScene.add(computerGroup);
             
             // ===== ZONA DE ALMACENAMIENTO =====
             
@@ -3538,7 +3592,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(shelfGroup);
+            personalRoomScene.add(shelfGroup);
             
             // ===== ZONA DE RELAX (Centro) =====
             
@@ -3571,7 +3625,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(sofaGroup);
+            personalRoomScene.add(sofaGroup);
             
             // Mesa de centro - Crear grupo para todas las partes
             const coffeeTableGroup = new THREE.Group();
@@ -3603,7 +3657,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            renderState.personalRoom.scene.add(coffeeTableGroup);
+            personalRoomScene.add(coffeeTableGroup);
             
             // ===== ELEMENTOS DECORATIVOS =====
             
@@ -3612,35 +3666,35 @@
             const windowMaterial = getCachedMaterial(0x87CEEB, 0.3, 0.8);
             const window = new THREE.Mesh(windowGeometry, windowMaterial);
             window.position.set(0, 1.75, roomDepth/2 - 0.1);
-            renderState.personalRoom.scene.add(window);
+            personalRoomScene.add(window);
             
             // Marco de la ventana
             const windowFrameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
             const windowFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
             const windowFrame = new THREE.Mesh(windowFrameGeometry, windowFrameMaterial);
             windowFrame.position.set(0, 1.75, roomDepth/2 - 0.05);
-            renderState.personalRoom.scene.add(windowFrame);
+            personalRoomScene.add(windowFrame);
             
             // Alfombra
             const carpetGeometry = new THREE.BoxGeometry(8, 0.05, 6);
             const carpetMaterial = getCachedMaterial(0xE67E22, 0.8, 0.1);
             const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
             carpet.position.set(0, 0.025, 0);
-            renderState.personalRoom.scene.add(carpet);
+            personalRoomScene.add(carpet);
             
             // Lámpara de techo
             const ceilingLampGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 8);
             const ceilingLampMaterial = getCachedMaterial(0xF1C40F, 0.8, 0.2);
             const ceilingLamp = new THREE.Mesh(ceilingLampGeometry, ceilingLampMaterial);
             ceilingLamp.position.set(0, roomHeight - 0.1, 0);
-            renderState.personalRoom.scene.add(ceilingLamp);
+            personalRoomScene.add(ceilingLamp);
             
             // Cable de la lámpara
             const lampCableGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6);
             const lampCableMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
             const lampCable = new THREE.Mesh(lampCableGeometry, lampCableMaterial);
             lampCable.position.set(0, roomHeight - 0.35, 0);
-            renderState.personalRoom.scene.add(lampCable);
+            personalRoomScene.add(lampCable);
         }
         
         function updatePersonalRoomMovement() {
@@ -3650,33 +3704,33 @@
             }
             
             // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (inputState.keyboard.ArrowLeft || inputState.mobile.left) renderState.personalRoom.targetRotation += ROTATE_SPEED;
-            if (inputState.keyboard.ArrowRight || inputState.mobile.right) renderState.personalRoom.targetRotation -= ROTATE_SPEED;
+            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY += ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY -= ROTATE_SPEED;
 
             // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
-            renderState.personalRoom.camera.getWorldDirection(direction);
+            personalRoomCamera.getWorldDirection(direction);
             direction.y = 0;
             direction.normalize();
             
             const velocity = new THREE.Vector3();
             
             // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (inputState.keyboard.ArrowUp || inputState.mobile.forward) velocity.add(direction);
-            if (inputState.keyboard.ArrowDown || inputState.mobile.backward) velocity.sub(direction);
+            if (keys.ArrowUp || mobileForward) velocity.add(direction);
+            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
             
             // Movimiento lateral con A y D (teclas)
             const rightDirection = new THREE.Vector3();
-            rightDirection.setFromMatrixColumn(renderState.personalRoom.camera.matrix, 0);
+            rightDirection.setFromMatrixColumn(personalRoomCamera.matrix, 0);
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (inputState.keyboard.A) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (inputState.keyboard.D) velocity.add(rightDirection); // Moverse hacia la derecha
+            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
+            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
-                const newPosition = renderState.personalRoom.targetPosition.clone().add(velocity);
+                const newPosition = personalRoomTargetPosition.clone().add(velocity);
                 
                 // --- Límites de la habitación (12x12 metros) ---
                 const roomBounds = {
@@ -3690,14 +3744,25 @@
                 newPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newPosition.x));
                 newPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newPosition.z));
                 
-                renderState.personalRoom.targetPosition.copy(newPosition);
+                personalRoomTargetPosition.copy(newPosition);
             }
 
             // --- Mantener altura fija en la habitación ---
-            renderState.personalRoom.targetPosition.y = CAMERA_HEIGHT;
+            personalRoomTargetPosition.y = CAMERA_HEIGHT;
         }
         
-
+        function animatePersonalRoom() {
+            requestAnimationFrame(animatePersonalRoom);
+            
+            // Actualizar movimiento en la habitación personal
+            updatePersonalRoomMovement();
+            
+            // Aplicar movimiento suave a la cámara
+            personalRoomCamera.position.lerp(personalRoomTargetPosition, 0.2);
+            personalRoomCamera.rotation.y = lerpAngle(personalRoomCamera.rotation.y, personalRoomTargetRotationY, 0.2);
+            
+            personalRoomRenderer.render(personalRoomScene, personalRoomCamera);
+        }
         
         function customizeRoom() {
             // Función placeholder para personalización de habitación
@@ -3713,7 +3778,7 @@
             
             gameState.furniture.editMode = !gameState.furniture.editMode;
             
-            if (gameState.furniture.editMode) {
+            if (furnitureEditMode) {
                 // Limpiar todos los resaltados al entrar en modo de edición
                 clearAllFurnitureHighlights();
                 openFurnitureEditPanel();
@@ -3728,7 +3793,7 @@
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel) {
                 furnitureEditPanel.style.display = 'flex';
-                uiState.furniture.editPanelOpen = true;
+                furnitureEditPanelOpen = true;
                 updateFurnitureList();
             }
         }
@@ -3737,9 +3802,9 @@
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel) {
                 furnitureEditPanel.style.display = 'none';
-                uiState.furniture.editPanelOpen = false;
+                furnitureEditPanelOpen = false;
             }
-            gameState.furniture.editMode = false;
+            furnitureEditMode = false;
             // Limpiar todos los resaltados al cerrar el panel
             clearAllFurnitureHighlights();
             deselectFurniture();
@@ -3890,7 +3955,7 @@
             
             // Mostrar la ventana de la habitación cuando se deselecciona un mueble
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
-            if (roomNavigationPanel && uiState.room.navigationPanelOpen) {
+            if (roomNavigationPanel && roomNavigationPanelOpen) {
                 roomNavigationPanel.style.display = 'flex';
             }
         }
@@ -3970,7 +4035,7 @@
                 
                 // Mostrar la ventana de la habitación después de guardar
                 const roomNavigationPanel = document.getElementById('room-navigation-panel');
-                if (roomNavigationPanel && uiState.room.navigationPanelOpen) {
+                if (roomNavigationPanel && roomNavigationPanelOpen) {
                     roomNavigationPanel.style.display = 'flex';
                 }
             }
@@ -3999,116 +4064,71 @@
             requestAnimationFrame(animate);
             
             // Obtener delta time del reloj para animaciones
-            const deltaTime = animationState.clock.getDelta();
+            const deltaTime = clock.getDelta();
             
             // Control de FPS
-            const frameDeltaTime = currentTime - animationState.lastTime;
-            if (frameDeltaTime < animationState.frameInterval) {
+            const frameDeltaTime = currentTime - lastTime;
+            if (frameDeltaTime < frameInterval) {
                 return;
             }
             
-            animationState.lastTime = currentTime - (frameDeltaTime % animationState.frameInterval);
-            animationState.frameCount++;
+            lastTime = currentTime - (frameDeltaTime % frameInterval);
+            frameCount++;
             
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
             
-            // Renderizar la escena activa
+            // Solo actualizar y renderizar si estamos en la escena del mall
             if (gameState.currentScene === 'mall') {
-                updateMovement();
-                updateAvatarPositions(); // Actualizar posiciones de avatares
-                
+            updateMovement();
+            updateAvatarPositions(); // Actualizar posiciones de avatares
+            
                 // Actualizar animaciones de avatares con el delta time correcto
                 updateAvatarAnimations(deltaTime);
                 
                 renderer.render(scene, camera);
-            } else if (gameState.currentScene === 'personal-room') {
-                // Actualizar movimiento en la habitación personal
-                updatePersonalRoomMovement();
-                
-                // Aplicar movimiento suave a la cámara
-                renderState.personalRoom.camera.position.lerp(renderState.personalRoom.targetPosition, 0.2);
-                renderState.personalRoom.camera.rotation.y = lerpAngle(renderState.personalRoom.camera.rotation.y, renderState.personalRoom.targetRotation, 0.2);
-                
-                renderState.personalRoom.renderer.render(renderState.personalRoom.scene, renderState.personalRoom.camera);
             }
         }
         
         // Función centralizada para manejar todas las actualizaciones periódicas
         function updatePeriodicSystems(currentTime) {
             // Actualizar el color del cielo
-            if (timingSystem.shouldUpdate(timingState.lastSkyUpdate, timingState.intervals.SKY)) {
+            if (timingSystem.shouldUpdate(lastSkyUpdate, UPDATE_INTERVALS.SKY)) {
                 scene.background = getSkyColor();
                 timingSystem.updateLastTime('SKY');
             }
             
             // Enviar posición del usuario
-            if (timingSystem.shouldUpdate(timingState.lastPositionUpdate, timingState.intervals.POSITION)) {
+            if (timingSystem.shouldUpdate(lastPositionUpdate, UPDATE_INTERVALS.POSITION)) {
                 sendUserPosition();
                 timingSystem.updateLastTime('POSITION');
             }
             
             // Actualizar carteles rotativos
-            if (timingSystem.shouldUpdate(timingState.lastRotatingSignUpdate, timingState.intervals.ROTATING_SIGN)) {
+            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
                 updateRotatingSigns();
                 timingSystem.updateLastTime('ROTATING_SIGN');
             }
             
             // Actualizar relojes digitales
-            if (timingSystem.shouldUpdate(timingState.lastClockUpdate, timingState.intervals.CLOCK)) {
+            if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
                 updateDigitalClocks();
                 timingSystem.updateLastTime('CLOCK');
             }
-            
-            // Actualizar carteles centrales (reemplaza setInterval en createCentralCubeScreens)
-            if (timingSystem.shouldUpdate(timingState.lastCentralCubeUpdate, timingState.intervals.CENTRAL_CUBE)) {
-                updateCentralCubeScreens();
-                timingSystem.updateLastTime('CENTRAL_CUBE');
-            }
-            
-            // Actualizar cielo de habitación personal (reemplaza setInterval en createPersonalRoom)
-            if (timingSystem.shouldUpdate(timingState.lastPersonalRoomSkyUpdate, timingState.intervals.PERSONAL_ROOM_SKY)) {
-                updatePersonalRoomSky();
-                timingSystem.updateLastTime('PERSONAL_ROOM_SKY');
-            }
-            
-            // Limpieza de Firebase (reemplaza setInterval en firebase-config.js)
-            if (timingSystem.shouldUpdate(timingState.lastFirebaseCleanup, timingState.intervals.FIREBASE_CLEANUP)) {
-                if (typeof window.cleanupOldMessages === 'function') {
-                    window.cleanupOldMessages();
-                }
-                timingSystem.updateLastTime('FIREBASE_CLEANUP');
-            }
-            
-            // Limpieza de usuarios desconectados de Firebase
-            if (timingSystem.shouldUpdate(timingState.lastFirebaseUserCleanup, timingState.intervals.FIREBASE_USER_CLEANUP)) {
-                if (typeof window.cleanupDisconnectedUsers === 'function') {
-                    window.cleanupDisconnectedUsers();
-                }
-                timingSystem.updateLastTime('FIREBASE_USER_CLEANUP');
-            }
-            
-            // Actualizar timestamp de Firebase
-            if (timingSystem.shouldUpdate(timingState.lastFirebaseTimestampUpdate, timingState.intervals.FIREBASE_TIMESTAMP)) {
-                if (typeof window.updateFirebaseTimestamp === 'function') {
-                    window.updateFirebaseTimestamp();
-                }
-                timingSystem.updateLastTime('FIREBASE_TIMESTAMP');
-            }
         }
         
-        // Variables globales para carteles rotativos y relojes (ahora en gameCollections)
-        // let rotatingSigns = [];
-        // let digitalClocks = [];
-        // let rotatingSignTextIndexes = {};
+        // Variables globales para carteles rotativos y relojes
+        let rotatingSigns = [];
+        let digitalClocks = [];
+        let rotatingSignTextIndexes = {};
         
         // Función para actualizar carteles rotativos
         function updateRotatingSigns() {
-            gameCollections.rotatingSigns.forEach((sign, index) => {
+            rotatingSigns.forEach((sign, index) => {
                 if (sign.texts && sign.texts.length > 0) {
-                    const textIndex = gameCollections.rotatingSignTextIndexes[index] || 0;
+                    const textIndex = rotatingSignTextIndexes[index] || 0;
                     const nextIndex = (textIndex + 1) % sign.texts.length;
-                    gameCollections.rotatingSignTextIndexes[index] = nextIndex;
+                    rotatingSignTextIndexes[index] = nextIndex;
                     updateRotatingSign(sign.material, sign.texts[nextIndex]);
                 }
             });
@@ -4116,67 +4136,39 @@
         
         // Función para actualizar relojes digitales
         function updateDigitalClocks() {
-            gameCollections.digitalClocks.forEach(clock => {
+            digitalClocks.forEach(clock => {
                 updateClockPlane(clock.material);
             });
         }
         
-        // Función para actualizar carteles centrales (reemplaza setInterval)
-        function updateCentralCubeScreens() {
-            // Actualizar todos los carteles centrales con el siguiente offset
-            if (typeof window.centralCubeOffsets !== 'undefined') {
-                Object.keys(window.centralCubeOffsets).forEach(key => {
-                    const data = window.centralCubeOffsets[key];
-                    if (data.planes && data.links && data.colorOffset) {
-                        data.offset = (data.offset + 1) % data.links.length;
-                        data.planes.forEach((plane, i) => {
-                            const linkIdx = (data.offset + i) % data.links.length;
-                            const url = data.links[linkIdx];
-                            const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
-                            plane.userData.URL = url;
-                            updateImagePlane(plane, url, domain, data.colorOffset + linkIdx, true);
-                        });
-                    }
-                });
-            }
-        }
-        
-        // Función para actualizar cielo de habitación personal (reemplaza setInterval)
-        function updatePersonalRoomSky() {
-            if (typeof backWindow !== 'undefined' && typeof leftWindow !== 'undefined' && typeof rightWindow !== 'undefined') {
-                const newSky = getSkyColorByHour();
-                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
-            }
-        }
-        
         // Función para limpiar recursos
         function cleanup() {
-            // Limpiar cache de texturas de logos
-            cacheSystem.logoTextureCache.forEach(texture => {
+            // Limpiar cache de texturas
+            logoTextureCache.forEach(texture => {
                 if (texture && texture.dispose) {
                     texture.dispose();
                 }
             });
-            cacheSystem.logoTextureCache.clear();
+            logoTextureCache.clear();
             
             // Limpiar cache de materiales
-            cacheSystem.materialCache.forEach(material => {
+            materialCache.forEach(material => {
                 if (material && material.dispose) {
                     material.dispose();
                 }
             });
-            cacheSystem.materialCache.clear();
+            materialCache.clear();
             
             // Limpiar cache de texturas generadas
-            cacheSystem.textureCache.forEach(texture => {
+            textureCache.forEach(texture => {
                 if (texture && texture.dispose) {
                     texture.dispose();
                 }
             });
-            cacheSystem.textureCache.clear();
+            textureCache.clear();
             
             // Limpiar mixers de animación
-            gameCollections.userAvatars.forEach((avatar, alias) => {
+            userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
@@ -4184,9 +4176,9 @@
             });
             
             // Limpiar arrays del sistema centralizado
-            gameCollections.rotatingSigns = [];
-            gameCollections.digitalClocks = [];
-            gameCollections.rotatingSignTextIndexes = {};
+            rotatingSigns = [];
+            digitalClocks = [];
+            rotatingSignTextIndexes = {};
         }
         
         // Limpiar al cerrar la página
@@ -4696,7 +4688,7 @@
     });
 }
 
-        function updateSelectedSkin() {
+function updateSelectedSkin() {
     const skinOptions = document.querySelectorAll('.skin-option');
     skinOptions.forEach(btn => {
         if (btn.getAttribute('data-skin') === avatarState.currentCustomization.skin) {
@@ -4752,18 +4744,18 @@
         selectedOption.classList.add('selected');
     }
 
-                // Actualizar color actual
-            switch (type) {
-                case 'shirt':
+    // Actualizar color actual
+    switch (type) {
+        case 'shirt':
                     avatarState.currentCustomization.shirtColor = color;
-                    break;
-                case 'pants':
+            break;
+        case 'pants':
                     avatarState.currentCustomization.pantsColor = color;
-                    break;
-                case 'shoes':
+            break;
+        case 'shoes':
                     avatarState.currentCustomization.shoesColor = color;
-                    break;
-            }
+            break;
+    }
             
             // Validar el alias
             if (newAlias.length === 0) {
@@ -4796,7 +4788,7 @@
         }
 
         // --- FUNCIONES UNIFICADAS DE PERSONALIZACIÓN ---
-        
+
         function loadCustomization() {
             const saved = localStorage.getItem('avatarCustomization');
             if (saved) {
@@ -4869,24 +4861,16 @@
             if (alias === userAlias) {
                 return;
             }
-            
-            let avatar = gameCollections.userAvatars.get(alias);
+            let avatar = userAvatars.get(alias);
             if (!avatar) {
-                // Crear avatar con datos de personalización si están disponibles
+                // Solo pasar skin si existe
                 let custom = {};
-                if (shirtColor !== undefined) custom.shirtColor = shirtColor;
-                if (pantsColor !== undefined) custom.pantsColor = pantsColor;
-                if (shoesColor !== undefined) custom.shoesColor = shoesColor;
-                
-                // Usar skin por defecto del usuario actual si está disponible
-                if (typeof avatarState !== 'undefined' && avatarState.currentCustomization && avatarState.currentCustomization.skin) {
-                    custom.skin = avatarState.currentCustomization.skin;
-                }
-                
+                if (typeof skin !== 'undefined') custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
-                avatar = gameCollections.userAvatars.get(alias);
-            } else {
-                // Si el avatar ya existe, solo actualizar su posición y rotación
+                avatar = userAvatars.get(alias);
+            }
+            if (avatar) {
+                // Actualización de posición y rotación en tiempo real
                 const floorStep = HALL_HEIGHT + 1;
                 const targetY = floor * floorStep;
                 avatar.targetPosition.set(position.x, targetY, position.z);
@@ -5005,39 +4989,21 @@
         // Los listeners específicos (child_added, child_changed, child_removed) están configurados allí
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
-        function removeUserAvatar(alias) {
-            const avatar = gameCollections.userAvatars.get(alias);
+function removeUserAvatar(alias) {
+    const avatar = userAvatars.get(alias);
             if (avatar) {
-                console.log(`[${alias}] Eliminando avatar...`);
-                
-                // Remover el grupo de la escena
                 if (avatar.group) {
-                    scene.remove(avatar.group);
-                    
-                    // Limpiar geometría y materiales si es un avatar de respaldo
-                    if (avatar.isFallback && avatar.group.geometry) {
-                        avatar.group.geometry.dispose();
-                        if (avatar.group.material) {
-                            avatar.group.material.dispose();
-                        }
-                    }
+        scene.remove(avatar.group);
                 }
-                
-                // Limpiar mixer de animación si existe
+                // Limpiar mixer de animación
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
-                    if (avatar.group) {
-                        avatar.mixer.uncacheRoot(avatar.group);
-                    }
+                    avatar.mixer.uncacheRoot(avatar.group);
                 }
-                
-                console.log(`[${alias}] Avatar eliminado`);
-            }
-            
-            // Limpiar de las colecciones
-            gameCollections.userAvatars.delete(alias);
-            pendingAvatarLoads.delete(alias);
-        }
+    }
+    userAvatars.delete(alias);
+    pendingAvatarLoads.delete(alias);
+}
         
         // Exponer función para uso en firebase-config.js
         window.removeUserAvatar = removeUserAvatar;
@@ -5050,39 +5016,26 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
-    if (pendingAvatarLoads.has(alias)) {
-        console.log(`[${alias}] Carga ya en progreso, saltando...`);
-        return;
-    }
+    if (pendingAvatarLoads.has(alias)) return;
     
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (gameCollections.userAvatars.has(alias)) {
-        console.log(`[${alias}] Avatar ya existe, saltando...`);
-        return;
-    }
+    if (userAvatars.has(alias)) return;
     
     pendingAvatarLoads.add(alias);
     
     const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
     
-    // Elegir el skin correcto con fallback robusto
-    let skinName = 'humanMaleA'; // Valor por defecto
-    if (custom && custom.skin) {
-        skinName = custom.skin;
-    } else if (typeof avatarState !== 'undefined' && avatarState.currentCustomization && avatarState.currentCustomization.skin) {
-        skinName = avatarState.currentCustomization.skin;
-    }
-    
+    // Elegir el skin correcto
+    let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
     const skinFileMap = {
         'humanMaleA': 'humanMaleA.png',
         'humanFemaleA': 'humanFemaleA.png',
         'zombieMaleA': 'zombieMaleA.png',
         'zombieFemaleA': 'zombieFemaleA.png'
     };
-    
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     
     const fbxLoader = new THREE.FBXLoader();
@@ -5092,167 +5045,94 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     const floorStep = HALL_HEIGHT + 1;
     const correctY = floor * floorStep;
     
-    console.log(`[${alias}] Iniciando carga de recursos:`, {
-        model: modelPath,
-        texture: texturePath,
-        skin: skinName
-    });
+    // Usaremos Promises para manejar las cargas asíncronas de forma limpia
+    const modelPromise = new Promise(resolve => fbxLoader.load(modelPath, resolve));
+    const texturePromise = new Promise(resolve => textureLoader.load(texturePath, resolve));
+    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve));
+    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve));
     
-    // Cargar recursos con manejo de errores robusto
-    const loadModel = () => new Promise((resolve, reject) => {
-        fbxLoader.load(modelPath, resolve, undefined, reject);
-    });
-    
-    const loadTexture = () => new Promise((resolve, reject) => {
-        textureLoader.load(texturePath, resolve, undefined, reject);
-    });
-    
-    const loadIdleAnim = () => new Promise((resolve, reject) => {
-        fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve, undefined, reject);
-    });
-    
-    const loadRunAnim = () => new Promise((resolve, reject) => {
-        fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve, undefined, reject);
-    });
-    
-    // Cargar todos los recursos en paralelo
-    Promise.all([
-        loadModel(),
-        loadTexture(),
-        loadIdleAnim(),
-        loadRunAnim()
-    ]).then(([avatar, texture, idleAnimation, runAnimation]) => {
-        
-        pendingAvatarLoads.delete(alias);
-        
-        // Verificar que el avatar no fue eliminado durante la carga
-        if (gameCollections.userAvatars.has(alias)) {
-            console.log(`[${alias}] Avatar fue eliminado durante la carga, cancelando...`);
-            return;
-        }
-        
-        console.log(`[${alias}] Recursos cargados exitosamente`);
-        
-        // Aplicar la textura al modelo
-        avatar.traverse(child => {
-            if (child.isMesh && child.material) {
-                child.material.map = texture;
-                child.material.needsUpdate = true;
-            }
-        });
-        
-        // Configurar posición y escala
-        avatar.position.set(position.x, correctY, position.z);
-        avatar.scale.set(0.009, 0.009, 0.009);
-        scene.add(avatar);
-        
-        // --- LÓGICA DE ANIMACIÓN MEJORADA ---
-        const mixer = new THREE.AnimationMixer(avatar);
-        const actions = {};
-        
-        // Verificar que las animaciones se cargaron correctamente
-        if (idleAnimation && idleAnimation.animations && idleAnimation.animations.length > 0) {
-            const idleClip = idleAnimation.animations[0];
-            actions.idle = mixer.clipAction(idleClip);
-            actions.idle.setLoop(THREE.LoopRepeat);
-            actions.idle.play();
-            console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
-        } else {
-            console.warn(`[${alias}] No se pudo cargar la animación idle`);
-        }
-        
-        if (runAnimation && runAnimation.animations && runAnimation.animations.length > 0) {
-            const runClip = runAnimation.animations[0];
-            runClip.name = 'walk'; // Renombrar para consistencia
-            actions.walk = mixer.clipAction(runClip);
-            actions.walk.setLoop(THREE.LoopRepeat);
-            console.log(`[${alias}] Animación Walk cargada`);
-        } else {
-            console.warn(`[${alias}] No se pudo cargar la animación walk`);
-        }
-        
-        // Crear el objeto avatar con toda la información necesaria
-        const avatarData = {
-            group: avatar,
-            mixer: mixer,
-            actions: actions,
-            targetPosition: new THREE.Vector3(position.x, correctY, position.z),
-            targetRotation: 0,
-            currentFloor: floor,
-            isMoving: false,
-            // Datos de personalización para futuras actualizaciones
-            customization: {
-                skin: skinName,
-                shirtColor: custom.shirtColor || 0x4ECDC4,
-                pantsColor: custom.pantsColor || 0x2C3E50,
-                shoesColor: custom.shoesColor || 0x8B4513
-            }
-        };
-        
-        // Guardar el avatar en la colección
-        gameCollections.userAvatars.set(alias, avatarData);
-        
-        console.log(`[${alias}] Avatar creado exitosamente:`, {
-            position: avatar.position,
-            scale: avatar.scale,
-            animations: Object.keys(actions),
-            skin: skinName
-        });
-        
-    }).catch(error => {
-        console.error(`[${alias}] Error al cargar recursos:`, error);
-        pendingAvatarLoads.delete(alias);
-        
-        // Crear avatar de respaldo simple si falla la carga
-        console.log(`[${alias}] Creando avatar de respaldo...`);
-        createFallbackAvatar(alias, position, floor, custom);
-    });
-}
-
-        // --- Función para crear avatar de respaldo simple ---
-        function createFallbackAvatar(alias, position, floor, custom) {
-            console.log(`[${alias}] Creando avatar de respaldo simple`);
+    Promise.all([modelPromise, texturePromise, idleAnimPromise, runAnimPromise])
+        .then(([avatar, texture, idleAnimation, runAnimation]) => {
             
-            const floorStep = HALL_HEIGHT + 1;
-            const correctY = floor * floorStep;
+            pendingAvatarLoads.delete(alias);
             
-            // Crear geometría simple para el avatar
-            const geometry = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: custom.shirtColor || 0x4ECDC4,
-                roughness: 0.8,
-                metalness: 0.1
+            // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
+            if (userAvatars.has(alias)) return;
+            
+            // Aplicar la textura al modelo
+            avatar.traverse(child => {
+                if (child.isMesh) {
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                }
             });
             
-            const avatar = new THREE.Mesh(geometry, material);
+            // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
-            avatar.castShadow = true;
-            avatar.receiveShadow = true;
-            
+            avatar.scale.set(0.009, 0.009, 0.009);
             scene.add(avatar);
             
-            // Crear datos del avatar sin animaciones
-            const avatarData = {
+            // --- LÓGICA DE ANIMACIÓN CORRECTA ---
+            const mixer = new THREE.AnimationMixer(avatar);
+            const actions = {};
+            
+            // Los clips de animación vienen en el array `animations` de los archivos cargados
+            const idleClip = idleAnimation.animations[0];
+            const runClip = runAnimation.animations[0];
+            
+            console.log(`[${alias}] Animaciones cargadas:`, {
+                idleAnimation: idleAnimation.animations.length,
+                runAnimation: runAnimation.animations.length,
+                idleClip: idleClip ? idleClip.name : 'null',
+                runClip: runClip ? runClip.name : 'null'
+            });
+            
+            if (idleClip) {
+                actions.idle = mixer.clipAction(idleClip);
+                actions.idle.setLoop(THREE.LoopRepeat);
+                actions.idle.play(); // Iniciar en 'idle' por defecto
+                console.log(`[${alias}] Animación Idle cargada y reproduciendo`);
+            } else {
+                console.warn(`[${alias}] No se encontró clip de animación idle`);
+            }
+            
+            if (runClip) {
+                // Renombramos el clip para que coincida con lo que buscamos ('walk')
+                runClip.name = 'walk';
+                actions.walk = mixer.clipAction(runClip);
+                actions.walk.setLoop(THREE.LoopRepeat);
+                console.log(`[${alias}] Animación Walk/Run cargada como 'walk'`);
+            } else {
+                console.warn(`[${alias}] No se encontró clip de animación run`);
+            }
+            
+            // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
+            if (Object.keys(actions).length === 0) {
+                console.warn(`No se cargaron clips de animación para el avatar ${alias}`);
+            }
+            
+            // --- FIN DE LA LÓGICA DE ANIMACIÓN ---
+            
+            printAllBones({ group: avatar }); // Debug: mostrar huesos en consola
+            console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
+            
+            // Guardar el avatar y su mixer
+            userAvatars.set(alias, {
                 group: avatar,
-                mixer: null,
-                actions: {},
+                mixer: mixer,
+                actions: actions,
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
-                isMoving: false,
-                isFallback: true,
-                customization: {
-                    skin: custom.skin || 'humanMaleA',
-                    shirtColor: custom.shirtColor || 0x4ECDC4,
-                    pantsColor: custom.pantsColor || 0x2C3E50,
-                    shoesColor: custom.shoesColor || 0x8B4513
-                }
-            };
+                isMoving: false
+            });
             
-            gameCollections.userAvatars.set(alias, avatarData);
-            console.log(`[${alias}] Avatar de respaldo creado`);
-        }
-        
+        }).catch(error => {
+            console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
+            pendingAvatarLoads.delete(alias);
+        });
+}
+
         // --- Utilidad para debug: imprimir huesos del modelo FBX ---
         function printAllBones(avatar) {
             if (!avatar || !avatar.group) return;
@@ -5279,48 +5159,58 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 }
         // --- Función para actualizar todas las posiciones de avatares ---
         function updateAvatarPositions() {
-            gameCollections.userAvatars.forEach((avatar, alias) => {
-                // Solo actualizar si el avatar existe y tiene grupo
-                if (!avatar || !avatar.group) {
-                    console.warn(`[${alias}] Avatar sin grupo válido, eliminando...`);
-                    gameCollections.userAvatars.delete(alias);
-                    return;
-                }
-                
+            userAvatars.forEach((avatar, alias) => {
                 // Interpolar posición y rotación
                 avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
-                // --- LÓGICA DE CONTROL DE ANIMACIÓN (solo para avatares con animaciones) ---
-                if (avatar.mixer && !avatar.isFallback) {
-                    const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
+                // --- LÓGICA DE CONTROL DE ANIMACIÓN ---
+                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
 
-                    if (isNowMoving && !avatar.isMoving) {
-                        // Empezó a moverse: cambia de 'idle' a 'walk'
-                        if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                            avatar.actions.idle.fadeOut(0.3);
-                            avatar.actions.walk.reset().fadeIn(0.3).play();
-                        }
-                        avatar.isMoving = true;
-                    } else if (!isNowMoving && avatar.isMoving) {
-                        // Dejó de moverse: cambia de 'walk' a 'idle'
-                        if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                            avatar.actions.walk.fadeOut(0.3);
-                            avatar.actions.idle.reset().fadeIn(0.3).play();
-                        }
-                        avatar.isMoving = false;
+                if (isNowMoving && !avatar.isMoving) {
+                    // Empezó a moverse: cambia de 'idle' a 'walk'
+                    console.log(`[${alias}] Empezó a moverse - Cambiando a walk animation`);
+                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                        console.log(`[${alias}] Transición: idle -> walk`);
+                        avatar.actions.idle.fadeOut(0.3);
+                        avatar.actions.walk.reset().fadeIn(0.3).play();
+                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                        // Si no hay idle, usar default
+                        console.log(`[${alias}] Transición: default -> walk`);
+                        avatar.actions.default.fadeOut(0.3);
+                        avatar.actions.walk.reset().fadeIn(0.3).play();
+                    } else {
+                        console.warn(`[${alias}] No se pudo cambiar a walk animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
                     }
+                    avatar.isMoving = true;
+                } else if (!isNowMoving && avatar.isMoving) {
+                    // Dejó de moverse: cambia de 'walk' a 'idle'
+                    console.log(`[${alias}] Dejó de moverse - Cambiando a idle animation`);
+                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                        console.log(`[${alias}] Transición: walk -> idle`);
+                        avatar.actions.walk.fadeOut(0.3);
+                        avatar.actions.idle.reset().fadeIn(0.3).play();
+                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                        // Si no hay idle, usar default
+                        console.log(`[${alias}] Transición: walk -> default`);
+                        avatar.actions.walk.fadeOut(0.3);
+                        avatar.actions.default.reset().fadeIn(0.3).play();
+                    } else {
+                        console.warn(`[${alias}] No se pudo cambiar a idle animation. Actions disponibles:`, Object.keys(avatar.actions || {}));
+                    }
+                    avatar.isMoving = false;
                 }
             });
         }
 
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
-            gameCollections.userAvatars.forEach((avatar, alias) => {
-                // Solo actualizar animaciones si el avatar tiene mixer y no es un avatar de respaldo
-                if (avatar.mixer && !avatar.isFallback) {
+            userAvatars.forEach((avatar, alias) => {
+                if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
                     avatar.mixer.update(deltaTime);
+                    
+
                 }
             });
         }
@@ -5365,22 +5255,22 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
         // --- Sistema de posición centralizado ---
         function sendUserPosition() {
-            if (
-                typeof camera !== 'undefined' &&
-                camera.position &&
-                typeof camera.position.x !== 'undefined' &&
-                typeof camera.position.y !== 'undefined' &&
-                typeof camera.position.z !== 'undefined'
-            ) {
-                const position = {
-                    x: camera.position.x,
-                    y: camera.position.y,
-                    z: camera.position.z
-                };
-                const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
-                const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                sendPosition(position, floor, rotation);
-            }
+                if (
+                    typeof camera !== 'undefined' &&
+                    camera.position &&
+                    typeof camera.position.x !== 'undefined' &&
+                    typeof camera.position.y !== 'undefined' &&
+                    typeof camera.position.z !== 'undefined'
+                ) {
+                    const position = {
+                        x: camera.position.x,
+                        y: camera.position.y,
+                        z: camera.position.z
+                    };
+                    const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
+                    const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
+                    sendPosition(position, floor, rotation);
+                }
         }
         
         // Iniciar al conectar
