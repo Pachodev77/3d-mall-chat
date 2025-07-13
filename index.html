@@ -1523,7 +1523,7 @@
                 const wall = new THREE.Mesh(axisConfig.geometry(), separatorMaterial);
                 wall.position.copy(axisConfig.position(i));
                 scene.add(wall);
-                collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
                 walls.push(wall);
             }
             
@@ -1609,7 +1609,7 @@
             floor.position.set(HALL_SIZE / 2, yOffset, HALL_SIZE / 2);
             floor.receiveShadow = true;
             scene.add(floor);
-            collisionObjects.push(new THREE.Box3().setFromObject(floor));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(floor));
 
             // --- Tiendas ---
             const storeWidth = 8; // Reducido para que las tiendas sean más estrechas
@@ -1688,7 +1688,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, norteZ)
             );
             scene.add(nortePasillo);
-            collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(nortePasillo));
             
             // Sur - pasillo rojo oscuro
             const surPasillo = createPasilloSueloPlantaBaja(
@@ -1696,7 +1696,7 @@
                 new THREE.Vector3(HALL_SIZE / 2, yOffset - 0.1, surZ)
             );
             scene.add(surPasillo);
-            collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(surPasillo));
             
             // Oeste - pasillo rojo oscuro
             const oestePasillo = createPasilloSueloPlantaBaja(
@@ -1704,7 +1704,7 @@
                 new THREE.Vector3(oesteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(oestePasillo);
-            collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oestePasillo));
             
             // Este - pasillo rojo oscuro
             const estePasillo = createPasilloSueloPlantaBaja(
@@ -1712,7 +1712,7 @@
                 new THREE.Vector3(esteX, yOffset - 0.1, HALL_SIZE / 2)
             );
             scene.add(estePasillo);
-            collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(estePasillo));
             
             // Esquinas - pasillo rojo oscuro
             const createCornerPlantaBaja = (posX, posZ) => {
@@ -1721,7 +1721,7 @@
                     new THREE.Vector3(posX, yOffset - 0.1, posZ)
                 );
                 scene.add(corner);
-                collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCornerPlantaBaja(oesteX, norteZ); // NO
             createCornerPlantaBaja(esteX, norteZ); // NE
@@ -1800,7 +1800,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(norte);
-            collisionObjects.push(new THREE.Box3().setFromObject(norte));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(norte));
             
             // Sur - vinotinto arriba, blanco abajo
             const sur = createPasilloSuelo(
@@ -1810,7 +1810,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(sur);
-            collisionObjects.push(new THREE.Box3().setFromObject(sur));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(sur));
             
             // Oeste - vinotinto arriba, blanco abajo
             const oeste = createPasilloSuelo(
@@ -1820,7 +1820,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(oeste);
-            collisionObjects.push(new THREE.Box3().setFromObject(oeste));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(oeste));
             
             // Este - vinotinto arriba, blanco abajo
             const este = createPasilloSuelo(
@@ -1830,7 +1830,7 @@
                 pasilloMaterialBlanco
             );
             scene.add(este);
-            collisionObjects.push(new THREE.Box3().setFromObject(este));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(este));
             
             // Esquinas - vinotinto arriba, blanco abajo
             const createCorner = (posX, posZ) => {
@@ -1841,7 +1841,7 @@
                     pasilloMaterialBlanco
                 );
                 scene.add(corner);
-                collisionObjects.push(new THREE.Box3().setFromObject(corner));
+                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(corner));
             };
             createCorner(oesteX, norteZ); // NO
             createCorner(esteX, norteZ); // NE
@@ -2009,7 +2009,7 @@
                 const railBox = new THREE.Box3().setFromObject(rail);
                 // Expandir la caja de colisión para hacer las barandas más efectivas
                 railBox.expandByScalar(0.2);
-                collisionObjects.push(railBox);
+                gameCollections.collisionObjects.push(railBox);
             });
 
             // Crear tiendas usando la función refactorizada
@@ -2251,7 +2251,7 @@
             // --- Actualizar colisiones ---
             storeGroup.updateMatrixWorld(true);
             [backWall, leftWall, rightWall].forEach(wall => {
-                collisionObjects.push(new THREE.Box3().setFromObject(wall));
+                gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(wall));
             });
         }
 
@@ -2279,7 +2279,7 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             let offset = 0;
             // Almacenar datos para el sistema de timing centralizado
@@ -2302,7 +2302,7 @@
             );
             plane.userData.URL = url;
             updateImagePlane(plane, url, text, colorIdx, solid);
-            clickableObjects.push(plane);
+            gameCollections.clickableObjects.push(plane);
             return plane;
         }
 
@@ -2426,12 +2426,12 @@
             plane.material.transparent = true;
             
             // Agregar al sistema centralizado en lugar de usar setInterval
-            const signIndex = rotatingSigns.length;
-            rotatingSigns.push({
+            const signIndex = gameCollections.rotatingSigns.length;
+            gameCollections.rotatingSigns.push({
                 material: plane.material,
                 texts: texts
             });
-            rotatingSignTextIndexes[signIndex] = 0;
+            gameCollections.rotatingSignTextIndexes[signIndex] = 0;
             
             return plane;
         }
@@ -2495,11 +2495,11 @@
             }
             scene.add(group);
             group.updateMatrixWorld(true);
-            collisionObjects.push(new THREE.Box3().setFromObject(cube));
+            gameCollections.collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             // Agregar al sistema centralizado en lugar de usar setInterval
             planes.forEach(plane => {
-                digitalClocks.push({
+                gameCollections.digitalClocks.push({
                     material: plane.material
                 });
             });
@@ -4164,18 +4164,18 @@
             }
         }
         
-        // Variables globales para carteles rotativos y relojes
-        let rotatingSigns = [];
-        let digitalClocks = [];
-        let rotatingSignTextIndexes = {};
+        // Variables globales para carteles rotativos y relojes (ahora en gameCollections)
+        // let rotatingSigns = [];
+        // let digitalClocks = [];
+        // let rotatingSignTextIndexes = {};
         
         // Función para actualizar carteles rotativos
         function updateRotatingSigns() {
-            rotatingSigns.forEach((sign, index) => {
+            gameCollections.rotatingSigns.forEach((sign, index) => {
                 if (sign.texts && sign.texts.length > 0) {
-                    const textIndex = rotatingSignTextIndexes[index] || 0;
+                    const textIndex = gameCollections.rotatingSignTextIndexes[index] || 0;
                     const nextIndex = (textIndex + 1) % sign.texts.length;
-                    rotatingSignTextIndexes[index] = nextIndex;
+                    gameCollections.rotatingSignTextIndexes[index] = nextIndex;
                     updateRotatingSign(sign.material, sign.texts[nextIndex]);
                 }
             });
@@ -4183,7 +4183,7 @@
         
         // Función para actualizar relojes digitales
         function updateDigitalClocks() {
-            digitalClocks.forEach(clock => {
+            gameCollections.digitalClocks.forEach(clock => {
                 updateClockPlane(clock.material);
             });
         }
@@ -4243,7 +4243,7 @@
             cacheSystem.textureCache.clear();
             
             // Limpiar mixers de animación
-            userAvatars.forEach((avatar, alias) => {
+            gameCollections.userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
@@ -4251,9 +4251,9 @@
             });
             
             // Limpiar arrays del sistema centralizado
-            rotatingSigns = [];
-            digitalClocks = [];
-            rotatingSignTextIndexes = {};
+            gameCollections.rotatingSigns = [];
+            gameCollections.digitalClocks = [];
+            gameCollections.rotatingSignTextIndexes = {};
         }
         
         // Limpiar al cerrar la página
@@ -4936,13 +4936,13 @@
             if (alias === userAlias) {
                 return;
             }
-            let avatar = userAvatars.get(alias);
+            let avatar = gameCollections.userAvatars.get(alias);
             if (!avatar) {
                 // Solo pasar skin si existe
                 let custom = {};
                 if (typeof skin !== 'undefined') custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
-                avatar = userAvatars.get(alias);
+                avatar = gameCollections.userAvatars.get(alias);
             }
             if (avatar) {
                 // Actualización de posición y rotación en tiempo real
@@ -5065,7 +5065,7 @@
 
         // --- Eliminar avatar de usuario de la escena y del mapa ---
         function removeUserAvatar(alias) {
-            const avatar = userAvatars.get(alias);
+            const avatar = gameCollections.userAvatars.get(alias);
             if (avatar) {
                 if (avatar.group) {
                     scene.remove(avatar.group);
@@ -5076,7 +5076,7 @@
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
             }
-            userAvatars.delete(alias);
+            gameCollections.userAvatars.delete(alias);
             pendingAvatarLoads.delete(alias);
         }
         
@@ -5097,7 +5097,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (userAvatars.has(alias)) return;
+    if (gameCollections.userAvatars.has(alias)) return;
     
     pendingAvatarLoads.add(alias);
     
@@ -5132,7 +5132,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             pendingAvatarLoads.delete(alias);
             
             // Si el alias ya no es válido (fue eliminado durante la carga), no agregues el avatar
-            if (userAvatars.has(alias)) return;
+            if (gameCollections.userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
             avatar.traverse(child => {
@@ -5192,7 +5192,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             console.log('Avatar añadido:', alias, avatar.position, avatar.scale);
             
             // Guardar el avatar y su mixer
-            userAvatars.set(alias, {
+            gameCollections.userAvatars.set(alias, {
                 group: avatar,
                 mixer: mixer,
                 actions: actions,
