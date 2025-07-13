@@ -1184,7 +1184,7 @@
 
         function getCachedTexture(text, colorIdx, width, height) {
             const key = `${text}-${colorIdx}-${width}-${height}`;
-            if (!textureCache.has(key)) {
+            if (!cacheSystem.textureCache.has(key)) {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 const canvasW = Math.min(512, width * 64); // Reducir tamaño del canvas
@@ -1202,9 +1202,9 @@
                 context.fillText(text.charAt(0).toUpperCase() + text.slice(1), canvasW / 2, canvasH / 2);
 
                 const texture = new THREE.CanvasTexture(canvas);
-                textureCache.set(key, texture);
+                cacheSystem.textureCache.set(key, texture);
             }
-            return textureCache.get(key);
+            return cacheSystem.textureCache.get(key);
         }
 
         // --- Función para obtener el color del cielo según la hora ---
