@@ -2380,31 +2380,25 @@
                 } else {
                     domain = domainParts[0];
                 }
-                
                 const logoTexture = getLogoTexture(domain);
-                
-                if (plane.material.map && plane.material.map.image) {
-                    plane.material.map.needsUpdate = true;
-                }
-                
                 if (logoTexture) {
                     plane.material.map = logoTexture;
                 } else {
                     // Fallback a la textura generada si no hay logo
                     const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
-            plane.material.map = texture;
+                    plane.material.map = texture;
                 }
-                
-            plane.material.needsUpdate = true;
-            } catch (error) {
-                console.error('Error en updateImagePlane:', error);
-                // Fallback seguro
                 if (plane.material.map && plane.material.map.image) {
                     plane.material.map.needsUpdate = true;
                 }
+            } catch (error) {
+                console.error('Error en updateImagePlane:', error);
+                // Fallback seguro
                 const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
                 plane.material.map = texture;
-                plane.material.needsUpdate = true;
+                if (plane.material.map && plane.material.map.image) {
+                    plane.material.map.needsUpdate = true;
+                }
             }
         }
 
@@ -2424,24 +2418,21 @@
         }
 
         function updateRotatingSign(material, text) {
-            // Create a new canvas if material.map doesn't exist or if it's not a canvas
-            let canvas = material.map ? material.map.image : null;
+            let canvas = material.map && material.map.image ? material.map.image : null;
             if (!canvas || !canvas.getContext) {
                 canvas = document.createElement('canvas');
                 canvas.width = 256;
                 canvas.height = 128;
+                material.map = new THREE.CanvasTexture(canvas);
             }
-            
             const context = canvas.getContext('2d');
             const canvasW = canvas.width;
             const canvasH = canvas.height;
-            
             context.fillStyle = '#fff';
             context.fillRect(0, 0, canvasW, canvasH);
             context.strokeStyle = '#000';
             context.lineWidth = 8;
             context.strokeRect(4, 4, canvasW-8, canvasH-8);
-
             let fontSize = canvasH * 0.3;
             context.font = `bold ${fontSize}px Arial`;
             context.fillStyle = '#000';
@@ -2452,11 +2443,7 @@
                 context.font = `bold ${fontSize}px Arial`;
             }
             context.fillText(text, canvasW/2, canvasH/2);
-            
-            // Create or update the texture
-            if (!material.map && material.map.image) {
-                material.map = new THREE.CanvasTexture(canvas);
-            } else {
+            if (material.map && material.map.image) {
                 material.map.needsUpdate = true;
             }
         }
