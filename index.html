@@ -944,7 +944,7 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
@@ -1063,30 +1063,6 @@
                 skin: 'humanMaleA'
             },
             
-            // Colores predefinidos para selección
-            predefinedColors: [
-                { shirt: 0x4ECDC4, pants: 0x2C3E50, shoes: 0x8B4513 },
-                { shirt: 0xE74C3C, pants: 0x34495E, shoes: 0x2C3E50 },
-                { shirt: 0x3498DB, pants: 0x2980B9, shoes: 0x1F618D },
-                { shirt: 0xF39C12, pants: 0xE67E22, shoes: 0xD35400 },
-                { shirt: 0x9B59B6, pants: 0x8E44AD, shoes: 0x6C3483 }
-            ],
-            
-            // Colores disponibles para personalización
-            customizationColors: [
-                // Colores vibrantes para camisas
-                0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
-                0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
-                0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
-                // Colores más oscuros para pantalones
-                0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
-                0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
-                0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
-                // Colores para zapatos
-                0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
-                0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
-                0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
-            ]
         };
         
         // Hacer avatarState accesible globalmente para Firebase
@@ -3068,12 +3044,12 @@
         function toggleRoomNavigation() {
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
             if (roomNavigationPanel) {
-                if (roomNavigationPanelOpen) {
+                if (uiState.room.navigationPanelOpen) {
                     roomNavigationPanel.style.display = 'none';
-                    roomNavigationPanelOpen = false;
+                    uiState.room.navigationPanelOpen = false;
                 } else {
                     roomNavigationPanel.style.display = 'flex';
-                    roomNavigationPanelOpen = true;
+                    uiState.room.navigationPanelOpen = true;
                 }
             }
         }
@@ -3082,7 +3058,7 @@
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
             if (roomNavigationPanel) {
                 roomNavigationPanel.style.display = 'none';
-                roomNavigationPanelOpen = false;
+                uiState.room.navigationPanelOpen = false;
             }
         }
         
@@ -3914,7 +3890,7 @@
             
             // Mostrar la ventana de la habitación cuando se deselecciona un mueble
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
-            if (roomNavigationPanel && roomNavigationPanelOpen) {
+            if (roomNavigationPanel && uiState.room.navigationPanelOpen) {
                 roomNavigationPanel.style.display = 'flex';
             }
         }
@@ -3994,7 +3970,7 @@
                 
                 // Mostrar la ventana de la habitación después de guardar
                 const roomNavigationPanel = document.getElementById('room-navigation-panel');
-                if (roomNavigationPanel && roomNavigationPanelOpen) {
+                if (roomNavigationPanel && uiState.room.navigationPanelOpen) {
                     roomNavigationPanel.style.display = 'flex';
                 }
             }
