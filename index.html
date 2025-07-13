@@ -3104,11 +3104,20 @@
             if (gameState.currentScene === 'mall') return;
             
             gameState.currentScene = 'mall';
+            
             // Limpiar escena de habitación personal
-            if (personalRoomRenderer) {
-                document.body.removeChild(personalRoomRenderer.domElement);
-                personalRoomRenderer.dispose();
+            if (renderState.personalRoom.renderer) {
+                document.body.removeChild(renderState.personalRoom.renderer.domElement);
+                renderState.personalRoom.renderer.dispose();
+                renderState.personalRoom.renderer = null;
             }
+            
+            // Limpiar escena de habitación personal
+            if (renderState.personalRoom.scene) {
+                renderState.personalRoom.scene.clear();
+                renderState.personalRoom.scene = null;
+            }
+            
             // Mostrar escena del mall
             renderer.domElement.style.display = 'block';
             
@@ -3124,8 +3133,8 @@
             renderer.domElement.style.display = 'none';
             
             // Crear nueva escena para la habitación personal
-            personalRoomScene = new THREE.Scene();
-            personalRoomScene.background = new THREE.Color(0x2C3E50); // Azul oscuro
+            renderState.personalRoom.scene = new THREE.Scene();
+            renderState.personalRoom.scene.background = new THREE.Color(0x2C3E50); // Azul oscuro
             
             // Crear cámara para la habitación
             renderState.personalRoom.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -3146,24 +3155,14 @@
             
             // Crear iluminación para la habitación
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            personalRoomScene.add(ambientLight);
+            renderState.personalRoom.scene.add(ambientLight);
             
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(5, 10, 5);
-            personalRoomScene.add(directionalLight);
+            renderState.personalRoom.scene.add(directionalLight);
             
             // Crear habitación
             createPersonalRoom();
-            // Crear y actualizar cielo visible desde las ventanas
-            // Eliminar la línea:
-            // createPersonalRoomSky();
-            // Y también:
-            // if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
-            // personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
-            // updatePersonalRoomSky();
-            
-            // Iniciar animación de la habitación
-            animatePersonalRoom();
         }
         
         function createPersonalRoom() {
@@ -3182,37 +3181,37 @@
             // Pared trasera
             const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
-            personalRoomScene.add(backWall);
+            renderState.personalRoom.scene.add(backWall);
             // Pared izquierda
             const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
             leftWall.position.set(-roomWidth/2, roomHeight/2, 0);
             leftWall.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftWall);
+            renderState.personalRoom.scene.add(leftWall);
             // Pared derecha
             const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
             rightWall.position.set(roomWidth/2, roomHeight/2, 0);
             rightWall.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWall);
+            renderState.personalRoom.scene.add(rightWall);
             // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
-            personalRoomScene.add(frontWallLeft);
+            renderState.personalRoom.scene.add(frontWallLeft);
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
-            personalRoomScene.add(frontWallRight);
+            renderState.personalRoom.scene.add(frontWallRight);
             // Puerta mejorada (paneles y manija)
             const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
             const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
             const door = new THREE.Mesh(doorGeometry, doorMaterial);
             door.position.set(0, 1.1, roomDepth/2);
-            personalRoomScene.add(door);
+            renderState.personalRoom.scene.add(door);
             // Paneles de la puerta (relieve)
             const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
             for (let i = 0; i < 3; i++) {
                 const panelGeo = new THREE.BoxGeometry(0.7, 0.4, 0.04);
                 const panel = new THREE.Mesh(panelGeo, panelMat);
                 panel.position.set(0, 1.7 - i * 0.7, roomDepth/2 + 0.055);
-                personalRoomScene.add(panel);
+                renderState.personalRoom.scene.add(panel);
             }
             // Manija de la puerta
             const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
@@ -3220,7 +3219,7 @@
             const handle = new THREE.Mesh(handleGeo, handleMat);
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
-            personalRoomScene.add(handle);
+            renderState.personalRoom.scene.add(handle);
             // --- Ventanas grandes mejoradas ---
             const skyColor = getSkyColorByHour();
             // Ventana trasera grande (con bisel y reflejo)
@@ -3229,57 +3228,57 @@
             const windowMaterial = new THREE.MeshPhysicalMaterial({ color: skyColor, transparent: true, opacity: 0.82, roughness: 0.15, metalness: 0.2, reflectivity: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
             const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
             backWindow.position.set(0, 1.7, -roomDepth/2 + 0.13);
-            personalRoomScene.add(backWindow);
+            renderState.personalRoom.scene.add(backWindow);
             // Bisel y marco ventana trasera
             const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
             const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
             const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             backFrame.position.copy(backWindow.position);
-            personalRoomScene.add(backFrame);
+            renderState.personalRoom.scene.add(backFrame);
             // Cruces del marco (vertical y horizontal)
             const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
             const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             crossV.position.copy(backWindow.position);
-            personalRoomScene.add(crossV);
+            renderState.personalRoom.scene.add(crossV);
             const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             crossH.position.copy(backWindow.position);
-            personalRoomScene.add(crossH);
+            renderState.personalRoom.scene.add(crossH);
             // Ventana izquierda grande
             const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
             leftWindow.position.set(-roomWidth/2 + 0.13, 1.7, 0);
             leftWindow.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftWindow);
+            renderState.personalRoom.scene.add(leftWindow);
             const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             leftFrame.position.copy(leftWindow.position);
             leftFrame.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftFrame);
+            renderState.personalRoom.scene.add(leftFrame);
             // Cruces marco izquierdo
             const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             leftCrossV.position.copy(leftWindow.position);
             leftCrossV.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftCrossV);
+            renderState.personalRoom.scene.add(leftCrossV);
             const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             leftCrossH.position.copy(leftWindow.position);
             leftCrossH.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftCrossH);
+            renderState.personalRoom.scene.add(leftCrossH);
             // Ventana derecha grande
             const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
             rightWindow.position.set(roomWidth/2 - 0.13, 1.7, 0);
             rightWindow.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWindow);
+            renderState.personalRoom.scene.add(rightWindow);
             const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             rightFrame.position.copy(rightWindow.position);
             rightFrame.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightFrame);
+            renderState.personalRoom.scene.add(rightFrame);
             // Cruces marco derecho
             const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
             rightCrossV.position.copy(rightWindow.position);
             rightCrossV.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightCrossV);
+            renderState.personalRoom.scene.add(rightCrossV);
             const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
             rightCrossH.position.copy(rightWindow.position);
             rightCrossH.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightCrossH);
+            renderState.personalRoom.scene.add(rightCrossH);
             // Actualizar color del cielo cada minuto
             // El setInterval se reemplaza con el sistema de timing centralizado
             // La actualización se maneja en updatePeriodicSystems()
@@ -3334,14 +3333,14 @@
             bedGroup.add(pillow2);
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(bedGroup);
+            renderState.personalRoom.scene.add(bedGroup);
             
             // Mesa de noche izquierda
             const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
             const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
             const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
             nightstandLeft.position.set(-5.5, 0.35, -3);
-            personalRoomScene.add(nightstandLeft);
+            renderState.personalRoom.scene.add(nightstandLeft);
             
             // Registrar mesa de noche izquierda en el array de muebles
             furnitureObjects.push({
@@ -3354,7 +3353,7 @@
             // Mesa de noche derecha
             const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
             nightstandRight.position.set(-2.5, 0.35, -3);
-            personalRoomScene.add(nightstandRight);
+            renderState.personalRoom.scene.add(nightstandRight);
             
             // Registrar mesa de noche derecha en el array de muebles
             furnitureObjects.push({
@@ -3396,7 +3395,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(lampGroup);
+            renderState.personalRoom.scene.add(lampGroup);
             
             // ===== ZONA DE TRABAJO (Lado derecho) =====
             
@@ -3431,7 +3430,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(deskGroup);
+            renderState.personalRoom.scene.add(deskGroup);
             
             // Silla ergonómica del escritorio - Crear grupo para todas las partes
             const chairGroup = new THREE.Group();
@@ -3471,7 +3470,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(chairGroup);
+            renderState.personalRoom.scene.add(chairGroup);
             
             // Computadora completa - Crear grupo para todas las partes
             const computerGroup = new THREE.Group();
@@ -3520,7 +3519,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(computerGroup);
+            renderState.personalRoom.scene.add(computerGroup);
             
             // ===== ZONA DE ALMACENAMIENTO =====
             
@@ -3563,7 +3562,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(shelfGroup);
+            renderState.personalRoom.scene.add(shelfGroup);
             
             // ===== ZONA DE RELAX (Centro) =====
             
@@ -3596,7 +3595,7 @@
             }
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(sofaGroup);
+            renderState.personalRoom.scene.add(sofaGroup);
             
             // Mesa de centro - Crear grupo para todas las partes
             const coffeeTableGroup = new THREE.Group();
@@ -3628,7 +3627,7 @@
             });
             
             // Agregar el grupo completo a la escena
-            personalRoomScene.add(coffeeTableGroup);
+            renderState.personalRoom.scene.add(coffeeTableGroup);
             
             // ===== ELEMENTOS DECORATIVOS =====
             
@@ -3637,35 +3636,35 @@
             const windowMaterial = getCachedMaterial(0x87CEEB, 0.3, 0.8);
             const window = new THREE.Mesh(windowGeometry, windowMaterial);
             window.position.set(0, 1.75, roomDepth/2 - 0.1);
-            personalRoomScene.add(window);
+            renderState.personalRoom.scene.add(window);
             
             // Marco de la ventana
             const windowFrameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
             const windowFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
             const windowFrame = new THREE.Mesh(windowFrameGeometry, windowFrameMaterial);
             windowFrame.position.set(0, 1.75, roomDepth/2 - 0.05);
-            personalRoomScene.add(windowFrame);
+            renderState.personalRoom.scene.add(windowFrame);
             
             // Alfombra
             const carpetGeometry = new THREE.BoxGeometry(8, 0.05, 6);
             const carpetMaterial = getCachedMaterial(0xE67E22, 0.8, 0.1);
             const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
             carpet.position.set(0, 0.025, 0);
-            personalRoomScene.add(carpet);
+            renderState.personalRoom.scene.add(carpet);
             
             // Lámpara de techo
             const ceilingLampGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 8);
             const ceilingLampMaterial = getCachedMaterial(0xF1C40F, 0.8, 0.2);
             const ceilingLamp = new THREE.Mesh(ceilingLampGeometry, ceilingLampMaterial);
             ceilingLamp.position.set(0, roomHeight - 0.1, 0);
-            personalRoomScene.add(ceilingLamp);
+            renderState.personalRoom.scene.add(ceilingLamp);
             
             // Cable de la lámpara
             const lampCableGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6);
             const lampCableMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
             const lampCable = new THREE.Mesh(lampCableGeometry, lampCableMaterial);
             lampCable.position.set(0, roomHeight - 0.35, 0);
-            personalRoomScene.add(lampCable);
+            renderState.personalRoom.scene.add(lampCable);
         }
         
         function updatePersonalRoomMovement() {
@@ -3675,29 +3674,29 @@
             }
             
             // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY += ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY -= ROTATE_SPEED;
+            if (inputState.keyboard.ArrowLeft || inputState.mobile.left) renderState.personalRoom.targetRotation += ROTATE_SPEED;
+            if (inputState.keyboard.ArrowRight || inputState.mobile.right) renderState.personalRoom.targetRotation -= ROTATE_SPEED;
 
             // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
             const direction = new THREE.Vector3();
-            personalRoomCamera.getWorldDirection(direction);
+            renderState.personalRoom.camera.getWorldDirection(direction);
             direction.y = 0;
             direction.normalize();
             
             const velocity = new THREE.Vector3();
             
             // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (keys.ArrowUp || mobileForward) velocity.add(direction);
-            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            if (inputState.keyboard.ArrowUp || inputState.mobile.forward) velocity.add(direction);
+            if (inputState.keyboard.ArrowDown || inputState.mobile.backward) velocity.sub(direction);
             
             // Movimiento lateral con A y D (teclas)
             const rightDirection = new THREE.Vector3();
-            rightDirection.setFromMatrixColumn(personalRoomCamera.matrix, 0);
+            rightDirection.setFromMatrixColumn(renderState.personalRoom.camera.matrix, 0);
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            if (inputState.keyboard.A) velocity.sub(rightDirection); // Moverse hacia la izquierda
+            if (inputState.keyboard.D) velocity.add(rightDirection); // Moverse hacia la derecha
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
@@ -3722,18 +3721,7 @@
             renderState.personalRoom.targetPosition.y = CAMERA_HEIGHT;
         }
         
-        function animatePersonalRoom() {
-            requestAnimationFrame(animatePersonalRoom);
-            
-            // Actualizar movimiento en la habitación personal
-            updatePersonalRoomMovement();
-            
-            // Aplicar movimiento suave a la cámara
-            renderState.personalRoom.camera.position.lerp(renderState.personalRoom.targetPosition, 0.2);
-            renderState.personalRoom.camera.rotation.y = lerpAngle(renderState.personalRoom.camera.rotation.y, renderState.personalRoom.targetRotation, 0.2);
-            
-            renderState.personalRoom.renderer.render(personalRoomScene, renderState.personalRoom.camera);
-        }
+
         
         function customizeRoom() {
             // Función placeholder para personalización de habitación
@@ -3749,7 +3737,7 @@
             
             gameState.furniture.editMode = !gameState.furniture.editMode;
             
-            if (furnitureEditMode) {
+            if (gameState.furniture.editMode) {
                 // Limpiar todos los resaltados al entrar en modo de edición
                 clearAllFurnitureHighlights();
                 openFurnitureEditPanel();
@@ -3764,7 +3752,7 @@
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel) {
                 furnitureEditPanel.style.display = 'flex';
-                furnitureEditPanelOpen = true;
+                uiState.furniture.editPanelOpen = true;
                 updateFurnitureList();
             }
         }
@@ -3773,9 +3761,9 @@
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel) {
                 furnitureEditPanel.style.display = 'none';
-                furnitureEditPanelOpen = false;
+                uiState.furniture.editPanelOpen = false;
             }
-            furnitureEditMode = false;
+            gameState.furniture.editMode = false;
             // Limpiar todos los resaltados al cerrar el panel
             clearAllFurnitureHighlights();
             deselectFurniture();
@@ -4049,7 +4037,7 @@
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
             
-            // Solo actualizar y renderizar si estamos en la escena del mall
+            // Renderizar la escena activa
             if (gameState.currentScene === 'mall') {
                 updateMovement();
                 updateAvatarPositions(); // Actualizar posiciones de avatares
@@ -4058,6 +4046,15 @@
                 updateAvatarAnimations(deltaTime);
                 
                 renderer.render(scene, camera);
+            } else if (gameState.currentScene === 'personal-room') {
+                // Actualizar movimiento en la habitación personal
+                updatePersonalRoomMovement();
+                
+                // Aplicar movimiento suave a la cámara
+                renderState.personalRoom.camera.position.lerp(renderState.personalRoom.targetPosition, 0.2);
+                renderState.personalRoom.camera.rotation.y = lerpAngle(renderState.personalRoom.camera.rotation.y, renderState.personalRoom.targetRotation, 0.2);
+                
+                renderState.personalRoom.renderer.render(renderState.personalRoom.scene, renderState.personalRoom.camera);
             }
         }
         
