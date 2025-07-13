@@ -4064,7 +4064,7 @@
             requestAnimationFrame(animate);
             
             // Obtener delta time del reloj para animaciones
-            const deltaTime = clock.getDelta();
+            const deltaTime = animationState.clock.getDelta();
             
             // Control de FPS
             const frameDeltaTime = currentTime - lastTime;
