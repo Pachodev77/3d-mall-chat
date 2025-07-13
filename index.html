@@ -2383,8 +2383,8 @@
                 
                 const logoTexture = getLogoTexture(domain);
                 
-                if (plane.material.map) {
-                    plane.material.map.dispose();
+                if (plane.material.map && plane.material.map.image) {
+                    plane.material.map.needsUpdate = true;
                 }
                 
                 if (logoTexture) {
@@ -2399,8 +2399,8 @@
             } catch (error) {
                 console.error('Error en updateImagePlane:', error);
                 // Fallback seguro
-                if (plane.material.map) {
-                    plane.material.map.dispose();
+                if (plane.material.map && plane.material.map.image) {
+                    plane.material.map.needsUpdate = true;
                 }
                 const texture = getCachedTexture(text, colorIdx, plane.geometry.parameters.width, plane.geometry.parameters.height);
                 plane.material.map = texture;
@@ -2454,7 +2454,7 @@
             context.fillText(text, canvasW/2, canvasH/2);
             
             // Create or update the texture
-            if (!material.map) {
+            if (!material.map && material.map.image) {
                 material.map = new THREE.CanvasTexture(canvas);
             } else {
                 material.map.needsUpdate = true;
@@ -2518,7 +2518,7 @@
             context.textBaseline = 'middle';
             context.fillText(timeStr, 400, 200);
 
-            if (!material.map) {
+            if (!material.map && material.map.image) {
                 material.map = new THREE.CanvasTexture(canvas);
             } else {
                 material.map.needsUpdate = true;
