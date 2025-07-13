@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -1172,14 +1172,14 @@
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
-            if (!materialCache.has(key)) {
-                materialCache.set(key, new THREE.MeshStandardMaterial({ 
+            if (!cacheSystem.materialCache.has(key)) {
+                cacheSystem.materialCache.set(key, new THREE.MeshStandardMaterial({ 
                     color, 
                     roughness, 
                     metalness 
                 }));
             }
-            return materialCache.get(key);
+            return cacheSystem.materialCache.get(key);
         }
 
         function getCachedTexture(text, colorIdx, width, height) {
