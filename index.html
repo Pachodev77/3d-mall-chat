@@ -2286,7 +2286,7 @@
             );
             plane.userData.URL = url;
             updateImagePlane(plane, url, text, colorIdx, solid);
-            clickableObjects.push(plane);
+            gameCollections.clickableObjects.push(plane);
             return plane;
         }
 
@@ -3001,7 +3001,7 @@
             } else {
                 // Comportamiento normal del mall
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(clickableObjects);
+            const intersects = raycaster.intersectObjects(gameCollections.clickableObjects);
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
                 
