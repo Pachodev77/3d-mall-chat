@@ -3681,7 +3681,7 @@
         function moveSelectedFurniture(direction) {
             if (!selectedFurniture || !selectedFurniture.mesh) return;
             
-            const moveSpeed = 0.2;
+            const moveSpeed = 0.12; // velocidad reducida para controles móviles
             const currentPosition = selectedFurniture.mesh.position.clone();
             
             switch (direction) {
@@ -4242,28 +4242,47 @@
                 alias: userAlias,
                 shirtColor: shirtColor,
                 pantsColor: pantsColor,
-                shoesColor: shoesColor
+                shoesColor: shoesColor,
+                skin: currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'
             };
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
             // Actualizar nombre en el avatar
             updateAvatarName && updateAvatarName();
-            // Aplicar colores al avatar propio si existe
-            const myAvatar = userAvatars.get(userAlias);
-            if (myAvatar) {
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(shirtColor);
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(pantsColor);
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(shoesColor);
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.needsUpdate = true;
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.needsUpdate = true;
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.needsUpdate = true;
+
+            // --- NUEVO: Eliminar y recrear avatar con la nueva skin y colores ---
+            // Obtener posición y piso actuales
+            let position = { x: 25, y: 2, z: 25 };
+            let floor = 0;
+            if (userAvatars.has(userAlias)) {
+                const myAvatar = userAvatars.get(userAlias);
+                if (myAvatar && myAvatar.group) {
+                    position = {
+                        x: myAvatar.group.position.x,
+                        y: myAvatar.group.position.y,
+                        z: myAvatar.group.position.z
+                    };
+                }
+                if (typeof myAvatar.floor !== 'undefined') {
+                    floor = myAvatar.floor;
+                } else if (typeof currentFloor !== 'undefined') {
+                    floor = currentFloor;
+                }
+            } else if (typeof currentFloor !== 'undefined') {
+                floor = currentFloor;
             }
+
+            // Eliminar avatar anterior
+            removeUserAvatar(userAlias);
+            // Crear avatar nuevo con nueva skin y colores
+            createUserAvatar(userAlias, position, floor, customizationData);
+
             // Enviar alias al servidor si está conectado
             if (typeof isConnected !== 'undefined' && isConnected) {
                 sendAlias && sendAlias();
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
-            console.log('✅ Personalización guardada:', customizationData);
+            console.log('✅ Personalización guardada y avatar actualizado:', customizationData);
         }
         
         function closeSimplePanel() {
@@ -4846,7 +4865,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 actions.run = mixer.clipAction(runClip);
                 // Forzar loop infinito y velocidad lenta
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                actions.run.timeScale = 0.2; // 5x más lento
+                actions.run.timeScale = 0.5; // Animación de correr más rápida
                 console.log('Animación Run cargada para:', alias, actions.run);
                 // Diagnóstico: información del clip y esqueleto
                 console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
