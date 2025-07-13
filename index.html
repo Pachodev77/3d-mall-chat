@@ -4813,16 +4813,26 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             
             // Los clips de animación vienen en el array `animations` de los archivos cargados
             const idleClip = idleAnimation.animations[0];
-            const runClip = runAnimation && runAnimation.animations ? runAnimation.animations[0] : undefined;
-            console.log('--- DIAGNÓSTICO RAW ---');
-            console.log('runAnimation:', runAnimation);
-            if (runAnimation && runAnimation.animations) {
-                console.log('runAnimation.animations:', runAnimation.animations);
-            } else {
-                console.warn('runAnimation.animations no existe o está vacío');
-            }
-            console.log('runClip:', runClip);
-            console.log('--- FIN DIAGNÓSTICO RAW ---');
+            // Diagnóstico y selección inteligente de clip para 'run'
+let runClip = undefined;
+if (runAnimation && Array.isArray(runAnimation.animations) && runAnimation.animations.length > 0) {
+    console.log('--- CLIPS ENCONTRADOS EN run.fbx ---');
+    runAnimation.animations.forEach((clip, i) => {
+        console.log(`Clip #${i}: Nombre='${clip.name}', Duración=${clip.duration}, Tracks=${clip.tracks.length}`);
+        clip.tracks.forEach((track, j) => {
+            console.log(`   Track #${j}: ${track.name}, Keyframes: ${track.times.length}`);
+        });
+    });
+    // Seleccionar el clip con mayor duración (usualmente el de animación, no el de pose)
+    runClip = runAnimation.animations.reduce((best, clip) => {
+        return (!best || clip.duration > best.duration) ? clip : best;
+    }, undefined);
+    console.log('Clip seleccionado para RUN:', runClip ? runClip.name : 'Ninguno');
+} else {
+    console.warn('runAnimation.animations no existe o está vacío');
+}
+console.log('runClip:', runClip);
+console.log('--- FIN DIAGNÓSTICO RAW ---');
 
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
