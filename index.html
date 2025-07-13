@@ -1051,15 +1051,13 @@
         
         // Estado de personalización del avatar
         const avatarState = {
-            // Colores del avatar
-            colors: {
-                shirt: 0x4ECDC4,
-                pants: 0x2C3E50,
-                shoes: 0x8B4513
+            // Objeto de personalización actual (sistema unificado)
+            currentCustomization: {
+                shirtColor: 0x4ECDC4,
+                pantsColor: 0x2C3E50,
+                shoesColor: 0x8B4513,
+                skin: 'humanMaleA'
             },
-            
-            // Skin del avatar
-            skin: 'humanMaleA',
             
             // Colores predefinidos para selección
             predefinedColors: [
@@ -1068,8 +1066,27 @@
                 { shirt: 0x3498DB, pants: 0x2980B9, shoes: 0x1F618D },
                 { shirt: 0xF39C12, pants: 0xE67E22, shoes: 0xD35400 },
                 { shirt: 0x9B59B6, pants: 0x8E44AD, shoes: 0x6C3483 }
+            ],
+            
+            // Colores disponibles para personalización
+            customizationColors: [
+                // Colores vibrantes para camisas
+                0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
+                0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
+                0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
+                // Colores más oscuros para pantalones
+                0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
+                0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
+                0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
+                // Colores para zapatos
+                0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
+                0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
+                0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
             ]
         };
+        
+        // Hacer avatarState accesible globalmente para Firebase
+        window.avatarState = avatarState;
         
         // Estado del sistema de renderizado
         const renderState = {
@@ -2547,14 +2564,14 @@
             
             if (saveCustomizationBtn) {
                 console.log('Botón de guardar personalización encontrado');
-                saveCustomizationBtn.onclick = saveCustomization;
+                saveCustomizationBtn.onclick = saveSimpleCustomization;
             } else {
                 console.error('No se encontró el botón de guardar personalización');
             }
             
             if (resetCustomizationBtn) {
                 console.log('Botón de resetear personalización encontrado');
-                resetCustomizationBtn.onclick = resetCustomization;
+                resetCustomizationBtn.onclick = resetSimpleCustomization;
             } else {
                 console.error('No se encontró el botón de resetear personalización');
             }
@@ -4128,18 +4145,17 @@
         
         function changeShirtColor(color) {
             console.log('Cambiando color de camisa a:', color);
-            shirtColor = color;
-            currentCustomization.shirtColor = color;
+            avatarState.currentCustomization.shirtColor = color;
             updateAvatarPreview();
             updateColorButtonSelection('shirt', color);
         }
         
         function changePantsColor(color) {
             console.log('Cambiando color de pantalón a:', color);
-            pantsColor = color;
+            avatarState.currentCustomization.pantsColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
+            const avatar = gameCollections.userAvatars.get(userAlias);
             if (avatar && avatar.pantsMaterial) {
                 avatar.pantsMaterial.color.setHex(color);
                 avatar.pantsMaterial.needsUpdate = true;
@@ -4154,10 +4170,10 @@
         
         function changeShoesColor(color) {
             console.log('Cambiando color de zapatos a:', color);
-            shoesColor = color;
+            avatarState.currentCustomization.shoesColor = color;
             
             // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
+            const avatar = gameCollections.userAvatars.get(userAlias);
             if (avatar && avatar.shoeMaterial) {
                 avatar.shoeMaterial.color.setHex(color);
                 avatar.shoeMaterial.needsUpdate = true;
@@ -4191,7 +4207,7 @@
             const aliasInput = document.getElementById('simple-alias-input');
             if (previewDiv) {
                 // Obtener el skin seleccionado
-                let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : (typeof skin !== 'undefined' ? skin : 'humanMaleA');
+                let skinName = avatarState.currentCustomization && avatarState.currentCustomization.skin ? avatarState.currentCustomization.skin : 'humanMaleA';
                 // Mapear nombre a archivo
                 const skinFileMap = {
                     'humanMaleA': 'humanMaleA.png',
@@ -4205,9 +4221,9 @@
                 // Actualizar el alias en la vista previa
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
                 // Crear una vista previa visual del avatar más detallada
-                const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
-                const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
-                const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
+                const shirtColorHex = avatarState.currentCustomization.shirtColor.toString(16).padStart(6, '0');
+                const pantsColorHex = avatarState.currentCustomization.pantsColor.toString(16).padStart(6, '0');
+                const shoesColorHex = avatarState.currentCustomization.shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Skin thumbnail -->
@@ -4253,10 +4269,13 @@
         function resetSimpleCustomization() {
             console.log('Restableciendo personalización');
             
-            // Restablecer colores por defecto
-            shirtColor = 0xFF6B6B;
-            pantsColor = 0x2C3E50;
-            shoesColor = 0x8B4513;
+            // Restablecer colores por defecto usando el sistema unificado
+            avatarState.currentCustomization = {
+                shirtColor: 0x4ECDC4,
+                pantsColor: 0x2C3E50,
+                shoesColor: 0x8B4513,
+                skin: 'humanMaleA'
+            };
             
             // Restablecer alias
             userAlias = '';
@@ -4266,11 +4285,11 @@
             }
             
             // Actualizar avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
+            const avatar = gameCollections.userAvatars.get(userAlias);
             if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
+                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(avatarState.currentCustomization.shirtColor);
+                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(avatarState.currentCustomization.pantsColor);
+                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(avatarState.currentCustomization.shoesColor);
                 
                 // Forzar actualización de materiales
                 if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
@@ -4302,22 +4321,16 @@
             }
             // Guardar alias
             userAlias = newAlias;
-            // Guardar en localStorage
-            const customizationData = {
-                alias: userAlias,
-                shirtColor: shirtColor,
-                pantsColor: pantsColor,
-                shoesColor: shoesColor
-            };
-            localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
+            // Guardar en localStorage usando el sistema unificado
+            localStorage.setItem('avatarCustomization', JSON.stringify(avatarState.currentCustomization));
             // Actualizar nombre en el avatar
             updateAvatarName && updateAvatarName();
             // Aplicar colores al avatar propio si existe
-            const myAvatar = userAvatars.get(userAlias);
+            const myAvatar = gameCollections.userAvatars.get(userAlias);
             if (myAvatar) {
-                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(shirtColor);
-                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(pantsColor);
-                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(shoesColor);
+                if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.color.setHex(avatarState.currentCustomization.shirtColor);
+                if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.color.setHex(avatarState.currentCustomization.pantsColor);
+                if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.color.setHex(avatarState.currentCustomization.shoesColor);
                 if (myAvatar.bodyMaterial) myAvatar.bodyMaterial.needsUpdate = true;
                 if (myAvatar.pantsMaterial) myAvatar.pantsMaterial.needsUpdate = true;
                 if (myAvatar.shoeMaterial) myAvatar.shoeMaterial.needsUpdate = true;
@@ -4328,7 +4341,7 @@
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
-            console.log('✅ Personalización guardada:', customizationData);
+            console.log('✅ Personalización guardada:', avatarState.currentCustomization);
         }
         
         function closeSimplePanel() {
@@ -4363,13 +4376,13 @@
     const img = document.getElementById('skin-preview-img');
     const label = document.getElementById('skin-preview-label');
     // Inicializar índice
-    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
+    let currentIdx = skinList.findIndex(s => s.key === (avatarState.currentCustomization && avatarState.currentCustomization.skin ? avatarState.currentCustomization.skin : 'humanMaleA'));
     if (currentIdx === -1) currentIdx = 0;
     // Función para actualizar preview
     function updateSkinPreview(idx) {
         img.src = skinList[idx].img;
         label.textContent = skinList[idx].label;
-        currentCustomization.skin = skinList[idx].key;
+        avatarState.currentCustomization.skin = skinList[idx].key;
         updateAvatarPreview && updateAvatarPreview();
     }
     // Asignar eventos
@@ -4402,7 +4415,7 @@
         }
         
         function changeShirtColor(color) {
-            currentCustomization.shirtColor = color;
+            avatarState.currentCustomization.shirtColor = color;
             applyCustomizationToAvatar();
             console.log('Color de camisa cambiado a:', color);
         }
@@ -4422,7 +4435,7 @@
                 console.log('Alias guardado:', newAlias);
             }
             
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            localStorage.setItem('avatarCustomization', JSON.stringify(avatarState.currentCustomization));
             closeSimplePanel();
             alert('¡Personalización guardada!');
         }
@@ -4438,10 +4451,10 @@
                     border: 3px solid transparent;
                     border-radius: 8px;
                     cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
+                    background-color: #${avatarState.customizationColors[i].toString(16).padStart(6, '0')};
                 `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
-                if (customizationColors[i] === currentCustomization.shirtColor) {
+                colorOption.onclick = () => selectWorkingColor(avatarState.customizationColors[i], 'shirt');
+                if (avatarState.customizationColors[i] === avatarState.currentCustomization.shirtColor) {
                     colorOption.style.borderColor = '#FFD700';
                 }
                 shirtGrid.appendChild(colorOption);
@@ -4468,17 +4481,17 @@
     skinOptions.forEach(btn => {
         btn.onclick = () => {
             const selectedSkin = btn.getAttribute('data-skin');
-            currentCustomization.skin = selectedSkin;
+            avatarState.currentCustomization.skin = selectedSkin;
             updateSelectedSkin();
             updateAvatarPreview();
         };
     });
 }
 
-function updateSelectedSkin() {
+        function updateSelectedSkin() {
     const skinOptions = document.querySelectorAll('.skin-option');
     skinOptions.forEach(btn => {
-        if (btn.getAttribute('data-skin') === currentCustomization.skin) {
+        if (btn.getAttribute('data-skin') === avatarState.currentCustomization.skin) {
             btn.classList.add('selected');
         } else {
             btn.classList.remove('selected');
@@ -4500,13 +4513,13 @@ function updateSelectedSkin() {
             // Actualizar color actual
             switch (type) {
                 case 'shirt':
-                    currentCustomization.shirtColor = color;
+                    avatarState.currentCustomization.shirtColor = color;
                     break;
                 case 'pants':
-                    currentCustomization.pantsColor = color;
+                    avatarState.currentCustomization.pantsColor = color;
                     break;
                 case 'shoes':
-                    currentCustomization.shoesColor = color;
+                    avatarState.currentCustomization.shoesColor = color;
                     break;
             }
             
@@ -4519,9 +4532,9 @@ function updateSelectedSkin() {
 
         function updateSelectedColors() {
             // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
+            const shirtOption = document.querySelector(`[data-color="${avatarState.currentCustomization.shirtColor}"][data-type="shirt"]`);
+            const pantsOption = document.querySelector(`[data-color="${avatarState.currentCustomization.pantsColor}"][data-type="pants"]`);
+            const shoesOption = document.querySelector(`[data-color="${avatarState.currentCustomization.shoesColor}"][data-type="shoes"]`);
             
             if (shirtOption) shirtOption.classList.add('selected');
 
@@ -4531,18 +4544,18 @@ function updateSelectedSkin() {
         selectedOption.classList.add('selected');
     }
 
-    // Actualizar color actual
-    switch (type) {
-        case 'shirt':
-            currentCustomization.shirtColor = color;
-            break;
-        case 'pants':
-            currentCustomization.pantsColor = color;
-            break;
-        case 'shoes':
-            currentCustomization.shoesColor = color;
-            break;
-    }
+                // Actualizar color actual
+            switch (type) {
+                case 'shirt':
+                    avatarState.currentCustomization.shirtColor = color;
+                    break;
+                case 'pants':
+                    avatarState.currentCustomization.pantsColor = color;
+                    break;
+                case 'shoes':
+                    avatarState.currentCustomization.shoesColor = color;
+                    break;
+            }
             
             // Validar el alias
             if (newAlias.length === 0) {
@@ -4574,28 +4587,15 @@ function updateSelectedSkin() {
             addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
         }
 
-        function resetCustomization() {
-            // Restablecer a colores por defecto
-            currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513,
-                skin: 'humanMaleA'
-            };
-            
-            // Aplicar cambios
-            applyCustomizationToAvatar();
-            updateSelectedColors();
-            updateSelectedSkin();
-        }
-
+        // --- FUNCIONES UNIFICADAS DE PERSONALIZACIÓN ---
+        
         function loadCustomization() {
             const saved = localStorage.getItem('avatarCustomization');
             if (saved) {
                 try {
-                    currentCustomization = JSON.parse(saved);
+                    avatarState.currentCustomization = JSON.parse(saved);
                     // Si falta la propiedad skin, asignar valor por defecto
-                    if (!currentCustomization.skin) currentCustomization.skin = 'humanMaleA';
+                    if (!avatarState.currentCustomization.skin) avatarState.currentCustomization.skin = 'humanMaleA';
                     applyCustomizationToAvatar();
                 } catch (error) {
                     console.error('Error cargando personalización:', error);
@@ -4604,16 +4604,16 @@ function updateSelectedSkin() {
         }
 
         function applyCustomizationToAvatar() {
-            if (!currentCustomization) return;
+            if (!avatarState.currentCustomization) return;
             
             // Actualizar colores del avatar
-            const shirtColor = currentCustomization.shirtColor || 0x4ECDC4;
-            const pantsColor = currentCustomization.pantsColor || 0x2C3E50;
-            const shoesColor = currentCustomization.shoesColor || 0x8B4513;
+            const shirtColor = avatarState.currentCustomization.shirtColor || 0x4ECDC4;
+            const pantsColor = avatarState.currentCustomization.pantsColor || 0x2C3E50;
+            const shoesColor = avatarState.currentCustomization.shoesColor || 0x8B4513;
             
             // Buscar y actualizar materiales del avatar
-            if (userAvatars.has(userAlias)) {
-                const avatarData = userAvatars.get(userAlias);
+            if (gameCollections.userAvatars.has(userAlias)) {
+                const avatarData = gameCollections.userAvatars.get(userAlias);
                 if (avatarData && avatarData.group) {
                     const group = avatarData.group;
                     
@@ -5036,9 +5036,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
         }
 
         // Inicialización robusta de colores de avatar
-        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
-        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
-        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
+        // Los colores ahora se manejan a través del sistema unificado avatarState.currentCustomization
+        // No se necesitan verificaciones de variables globales
         
         // UI: Al hacer clic en un usuario, activar modo privado
         usersList.addEventListener('click', function(e) {
