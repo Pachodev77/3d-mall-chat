@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -4823,9 +4823,9 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             
             if (runClip) {
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
-                runClip.name = 'walk';
-                actions.walk = mixer.clipAction(runClip);
-                console.log('Animación Walk/Run cargada para:', alias);
+                runClip.name = 'run';
+                actions.run = mixer.clipAction(runClip);
+                console.log('Animación Run cargada para:', alias);
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -4891,23 +4891,23 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'walk'
-                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
+                    if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
                         avatar.actions.idle.fadeOut(0.2);
-                        avatar.actions.walk.reset().fadeIn(0.2).play();
-                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                        avatar.actions.run.reset().fadeIn(0.2).play();
+                    } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
                         // Si no hay idle, usar default
                         avatar.actions.default.fadeOut(0.2);
-                        avatar.actions.walk.reset().fadeIn(0.2).play();
+                        avatar.actions.run.reset().fadeIn(0.2).play();
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'walk' a 'idle'
-                    if (avatar.actions && avatar.actions.walk && avatar.actions.idle) {
-                        avatar.actions.walk.fadeOut(0.2);
+                    if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
+                        avatar.actions.run.fadeOut(0.2);
                         avatar.actions.idle.reset().fadeIn(0.2).play();
-                    } else if (avatar.actions && avatar.actions.walk && avatar.actions.default) {
+                    } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
                         // Si no hay idle, usar default
-                        avatar.actions.walk.fadeOut(0.2);
+                        avatar.actions.run.fadeOut(0.2);
                         avatar.actions.default.reset().fadeIn(0.2).play();
                     }
                     avatar.isMoving = false;
