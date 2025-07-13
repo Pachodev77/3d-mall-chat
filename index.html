@@ -3888,7 +3888,7 @@
             // Limpiar mixers de animación
             userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
-                    
+                    avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
             });
@@ -4732,7 +4732,7 @@ function removeUserAvatar(alias) {
                 }
                 // Limpiar mixer de animación
                 if (avatar.mixer) {
-                    
+                    avatar.mixer.stopAllAction();
                     avatar.mixer.uncacheRoot(avatar.group);
                 }
     }
@@ -4836,7 +4836,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 actions.run = mixer.clipAction(runClip);
                 // Forzar loop infinito y velocidad lenta
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                actions.run.timeScale = 1.0; // Velocidad normal
+                actions.run.timeScale = 0.2; // 5x más lento
                 console.log('Animación Run cargada para:', alias, actions.run);
                 // Diagnóstico: información del clip y esqueleto
                 console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
@@ -4941,13 +4941,13 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                     // Empezó a moverse: cambia de 'idle' a 'walk'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
                         console.log('Activando RUN para', alias);
-                        
+                        avatar.mixer.stopAllAction();
                         avatar.actions.idle.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
                         // Si no hay idle, usar default
                         console.log('Activando RUN (sin idle) para', alias);
-                        
+                        avatar.mixer.stopAllAction();
                         avatar.actions.default.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     }
