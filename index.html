@@ -2845,7 +2845,7 @@
             
             // Procesar controles para ambas escenas
             const key = event.code.replace('Key', '');
-            if (key in keys) keys[key] = true;
+            if (key in inputState.keyboard) inputState.keyboard[key] = true;
             if (event.code === 'ArrowUp') inputState.keyboard.W = true;
             if (event.code === 'ArrowDown') inputState.keyboard.S = true;
             if (event.code === 'ArrowLeft') inputState.keyboard.A = true;
@@ -2897,7 +2897,7 @@
 
         function onKeyUp(event) {
             const key = event.code.replace('Key', '');
-            if (key in keys) keys[key] = false;
+            if (key in inputState.keyboard) inputState.keyboard[key] = false;
             if (event.code === 'ArrowUp') inputState.keyboard.W = false;
             if (event.code === 'ArrowDown') inputState.keyboard.S = false;
             if (event.code === 'ArrowLeft') inputState.keyboard.A = false;
@@ -2919,10 +2919,10 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             
             // Actualizar cámara y renderer de la habitación personal si existe
-            if (personalRoomCamera && personalRoomRenderer) {
-                personalRoomCamera.aspect = window.innerWidth / window.innerHeight;
-                personalRoomCamera.updateProjectionMatrix();
-                personalRoomRenderer.setSize(window.innerWidth, window.innerHeight);
+            if (renderState.personalRoom.camera && renderState.personalRoom.renderer) {
+                renderState.personalRoom.camera.aspect = window.innerWidth / window.innerHeight;
+                renderState.personalRoom.camera.updateProjectionMatrix();
+                renderState.personalRoom.renderer.setSize(window.innerWidth, window.innerHeight);
             }
         }
         
@@ -2967,7 +2967,7 @@
                 return;
             }
             
-            if (customizationPanelOpen && !customizationPanel.contains(target)) {
+            if (uiState.customization.panelOpen && !customizationPanel.contains(target)) {
                 closeCustomizationPanel();
                 return;
             }
@@ -3004,12 +3004,12 @@
             
             // Si estamos en modo de edición de muebles, usar la cámara de la habitación
             if (gameState.currentScene === 'personal-room' && gameState.furniture.editMode) {
-                raycaster.setFromCamera(mouse, personalRoomCamera);
-                const furnitureIntersects = raycaster.intersectObjects(furnitureObjects.map(f => f.mesh));
+                raycaster.setFromCamera(mouse, renderState.personalRoom.camera);
+                const furnitureIntersects = raycaster.intersectObjects(gameState.furniture.objects.map(f => f.mesh));
                 
                 if (furnitureIntersects.length > 0) {
                     const clickedFurniture = furnitureIntersects[0].object;
-                    const furniture = furnitureObjects.find(f => f.mesh === clickedFurniture);
+                    const furniture = gameState.furniture.objects.find(f => f.mesh === clickedFurniture);
                     if (furniture) {
                         selectFurniture(furniture.id);
                         return;
@@ -3018,7 +3018,7 @@
             } else {
                 // Comportamiento normal del mall
                 raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(clickableObjects);
+                const intersects = raycaster.intersectObjects(gameCollections.clickableObjects);
                 if (intersects.length > 0) {
                     const clickedObject = intersects[0].object;
                     
@@ -3081,7 +3081,7 @@
                 let collision = false;
                 
                 // Optimización: solo verificar colisiones cercanas
-                const nearbyCollisions = collisionObjects.filter(wallBox => {
+                const nearbyCollisions = gameCollections.collisionObjects.filter(wallBox => {
                     const distance = wallBox.getCenter(new THREE.Vector3()).distanceTo(newPosition);
                     return distance < 20; // Solo verificar objetos dentro de 20 unidades
                 });
