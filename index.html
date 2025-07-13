@@ -986,8 +986,8 @@
             
             // Posición y movimiento del jugador
             player: {
-                position: { x: 0, y: 0, z: 0 },
-                targetPosition: { x: 0, y: 0, z: 0 },
+                position: new THREE.Vector3(0, 0, 0),
+                targetPosition: new THREE.Vector3(0, 0, 0),
                 rotation: 0,
                 targetRotation: 0,
                 floor: 0,
@@ -1101,7 +1101,7 @@
                 scene: null,
                 camera: null,
                 renderer: null,
-                targetPosition: { x: 0, y: 0, z: 0 },
+                targetPosition: new THREE.Vector3(0, 0, 0),
                 targetRotation: 0
             }
         };
@@ -1275,8 +1275,8 @@
             camera.position.set(25, CAMERA_HEIGHT, 25); // Posición más cerca del centro
             camera.lookAt(HALL_SIZE / 2, CAMERA_HEIGHT, HALL_SIZE / 2);
 
-            targetPosition = camera.position.clone();
-            targetRotationY = camera.rotation.y;
+            gameState.player.targetPosition.copy(camera.position);
+            gameState.player.targetRotation = camera.rotation.y;
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -3193,21 +3193,21 @@
             personalRoomScene.background = new THREE.Color(0x2C3E50); // Azul oscuro
             
             // Crear cámara para la habitación
-            personalRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            personalRoomCamera.position.set(0, CAMERA_HEIGHT, 3); // Posición inicial en la habitación
-            personalRoomCamera.lookAt(0, CAMERA_HEIGHT, 0);
+            renderState.personalRoom.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderState.personalRoom.camera.position.set(0, CAMERA_HEIGHT, 3); // Posición inicial en la habitación
+            renderState.personalRoom.camera.lookAt(0, CAMERA_HEIGHT, 0);
             
             // Configurar posición y rotación objetivo para movimiento suave
-            personalRoomTargetPosition = personalRoomCamera.position.clone();
-            personalRoomTargetRotationY = personalRoomCamera.rotation.y;
+            renderState.personalRoom.targetPosition.copy(renderState.personalRoom.camera.position);
+            renderState.personalRoom.targetRotation = renderState.personalRoom.camera.rotation.y;
             
             // Crear renderer para la habitación
-            personalRoomRenderer = new THREE.WebGLRenderer({ antialias: true });
-            personalRoomRenderer.setSize(window.innerWidth, window.innerHeight);
-            personalRoomRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            personalRoomRenderer.shadowMap.enabled = false;
-            personalRoomRenderer.domElement.style.zIndex = '1';
-            document.body.appendChild(personalRoomRenderer.domElement);
+            renderState.personalRoom.renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderState.personalRoom.renderer.setSize(window.innerWidth, window.innerHeight);
+            renderState.personalRoom.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderState.personalRoom.renderer.shadowMap.enabled = false;
+            renderState.personalRoom.renderer.domElement.style.zIndex = '1';
+            document.body.appendChild(renderState.personalRoom.renderer.domElement);
             
             // Crear iluminación para la habitación
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -3766,7 +3766,7 @@
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
-                const newPosition = personalRoomTargetPosition.clone().add(velocity);
+                const newPosition = renderState.personalRoom.targetPosition.clone().add(velocity);
                 
                 // --- Límites de la habitación (12x12 metros) ---
                 const roomBounds = {
@@ -3780,11 +3780,11 @@
                 newPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, newPosition.x));
                 newPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, newPosition.z));
                 
-                personalRoomTargetPosition.copy(newPosition);
+                renderState.personalRoom.targetPosition.copy(newPosition);
             }
 
             // --- Mantener altura fija en la habitación ---
-            personalRoomTargetPosition.y = CAMERA_HEIGHT;
+            renderState.personalRoom.targetPosition.y = CAMERA_HEIGHT;
         }
         
         function animatePersonalRoom() {
@@ -3794,10 +3794,10 @@
             updatePersonalRoomMovement();
             
             // Aplicar movimiento suave a la cámara
-            personalRoomCamera.position.lerp(personalRoomTargetPosition, 0.2);
-            personalRoomCamera.rotation.y = lerpAngle(personalRoomCamera.rotation.y, personalRoomTargetRotationY, 0.2);
+            renderState.personalRoom.camera.position.lerp(renderState.personalRoom.targetPosition, 0.2);
+            renderState.personalRoom.camera.rotation.y = lerpAngle(renderState.personalRoom.camera.rotation.y, renderState.personalRoom.targetRotation, 0.2);
             
-            personalRoomRenderer.render(personalRoomScene, personalRoomCamera);
+            renderState.personalRoom.renderer.render(personalRoomScene, renderState.personalRoom.camera);
         }
         
         function customizeRoom() {
