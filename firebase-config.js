@@ -227,7 +227,7 @@ function cleanupOldMessages() {
         }
     });
 }
-setInterval(cleanupOldMessages, 5 * 60 * 1000);
+// setInterval removido - ahora se maneja desde el sistema de timing centralizado
 
 function cleanupDisconnectedUsers() {
     const now = Date.now();
@@ -244,7 +244,7 @@ function cleanupDisconnectedUsers() {
         }
     });
 }
-setInterval(cleanupDisconnectedUsers, 10000); 
+// setInterval removido - ahora se maneja desde el sistema de timing centralizado 
 
 function getPrivateChatId(aliasA, aliasB) {
     return [aliasA, aliasB].sort().join('_');
@@ -291,10 +291,14 @@ window.disconnectFromChat = disconnectFromChat;
 window.updateUsersList = updateUsersList;
 window.sendPrivateMessage = sendPrivateMessage;
 window.listenToPrivateMessages = listenToPrivateMessages;
+window.cleanupOldMessages = cleanupOldMessages;
+window.cleanupDisconnectedUsers = cleanupDisconnectedUsers;
+window.updateFirebaseTimestamp = updateFirebaseTimestamp;
 
 // Mantener actualizado el timestamp del usuario conectado
-setInterval(() => {
+// setInterval removido - ahora se maneja desde el sistema de timing centralizado
+function updateFirebaseTimestamp() {
     if (isConnected && currentUser) {
         usersRef.child(currentUser.alias).update({ timestamp: Date.now() });
     }
-}, 10000); 
+} 

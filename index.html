@@ -1118,12 +1118,22 @@
             lastPositionUpdate: 0,
             lastRotatingSignUpdate: 0,
             lastClockUpdate: 0,
+            lastCentralCubeUpdate: 0,
+            lastPersonalRoomSkyUpdate: 0,
+            lastFirebaseCleanup: 0,
+            lastFirebaseUserCleanup: 0,
+            lastFirebaseTimestampUpdate: 0,
             
             intervals: {
                 SKY: 60000,        // 1 minuto
                 POSITION: 500,     // 500ms
                 ROTATING_SIGN: 2500, // 2.5 segundos
-                CLOCK: 1000        // 1 segundo
+                CLOCK: 1000,       // 1 segundo
+                CENTRAL_CUBE: 2500, // 2.5 segundos para carteles centrales
+                PERSONAL_ROOM_SKY: 60000, // 1 minuto para cielo de habitación personal
+                FIREBASE_CLEANUP: 5 * 60 * 1000, // 5 minutos para limpieza de mensajes
+                FIREBASE_USER_CLEANUP: 10000, // 10 segundos para limpieza de usuarios
+                FIREBASE_TIMESTAMP: 10000 // 10 segundos para actualizar timestamp
             }
         };
         
@@ -1161,6 +1171,11 @@
                     case 'POSITION': timingState.lastPositionUpdate = Date.now(); break;
                     case 'ROTATING_SIGN': timingState.lastRotatingSignUpdate = Date.now(); break;
                     case 'CLOCK': timingState.lastClockUpdate = Date.now(); break;
+                    case 'CENTRAL_CUBE': timingState.lastCentralCubeUpdate = Date.now(); break;
+                    case 'PERSONAL_ROOM_SKY': timingState.lastPersonalRoomSkyUpdate = Date.now(); break;
+                    case 'FIREBASE_CLEANUP': timingState.lastFirebaseCleanup = Date.now(); break;
+                    case 'FIREBASE_USER_CLEANUP': timingState.lastFirebaseUserCleanup = Date.now(); break;
+                    case 'FIREBASE_TIMESTAMP': timingState.lastFirebaseTimestampUpdate = Date.now(); break;
                 }
             }
         };
@@ -2267,16 +2282,17 @@
             collisionObjects.push(new THREE.Box3().setFromObject(cube));
 
             let offset = 0;
-            setInterval(() => {
-                planes.forEach((plane, i) => {
-                    const linkIdx = (offset + i) % links.length;
-                    const url = links[linkIdx];
-                    const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
-                    plane.userData.URL = url;
-                    updateImagePlane(plane, url, domain, colorOffset + linkIdx, true);
-                });
-                offset = (offset + 1) % links.length;
-            }, interval);
+            // Almacenar datos para el sistema de timing centralizado
+            if (!window.centralCubeOffsets) {
+                window.centralCubeOffsets = {};
+            }
+            const cubeKey = `cube_${Date.now()}_${Math.random()}`;
+            window.centralCubeOffsets[cubeKey] = {
+                planes: planes,
+                links: links,
+                colorOffset: colorOffset,
+                offset: offset
+            };
         }
 
         function createImagePlane(url, text, width, height, colorIdx, solid) {
@@ -3308,10 +3324,8 @@
             rightCrossH.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightCrossH);
             // Actualizar color del cielo cada minuto
-            setInterval(() => {
-                const newSky = getSkyColorByHour();
-                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
-            }, 60000);
+            // El setInterval se reemplaza con el sistema de timing centralizado
+            // La actualización se maneja en updatePeriodicSystems()
             // Muebles básicos
             createRoomFurniture(roomWidth, roomHeight, roomDepth);
             // Cargar posiciones guardadas de muebles
@@ -4115,6 +4129,42 @@
                 updateDigitalClocks();
                 timingSystem.updateLastTime('CLOCK');
             }
+            
+            // Actualizar carteles centrales (reemplaza setInterval en createCentralCubeScreens)
+            if (timingSystem.shouldUpdate(lastCentralCubeUpdate, UPDATE_INTERVALS.CENTRAL_CUBE)) {
+                updateCentralCubeScreens();
+                timingSystem.updateLastTime('CENTRAL_CUBE');
+            }
+            
+            // Actualizar cielo de habitación personal (reemplaza setInterval en createPersonalRoom)
+            if (timingSystem.shouldUpdate(lastPersonalRoomSkyUpdate, UPDATE_INTERVALS.PERSONAL_ROOM_SKY)) {
+                updatePersonalRoomSky();
+                timingSystem.updateLastTime('PERSONAL_ROOM_SKY');
+            }
+            
+            // Limpieza de Firebase (reemplaza setInterval en firebase-config.js)
+            if (timingSystem.shouldUpdate(lastFirebaseCleanup, UPDATE_INTERVALS.FIREBASE_CLEANUP)) {
+                if (typeof window.cleanupOldMessages === 'function') {
+                    window.cleanupOldMessages();
+                }
+                timingSystem.updateLastTime('FIREBASE_CLEANUP');
+            }
+            
+            // Limpieza de usuarios desconectados de Firebase
+            if (timingSystem.shouldUpdate(lastFirebaseUserCleanup, UPDATE_INTERVALS.FIREBASE_USER_CLEANUP)) {
+                if (typeof window.cleanupDisconnectedUsers === 'function') {
+                    window.cleanupDisconnectedUsers();
+                }
+                timingSystem.updateLastTime('FIREBASE_USER_CLEANUP');
+            }
+            
+            // Actualizar timestamp de Firebase
+            if (timingSystem.shouldUpdate(lastFirebaseTimestampUpdate, UPDATE_INTERVALS.FIREBASE_TIMESTAMP)) {
+                if (typeof window.updateFirebaseTimestamp === 'function') {
+                    window.updateFirebaseTimestamp();
+                }
+                timingSystem.updateLastTime('FIREBASE_TIMESTAMP');
+            }
         }
         
         // Variables globales para carteles rotativos y relojes
@@ -4139,6 +4189,34 @@
             digitalClocks.forEach(clock => {
                 updateClockPlane(clock.material);
             });
+        }
+        
+        // Función para actualizar carteles centrales (reemplaza setInterval)
+        function updateCentralCubeScreens() {
+            // Actualizar todos los carteles centrales con el siguiente offset
+            if (typeof window.centralCubeOffsets !== 'undefined') {
+                Object.keys(window.centralCubeOffsets).forEach(key => {
+                    const data = window.centralCubeOffsets[key];
+                    if (data.planes && data.links && data.colorOffset) {
+                        data.offset = (data.offset + 1) % data.links.length;
+                        data.planes.forEach((plane, i) => {
+                            const linkIdx = (data.offset + i) % data.links.length;
+                            const url = data.links[linkIdx];
+                            const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
+                            plane.userData.URL = url;
+                            updateImagePlane(plane, url, domain, data.colorOffset + linkIdx, true);
+                        });
+                    }
+                });
+            }
+        }
+        
+        // Función para actualizar cielo de habitación personal (reemplaza setInterval)
+        function updatePersonalRoomSky() {
+            if (typeof backWindow !== 'undefined' && typeof leftWindow !== 'undefined' && typeof rightWindow !== 'undefined') {
+                const newSky = getSkyColorByHour();
+                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
+            }
         }
         
         // Función para limpiar recursos
