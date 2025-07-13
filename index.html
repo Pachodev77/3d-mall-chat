@@ -4863,6 +4863,17 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                     console.warn('No se pudo crear action para RUN:', alias);
                 }
                 console.log('--- FIN DIAGNÓSTICO ANIMACIÓN RUN ---');
+                
+                // Imprimir nombres de huesos del modelo y nombres de tracks del clip de animación run
+                console.log('Nombres de huesos del modelo:', boneNames);
+                console.log('Nombres de tracks del clip de animación run:', runClip.tracks.map(track => track.name));
+                
+                // Reasignar tracks para eliminar prefijo 'mixamorig:'
+                runClip.tracks.forEach(track => {
+                    if (track.name.startsWith('mixamorig:')) {
+                        track.name = track.name.replace('mixamorig:', '');
+                    }
+                });
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
