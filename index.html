@@ -972,6 +972,10 @@
         const MIN_FLOOR = 0;
         // --- Dimensiones globales de la habitación personal ---
         const roomWidth = 12, roomHeight = 3.5, roomDepth = 12;
+        
+        // --- Variables globales de Three.js ---
+        let scene, camera, renderer;
+        let targetPosition, targetRotationY;
 
         // --- SISTEMA DE ESTADO CENTRALIZADO ---
         
@@ -4075,16 +4079,16 @@
             requestAnimationFrame(animate);
             
             // Obtener delta time del reloj para animaciones
-            const deltaTime = clock.getDelta();
+            const deltaTime = animationState.clock.getDelta();
             
             // Control de FPS
-            const frameDeltaTime = currentTime - lastTime;
-            if (frameDeltaTime < frameInterval) {
+            const frameDeltaTime = currentTime - animationState.lastTime;
+            if (frameDeltaTime < animationState.frameInterval) {
                 return;
             }
             
-            lastTime = currentTime - (frameDeltaTime % frameInterval);
-            frameCount++;
+            animationState.lastTime = currentTime - (frameDeltaTime % animationState.frameInterval);
+            animationState.frameCount++;
             
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
