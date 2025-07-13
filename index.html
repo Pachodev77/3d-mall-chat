@@ -764,7 +764,7 @@
     <div id="furniture-edit-panel" style="position: fixed; top: 60px; right: 16px; width: 380px; height: 500px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
             <span>🪑 Editar Muebles</span>
-            <button onclick="closeFurnitureEditPanel()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
+                            <button class="close-btn" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
         </div>
         <div style="padding: 16px; color: #eee;">
             <div style="margin-bottom: 16px;">
@@ -785,16 +785,16 @@
     </div>
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
             <span>🏠 Mi Habitación</span>
-            <button onclick="closeRoomNavigation()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
+                            <button class="close-btn" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✖</button>
         </div>
         <div style="padding: 20px; color: #eee;">
             <div style="margin-bottom: 24px;">
                 <h3 style="margin: 0 0 12px 0; color: #FFD700; font-size: 20px;">Bienvenido a tu espacio personal</h3>
                 <p style="margin: 0; font-size: 16px; color: #ccc; line-height: 1.5;">Aquí puedes personalizar tu habitación y relajarte en tu espacio privado.</p>
             </div>
-            <button onclick="enterPersonalRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🚪 Entrar a mi habitación</button>
-            <button onclick="toggleFurnitureEditMode()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🪑 Mover muebles</button>
-            <button onclick="customizeRoom()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
+            <button id="enter-room-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🚪 Entrar a mi habitación</button>
+            <button id="toggle-furniture-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #27AE60, #2ECC71); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;">🪑 Mover muebles</button>
+            <button id="customize-room-btn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #333, #555); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s;">🎨 Personalizar habitación</button>
         </div>
     </div>
     
@@ -824,7 +824,7 @@
                 <span>👤</span>
                 <span>Personalizar Avatar</span>
             </div>
-            <button onclick="closeSimplePanel()" class="close-btn">✖</button>
+                            <button class="close-btn">✖</button>
         </div>
         
         <!-- Contenido principal -->
@@ -850,8 +850,8 @@
                 </div>
                     </div>
         <div class="panel-footer">
-            <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
-            <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
+            <button id="reset-customization-btn" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
+            <button id="save-customization-btn" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
         </div>
     </div>
     <div id="chat-panel">
@@ -1240,8 +1240,8 @@
             // --- Event Listeners ---
             setupEventListeners();
             
-            // --- Configurar botones de UI ---
-            setupUIButtons();
+            // --- Configurar event listeners centralizados ---
+            setupEventListeners();
 
             // --- Iniciar Animación ---
             animate();
@@ -2535,61 +2535,261 @@
         document.addEventListener('click', handleGlobalClick);
         }
         
-        function setupUIButtons() {
-            console.log('Configurando botones de UI...');
+        // --- SISTEMA CENTRALIZADO DE EVENT LISTENERS ---
+        
+        function setupEventListeners() {
+            console.log('Configurando event listeners centralizados...');
             
-            // Botón de habitaciones personales
+            // Event listeners del documento
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            document.addEventListener('mousedown', handleGlobalClick);
+            document.addEventListener('click', handleGlobalClick);
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('beforeunload', cleanup);
+            
+            // Event listeners de UI principal
+            setupUIEventListeners();
+            
+            // Event listeners de chat
+            setupChatEventListeners();
+            
+            // Event listeners de personalización
+            setupCustomizationEventListeners();
+            
+            // Event listeners de habitación personal
+            setupRoomEventListeners();
+            
+            // Event listeners de controles móviles
+            setupMobileControls();
+            
+            // Event listeners de usuarios
+            setupUserEventListeners();
+            
+            console.log('✅ Event listeners configurados');
+        }
+        
+        function setupUIEventListeners() {
+            // Botón de personalización
+            const customizationBtn = document.getElementById('customization-btn');
+            if (customizationBtn) {
+                customizationBtn.addEventListener('click', () => {
+                    console.log('Botón de personalización clickeado');
+                    openCustomizationPanel();
+                });
+            }
+            
+            // Botón de habitación personal
             const roomToggleBtn = document.getElementById('room-toggle-btn');
             if (roomToggleBtn) {
-                console.log('Botón de habitaciones encontrado');
-                roomToggleBtn.onclick = () => {
-                    console.log('Botón de habitaciones clickeado');
-                    toggleRoomNavigation();
-                };
-            } else {
-                console.error('No se encontró el botón de habitaciones');
+                roomToggleBtn.addEventListener('click', () => {
+                    console.log('Botón de habitación clickeado');
+                    if (gameState.currentScene === 'mall') {
+                        enterPersonalRoom();
+                    } else {
+                        returnToMall();
+                    }
+                });
             }
             
-            // Verificar que el botón se encontró correctamente
+            // Botón de cambio de alias
+            const changeAliasBtn = document.getElementById('change-alias-btn');
             if (changeAliasBtn) {
-                console.log('Botón de personalización encontrado');
-                changeAliasBtn.onclick = () => {
-                    console.log('Botón de personalización clickeado');
-                    // Mostrar el panel de personalización completo
-                    openCustomizationPanel();
-                };
-            } else {
-                console.error('No se encontró el botón de personalización');
-            }
-            
-            if (saveCustomizationBtn) {
-                console.log('Botón de guardar personalización encontrado');
-                saveCustomizationBtn.onclick = saveSimpleCustomization;
-            } else {
-                console.error('No se encontró el botón de guardar personalización');
-            }
-            
-            if (resetCustomizationBtn) {
-                console.log('Botón de resetear personalización encontrado');
-                resetCustomizationBtn.onclick = resetSimpleCustomization;
-            } else {
-                console.error('No se encontró el botón de resetear personalización');
+                changeAliasBtn.addEventListener('click', () => {
+                    const newAlias = prompt('Ingresa tu nuevo alias:');
+                    if (newAlias && newAlias.trim()) {
+                        userAlias = newAlias.trim();
+                        localStorage.setItem('userAlias', userAlias);
+                        if (isConnected) {
+                            sendAlias();
+                        }
+                    }
+                });
             }
             
             // Botón para regresar al mall
             const returnToMallBtn = document.getElementById('return-to-mall-btn');
             if (returnToMallBtn) {
-                console.log('Botón de regreso al mall encontrado');
-                returnToMallBtn.onclick = () => {
+                returnToMallBtn.addEventListener('click', () => {
                     console.log('Botón de regreso al mall clickeado');
                     returnToMall();
-                };
-            } else {
-                console.error('No se encontró el botón de regreso al mall');
+                });
+            }
+        }
+        
+        function setupChatEventListeners() {
+            // Botón de toggle del chat
+            const chatToggleBtn = document.getElementById('chat-toggle-btn');
+            if (chatToggleBtn) {
+                chatToggleBtn.addEventListener('click', () => {
+                    if (chatOpen) {
+                        chatPanel.style.display = 'none';
+                        chatOpen = false;
+                    } else {
+                        chatPanel.style.display = 'flex';
+                        chatOpen = true;
+                        chatInput.focus();
+                    }
+                });
             }
             
-            // Configurar controles móviles
-            setupMobileControls();
+            // Botón de cerrar chat
+            const chatCloseBtn = document.getElementById('chat-close-btn');
+            if (chatCloseBtn) {
+                chatCloseBtn.addEventListener('click', () => {
+                    chatPanel.style.display = 'none';
+                    chatOpen = false;
+                });
+            }
+            
+            // Botón de enviar mensaje
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            const chatInput = document.getElementById('chat-input');
+            if (chatSendBtn && chatInput) {
+                chatSendBtn.addEventListener('click', handleSendMessage);
+                chatInput.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') {
+                        handleSendMessage();
+                    }
+                });
+            }
+            
+            // Toggle de emojis
+            const emojiToggle = document.getElementById('emoji-toggle');
+            if (emojiToggle) {
+                emojiToggle.addEventListener('click', () => {
+                    if (emojiPanel.style.display === 'none' || !emojiPanel.style.display) {
+                        emojiPanel.style.display = 'flex';
+                        createEmojiPanel();
+                    } else {
+                        emojiPanel.style.display = 'none';
+                    }
+                });
+                }
+            }
+        
+        function setupCustomizationEventListeners() {
+            // Botones de personalización
+            const saveCustomizationBtn = document.getElementById('save-customization-btn');
+            const resetCustomizationBtn = document.getElementById('reset-customization-btn');
+            
+            if (saveCustomizationBtn) {
+                saveCustomizationBtn.addEventListener('click', saveSimpleCustomization);
+            }
+            
+            if (resetCustomizationBtn) {
+                resetCustomizationBtn.addEventListener('click', resetSimpleCustomization);
+            }
+            
+            // Botón de cerrar panel simple
+            const simplePanelCloseBtn = document.querySelector('#simple-panel .close-btn');
+            if (simplePanelCloseBtn) {
+                simplePanelCloseBtn.addEventListener('click', closeSimplePanel);
+            }
+            
+            // Input de alias para preview
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.addEventListener('input', () => {
+                    updateAvatarPreview();
+                });
+            }
+            
+            // Botones de navegación de skin
+            const prevBtn = document.getElementById('skin-prev-btn');
+            const nextBtn = document.getElementById('skin-next-btn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    const skinList = [
+                        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+                        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+                        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+                        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
+                    ];
+                    let currentIdx = skinList.findIndex(s => s.key === avatarState.currentCustomization.skin);
+                    if (currentIdx === -1) currentIdx = 0;
+                    currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
+                    updateSkinPreview(currentIdx);
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    const skinList = [
+                        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+                        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+                        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+                        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
+                    ];
+                    let currentIdx = skinList.findIndex(s => s.key === avatarState.currentCustomization.skin);
+                    if (currentIdx === -1) currentIdx = 0;
+                    currentIdx = (currentIdx + 1) % skinList.length;
+                    updateSkinPreview(currentIdx);
+                });
+            }
+        }
+        
+        function setupRoomEventListeners() {
+            // Botón de cerrar panel de edición de muebles
+            const furnitureEditCloseBtn = document.querySelector('#furniture-edit-panel .close-btn');
+            if (furnitureEditCloseBtn) {
+                furnitureEditCloseBtn.addEventListener('click', closeFurnitureEditPanel);
+            }
+            
+            // Botón de cerrar navegación de habitación
+            const roomNavCloseBtn = document.querySelector('#room-navigation-panel .close-btn');
+            if (roomNavCloseBtn) {
+                roomNavCloseBtn.addEventListener('click', closeRoomNavigation);
+            }
+            
+            // Botones de habitación personal
+            const enterRoomBtn = document.getElementById('enter-room-btn');
+            if (enterRoomBtn) {
+                enterRoomBtn.addEventListener('click', enterPersonalRoom);
+            }
+            
+            const toggleFurnitureBtn = document.getElementById('toggle-furniture-btn');
+            if (toggleFurnitureBtn) {
+                toggleFurnitureBtn.addEventListener('click', toggleFurnitureEditMode);
+            }
+            
+            const customizeRoomBtn = document.getElementById('customize-room-btn');
+            if (customizeRoomBtn) {
+                customizeRoomBtn.addEventListener('click', customizeRoom);
+            }
+        }
+        
+        function setupUserEventListeners() {
+            // Lista de usuarios
+            const usersList = document.getElementById('users-list');
+            if (usersList) {
+                usersList.addEventListener('click', function(e) {
+                    const userItem = e.target.closest('.user-item');
+                    if (userItem && !userItem.classList.contains('own')) {
+                        const alias = userItem.textContent.replace(' (Tú)', '');
+                        openPrivateChatWindow(alias);
+                    }
+                });
+            }
+        }
+        
+        // Función auxiliar para actualizar preview de skin
+        function updateSkinPreview(idx) {
+            const skinList = [
+                { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+                { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+                { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+                { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
+            ];
+            const img = document.getElementById('skin-preview-img');
+            const label = document.getElementById('skin-preview-label');
+            if (img && label) {
+                img.src = skinList[idx].img;
+                label.textContent = skinList[idx].label;
+                avatarState.currentCustomization.skin = skinList[idx].key;
+                updateAvatarPreview && updateAvatarPreview();
+            }
         }
         
         function setupMobileControls() {
