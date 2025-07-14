@@ -4813,8 +4813,17 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             
             // Los clips de animación vienen en el array `animations` de los archivos cargados
             const idleClip = idleAnimation.animations[0];
-            const runClip = runAnimation.animations[0];
-            
+            const runClip = runAnimation && runAnimation.animations ? runAnimation.animations[0] : undefined;
+            console.log('--- DIAGNÓSTICO RAW ---');
+            console.log('runAnimation:', runAnimation);
+            if (runAnimation && runAnimation.animations) {
+                console.log('runAnimation.animations:', runAnimation.animations);
+            } else {
+                console.warn('runAnimation.animations no existe o está vacío');
+            }
+            console.log('runClip:', runClip);
+            console.log('--- FIN DIAGNÓSTICO RAW ---');
+
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
                 actions.idle.play(); // Iniciar en 'idle' por defecto
@@ -4825,7 +4834,46 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 // Renombramos el clip para que coincida con lo que buscamos ('walk')
                 runClip.name = 'run';
                 actions.run = mixer.clipAction(runClip);
-                console.log('Animación Run cargada para:', alias);
+                // Forzar loop infinito y velocidad lenta
+                actions.run.setLoop(THREE.LoopRepeat, Infinity);
+                actions.run.timeScale = 0.2; // 5x más lento
+                console.log('Animación Run cargada para:', alias, actions.run);
+                // Diagnóstico: información del clip y esqueleto
+                console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
+                console.log('Nombre del clip:', runClip.name);
+                console.log('Duración:', runClip.duration);
+                console.log('Tracks:', runClip.tracks ? runClip.tracks.length : 'N/A');
+                if (runClip.tracks) {
+                    runClip.tracks.forEach((track, i) => {
+                        console.log(`Track #${i}:`, track.name, 'Keyframes:', track.times.length);
+                    });
+                }
+                // Diagnóstico: huesos del modelo
+                let boneCount = 0;
+                let boneNames = [];
+                avatar.traverse(child => {
+                    if (child.isBone) {
+                        boneCount++;
+                        boneNames.push(child.name);
+                    }
+                });
+                console.log('Huesos encontrados en el modelo:', boneCount);
+                console.log('Nombres de huesos:', boneNames);
+                if (!actions.run) {
+                    console.warn('No se pudo crear action para RUN:', alias);
+                }
+                console.log('--- FIN DIAGNÓSTICO ANIMACIÓN RUN ---');
+                
+                // Imprimir nombres de huesos del modelo y nombres de tracks del clip de animación run
+                console.log('Nombres de huesos del modelo:', boneNames);
+                console.log('Nombres de tracks del clip de animación run:', runClip.tracks.map(track => track.name));
+                
+                // Reasignar tracks para eliminar prefijo 'mixamorig:'
+                runClip.tracks.forEach(track => {
+                    if (track.name.startsWith('mixamorig:')) {
+                        track.name = track.name.replace('mixamorig:', '');
+                    }
+                });
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -4892,10 +4940,14 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'walk'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
+                        console.log('Activando RUN para', alias);
+                        avatar.mixer.stopAllAction();
                         avatar.actions.idle.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
                         // Si no hay idle, usar default
+                        console.log('Activando RUN (sin idle) para', alias);
+                        avatar.mixer.stopAllAction();
                         avatar.actions.default.fadeOut(0.2);
                         avatar.actions.run.reset().fadeIn(0.2).play();
                     }

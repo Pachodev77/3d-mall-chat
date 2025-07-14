@@ -14,7 +14,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const usersRef = db.ref('users');
 const messagesRef = db.ref('messages');
-const positionsRef = db.ref('positions');
+
 
 let currentUser = null;
 let isConnected = false;
@@ -33,8 +33,6 @@ function connectToChat(alias) {
         timestamp: Date.now()
     };
     usersRef.child(currentUser.alias).set(currentUser);
-// Eliminar posición al desconectarse
-positionsRef.child(currentUser.alias).onDisconnect().remove();
     usersRef.on('value', (snapshot) => {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
@@ -67,86 +65,7 @@ positionsRef.child(currentUser.alias).onDisconnect().remove();
     });
         messagesListenerSet = true;
     }
-    // Cargar usuarios existentes al conectar (solo una vez)
-    positionsRef.once('value', (snapshot) => {
-        const positions = snapshot.val() || {};
-        Object.entries(positions).forEach(([alias, userData]) => {
-            if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
-                console.log('[Firebase] Cargando usuario existente:', alias);
-                updateAvatarPosition(
-                    alias, 
-                    userData.position, 
-                    userData.floor, 
-                    userData.rotation,
-                    userData.shirtColor,
-                    userData.pantsColor,
-                    userData.shoesColor
-                );
-            }
-        });
-    });
-    
-    // Sistema de listeners optimizado para posiciones
-    // Listener para nuevos usuarios que se conectan
-    positionsRef.on('child_added', (snapshot) => {
-        const alias = snapshot.key;
-        const userData = snapshot.val();
-        
-        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
-            console.log('[Firebase] Nuevo usuario conectado:', alias);
-            updateAvatarPosition(
-                alias, 
-                userData.position, 
-                userData.floor, 
-                userData.rotation,
-                userData.shirtColor,
-                userData.pantsColor,
-                userData.shoesColor
-            );
-        }
-    });
-    
-    // Listener para actualizaciones de posición
-    positionsRef.on('child_changed', (snapshot) => {
-        const alias = snapshot.key;
-        const userData = snapshot.val();
-        
-        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
-            console.log('[Firebase] Posición actualizada:', alias);
-            updateAvatarPosition(
-                alias, 
-                userData.position, 
-                userData.floor, 
-                userData.rotation,
-                userData.shirtColor,
-                userData.pantsColor,
-                userData.shoesColor
-            );
-        }
-    });
-    
-    // Listener para usuarios que se desconectan
-    positionsRef.on('child_removed', (snapshot) => {
-        const alias = snapshot.key;
-        
-        if (alias !== currentUser.alias) {
-            console.log('[Firebase] Usuario desconectado:', alias);
-            if (typeof window.removeUserAvatar === 'function') {
-                window.removeUserAvatar(alias);
-            }
-        }
-    });
-    
-    // Función auxiliar para validar datos de posición
-    function isValidPositionData(data) {
-        return data &&
-               typeof data === 'object' &&
-               data.position && 
-               typeof data.position.x === 'number' && 
-               typeof data.position.y === 'number' && 
-               typeof data.position.z === 'number' &&
-               typeof data.floor === 'number';
-    }
+
     isConnected = true;
     console.log('Connected as:', currentUser.alias);
 }
@@ -165,43 +84,15 @@ function sendMessage(message) {
     }
 }
 
-function sendPosition(position, floor, rotation) {
-    if (!isConnected || !currentUser) return;
-    // Obtener colores actuales del avatar
-    let shirtColor = 0x4ECDC4, pantsColor = 0x2C3E50, shoesColor = 0x8B4513;
-    if (typeof window.currentCustomization === 'object') {
-        shirtColor = window.currentCustomization.shirtColor || shirtColor;
-        pantsColor = window.currentCustomization.pantsColor || pantsColor;
-        shoesColor = window.currentCustomization.shoesColor || shoesColor;
-    } else if (typeof window.shirtColor !== 'undefined') {
-        shirtColor = window.shirtColor;
-        pantsColor = window.pantsColor;
-        shoesColor = window.shoesColor;
-    }
-    const positionData = {
-        position: position,
-        floor: floor,
-        rotation: rotation,
-        shirtColor: shirtColor,
-        pantsColor: pantsColor,
-        shoesColor: shoesColor,
-        timestamp: Date.now()
-    };
-    positionsRef.child(currentUser.alias).set(positionData);
-}
 
 function disconnectFromChat() {
     if (currentUser) {
         usersRef.child(currentUser.alias).remove();
-        positionsRef.child(currentUser.alias).remove();
+
         currentUser = null;
     }
     isConnected = false;
     
-    // Limpiar listeners específicos para evitar memory leaks
-    positionsRef.off('child_added');
-    positionsRef.off('child_changed');
-    positionsRef.off('child_removed');
 }
 
 function updateUsersList(users) {
@@ -290,7 +181,6 @@ function listenToPrivateMessages() {
 
 window.connectToChat = connectToChat;
 window.sendMessage = sendMessage;
-window.sendPosition = sendPosition;
 window.disconnectFromChat = disconnectFromChat;
 window.updateUsersList = updateUsersList;
 window.sendPrivateMessage = sendPrivateMessage;
