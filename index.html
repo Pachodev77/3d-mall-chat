@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -752,6 +752,11 @@
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
         <button id="room-toggle-btn" title="Mi habitación" style="pointer-events: auto;">🏠</button>
+        <!-- Botones de piso para móvil -->
+        <div id="mobile-floor-buttons" style="position: fixed; top: 20px; right: 20px; display: none; flex-direction: column; gap: 10px; z-index: 35000; pointer-events: auto;">
+            <button id="btn-floor-2" style="width: 70px; height: 44px; font-size: 18px; border-radius: 10px 10px 0 0; background: #4B0000; color: #fff; border: 2px solid #FFD700;">Piso 2</button>
+            <button id="btn-floor-1" style="width: 70px; height: 44px; font-size: 18px; border-radius: 0 0 10px 10px; background: #4B0000; color: #fff; border: 2px solid #FFD700;">Piso 1</button>
+        </div>
     </div>
     
     <!-- Panel de navegación de habitaciones -->
@@ -836,7 +841,7 @@
                         <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
                             <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
                             <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
-                </div>
+                        </div>
                         <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
                     </div>
                 </div>
@@ -846,9 +851,9 @@
                         Nombre del Avatar
                     </h3>
                     <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
-                    </div>
                 </div>
-                    </div>
+            </div>
+        </div>
         <div class="panel-footer">
             <button onclick="resetSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #555, #777); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🔄 Restablecer</button>
             <button onclick="saveSimpleCustomization()" style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #4B0000, #800000); color: #fff; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">💾 Guardar</button>
@@ -965,8 +970,10 @@
         // --- Constantes y Configuración Global ---
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
         const HALL_HEIGHT = 4;
-        const MOVE_SPEED = 0.8;
-        const ROTATE_SPEED = 0.1;
+        // Ajustar velocidad de movimiento según dispositivo
+        const IS_MOBILE = isMobileDevice();
+        const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
+        const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
         const MIN_FLOOR = 0;
@@ -3780,30 +3787,52 @@
 
         function animate(currentTime) {
             requestAnimationFrame(animate);
-            
             // Obtener delta time del reloj para animaciones
             const deltaTime = clock.getDelta();
-            
             // Control de FPS
             const frameDeltaTime = currentTime - lastTime;
             if (frameDeltaTime < frameInterval) {
                 return;
             }
-            
             lastTime = currentTime - (frameDeltaTime % frameInterval);
             frameCount++;
-            
             // Sistema de timing centralizado para actualizaciones periódicas
             updatePeriodicSystems(currentTime);
-            
             // Solo actualizar y renderizar si estamos en la escena del mall
             if (currentScene === 'mall') {
-            updateMovement();
-            updateAvatarPositions(); // Actualizar posiciones de avatares
-            
-                // Actualizar animaciones de avatares con el delta time correcto
-                updateAvatarAnimations(deltaTime);
-                
+                updateMovement();
+                updateAvatarPositions(); // Actualizar posiciones de avatares
+                updateAvatarAnimations(deltaTime); // Animaciones de avatares
+                // --- Mostrar botones de piso si el usuario está sobre el pasillo rojo oscuro (solo móvil) ---
+                if (IS_MOBILE) {
+                    // Raycast hacia abajo desde la cámara
+                    const downRay = new THREE.Raycaster();
+                    const from = camera.position.clone();
+                    const to = from.clone();
+                    to.y -= 2; // 2 metros hacia abajo
+                    downRay.set(from, new THREE.Vector3(0, -1, 0));
+                    const intersects = downRay.intersectObjects(scene.children, true);
+                    let onRedHall = false;
+                    for (let i = 0; i < intersects.length; i++) {
+                        const obj = intersects[i].object;
+                        if (obj.material && obj.material.color && obj.material.color.getHex() === 0x4B0000) {
+                            onRedHall = true;
+                            break;
+                        }
+                    }
+                    const floorBtns = document.getElementById('mobile-floor-buttons');
+                    if (onRedHall) {
+                        if (floorBtns.style.display !== 'flex') {
+                            floorBtns.style.display = 'flex';
+                        }
+                        // Cancelar cualquier timeout de ocultar
+                        clearTimeout(window._hideFloorBtnsTimeout);
+                    } else {
+                        if (floorBtns.style.display !== 'none') {
+                            floorBtns.style.display = 'none';
+                        }
+                    }
+                }
                 renderer.render(scene, camera);
             }
         }
@@ -4254,7 +4283,7 @@
             let position = { x: 25, y: 2, z: 25 };
             let floor = 0;
             if (userAvatars.has(userAlias)) {
-                const myAvatar = userAvatars.get(userAlias);
+            const myAvatar = userAvatars.get(userAlias);
                 if (myAvatar && myAvatar.group) {
                     position = {
                         x: myAvatar.group.position.x,
@@ -4303,7 +4332,7 @@
         }
         
         // --- SKIN SELECTION ARROWS LOGIC ---
-        document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Skins disponibles
     const skinList = [
         { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
@@ -4339,13 +4368,13 @@
     updateSkinPreview(currentIdx);
 
     // Alias input para preview
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.addEventListener('input', function() {
-                    updateAvatarPreview();
-                });
-            }
+    const aliasInput = document.getElementById('simple-alias-input');
+    if (aliasInput) {
+        aliasInput.addEventListener('input', function() {
+            updateAvatarPreview();
         });
+    }
+});
 
         function closeWorkingPanel() {
             const panel = document.getElementById('working-customization-panel');
@@ -4865,7 +4894,12 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 actions.run = mixer.clipAction(runClip);
                 // Forzar loop infinito y velocidad lenta
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                actions.run.timeScale = 0.5; // Animación de correr más rápida
+                // Ajustar la velocidad de la animación de correr según dispositivo
+                if (IS_MOBILE) {
+                    actions.run.timeScale = 1.0; // Más fluida en móvil
+                } else {
+                    actions.run.timeScale = 0.7; // Más lenta en escritorio
+                }
                 console.log('Animación Run cargada para:', alias, actions.run);
                 // Diagnóstico: información del clip y esqueleto
                 console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
@@ -4957,39 +4991,56 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
     };
 }
         // --- Función para actualizar todas las posiciones de avatares ---
-        function updateAvatarPositions() {
-            userAvatars.forEach((avatar, alias) => {
+function updateAvatarPositions() {
+    userAvatars.forEach((avatar, alias) => {
                 // Interpolar posición y rotación
-                avatar.group.position.lerp(avatar.targetPosition, 0.2);
+        avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
                 // --- LÓGICA DE CONTROL DE ANIMACIÓN ---
                 const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
 
                 if (isNowMoving && !avatar.isMoving) {
-                    // Empezó a moverse: cambia de 'idle' a 'walk'
+                    // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        console.log('Activando RUN para', alias);
                         avatar.mixer.stopAllAction();
-                        avatar.actions.idle.fadeOut(0.2);
-                        avatar.actions.run.reset().fadeIn(0.2).play();
+                        // Fade más largo en móvil para suavidad
+                        if (IS_MOBILE) {
+                            avatar.actions.idle.fadeOut(0.5);
+                            avatar.actions.run.reset().fadeIn(0.5).play();
+                        } else {
+                            avatar.actions.idle.fadeOut(0.2);
+                            avatar.actions.run.reset().fadeIn(0.2).play();
+                        }
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        // Si no hay idle, usar default
-                        console.log('Activando RUN (sin idle) para', alias);
                         avatar.mixer.stopAllAction();
-                        avatar.actions.default.fadeOut(0.2);
-                        avatar.actions.run.reset().fadeIn(0.2).play();
+                        if (IS_MOBILE) {
+                            avatar.actions.default.fadeOut(0.5);
+                            avatar.actions.run.reset().fadeIn(0.5).play();
+                        } else {
+                            avatar.actions.default.fadeOut(0.2);
+                            avatar.actions.run.reset().fadeIn(0.2).play();
+                        }
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
-                    // Dejó de moverse: cambia de 'walk' a 'idle'
+                    // Dejó de moverse: cambia de 'run' a 'idle'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        avatar.actions.run.fadeOut(0.2);
-                        avatar.actions.idle.reset().fadeIn(0.2).play();
+                        if (IS_MOBILE) {
+                            avatar.actions.run.fadeOut(0.5);
+                            avatar.actions.idle.reset().fadeIn(0.5).play();
+                        } else {
+                            avatar.actions.run.fadeOut(0.2);
+                            avatar.actions.idle.reset().fadeIn(0.2).play();
+                        }
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        // Si no hay idle, usar default
-                        avatar.actions.run.fadeOut(0.2);
-                        avatar.actions.default.reset().fadeIn(0.2).play();
+                        if (IS_MOBILE) {
+                            avatar.actions.run.fadeOut(0.5);
+                            avatar.actions.default.reset().fadeIn(0.5).play();
+    } else {
+                            avatar.actions.run.fadeOut(0.2);
+                            avatar.actions.default.reset().fadeIn(0.2).play();
+                        }
                     }
                     avatar.isMoving = false;
                 }
@@ -5220,4 +5271,49 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
         // --- Variables globales para el cielo de la habitación personal ---
         
     </script>
+    <script>
+        // ... existing code ...
+        // --- Al final del setupEventListeners o en DOMContentLoaded ---
+        document.addEventListener('DOMContentLoaded', function() {
+            if (IS_MOBILE) {
+                // Ocultar botones al inicio
+                const floorBtns = document.getElementById('mobile-floor-buttons');
+                floorBtns.style.display = 'none';
+                // Listeners para los botones
+                document.getElementById('btn-floor-1').onclick = function(e) {
+                    e.stopPropagation();
+                    currentFloor = 0;
+                    floorBtns.style.display = 'none';
+                };
+                document.getElementById('btn-floor-2').onclick = function(e) {
+                    e.stopPropagation();
+                    currentFloor = 1;
+                    floorBtns.style.display = 'none';
+                };
+            }
+        });
+        // ... existing code ...
+        // --- En handleGameClick, después de raycaster.setFromCamera(mouse, camera); ---
+            // Detectar si se hizo clic en la franja roja oscura de los pasillos (solo móvil)
+            if (IS_MOBILE) {
+                const intersectsAll = raycaster.intersectObjects(scene.children, true);
+                for (let i = 0; i < intersectsAll.length; i++) {
+                    const obj = intersectsAll[i].object;
+                    // Detectar por color/material del pasillo rojo oscuro
+                    if (obj.material && obj.material.color && obj.material.color.getHex() === 0x4B0000) {
+                        // Mostrar botones de piso
+                        const floorBtns = document.getElementById('mobile-floor-buttons');
+                        floorBtns.style.display = 'flex';
+                        // Ocultar automáticamente después de 4 segundos si no se presiona
+                        clearTimeout(window._hideFloorBtnsTimeout);
+                        window._hideFloorBtnsTimeout = setTimeout(() => {
+                            floorBtns.style.display = 'none';
+                        }, 4000);
+                        break;
+                    }
+                }
+            }
+        // ... existing code ...
+    </script>
+    <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
 </body>
