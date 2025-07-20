@@ -5374,7 +5374,7 @@ function updateAvatarPositions() {
         // ... existing code ...
         // --- En handleGameClick, después de raycaster.setFromCamera(mouse, camera); ---
             // Detectar si se hizo clic en la franja roja oscura de los pasillos (solo móvil)
-            if (IS_MOBILE) {
+            if (IS_MOBILE && typeof scene !== 'undefined' && scene) {
                 const intersectsAll = raycaster.intersectObjects(scene.children, true);
                 for (let i = 0; i < intersectsAll.length; i++) {
                     const obj = intersectsAll[i].object;
