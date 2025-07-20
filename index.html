@@ -892,6 +892,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="/firebase-config.js"></script>
     <script>
+        // Función para detectar dispositivo móvil
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+        }
+        
+        // Ajustar velocidad de movimiento según dispositivo
+        const IS_MOBILE = isMobileDevice();
+
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
         const originalStoreLinks = [
             "https://www.ipweb.pro/en/?Davincho88", "https://ipgold.biz/?r=meramente42@gmail.com", "https://surfe.be/ext/2837287",
@@ -970,8 +979,6 @@
         // --- Constantes y Configuración Global ---
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
         const HALL_HEIGHT = 4;
-        // Ajustar velocidad de movimiento según dispositivo
-        const IS_MOBILE = isMobileDevice();
         const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
