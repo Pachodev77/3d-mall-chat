@@ -991,6 +991,7 @@
         
         // --- Variables para Avatares de Usuarios ---
         const userAvatars = new Map(); // Mapa de alias -> avatar
+        const pendingSkins = {};
         const avatarColors = [
             0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
             0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
@@ -4764,6 +4765,10 @@ function updateSelectedSkin() {
 
         // Función para actualizar el skin del avatar de otro usuario
         function updateAvatarSkinForUser(alias, newSkin) {
+            if (!userAvatars.has(alias) || !userAvatars.get(alias).group) {
+                pendingSkins[alias] = newSkin;
+                return;
+            }
             console.log('🔍 [updateAvatarSkinForUser] Actualizando skin para usuario:', alias, 'skin:', newSkin);
             console.log('🔍 [updateAvatarSkinForUser] userAvatars tiene alias?', userAvatars.has(alias));
             console.log('🔍 [updateAvatarSkinForUser] Todos los avatares:', Array.from(userAvatars.keys()));
@@ -5197,6 +5202,11 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 currentFloor: floor,
                 isMoving: false
             });
+            
+            if (pendingSkins[alias]) {
+                updateAvatarSkinForUser(alias, pendingSkins[alias]);
+                delete pendingSkins[alias];
+            }
             
         }).catch(error => {
             console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
