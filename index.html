@@ -949,7 +949,7 @@
             'bux': 'buxmoney-logo.png',
             'swagbucks': 'swagbucks-logo.png',
             'grass': 'grass-logo.png',
-            'getgrass': 'grass-logo.png', // Agregar alias para app.getgrass.io
+            'getgrass': 'grass-logo.png", // Agregar alias para app.getgrass.io
             'freecash': 'freecash-logo.png',
             'binance': 'binance-logo.png',
             'paidwork': 'paidwork-logo.png',
@@ -4209,6 +4209,10 @@
             // Enviar alias al servidor si está conectado
             if (typeof isConnected !== 'undefined' && isConnected) {
                 sendAlias && sendAlias();
+            }
+            // --- NUEVO: Forzar sincronización de skin en tiempo real ---
+            if (typeof sendUserPosition === 'function') {
+                sendUserPosition();
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
