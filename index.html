@@ -4830,19 +4830,11 @@ function updateSelectedSkin() {
                 console.warn('Rotación inválida para alias:', alias, rotation);
                 return;
             }
-            // Eliminar filtro que ignora el avatar propio
-            // if (alias === userAlias) {
-            //     console.log('🔄 [updateAvatarPosition] Ignorando avatar propio:', alias);
-            //     return;
-            // }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                // Solo pasar skin si existe
-                let custom = {};
-                if (skin) {
-                    custom.skin = skin;
-                    console.log('🔄 [updateAvatarPosition] Creando avatar con skin:', skin);
-                }
+                // Siempre pasar el skin recibido, aunque sea 'humanMaleA'
+                let custom = { skin: skin || 'humanMaleA' };
+                console.log('🔄 [updateAvatarPosition] Creando avatar con skin:', custom.skin);
                 createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
             } else if (skin && avatar.group) {
