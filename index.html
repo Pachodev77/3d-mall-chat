@@ -4328,8 +4328,8 @@
             createUserAvatar(userAlias, position, floor, customizationData);
 
             // Enviar alias al servidor si está conectado
-            if (typeof isConnected !== 'undefined' && isConnected) {
-                sendAlias && sendAlias();
+            if (typeof isConnected !== 'undefined' && isConnected && typeof sendAlias === 'function') {
+                sendAlias();
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
@@ -4477,7 +4477,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 userAlias = newAlias;
                 localStorage.setItem('userAlias', userAlias);
                 
-                if (isConnected) {
+                if (isConnected && typeof sendAlias === 'function') {
                     sendAlias();
                 }
                 
@@ -4623,7 +4623,7 @@ function updateSelectedSkin() {
                 localStorage.setItem('userAlias', userAlias);
                 
                 // Enviar nuevo alias al servidor
-                if (isConnected) {
+                if (isConnected && typeof sendAlias === 'function') {
                     sendAlias();
                 }
             }
