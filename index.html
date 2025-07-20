@@ -991,7 +991,6 @@
         
         // --- Variables para Avatares de Usuarios ---
         const userAvatars = new Map(); // Mapa de alias -> avatar
-        const pendingSkins = {};
         const avatarColors = [
             0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7,
             0xDDA0DD, 0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9,
@@ -4260,7 +4259,7 @@
             console.log('Guardando personalización');
             const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput ? aliasInput.value.trim() : '';
-            
+            // Validar alias
             if (newAlias.length > 20) {
                 alert('El nombre no puede tener más de 20 caracteres');
                 return;
@@ -4307,8 +4306,8 @@
             createUserAvatar(userAlias, position, floor, customizationData);
 
             // Enviar alias al servidor si está conectado
-            if (typeof isConnected !== 'undefined' && isConnected && typeof sendAlias === 'function') {
-                sendAlias();
+            if (typeof isConnected !== 'undefined' && isConnected) {
+                sendAlias && sendAlias();
             }
             // Cerrar panel
             closeSimplePanel && closeSimplePanel();
@@ -4341,144 +4340,32 @@ document.addEventListener('DOMContentLoaded', function() {
         { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
         { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
     ];
-    
-    // Variables globales para el selector de skins
-    window.skinList = skinList;
-    window.currentSkinIndex = 0;
-    
     // Obtener elementos
     const prevBtn = document.getElementById('skin-prev-btn');
     const nextBtn = document.getElementById('skin-next-btn');
     const img = document.getElementById('skin-preview-img');
     const label = document.getElementById('skin-preview-label');
-    
+    // Inicializar índice
+    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
+    if (currentIdx === -1) currentIdx = 0;
     // Función para actualizar preview
     function updateSkinPreview(idx) {
-        if (img && label && skinList[idx]) {
-            img.src = skinList[idx].img;
-            label.textContent = skinList[idx].label;
-            currentCustomization.skin = skinList[idx].key;
-            window.currentSkinIndex = idx;
-            updateAvatarPreview && updateAvatarPreview();
-            // Actualizar avatar en tiempo real
-            updateAvatarSkinInRealTime(skinList[idx].key);
-        }
+        img.src = skinList[idx].img;
+        label.textContent = skinList[idx].label;
+        currentCustomization.skin = skinList[idx].key;
+        updateAvatarPreview && updateAvatarPreview();
     }
-    
-
-
-    // Función para actualizar el skin del avatar en tiempo real
-    function updateAvatarSkinInRealTime(newSkin) {
-        console.log('🔍 [updateAvatarSkinInRealTime] Iniciando con skin:', newSkin);
-        console.log('🔍 [updateAvatarSkinInRealTime] userAlias:', userAlias);
-        console.log('🔍 [updateAvatarSkinInRealTime] userAvatars tiene userAlias?', userAvatars.has(userAlias));
-        console.log('🔍 [updateAvatarSkinInRealTime] Todos los avatares:', Array.from(userAvatars.entries()));
-        
-        if (!userAvatars.has(userAlias)) {
-            console.log('❌ [updateAvatarSkinInRealTime] No se encontró avatar para userAlias:', userAlias);
-            console.log('🔍 [updateAvatarSkinInRealTime] Avatares disponibles:', Array.from(userAvatars.keys()));
-            return;
-        }
-        
-        const avatar = userAvatars.get(userAlias);
-        console.log('🔍 [updateAvatarSkinInRealTime] Avatar encontrado:', avatar);
-        console.log('🔍 [updateAvatarSkinInRealTime] Avatar.group:', avatar.group);
-        console.log('🔍 [updateAvatarSkinInRealTime] Avatar.group.children:', avatar.group.children);
-        
-        if (!avatar || !avatar.group) {
-            console.log('❌ [updateAvatarSkinInRealTime] Avatar o avatar.group es undefined');
-            return;
-        }
-        
-        console.log('🔄 Actualizando skin a:', newSkin);
-        
-        // Actualizar currentCustomization para sincronización
-        if (typeof currentCustomization !== 'undefined') {
-            currentCustomization.skin = newSkin;
-            console.log('🔄 [updateAvatarSkinInRealTime] currentCustomization actualizado:', currentCustomization);
-        }
-        
-        // Mapear nombre de skin a archivo de textura
-        const skinFileMap = {
-            'humanMaleA': 'humanMaleA.png',
-            'humanFemaleA': 'humanFemaleA.png',
-            'zombieMaleA': 'zombieMaleA.png',
-            'zombieFemaleA': 'zombieFemaleA.png'
-        };
-        
-        const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
-        console.log('📁 Cargando textura desde:', texturePath);
-        
-        // Cargar nueva textura y aplicarla
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(texturePath, (texture) => {
-            console.log('✅ Textura cargada, aplicando al avatar...');
-            let meshCount = 0;
-            let materialCount = 0;
-            
-            // Recorrer todos los hijos del avatar
-            avatar.group.traverse(child => {
-                console.log('🔍 [updateAvatarSkinInRealTime] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh);
-                
-                if (child.isMesh) {
-                    meshCount++;
-                    console.log('🎨 [updateAvatarSkinInRealTime] Mesh encontrado:', child.name);
-                    console.log('🎨 [updateAvatarSkinInRealTime] Material del mesh:', child.material);
-                    
-                    if (child.material) {
-                        materialCount++;
-                        console.log('🎨 Aplicando textura a mesh:', child.name, 'material:', child.material);
-                        child.material.map = texture;
-                        child.material.needsUpdate = true;
-                        console.log('✅ Textura aplicada a mesh:', child.name);
-                    } else {
-                        console.log('⚠️ Mesh sin material:', child.name);
-                    }
-                }
-            });
-            
-            console.log('✅ Skin actualizada en tiempo real:', newSkin);
-            console.log('📊 Resumen: meshes encontrados:', meshCount, 'materials actualizados:', materialCount);
-            
-            // Forzar re-renderizado
-            if (renderer) {
-                renderer.render(scene, camera);
-            }
-            
-            // Enviar la actualización a Firebase para que otros usuarios vean el cambio
-            if (typeof sendPosition === 'function') {
-                console.log('📡 Enviando actualización de skin a Firebase...');
-                sendPosition(camera.position, currentFloor, camera.rotation.y);
-            } else {
-                console.log('⚠️ Función sendPosition no disponible');
-            }
-        }, undefined, (error) => {
-            console.error('❌ Error cargando textura para skin:', newSkin, error);
-        });
-    }
-    
-    // Función para inicializar el selector con el skin actual
-    function initializeSkinSelector() {
-        // Encontrar el índice del skin actual
-        const currentSkin = currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA';
-        const idx = skinList.findIndex(s => s.key === currentSkin);
-        window.currentSkinIndex = idx !== -1 ? idx : 0;
-        updateSkinPreview(window.currentSkinIndex);
-    }
-    
     // Asignar eventos
     prevBtn && prevBtn.addEventListener('click', function() {
-        window.currentSkinIndex = (window.currentSkinIndex - 1 + skinList.length) % skinList.length;
-        updateSkinPreview(window.currentSkinIndex);
+        currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
+        updateSkinPreview(currentIdx);
     });
-    
     nextBtn && nextBtn.addEventListener('click', function() {
-        window.currentSkinIndex = (window.currentSkinIndex + 1) % skinList.length;
-        updateSkinPreview(window.currentSkinIndex);
+        currentIdx = (currentIdx + 1) % skinList.length;
+        updateSkinPreview(currentIdx);
     });
-    
-    // Exponer función para inicializar desde openSimplePanel
-    window.initializeSkinSelector = initializeSkinSelector;
+    // Inicializar preview
+    updateSkinPreview(currentIdx);
 
     // Alias input para preview
     const aliasInput = document.getElementById('simple-alias-input');
@@ -4511,7 +4398,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 userAlias = newAlias;
                 localStorage.setItem('userAlias', userAlias);
                 
-                if (isConnected && typeof sendAlias === 'function') {
+                if (isConnected) {
                     sendAlias();
                 }
                 
@@ -4657,7 +4544,7 @@ function updateSelectedSkin() {
                 localStorage.setItem('userAlias', userAlias);
                 
                 // Enviar nuevo alias al servidor
-                if (isConnected && typeof sendAlias === 'function') {
+                if (isConnected) {
                     sendAlias();
                 }
             }
@@ -4740,84 +4627,7 @@ function updateSelectedSkin() {
             }
         }
 
-        // Función para actualizar el skin del avatar de otro usuario
-        function updateAvatarSkinForUser(alias, newSkin) {
-            if (!userAvatars.has(alias) || !userAvatars.get(alias).group) {
-                pendingSkins[alias] = newSkin;
-                return;
-            }
-            console.log('🔍 [updateAvatarSkinForUser] Actualizando skin para usuario:', alias, 'skin:', newSkin);
-            console.log('🔍 [updateAvatarSkinForUser] userAvatars tiene alias?', userAvatars.has(alias));
-            console.log('🔍 [updateAvatarSkinForUser] Todos los avatares:', Array.from(userAvatars.keys()));
-            
-            if (!userAvatars.has(alias)) {
-                console.log('❌ [updateAvatarSkinForUser] No se encontró avatar para alias:', alias);
-                return;
-            }
-            
-            const avatar = userAvatars.get(alias);
-            console.log('🔍 [updateAvatarSkinForUser] Avatar encontrado:', avatar);
-            console.log('🔍 [updateAvatarSkinForUser] Avatar.group:', avatar.group);
-            console.log('🔍 [updateAvatarSkinForUser] Avatar.group.children:', avatar.group.children);
-            
-            if (!avatar || !avatar.group) {
-                console.log('❌ [updateAvatarSkinForUser] Avatar o avatar.group es undefined para:', alias);
-                return;
-            }
-            
-            // Mapear nombre de skin a archivo de textura
-            const skinFileMap = {
-                'humanMaleA': 'humanMaleA.png',
-                'humanFemaleA': 'humanFemaleA.png',
-                'zombieMaleA': 'zombieMaleA.png',
-                'zombieFemaleA': 'zombieFemaleA.png'
-            };
-            
-            const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
-            console.log('📁 [updateAvatarSkinForUser] Cargando textura desde:', texturePath);
-            
-            // Cargar nueva textura y aplicarla
-            const textureLoader = new THREE.TextureLoader();
-            textureLoader.load(texturePath, (texture) => {
-                console.log('✅ [updateAvatarSkinForUser] Textura cargada, aplicando al avatar de:', alias);
-                let meshCount = 0;
-                let materialCount = 0;
-                
-                // Recorrer todos los hijos del avatar
-                avatar.group.traverse(child => {
-                    console.log('🔍 [updateAvatarSkinForUser] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh, 'de usuario:', alias);
-                    
-                    if (child.isMesh) {
-                        meshCount++;
-                        console.log('🎨 [updateAvatarSkinForUser] Mesh encontrado:', child.name, 'de usuario:', alias);
-                        console.log('🎨 [updateAvatarSkinForUser] Material del mesh:', child.material, 'de usuario:', alias);
-                        
-                        if (child.material) {
-                            materialCount++;
-                            console.log('🎨 [updateAvatarSkinForUser] Aplicando textura a mesh:', child.name, 'de usuario:', alias);
-                            child.material.map = texture;
-                            child.material.needsUpdate = true;
-                            console.log('✅ [updateAvatarSkinForUser] Textura aplicada a mesh:', child.name, 'de usuario:', alias);
-                        } else {
-                            console.log('⚠️ [updateAvatarSkinForUser] Mesh sin material:', child.name, 'de usuario:', alias);
-                        }
-                    }
-                });
-                
-                console.log('✅ [updateAvatarSkinForUser] Skin actualizada para:', alias, 'meshes:', meshCount, 'materials:', materialCount);
-                
-                // Forzar re-renderizado
-                if (renderer) {
-                    renderer.render(scene, camera);
-                }
-            }, undefined, (error) => {
-                console.error('❌ [updateAvatarSkinForUser] Error cargando textura para skin:', newSkin, 'usuario:', alias, error);
-            });
-        }
-
-        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor, skin) {
-            console.log('🔄 [updateAvatarPosition] Recibido para alias:', alias, 'skin:', skin);
-            
+        function updateAvatarPosition(alias, position, floor, rotation = 0, skin) {
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
                 return;
@@ -4830,17 +4640,17 @@ function updateSelectedSkin() {
                 console.warn('Rotación inválida para alias:', alias, rotation);
                 return;
             }
+            // No crear avatar para el usuario propio
+            if (alias === userAlias) {
+                return;
+            }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
-                // Siempre pasar el skin recibido, aunque sea 'humanMaleA'
-                let custom = { skin: skin || 'humanMaleA' };
-                console.log('🔄 [updateAvatarPosition] Creando avatar con skin:', custom.skin);
+                // Solo pasar skin si existe
+                let custom = {};
+                if (typeof skin !== 'undefined') custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
-            } else if (skin && avatar.group) {
-                // Si el avatar ya existe pero recibimos un skin diferente, actualizar la textura
-                console.log('🔄 [updateAvatarPosition] Actualizando skin existente a:', skin);
-                updateAvatarSkinForUser(alias, skin);
             }
             if (avatar) {
                 // Actualización de posición y rotación en tiempo real
@@ -4986,24 +4796,16 @@ const pendingAvatarLoads = new Set();
 
 // --- Función para crear un avatar de usuario con animaciones correctamente cargadas ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
-    console.log('🚀 [createUserAvatar] llamado para alias:', alias, position, floor, custom);
-    console.log('🚀 [createUserAvatar] custom.skin:', custom.skin);
-    console.log('🚀 [createUserAvatar] currentCustomization:', currentCustomization);
+    console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
-    if (pendingAvatarLoads.has(alias)) {
-        console.log('⚠️ [createUserAvatar] Ya hay una carga pendiente para:', alias);
-        return;
-    }
+    if (pendingAvatarLoads.has(alias)) return;
     
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (userAvatars.has(alias)) {
-        console.log('⚠️ [createUserAvatar] Avatar ya existe para:', alias);
-        return;
-    }
+    if (userAvatars.has(alias)) return;
     
     pendingAvatarLoads.add(alias);
     
@@ -5041,26 +4843,12 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             if (userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
-            console.log('🎨 [createUserAvatar] Aplicando textura inicial:', texturePath, 'para alias:', alias);
-            let meshCount = 0;
-            let materialCount = 0;
             avatar.traverse(child => {
                 if (child.isMesh) {
-                    meshCount++;
-                    console.log('🎨 [createUserAvatar] Aplicando textura a mesh:', child.name, 'para alias:', alias);
-                    console.log('🎨 [createUserAvatar] Material del mesh:', child.material, 'para alias:', alias);
-                    
-                    if (child.material) {
-                        materialCount++;
-                        child.material.map = texture;
-                        child.material.needsUpdate = true;
-                        console.log('✅ [createUserAvatar] Textura aplicada a mesh:', child.name, 'para alias:', alias);
-                    } else {
-                        console.log('⚠️ [createUserAvatar] Mesh sin material:', child.name, 'para alias:', alias);
-                    }
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
                 }
             });
-            console.log('✅ [createUserAvatar] Textura aplicada a', meshCount, 'meshes,', materialCount, 'materials para alias:', alias);
             
             // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
@@ -5172,11 +4960,6 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 isMoving: false
             });
             
-            if (pendingSkins[alias]) {
-                updateAvatarSkinForUser(alias, pendingSkins[alias]);
-                delete pendingSkins[alias];
-            }
-            
         }).catch(error => {
             console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
             pendingAvatarLoads.delete(alias);
@@ -5285,12 +5068,12 @@ function updateAvatarPositions() {
                 updateAvatarPreview();
                 // Inicializar los grids de colores
                 createColorGrids();
-                // Inicializar selector de skin con el skin actual
-                if (window.initializeSkinSelector) {
-                    window.initializeSkinSelector();
-                }
+                // Inicializar selección de skin
+                createSkinSelection();
                 // Actualizar selecciones de colores
                 updateSelectedColors();
+                // Actualizar selección de skin
+                updateSelectedSkin();
             }
         }
 
@@ -5512,7 +5295,7 @@ function updateAvatarPositions() {
         // ... existing code ...
         // --- En handleGameClick, después de raycaster.setFromCamera(mouse, camera); ---
             // Detectar si se hizo clic en la franja roja oscura de los pasillos (solo móvil)
-            if (IS_MOBILE && typeof scene !== 'undefined' && scene) {
+            if (IS_MOBILE) {
                 const intersectsAll = raycaster.intersectObjects(scene.children, true);
                 for (let i = 0; i < intersectsAll.length; i++) {
                     const obj = intersectsAll[i].object;
