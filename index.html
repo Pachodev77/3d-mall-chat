@@ -4374,6 +4374,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const avatar = userAvatars.get(userAlias);
         if (!avatar || !avatar.group) return;
         
+        console.log('🔄 Actualizando skin a:', newSkin);
+        
         // Mapear nombre de skin a archivo de textura
         const skinFileMap = {
             'humanMaleA': 'humanMaleA.png',
@@ -4383,19 +4385,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
+        console.log('📁 Cargando textura desde:', texturePath);
         
         // Cargar nueva textura y aplicarla
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(texturePath, (texture) => {
+            console.log('✅ Textura cargada, aplicando al avatar...');
             avatar.group.traverse(child => {
                 if (child.isMesh && child.material) {
+                    console.log('🎨 Aplicando textura a mesh:', child.name);
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
             console.log('✅ Skin actualizada en tiempo real:', newSkin);
         }, undefined, (error) => {
-            console.error('Error cargando textura para skin:', newSkin, error);
+            console.error('❌ Error cargando textura para skin:', newSkin, error);
         });
     }
     
