@@ -4388,10 +4388,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para actualizar el skin del avatar en tiempo real
     function updateAvatarSkinInRealTime(newSkin) {
-        if (!userAvatars.has(userAlias)) return;
+        console.log('🔍 [updateAvatarSkinInRealTime] Iniciando con skin:', newSkin);
+        console.log('🔍 [updateAvatarSkinInRealTime] userAlias:', userAlias);
+        console.log('🔍 [updateAvatarSkinInRealTime] userAvatars tiene userAlias?', userAvatars.has(userAlias));
+        
+        if (!userAvatars.has(userAlias)) {
+            console.log('❌ [updateAvatarSkinInRealTime] No se encontró avatar para userAlias:', userAlias);
+            console.log('🔍 [updateAvatarSkinInRealTime] Avatares disponibles:', Array.from(userAvatars.keys()));
+            return;
+        }
         
         const avatar = userAvatars.get(userAlias);
-        if (!avatar || !avatar.group) return;
+        console.log('🔍 [updateAvatarSkinInRealTime] Avatar encontrado:', avatar);
+        
+        if (!avatar || !avatar.group) {
+            console.log('❌ [updateAvatarSkinInRealTime] Avatar o avatar.group es undefined');
+            return;
+        }
         
         console.log('🔄 Actualizando skin a:', newSkin);
         
@@ -4410,14 +4423,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(texturePath, (texture) => {
             console.log('✅ Textura cargada, aplicando al avatar...');
+            let meshCount = 0;
             avatar.group.traverse(child => {
                 if (child.isMesh && child.material) {
-                    console.log('🎨 Aplicando textura a mesh:', child.name);
+                    meshCount++;
+                    console.log('🎨 Aplicando textura a mesh:', child.name, 'material:', child.material);
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
-            console.log('✅ Skin actualizada en tiempo real:', newSkin);
+            console.log('✅ Skin actualizada en tiempo real:', newSkin, 'meshes actualizados:', meshCount);
         }, undefined, (error) => {
             console.error('❌ Error cargando textura para skin:', newSkin, error);
         });
@@ -4875,16 +4890,24 @@ const pendingAvatarLoads = new Set();
 
 // --- Función para crear un avatar de usuario con animaciones correctamente cargadas ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
-    console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
+    console.log('🚀 [createUserAvatar] llamado para alias:', alias, position, floor, custom);
+    console.log('🚀 [createUserAvatar] custom.skin:', custom.skin);
+    console.log('🚀 [createUserAvatar] currentCustomization:', currentCustomization);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
-    if (pendingAvatarLoads.has(alias)) return;
+    if (pendingAvatarLoads.has(alias)) {
+        console.log('⚠️ [createUserAvatar] Ya hay una carga pendiente para:', alias);
+        return;
+    }
     
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (userAvatars.has(alias)) return;
+    if (userAvatars.has(alias)) {
+        console.log('⚠️ [createUserAvatar] Avatar ya existe para:', alias);
+        return;
+    }
     
     pendingAvatarLoads.add(alias);
     
@@ -4922,12 +4945,17 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             if (userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
+            console.log('🎨 [createUserAvatar] Aplicando textura inicial:', texturePath);
+            let meshCount = 0;
             avatar.traverse(child => {
                 if (child.isMesh) {
+                    meshCount++;
+                    console.log('🎨 [createUserAvatar] Aplicando textura a mesh:', child.name);
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                 }
             });
+            console.log('✅ [createUserAvatar] Textura aplicada a', meshCount, 'meshes');
             
             // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
