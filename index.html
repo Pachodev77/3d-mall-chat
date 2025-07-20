@@ -4853,11 +4853,11 @@ function updateSelectedSkin() {
                 console.warn('Rotación inválida para alias:', alias, rotation);
                 return;
             }
-            // No crear avatar para el usuario propio
-            if (alias === userAlias) {
-                console.log('🔄 [updateAvatarPosition] Ignorando avatar propio:', alias);
-                return;
-            }
+            // Eliminar filtro que ignora el avatar propio
+            // if (alias === userAlias) {
+            //     console.log('🔄 [updateAvatarPosition] Ignorando avatar propio:', alias);
+            //     return;
+            // }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
                 // Solo pasar skin si existe
