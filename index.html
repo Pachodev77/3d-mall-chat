@@ -1190,6 +1190,7 @@
                 }
                 
                 console.log('🚀 Creando avatar principal:', userAlias, 'con skin:', currentCustomization.skin);
+                console.log('🚀 [AVATAR PRINCIPAL] currentCustomization completo:', currentCustomization);
                 createUserAvatar(userAlias, { x: 25, y: 2, z: 25 }, 0, currentCustomization);
             }, 1000); // Esperar 1 segundo para asegurar que todo esté inicializado
         }
@@ -4391,6 +4392,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔍 [updateAvatarSkinInRealTime] Iniciando con skin:', newSkin);
         console.log('🔍 [updateAvatarSkinInRealTime] userAlias:', userAlias);
         console.log('🔍 [updateAvatarSkinInRealTime] userAvatars tiene userAlias?', userAvatars.has(userAlias));
+        console.log('🔍 [updateAvatarSkinInRealTime] Todos los avatares:', Array.from(userAvatars.entries()));
         
         if (!userAvatars.has(userAlias)) {
             console.log('❌ [updateAvatarSkinInRealTime] No se encontró avatar para userAlias:', userAlias);
@@ -4400,6 +4402,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const avatar = userAvatars.get(userAlias);
         console.log('🔍 [updateAvatarSkinInRealTime] Avatar encontrado:', avatar);
+        console.log('🔍 [updateAvatarSkinInRealTime] Avatar.group:', avatar.group);
+        console.log('🔍 [updateAvatarSkinInRealTime] Avatar.group.children:', avatar.group.children);
         
         if (!avatar || !avatar.group) {
             console.log('❌ [updateAvatarSkinInRealTime] Avatar o avatar.group es undefined');
@@ -4424,15 +4428,36 @@ document.addEventListener('DOMContentLoaded', function() {
         textureLoader.load(texturePath, (texture) => {
             console.log('✅ Textura cargada, aplicando al avatar...');
             let meshCount = 0;
+            let materialCount = 0;
+            
+            // Recorrer todos los hijos del avatar
             avatar.group.traverse(child => {
-                if (child.isMesh && child.material) {
+                console.log('🔍 [updateAvatarSkinInRealTime] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh);
+                
+                if (child.isMesh) {
                     meshCount++;
-                    console.log('🎨 Aplicando textura a mesh:', child.name, 'material:', child.material);
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
+                    console.log('🎨 [updateAvatarSkinInRealTime] Mesh encontrado:', child.name);
+                    console.log('🎨 [updateAvatarSkinInRealTime] Material del mesh:', child.material);
+                    
+                    if (child.material) {
+                        materialCount++;
+                        console.log('🎨 Aplicando textura a mesh:', child.name, 'material:', child.material);
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                        console.log('✅ Textura aplicada a mesh:', child.name);
+                    } else {
+                        console.log('⚠️ Mesh sin material:', child.name);
+                    }
                 }
             });
-            console.log('✅ Skin actualizada en tiempo real:', newSkin, 'meshes actualizados:', meshCount);
+            
+            console.log('✅ Skin actualizada en tiempo real:', newSkin);
+            console.log('📊 Resumen: meshes encontrados:', meshCount, 'materials actualizados:', materialCount);
+            
+            // Forzar re-renderizado
+            if (renderer) {
+                renderer.render(scene, camera);
+            }
         }, undefined, (error) => {
             console.error('❌ Error cargando textura para skin:', newSkin, error);
         });
