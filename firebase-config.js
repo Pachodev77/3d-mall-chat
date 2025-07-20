@@ -71,7 +71,7 @@ positionsRef.child(currentUser.alias).onDisconnect().remove();
     positionsRef.once('value', (snapshot) => {
         const positions = snapshot.val() || {};
         Object.entries(positions).forEach(([alias, userData]) => {
-            if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+            if (userData && isValidPositionData(userData)) {
                 console.log('[Firebase] Cargando usuario existente:', alias);
                 updateAvatarPosition(
                     alias, 
@@ -87,13 +87,12 @@ positionsRef.child(currentUser.alias).onDisconnect().remove();
         });
     });
     
-    // Sistema de listeners optimizado para posiciones
     // Listener para nuevos usuarios que se conectan
     positionsRef.on('child_added', (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
         
-        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+        if (userData && isValidPositionData(userData)) {
             console.log('[Firebase] Nuevo usuario conectado:', alias);
             updateAvatarPosition(
                 alias, 
@@ -113,7 +112,7 @@ positionsRef.child(currentUser.alias).onDisconnect().remove();
         const alias = snapshot.key;
         const userData = snapshot.val();
         
-        if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
+        if (userData && isValidPositionData(userData)) {
             console.log('[Firebase] Posición actualizada:', alias);
             updateAvatarPosition(
                 alias, 
