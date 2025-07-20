@@ -4387,76 +4387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Función para actualizar el skin del avatar de otro usuario
-    function updateAvatarSkinForUser(alias, newSkin) {
-        console.log('🔍 [updateAvatarSkinForUser] Actualizando skin para usuario:', alias, 'skin:', newSkin);
-        console.log('🔍 [updateAvatarSkinForUser] userAvatars tiene alias?', userAvatars.has(alias));
-        console.log('🔍 [updateAvatarSkinForUser] Todos los avatares:', Array.from(userAvatars.keys()));
-        
-        if (!userAvatars.has(alias)) {
-            console.log('❌ [updateAvatarSkinForUser] No se encontró avatar para alias:', alias);
-            return;
-        }
-        
-        const avatar = userAvatars.get(alias);
-        console.log('🔍 [updateAvatarSkinForUser] Avatar encontrado:', avatar);
-        console.log('🔍 [updateAvatarSkinForUser] Avatar.group:', avatar.group);
-        console.log('🔍 [updateAvatarSkinForUser] Avatar.group.children:', avatar.group.children);
-        
-        if (!avatar || !avatar.group) {
-            console.log('❌ [updateAvatarSkinForUser] Avatar o avatar.group es undefined para:', alias);
-            return;
-        }
-        
-        // Mapear nombre de skin a archivo de textura
-        const skinFileMap = {
-            'humanMaleA': 'humanMaleA.png',
-            'humanFemaleA': 'humanFemaleA.png',
-            'zombieMaleA': 'zombieMaleA.png',
-            'zombieFemaleA': 'zombieFemaleA.png'
-        };
-        
-        const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
-        console.log('📁 [updateAvatarSkinForUser] Cargando textura desde:', texturePath);
-        
-        // Cargar nueva textura y aplicarla
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(texturePath, (texture) => {
-            console.log('✅ [updateAvatarSkinForUser] Textura cargada, aplicando al avatar de:', alias);
-            let meshCount = 0;
-            let materialCount = 0;
-            
-            // Recorrer todos los hijos del avatar
-            avatar.group.traverse(child => {
-                console.log('🔍 [updateAvatarSkinForUser] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh, 'de usuario:', alias);
-                
-                if (child.isMesh) {
-                    meshCount++;
-                    console.log('🎨 [updateAvatarSkinForUser] Mesh encontrado:', child.name, 'de usuario:', alias);
-                    console.log('🎨 [updateAvatarSkinForUser] Material del mesh:', child.material, 'de usuario:', alias);
-                    
-                    if (child.material) {
-                        materialCount++;
-                        console.log('🎨 [updateAvatarSkinForUser] Aplicando textura a mesh:', child.name, 'de usuario:', alias);
-                        child.material.map = texture;
-                        child.material.needsUpdate = true;
-                        console.log('✅ [updateAvatarSkinForUser] Textura aplicada a mesh:', child.name, 'de usuario:', alias);
-                    } else {
-                        console.log('⚠️ [updateAvatarSkinForUser] Mesh sin material:', child.name, 'de usuario:', alias);
-                    }
-                }
-            });
-            
-            console.log('✅ [updateAvatarSkinForUser] Skin actualizada para:', alias, 'meshes:', meshCount, 'materials:', materialCount);
-            
-            // Forzar re-renderizado
-            if (renderer) {
-                renderer.render(scene, camera);
-            }
-        }, undefined, (error) => {
-            console.error('❌ [updateAvatarSkinForUser] Error cargando textura para skin:', newSkin, 'usuario:', alias, error);
-        });
-    }
+
 
     // Función para actualizar el skin del avatar en tiempo real
     function updateAvatarSkinInRealTime(newSkin) {
@@ -4829,6 +4760,77 @@ function updateSelectedSkin() {
                 // TODO: Enviar posición a Firebase
                 // firebase.database().ref('positions').child(userAlias).set({ ... })
             }
+        }
+
+        // Función para actualizar el skin del avatar de otro usuario
+        function updateAvatarSkinForUser(alias, newSkin) {
+            console.log('🔍 [updateAvatarSkinForUser] Actualizando skin para usuario:', alias, 'skin:', newSkin);
+            console.log('🔍 [updateAvatarSkinForUser] userAvatars tiene alias?', userAvatars.has(alias));
+            console.log('🔍 [updateAvatarSkinForUser] Todos los avatares:', Array.from(userAvatars.keys()));
+            
+            if (!userAvatars.has(alias)) {
+                console.log('❌ [updateAvatarSkinForUser] No se encontró avatar para alias:', alias);
+                return;
+            }
+            
+            const avatar = userAvatars.get(alias);
+            console.log('🔍 [updateAvatarSkinForUser] Avatar encontrado:', avatar);
+            console.log('🔍 [updateAvatarSkinForUser] Avatar.group:', avatar.group);
+            console.log('🔍 [updateAvatarSkinForUser] Avatar.group.children:', avatar.group.children);
+            
+            if (!avatar || !avatar.group) {
+                console.log('❌ [updateAvatarSkinForUser] Avatar o avatar.group es undefined para:', alias);
+                return;
+            }
+            
+            // Mapear nombre de skin a archivo de textura
+            const skinFileMap = {
+                'humanMaleA': 'humanMaleA.png',
+                'humanFemaleA': 'humanFemaleA.png',
+                'zombieMaleA': 'zombieMaleA.png',
+                'zombieFemaleA': 'zombieFemaleA.png'
+            };
+            
+            const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
+            console.log('📁 [updateAvatarSkinForUser] Cargando textura desde:', texturePath);
+            
+            // Cargar nueva textura y aplicarla
+            const textureLoader = new THREE.TextureLoader();
+            textureLoader.load(texturePath, (texture) => {
+                console.log('✅ [updateAvatarSkinForUser] Textura cargada, aplicando al avatar de:', alias);
+                let meshCount = 0;
+                let materialCount = 0;
+                
+                // Recorrer todos los hijos del avatar
+                avatar.group.traverse(child => {
+                    console.log('🔍 [updateAvatarSkinForUser] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh, 'de usuario:', alias);
+                    
+                    if (child.isMesh) {
+                        meshCount++;
+                        console.log('🎨 [updateAvatarSkinForUser] Mesh encontrado:', child.name, 'de usuario:', alias);
+                        console.log('🎨 [updateAvatarSkinForUser] Material del mesh:', child.material, 'de usuario:', alias);
+                        
+                        if (child.material) {
+                            materialCount++;
+                            console.log('🎨 [updateAvatarSkinForUser] Aplicando textura a mesh:', child.name, 'de usuario:', alias);
+                            child.material.map = texture;
+                            child.material.needsUpdate = true;
+                            console.log('✅ [updateAvatarSkinForUser] Textura aplicada a mesh:', child.name, 'de usuario:', alias);
+                        } else {
+                            console.log('⚠️ [updateAvatarSkinForUser] Mesh sin material:', child.name, 'de usuario:', alias);
+                        }
+                    }
+                });
+                
+                console.log('✅ [updateAvatarSkinForUser] Skin actualizada para:', alias, 'meshes:', meshCount, 'materials:', materialCount);
+                
+                // Forzar re-renderizado
+                if (renderer) {
+                    renderer.render(scene, camera);
+                }
+            }, undefined, (error) => {
+                console.error('❌ [updateAvatarSkinForUser] Error cargando textura para skin:', newSkin, 'usuario:', alias, error);
+            });
         }
 
         function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor, skin) {
