@@ -168,6 +168,18 @@ function sendMessage(message) {
     }
 }
 
+function sendAlias() {
+    if (!isConnected || !currentUser) return;
+    
+    // Actualizar el alias en Firebase
+    usersRef.child(currentUser.alias).update({
+        alias: currentUser.alias,
+        timestamp: Date.now()
+    });
+    
+    console.log('Alias enviado a Firebase:', currentUser.alias);
+}
+
 function sendPosition(position, floor, rotation) {
     if (!isConnected || !currentUser) return;
     // Obtener colores actuales del avatar
@@ -296,6 +308,7 @@ function listenToPrivateMessages() {
 
 window.connectToChat = connectToChat;
 window.sendMessage = sendMessage;
+window.sendAlias = sendAlias;
 window.sendPosition = sendPosition;
 window.disconnectFromChat = disconnectFromChat;
 window.updateUsersList = updateUsersList;
