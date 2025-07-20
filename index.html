@@ -4340,32 +4340,50 @@ document.addEventListener('DOMContentLoaded', function() {
         { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
         { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
     ];
+    
+    // Variables globales para el selector de skins
+    window.skinList = skinList;
+    window.currentSkinIndex = 0;
+    
     // Obtener elementos
     const prevBtn = document.getElementById('skin-prev-btn');
     const nextBtn = document.getElementById('skin-next-btn');
     const img = document.getElementById('skin-preview-img');
     const label = document.getElementById('skin-preview-label');
-    // Inicializar índice
-    let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
-    if (currentIdx === -1) currentIdx = 0;
+    
     // Función para actualizar preview
     function updateSkinPreview(idx) {
-        img.src = skinList[idx].img;
-        label.textContent = skinList[idx].label;
-        currentCustomization.skin = skinList[idx].key;
-        updateAvatarPreview && updateAvatarPreview();
+        if (img && label && skinList[idx]) {
+            img.src = skinList[idx].img;
+            label.textContent = skinList[idx].label;
+            currentCustomization.skin = skinList[idx].key;
+            window.currentSkinIndex = idx;
+            updateAvatarPreview && updateAvatarPreview();
+        }
     }
+    
+    // Función para inicializar el selector con el skin actual
+    function initializeSkinSelector() {
+        // Encontrar el índice del skin actual
+        const currentSkin = currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA';
+        const idx = skinList.findIndex(s => s.key === currentSkin);
+        window.currentSkinIndex = idx !== -1 ? idx : 0;
+        updateSkinPreview(window.currentSkinIndex);
+    }
+    
     // Asignar eventos
     prevBtn && prevBtn.addEventListener('click', function() {
-        currentIdx = (currentIdx - 1 + skinList.length) % skinList.length;
-        updateSkinPreview(currentIdx);
+        window.currentSkinIndex = (window.currentSkinIndex - 1 + skinList.length) % skinList.length;
+        updateSkinPreview(window.currentSkinIndex);
     });
+    
     nextBtn && nextBtn.addEventListener('click', function() {
-        currentIdx = (currentIdx + 1) % skinList.length;
-        updateSkinPreview(currentIdx);
+        window.currentSkinIndex = (window.currentSkinIndex + 1) % skinList.length;
+        updateSkinPreview(window.currentSkinIndex);
     });
-    // Inicializar preview
-    updateSkinPreview(currentIdx);
+    
+    // Exponer función para inicializar desde openSimplePanel
+    window.initializeSkinSelector = initializeSkinSelector;
 
     // Alias input para preview
     const aliasInput = document.getElementById('simple-alias-input');
@@ -5068,12 +5086,12 @@ function updateAvatarPositions() {
                 updateAvatarPreview();
                 // Inicializar los grids de colores
                 createColorGrids();
-                // Inicializar selección de skin
-                createSkinSelection();
+                // Inicializar selector de skin con el skin actual
+                if (window.initializeSkinSelector) {
+                    window.initializeSkinSelector();
+                }
                 // Actualizar selecciones de colores
                 updateSelectedColors();
-                // Actualizar selección de skin
-                updateSelectedSkin();
             }
         }
 
