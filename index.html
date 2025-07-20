@@ -4390,6 +4390,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para actualizar el skin del avatar de otro usuario
     function updateAvatarSkinForUser(alias, newSkin) {
         console.log('🔍 [updateAvatarSkinForUser] Actualizando skin para usuario:', alias, 'skin:', newSkin);
+        console.log('🔍 [updateAvatarSkinForUser] userAvatars tiene alias?', userAvatars.has(alias));
+        console.log('🔍 [updateAvatarSkinForUser] Todos los avatares:', Array.from(userAvatars.keys()));
         
         if (!userAvatars.has(alias)) {
             console.log('❌ [updateAvatarSkinForUser] No se encontró avatar para alias:', alias);
@@ -4397,6 +4399,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const avatar = userAvatars.get(alias);
+        console.log('🔍 [updateAvatarSkinForUser] Avatar encontrado:', avatar);
+        console.log('🔍 [updateAvatarSkinForUser] Avatar.group:', avatar.group);
+        console.log('🔍 [updateAvatarSkinForUser] Avatar.group.children:', avatar.group.children);
+        
         if (!avatar || !avatar.group) {
             console.log('❌ [updateAvatarSkinForUser] Avatar o avatar.group es undefined para:', alias);
             return;
@@ -4422,13 +4428,21 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Recorrer todos los hijos del avatar
             avatar.group.traverse(child => {
+                console.log('🔍 [updateAvatarSkinForUser] Revisando child:', child.name, 'tipo:', child.type, 'isMesh:', child.isMesh, 'de usuario:', alias);
+                
                 if (child.isMesh) {
                     meshCount++;
+                    console.log('🎨 [updateAvatarSkinForUser] Mesh encontrado:', child.name, 'de usuario:', alias);
+                    console.log('🎨 [updateAvatarSkinForUser] Material del mesh:', child.material, 'de usuario:', alias);
+                    
                     if (child.material) {
                         materialCount++;
                         console.log('🎨 [updateAvatarSkinForUser] Aplicando textura a mesh:', child.name, 'de usuario:', alias);
                         child.material.map = texture;
                         child.material.needsUpdate = true;
+                        console.log('✅ [updateAvatarSkinForUser] Textura aplicada a mesh:', child.name, 'de usuario:', alias);
+                    } else {
+                        console.log('⚠️ [updateAvatarSkinForUser] Mesh sin material:', child.name, 'de usuario:', alias);
                     }
                 }
             });
@@ -5051,17 +5065,26 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             if (userAvatars.has(alias)) return;
             
             // Aplicar la textura al modelo
-            console.log('🎨 [createUserAvatar] Aplicando textura inicial:', texturePath);
+            console.log('🎨 [createUserAvatar] Aplicando textura inicial:', texturePath, 'para alias:', alias);
             let meshCount = 0;
+            let materialCount = 0;
             avatar.traverse(child => {
                 if (child.isMesh) {
                     meshCount++;
-                    console.log('🎨 [createUserAvatar] Aplicando textura a mesh:', child.name);
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
+                    console.log('🎨 [createUserAvatar] Aplicando textura a mesh:', child.name, 'para alias:', alias);
+                    console.log('🎨 [createUserAvatar] Material del mesh:', child.material, 'para alias:', alias);
+                    
+                    if (child.material) {
+                        materialCount++;
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                        console.log('✅ [createUserAvatar] Textura aplicada a mesh:', child.name, 'para alias:', alias);
+                    } else {
+                        console.log('⚠️ [createUserAvatar] Mesh sin material:', child.name, 'para alias:', alias);
+                    }
                 }
             });
-            console.log('✅ [createUserAvatar] Textura aplicada a', meshCount, 'meshes');
+            console.log('✅ [createUserAvatar] Textura aplicada a', meshCount, 'meshes,', materialCount, 'materials para alias:', alias);
             
             // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
