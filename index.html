@@ -4259,7 +4259,7 @@
             console.log('Guardando personalización');
             const aliasInput = document.getElementById('simple-alias-input');
             const newAlias = aliasInput ? aliasInput.value.trim() : '';
-            // Validar alias
+            
             if (newAlias.length > 20) {
                 alert('El nombre no puede tener más de 20 caracteres');
                 return;
@@ -4627,7 +4627,7 @@ function updateSelectedSkin() {
             }
         }
 
-        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor) {
+        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor, skin) {
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
                 return;
@@ -4648,7 +4648,7 @@ function updateSelectedSkin() {
             if (!avatar) {
                 // Solo pasar skin si existe
                 let custom = {};
-                if (typeof skin !== 'undefined') custom.skin = skin;
+                if (skin) custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
             }
