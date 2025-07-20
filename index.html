@@ -999,20 +999,7 @@
         ];
 
         // --- Variables de personalización de avatar ---
-        const customizationColors = [
-            // Colores vibrantes para camisas
-            0xFF6B6B, 0x4ECDC4, 0x45B7D1, 0x96CEB4, 0xFFEAA7, 0xDDA0DD,
-            0x98D8C8, 0xF7DC6F, 0xBB8FCE, 0x85C1E9, 0xF8C471, 0x82E0AA,
-            0xF1948A, 0xD7BDE2, 0xF9E79F, 0xABEBC6, 0xFAD7A0, 0xAED6F1,
-            // Colores más oscuros para pantalones
-            0x2C3E50, 0x34495E, 0x8B4513, 0x654321, 0x2F4F4F, 0x696969,
-            0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400, 0x8B4513,
-            0x654321, 0x2F4F4F, 0x696969, 0x556B2F, 0x8B0000, 0x4B0082,
-            // Colores para zapatos
-            0x8B4513, 0x654321, 0x000000, 0x2F4F4F, 0x696969, 0x8B0000,
-            0x4B0082, 0x191970, 0x006400, 0x8B4513, 0x654321, 0x2F4F4F,
-            0x696969, 0x556B2F, 0x8B0000, 0x4B0082, 0x191970, 0x006400
-        ];
+        
         
         let currentCustomization = {
             skin: 'humanMaleA' // Skin por defecto
@@ -4032,9 +4019,7 @@
         // --- Funciones de personalización de avatar ---
         const saveCustomizationBtn = document.getElementById('save-customization-btn');
         const resetCustomizationBtn = document.getElementById('reset-customization-btn');
-        const shirtColorsGrid = document.getElementById('shirt-colors');
-        const pantsColorsGrid = document.getElementById('pants-colors');
-        const shoesColorsGrid = document.getElementById('shoes-colors');
+        
         
 
 
@@ -4090,65 +4075,13 @@
         
 
         
-        function changeShirtColor(color) {
-            console.log('Cambiando color de camisa a:', color);
-            shirtColor = color;
-            currentCustomization.shirtColor = color;
-            updateAvatarPreview();
-            updateColorButtonSelection('shirt', color);
-        }
         
-        function changePantsColor(color) {
-            console.log('Cambiando color de pantalón a:', color);
-            pantsColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.pantsMaterial) {
-                avatar.pantsMaterial.color.setHex(color);
-                avatar.pantsMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('pants', color);
-        }
         
-        function changeShoesColor(color) {
-            console.log('Cambiando color de zapatos a:', color);
-            shoesColor = color;
-            
-            // Actualizar el avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar && avatar.shoeMaterial) {
-                avatar.shoeMaterial.color.setHex(color);
-                avatar.shoeMaterial.needsUpdate = true;
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            // Feedback visual en los botones
-            updateColorButtonSelection('shoes', color);
-        }
         
-        function updateColorButtonSelection(type, selectedColor) {
-            // Remover selección anterior
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-            });
-            
-            // Marcar el botón seleccionado
-            const selectedBtn = document.querySelector(`[data-color="${selectedColor}"]`);
-            if (selectedBtn) {
-                selectedBtn.style.borderColor = '#FFD700';
-                selectedBtn.style.transform = 'scale(1.1)';
-                selectedBtn.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.5)';
-            }
-        }
+        
+        
+        
+        
         
         function updateAvatarPreview() {
             const previewDiv = document.getElementById('avatar-preview');
@@ -4168,10 +4101,6 @@
 
                 // Actualizar el alias en la vista previa
                 const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                // Crear una vista previa visual del avatar más detallada
-                const shirtColorHex = shirtColor.toString(16).padStart(6, '0');
-                const pantsColorHex = pantsColor.toString(16).padStart(6, '0');
-                const shoesColorHex = shoesColor.toString(16).padStart(6, '0');
                 previewDiv.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Skin thumbnail -->
@@ -4187,25 +4116,25 @@
                         <!-- Torso y brazos -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
                             <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-right: 0;"></div>
+                            <div style="width: 16px; height: 50px; background: #8B4513; border: 2px solid #333; margin-right: 0;"></div>
                             <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin: 0 0;"></div>
+                            <div style="width: 28px; height: 50px; background: #8B4513; border: 2px solid #333; margin: 0 0;"></div>
                             <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #${shirtColorHex}; border: 2px solid #333; margin-left: 0;"></div>
+                            <div style="width: 16px; height: 50px; background: #8B4513; border: 2px solid #333; margin-left: 0;"></div>
                         </div>
                         <!-- Piernas -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
                             <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                            <div style="width: 16px; height: 50px; background: #2F4F4F; border: 2px solid #333; margin-right: 4px;"></div>
                             <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #${pantsColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                            <div style="width: 16px; height: 50px; background: #2F4F4F; border: 2px solid #333; margin-left: 4px;"></div>
                         </div>
                         <!-- Zapatos -->
                         <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
                             <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-right: 4px;"></div>
+                            <div style="width: 16px; height: 12px; background: #696969; border: 2px solid #333; margin-right: 4px;"></div>
                             <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #${shoesColorHex}; border: 2px solid #333; margin-left: 4px;"></div>
+                            <div style="width: 16px; height: 12px; background: #696969; border: 2px solid #333; margin-left: 4px;"></div>
                         </div>
                         <!-- Nombre del avatar -->
                         <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
@@ -4217,11 +4146,6 @@
         function resetSimpleCustomization() {
             console.log('Restableciendo personalización');
             
-            // Restablecer colores por defecto
-            shirtColor = 0xFF6B6B;
-            pantsColor = 0x2C3E50;
-            shoesColor = 0x8B4513;
-            
             // Restablecer alias
             userAlias = '';
             const aliasInput = document.getElementById('simple-alias-input');
@@ -4229,28 +4153,8 @@
                 aliasInput.value = '';
             }
             
-            // Actualizar avatar en tiempo real usando el sistema correcto
-            const avatar = userAvatars.get(userAlias);
-            if (avatar) {
-                if (avatar.bodyMaterial) avatar.bodyMaterial.color.setHex(shirtColor);
-                if (avatar.pantsMaterial) avatar.pantsMaterial.color.setHex(pantsColor);
-                if (avatar.shoeMaterial) avatar.shoeMaterial.color.setHex(shoesColor);
-                
-                // Forzar actualización de materiales
-                if (avatar.bodyMaterial) avatar.bodyMaterial.needsUpdate = true;
-                if (avatar.pantsMaterial) avatar.pantsMaterial.needsUpdate = true;
-                if (avatar.shoeMaterial) avatar.shoeMaterial.needsUpdate = true;
-            }
-            
             // Actualizar vista previa
             updateAvatarPreview();
-            
-            // Limpiar selección de botones
-            document.querySelectorAll('.color-option').forEach(btn => {
-                btn.style.borderColor = 'transparent';
-                btn.style.transform = 'scale(1)';
-                btn.style.boxShadow = 'none';
-            });
             
             console.log('✅ Personalización restablecida');
         }
@@ -4269,9 +4173,6 @@
             // Guardar en localStorage
             const customizationData = {
                 alias: userAlias,
-                shirtColor: shirtColor,
-                pantsColor: pantsColor,
-                shoesColor: shoesColor,
                 skin: currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'
             };
             localStorage.setItem('avatarCustomization', JSON.stringify(customizationData));
@@ -4410,28 +4311,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('¡Personalización guardada!');
         }
         
-        function createWorkingColorGrids() {
-            // Crear opciones de color para camisas (primeros 18 colores)
-            const shirtGrid = document.getElementById('working-shirt-colors');
-            for (let i = 0; i < 18; i++) {
-                const colorOption = document.createElement('div');
-                colorOption.style.cssText = `
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid transparent;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    background-color: #${customizationColors[i].toString(16).padStart(6, '0')};
-                `;
-                colorOption.onclick = () => selectWorkingColor(customizationColors[i], 'shirt');
-                if (customizationColors[i] === currentCustomization.shirtColor) {
-                    colorOption.style.borderColor = '#FFD700';
-                }
-                shirtGrid.appendChild(colorOption);
-            }
-            
-
-        }
+        
         
 
         
@@ -4469,106 +4349,18 @@ function updateSelectedSkin() {
     });
 }
 
-        function selectColor(color, type) {
-            // Remover selección previa del mismo tipo
-            const allSelected = document.querySelectorAll(`.color-option.selected[data-type="${type}"]`);
-            allSelected.forEach(btn => btn.classList.remove('selected'));
-            
-            // Seleccionar nueva opción
-            const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-            }
-            
-            // Actualizar color actual
-            switch (type) {
-                case 'shirt':
-                    currentCustomization.shirtColor = color;
-                    break;
-                case 'pants':
-                    currentCustomization.pantsColor = color;
-                    break;
-                case 'shoes':
-                    currentCustomization.shoesColor = color;
-                    break;
-            }
-            
-            // Actualizar selecciones visuales
-            updateSelectedColors();
-            
-            // Aplicar cambios inmediatamente al avatar
-            applyCustomizationToAvatar();
-        }
+        
 
-        function updateSelectedColors() {
-            // Actualizar selecciones visuales
-            const shirtOption = document.querySelector(`[data-color="${currentCustomization.shirtColor}"][data-type="shirt"]`);
-            const pantsOption = document.querySelector(`[data-color="${currentCustomization.pantsColor}"][data-type="pants"]`);
-            const shoesOption = document.querySelector(`[data-color="${currentCustomization.shoesColor}"][data-type="shoes"]`);
-            
-            if (shirtOption) shirtOption.classList.add('selected');
-
-    // Seleccionar nueva opción
-    const selectedOption = document.querySelector(`[data-color="${color}"][data-type="${type}"]`);
-    if (selectedOption) {
-        selectedOption.classList.add('selected');
-    }
-
-    // Actualizar color actual
-    switch (type) {
-        case 'shirt':
-            currentCustomization.shirtColor = color;
-            break;
-        case 'pants':
-            currentCustomization.pantsColor = color;
-            break;
-        case 'shoes':
-            currentCustomization.shoesColor = color;
-            break;
-    }
-            
-            // Validar el alias
-            if (newAlias.length === 0) {
-                addMessageToChat('Sistema', 'El alias no puede estar vacío', 'system');
-                return;
-            }
-            
-            if (newAlias.length > 18) {
-                addMessageToChat('Sistema', 'El alias no puede tener más de 18 caracteres', 'system');
-                return;
-            }
-            
-            // Actualizar el alias si ha cambiado
-            if (newAlias !== userAlias) {
-                userAlias = newAlias;
-                localStorage.setItem('userAlias', userAlias);
-                
-                // Enviar nuevo alias al servidor
-                if (isConnected) {
-                    sendAlias();
-                }
-            }
-            
-            // Guardar personalización en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            closeCustomizationPanel();
-            
-            // Mostrar mensaje de confirmación
-            addMessageToChat('Sistema', 'Personalización guardada exitosamente', 'system');
-        }
+        
 
         function resetCustomization() {
             // Restablecer a colores por defecto
             currentCustomization = {
-                shirtColor: 0x4ECDC4,
-                pantsColor: 0x2C3E50,
-                shoesColor: 0x8B4513,
                 skin: 'humanMaleA'
             };
             
             // Aplicar cambios
             applyCustomizationToAvatar();
-            updateSelectedColors();
             updateSelectedSkin();
         }
 
@@ -4590,9 +4382,6 @@ function updateSelectedSkin() {
             if (!currentCustomization) return;
             
             // Actualizar colores del avatar
-            const shirtColor = currentCustomization.shirtColor || 0x4ECDC4;
-            const pantsColor = currentCustomization.pantsColor || 0x2C3E50;
-            const shoesColor = currentCustomization.shoesColor || 0x8B4513;
             
             // Buscar y actualizar materiales del avatar
             if (userAvatars.has(userAlias)) {
@@ -4601,14 +4390,6 @@ function updateSelectedSkin() {
                     const group = avatarData.group;
                     
                     // Actualizar colores de materiales
-                    if (group.bodyMaterial) group.bodyMaterial.color.setHex(shirtColor);
-                    if (group.armMaterial) group.armMaterial.color.setHex(shirtColor);
-                    if (group.pantsMaterial) group.pantsMaterial.color.setHex(pantsColor);
-                    
-                    // Actualizar UI de selección de colores
-                    updateColorButtonSelection('shirt', shirtColor);
-                    updateColorButtonSelection('pants', pantsColor);
-                    updateColorButtonSelection('shoes', shoesColor);
                 }
             }
         }
@@ -4627,7 +4408,8 @@ function updateSelectedSkin() {
             }
         }
 
-        function updateAvatarPosition(alias, position, floor, rotation = 0, skin) {
+        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor) {
+            function updateAvatarPosition(alias, position, floor, rotation = 0) {
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
                 return;
@@ -4663,6 +4445,7 @@ function updateSelectedSkin() {
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
                 avatar.targetRotation = normalizedRotation;
             }
+        }
         }
 
         // Asegurar que el DOM esté completamente cargado antes de inicializar
@@ -5066,30 +4849,14 @@ function updateAvatarPositions() {
                 customizationPanelOpen = true;
                 // Inicializar vista previa del avatar
                 updateAvatarPreview();
-                // Inicializar los grids de colores
-                createColorGrids();
                 // Inicializar selección de skin
                 createSkinSelection();
-                // Actualizar selecciones de colores
-                updateSelectedColors();
                 // Actualizar selección de skin
                 updateSelectedSkin();
             }
         }
 
-        // Inicialización robusta de colores de avatar
-        if (typeof shirtColor === 'undefined' || shirtColor === null) shirtColor = 0x4ECDC4;
-        if (typeof pantsColor === 'undefined' || pantsColor === null) pantsColor = 0x2C3E50;
-        if (typeof shoesColor === 'undefined' || shoesColor === null) shoesColor = 0x8B4513;
         
-        // UI: Al hacer clic en un usuario, activar modo privado
-        usersList.addEventListener('click', function(e) {
-            const userItem = e.target.closest('.user-item');
-            if (userItem && !userItem.classList.contains('own')) {
-                const alias = userItem.textContent.replace(' (Tú)', '').trim();
-                openPrivateChatWindow(alias);
-            }
-        });
         
 
         // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
