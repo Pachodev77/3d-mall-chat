@@ -1171,29 +1171,6 @@
 
             // --- Iniciar Animación ---
             animate();
-            
-            // --- Crear avatar del usuario principal DESPUÉS de que todo esté inicializado ---
-            setTimeout(() => {
-                // Asegurar que userAlias esté definido
-                if (!userAlias) {
-                    userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
-                    localStorage.setItem('userAlias', userAlias);
-                }
-                
-                // Asegurar que currentCustomization esté definido
-                if (!currentCustomization) {
-                    currentCustomization = {
-                        skin: 'humanMaleA',
-                        shirtColor: 0x4ECDC4,
-                        pantsColor: 0x2C3E50,
-                        shoesColor: 0x8B4513
-                    };
-                }
-                
-                console.log('🚀 Creando avatar principal:', userAlias, 'con skin:', currentCustomization.skin);
-                console.log('🚀 [AVATAR PRINCIPAL] currentCustomization completo:', currentCustomization);
-                createUserAvatar(userAlias, { x: 25, y: 2, z: 25 }, 0, currentCustomization);
-            }, 1000); // Esperar 1 segundo para asegurar que todo esté inicializado
         }
 
         function setupScene() {
