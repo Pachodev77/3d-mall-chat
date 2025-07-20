@@ -4359,7 +4359,41 @@ document.addEventListener('DOMContentLoaded', function() {
             currentCustomization.skin = skinList[idx].key;
             window.currentSkinIndex = idx;
             updateAvatarPreview && updateAvatarPreview();
+            // Actualizar avatar en tiempo real
+            updateAvatarSkinInRealTime(skinList[idx].key);
         }
+    }
+    
+    // Función para actualizar el skin del avatar en tiempo real
+    function updateAvatarSkinInRealTime(newSkin) {
+        if (!userAvatars.has(userAlias)) return;
+        
+        const avatar = userAvatars.get(userAlias);
+        if (!avatar || !avatar.group) return;
+        
+        // Mapear nombre de skin a archivo de textura
+        const skinFileMap = {
+            'humanMaleA': 'humanMaleA.png',
+            'humanFemaleA': 'humanFemaleA.png',
+            'zombieMaleA': 'zombieMaleA.png',
+            'zombieFemaleA': 'zombieFemaleA.png'
+        };
+        
+        const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[newSkin] || 'humanMaleA.png'}`;
+        
+        // Cargar nueva textura y aplicarla
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(texturePath, (texture) => {
+            avatar.group.traverse(child => {
+                if (child.isMesh && child.material) {
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                }
+            });
+            console.log('✅ Skin actualizada en tiempo real:', newSkin);
+        }, undefined, (error) => {
+            console.error('Error cargando textura para skin:', newSkin, error);
+        });
     }
     
     // Función para inicializar el selector con el skin actual
