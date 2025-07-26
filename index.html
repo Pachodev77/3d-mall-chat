@@ -2922,16 +2922,47 @@
             const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
             personalRoomScene.add(backWall);
-            // Pared izquierda
-            const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
-            leftWall.position.set(-roomWidth/2, roomHeight/2, 0);
-            leftWall.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftWall);
-            // Pared derecha
-            const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
-            rightWall.position.set(roomWidth/2, roomHeight/2, 0);
-            rightWall.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWall);
+            // Pared izquierda con hueco de ventana
+            const leftWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+            leftWallTop.position.set(-roomWidth/2, roomHeight - 0.6, 0);
+            leftWallTop.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWallTop);
+            
+            const leftWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+            leftWallBottom.position.set(-roomWidth/2, 0.6, 0);
+            leftWallBottom.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWallBottom);
+            
+            const leftWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+            leftWallLeft.position.set(-roomWidth/2, 1.85, -7);
+            leftWallLeft.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWallLeft);
+            
+            const leftWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+            leftWallRight.position.set(-roomWidth/2, 1.85, 7);
+            leftWallRight.rotation.y = Math.PI / 2;
+            personalRoomScene.add(leftWallRight);
+            
+            // Pared derecha con hueco de ventana
+            const rightWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+            rightWallTop.position.set(roomWidth/2, roomHeight - 0.6, 0);
+            rightWallTop.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallTop);
+            
+            const rightWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+            rightWallBottom.position.set(roomWidth/2, 0.6, 0);
+            rightWallBottom.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallBottom);
+            
+            const rightWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+            rightWallLeft.position.set(roomWidth/2, 1.85, -7);
+            rightWallLeft.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallLeft);
+            
+            const rightWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+            rightWallRight.position.set(roomWidth/2, 1.85, 7);
+            rightWallRight.rotation.y = -Math.PI / 2;
+            personalRoomScene.add(rightWallRight);
             // Pared frontal (con puerta)
             const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
@@ -2960,81 +2991,9 @@
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
             personalRoomScene.add(handle);
-            // --- Ventanas mejoradas con tamaño apropiado ---
-            const skyColor = getSkyColorByHour();
-            // Ventanas con tamaño más apropiado para las paredes
-            const windowW = 4, windowH = 2.5; // Reducido de 9x4.4 a 4x2.5
-            const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.08);
-            const windowMaterial = new THREE.MeshPhysicalMaterial({ 
-                color: skyColor, 
-                transparent: true, 
-                opacity: 0.3, // Más transparente (era 0.82)
-                roughness: 0.1, 
-                metalness: 0.1, 
-                reflectivity: 0.3, 
-                clearcoat: 0.8, 
-                clearcoatRoughness: 0.05, 
-                transmission: 0.95, // Más transmisión de luz
-                ior: 1.33 // Índice de refracción del vidrio
-            });
-            const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-            backWindow.position.set(0, 3.4, -roomDepth/2 + 0.13);
-            personalRoomScene.add(backWindow);
-            // Marco ventana trasera (ajustado al nuevo tamaño)
-            const frameGeometry = new THREE.BoxGeometry(windowW + 0.2, windowH + 0.2, 0.12);
-            const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
-            const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-            backFrame.position.copy(backWindow.position);
-            personalRoomScene.add(backFrame);
-            // Cruces del marco (vertical y horizontal) - más delgados
-            const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
-            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
-            crossV.position.copy(backWindow.position);
-            personalRoomScene.add(crossV);
-            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
-            crossH.position.copy(backWindow.position);
-            personalRoomScene.add(crossH);
-            // Ventana izquierda grande
-            const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
-            leftWindow.position.set(-roomWidth/2 + 0.13, 3.4, 0);
-            leftWindow.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftWindow);
-            const leftFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-            leftFrame.position.copy(leftWindow.position);
-            leftFrame.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftFrame);
-            // Cruces marco izquierdo - más delgados
-            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
-            leftCrossV.position.copy(leftWindow.position);
-            leftCrossV.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftCrossV);
-            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
-            leftCrossH.position.copy(leftWindow.position);
-            leftCrossH.rotation.y = Math.PI / 2;
-            personalRoomScene.add(leftCrossH);
-            // Ventana derecha grande
-            const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial.clone());
-            rightWindow.position.set(roomWidth/2 - 0.13, 3.4, 0);
-            rightWindow.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightWindow);
-            const rightFrame = new THREE.Mesh(frameGeometry, frameMaterial);
-            rightFrame.position.copy(rightWindow.position);
-            rightFrame.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightFrame);
-            // Cruces marco derecho - más delgados
-            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
-            rightCrossV.position.copy(rightWindow.position);
-            rightCrossV.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightCrossV);
-            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
-            rightCrossH.position.copy(rightWindow.position);
-            rightCrossH.rotation.y = -Math.PI / 2;
-            personalRoomScene.add(rightCrossH);
-            // Actualizar color del cielo cada minuto
-            setInterval(() => {
-                const newSky = getSkyColorByHour();
-                [backWindow, leftWindow, rightWindow].forEach(w => w.material.color.set(newSky));
-            }, 60000);
+            // --- Huecos de ventana en las paredes laterales ---
+            // Los huecos están creados por las paredes segmentadas arriba
+            // No se necesitan ventanas transparentes, solo los huecos en las paredes
             // Limpiar muebles y decoraciones
             furnitureObjects = [];
             localStorage.removeItem('furniturePositions');
@@ -4612,18 +4571,16 @@ function updateSelectedSkin() {
         // Exponer función de debug globalmente
         window.debugRoomBounds = debugRoomBounds;
         
-        // Función para mostrar información de las ventanas
+        // Función para mostrar información de los huecos de ventana
         function debugWindows() {
-            console.log('=== INFORMACIÓN DE VENTANAS ===');
-            console.log('Tamaño actual de ventanas:');
-            console.log('  Ancho: 4 metros (era 9 metros)');
-            console.log('  Alto: 2.5 metros (era 4.4 metros)');
-            console.log('Propiedades del vidrio:');
-            console.log('  Opacidad: 0.3 (era 0.82)');
-            console.log('  Transmisión: 0.95 (era 0.85)');
-            console.log('  Índice de refracción: 1.33 (era 1.45)');
-            console.log('  Clearcoat: 0.8 (era 0.5)');
-            console.log('================================');
+            console.log('=== INFORMACIÓN DE HUECOS DE VENTANA ===');
+            console.log('Huecos en las paredes laterales:');
+            console.log('  Ubicación: Pared izquierda y derecha');
+            console.log('  Tamaño: 4x2.5 metros');
+            console.log('  Posición: Centrados en altura (1.85m)');
+            console.log('  Tipo: Huecos reales en las paredes (sin vidrio)');
+            console.log('  Ventajas: Visibilidad completa, sin obstrucciones');
+            console.log('==========================================');
         }
         
         // Exponer función de debug globalmente
