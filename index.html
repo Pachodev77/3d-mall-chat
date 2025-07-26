@@ -3790,6 +3790,11 @@
                             updateAvatarPositions(); // Actualizar posiciones de avatares
             updateAvatarAnimations(deltaTime); // Animaciones de avatares
             ensureAvatarVisibility(); // Verificar visibilidad de avatares
+            
+            // Asegurar que las animaciones estén siempre activas
+            userAvatars.forEach((avatar, alias) => {
+                ensureAnimationState(avatar);
+            });
                 // --- Mostrar botones de piso si el usuario está sobre el pasillo rojo oscuro (solo móvil) ---
                 if (IS_MOBILE) {
                     // Raycast hacia abajo desde la cámara
@@ -4735,59 +4740,30 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
 
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
+                actions.idle.setLoop(THREE.LoopRepeat, Infinity);
+                actions.idle.timeScale = 1.0; // Velocidad normal
                 actions.idle.play(); // Iniciar en 'idle' por defecto
                 console.log('Animación Idle cargada para:', alias);
             }
             
             if (runClip) {
-                // Renombramos el clip para que coincida con lo que buscamos ('walk')
+                // Renombramos el clip para que coincida con lo que buscamos ('run')
                 runClip.name = 'run';
                 actions.run = mixer.clipAction(runClip);
-                // Forzar loop infinito y velocidad lenta
+                // Configurar animación de correr para que sea más fluida
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                // Ajustar la velocidad de la animación de correr según dispositivo
-                if (IS_MOBILE) {
-                    actions.run.timeScale = 1.0; // Más fluida en móvil
-                } else {
-                    actions.run.timeScale = 0.7; // Más lenta en escritorio
-                }
-                console.log('Animación Run cargada para:', alias, actions.run);
-                // Diagnóstico: información del clip y esqueleto
-                console.log('--- DIAGNÓSTICO ANIMACIÓN RUN ---');
-                console.log('Nombre del clip:', runClip.name);
-                console.log('Duración:', runClip.duration);
-                console.log('Tracks:', runClip.tracks ? runClip.tracks.length : 'N/A');
+                actions.run.timeScale = 1.2; // Velocidad más rápida para evitar cortes
+                actions.run.clampWhenFinished = false; // Evitar que se quede en la última pose
+                console.log('Animación Run cargada para:', alias);
+                
+                // Reasignar tracks para eliminar prefijo 'mixamorig:' si existe
                 if (runClip.tracks) {
-                    runClip.tracks.forEach((track, i) => {
-                        console.log(`Track #${i}:`, track.name, 'Keyframes:', track.times.length);
+                    runClip.tracks.forEach(track => {
+                        if (track.name.startsWith('mixamorig:')) {
+                            track.name = track.name.replace('mixamorig:', '');
+                        }
                     });
                 }
-                // Diagnóstico: huesos del modelo
-                let boneCount = 0;
-                let boneNames = [];
-                avatar.traverse(child => {
-                    if (child.isBone) {
-                        boneCount++;
-                        boneNames.push(child.name);
-                    }
-                });
-                console.log('Huesos encontrados en el modelo:', boneCount);
-                console.log('Nombres de huesos:', boneNames);
-                if (!actions.run) {
-                    console.warn('No se pudo crear action para RUN:', alias);
-                }
-                console.log('--- FIN DIAGNÓSTICO ANIMACIÓN RUN ---');
-                
-                // Imprimir nombres de huesos del modelo y nombres de tracks del clip de animación run
-                console.log('Nombres de huesos del modelo:', boneNames);
-                console.log('Nombres de tracks del clip de animación run:', runClip.tracks.map(track => track.name));
-                
-                // Reasignar tracks para eliminar prefijo 'mixamorig:'
-                runClip.tracks.forEach(track => {
-                    if (track.name.startsWith('mixamorig:')) {
-                        track.name = track.name.replace('mixamorig:', '');
-                    }
-                });
             }
             
             // Si no se cargó ninguna animación, al menos el avatar aparecerá estático
@@ -4850,50 +4826,27 @@ function updateAvatarPositions() {
         avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
-                // --- LÓGICA DE CONTROL DE ANIMACIÓN ---
+                // --- LÓGICA DE CONTROL DE ANIMACIÓN MEJORADA ---
                 const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        avatar.mixer.stopAllAction();
-                        // Fade más largo en móvil para suavidad
-                        if (IS_MOBILE) {
-                            avatar.actions.idle.fadeOut(0.5);
-                            avatar.actions.run.reset().fadeIn(0.5).play();
-                        } else {
-                            avatar.actions.idle.fadeOut(0.2);
-                            avatar.actions.run.reset().fadeIn(0.2).play();
-                        }
+                        smoothAnimationTransition(avatar, avatar.actions.idle, avatar.actions.run, 0.1);
+                        console.log('[Animation] Transición idle -> run para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        avatar.mixer.stopAllAction();
-                        if (IS_MOBILE) {
-                            avatar.actions.default.fadeOut(0.5);
-                            avatar.actions.run.reset().fadeIn(0.5).play();
-                        } else {
-                            avatar.actions.default.fadeOut(0.2);
-                            avatar.actions.run.reset().fadeIn(0.2).play();
-                        }
+                        smoothAnimationTransition(avatar, avatar.actions.default, avatar.actions.run, 0.1);
+                        console.log('[Animation] Transición default -> run para:', alias);
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'run' a 'idle'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        if (IS_MOBILE) {
-                            avatar.actions.run.fadeOut(0.5);
-                            avatar.actions.idle.reset().fadeIn(0.5).play();
-                        } else {
-                            avatar.actions.run.fadeOut(0.2);
-                            avatar.actions.idle.reset().fadeIn(0.2).play();
-                        }
+                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.idle, 0.1);
+                        console.log('[Animation] Transición run -> idle para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        if (IS_MOBILE) {
-                            avatar.actions.run.fadeOut(0.5);
-                            avatar.actions.default.reset().fadeIn(0.5).play();
-    } else {
-                            avatar.actions.run.fadeOut(0.2);
-                            avatar.actions.default.reset().fadeIn(0.2).play();
-                        }
+                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.default, 0.1);
+                        console.log('[Animation] Transición run -> default para:', alias);
                     }
                     avatar.isMoving = false;
                 }
@@ -4918,6 +4871,39 @@ function updateAvatarPositions() {
                     avatar.group.visible = true;
                 }
             });
+        }
+        
+        // --- Función para mejorar la fluidez de las animaciones ---
+        function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.15) {
+            if (!fromAction || !toAction) return;
+            
+            // Asegurar que las acciones estén configuradas correctamente
+            fromAction.setLoop(THREE.LoopRepeat, Infinity);
+            toAction.setLoop(THREE.LoopRepeat, Infinity);
+            toAction.clampWhenFinished = false;
+            
+            // Transición suave
+            fromAction.fadeOut(duration);
+            toAction.reset().fadeIn(duration).play();
+        }
+        
+        // --- Función para asegurar que las animaciones estén siempre activas ---
+        function ensureAnimationState(avatar) {
+            if (!avatar.actions) return;
+            
+            // Verificar que siempre haya una animación activa
+            let hasActiveAction = false;
+            Object.values(avatar.actions).forEach(action => {
+                if (action.isRunning()) {
+                    hasActiveAction = true;
+                }
+            });
+            
+            // Si no hay animación activa, activar idle
+            if (!hasActiveAction && avatar.actions.idle) {
+                avatar.actions.idle.play();
+                console.log('[Animation] Reactivando animación idle');
+            }
         }
 
         
