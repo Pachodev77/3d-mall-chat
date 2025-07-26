@@ -4305,7 +4305,14 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = skinList[idx].img;
         label.textContent = skinList[idx].label;
         currentCustomization.skin = skinList[idx].key;
+        
+        // Aplicar el skin al avatar inmediatamente
+        applyCustomizationToAvatar();
+        
+        // Actualizar preview si existe
         updateAvatarPreview && updateAvatarPreview();
+        
+        console.log('[updateSkinPreview] Skin cambiado a:', skinList[idx].key);
     }
     // Asignar eventos
     prevBtn && prevBtn.addEventListener('click', function() {
@@ -4357,9 +4364,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Alias guardado:', newAlias);
             }
             
+            // Aplicar la personalización al avatar antes de guardar
+            applyCustomizationToAvatar();
+            
+            // Guardar en localStorage
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            
             closeSimplePanel();
-            alert('¡Personalización guardada!');
+            showNotification('✅ Personalización guardada exitosamente!', 'success');
         }
         
         
@@ -4432,17 +4444,65 @@ function updateSelectedSkin() {
         function applyCustomizationToAvatar() {
             if (!currentCustomization) return;
             
-            // Actualizar colores del avatar
+            console.log('[applyCustomizationToAvatar] Aplicando personalización:', currentCustomization);
             
-            // Buscar y actualizar materiales del avatar
+            // Actualizar el avatar del usuario actual
             if (userAvatars.has(userAlias)) {
                 const avatarData = userAvatars.get(userAlias);
                 if (avatarData && avatarData.group) {
                     const group = avatarData.group;
                     
-                    // Actualizar colores de materiales
+                    // Aplicar skin si está definido
+                    if (currentCustomization.skin) {
+                        console.log('[applyCustomizationToAvatar] Aplicando skin:', currentCustomization.skin);
+                        
+                        const skinFileMap = {
+                            'humanMaleA': 'humanMaleA.png',
+                            'humanFemaleA': 'humanFemaleA.png',
+                            'zombieMaleA': 'zombieMaleA.png',
+                            'zombieFemaleA': 'zombieFemaleA.png'
+                        };
+                        
+                        const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[currentCustomization.skin] || 'humanMaleA.png'}`;
+                        
+                        // Cargar nueva textura
+                        const textureLoader = new THREE.TextureLoader();
+                        textureLoader.load(texturePath, (texture) => {
+                            // Aplicar la textura al modelo
+                            group.traverse(child => {
+                                if (child.isMesh && child.material) {
+                                    child.material.map = texture;
+                                    child.material.needsUpdate = true;
+                                }
+                            });
+                            
+                            console.log('[applyCustomizationToAvatar] Skin aplicado exitosamente:', currentCustomization.skin);
+                        }, undefined, (error) => {
+                            console.error('[applyCustomizationToAvatar] Error al cargar textura:', error);
+                        });
+                    }
+                    
+                    // Aplicar colores de camisa si están definidos
+                    if (currentCustomization.shirtColor) {
+                        console.log('[applyCustomizationToAvatar] Aplicando color de camisa:', currentCustomization.shirtColor);
+                        
+                        group.traverse(child => {
+                            if (child.isMesh && child.material) {
+                                // Buscar el material de la camisa (puede variar según el modelo)
+                                if (child.material.name && child.material.name.toLowerCase().includes('shirt')) {
+                                    child.material.color.setHex(currentCustomization.shirtColor);
+                                    child.material.needsUpdate = true;
+                                }
+                            }
+                        });
+                    }
                 }
             }
+            
+            // Guardar la personalización en localStorage
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            
+            console.log('[applyCustomizationToAvatar] Personalización aplicada y guardada');
         }
 
         // El manejo de cierre de paneles ahora está integrado en handleGlobalClick
@@ -4665,6 +4725,45 @@ function updateSelectedSkin() {
         }
         
         window.debugRoomState = debugRoomState;
+        
+        // Función para debug del sistema de skins
+        function debugSkinSystem() {
+            console.log('=== DEBUG SISTEMA DE SKINS ===');
+            console.log('Personalización actual:', currentCustomization);
+            console.log('Avatar del usuario existe:', userAvatars.has(userAlias));
+            
+            if (userAvatars.has(userAlias)) {
+                const avatarData = userAvatars.get(userAlias);
+                console.log('Datos del avatar:', avatarData);
+                
+                if (avatarData && avatarData.group) {
+                    console.log('Materiales del avatar:');
+                    avatarData.group.traverse(child => {
+                        if (child.isMesh && child.material) {
+                            console.log(`  - ${child.name}:`, {
+                                material: child.material.name || 'Sin nombre',
+                                hasTexture: !!child.material.map,
+                                texturePath: child.material.map ? 'Cargada' : 'No cargada'
+                            });
+                        }
+                    });
+                }
+            }
+            
+            console.log('Skins disponibles:');
+            const skinList = [
+                { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+                { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+                { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+                { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
+            ];
+            skinList.forEach(skin => {
+                console.log(`  - ${skin.key}: ${skin.label}`);
+            });
+            console.log('==========================================');
+        }
+        
+        window.debugSkinSystem = debugSkinSystem;
         
         // Función para mostrar información de los huecos de ventana
         function debugWindows() {
