@@ -2922,7 +2922,7 @@
             const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
             backWall.position.set(0, roomHeight/2, -roomDepth/2);
             personalRoomScene.add(backWall);
-            // Pared izquierda con hueco de ventana
+            // Pared izquierda con hueco de ventana (4x2.5 metros)
             const leftWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
             leftWallTop.position.set(-roomWidth/2, roomHeight - 0.6, 0);
             leftWallTop.rotation.y = Math.PI / 2;
@@ -2933,17 +2933,19 @@
             leftWallBottom.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWallBottom);
             
+            // Pared izquierda del hueco (lado izquierdo del hueco)
             const leftWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
-            leftWallLeft.position.set(-roomWidth/2, 1.85, -7);
+            leftWallLeft.position.set(-roomWidth/2, 1.85, -10);
             leftWallLeft.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWallLeft);
             
+            // Pared derecha del hueco (lado derecho del hueco)
             const leftWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
-            leftWallRight.position.set(-roomWidth/2, 1.85, 7);
+            leftWallRight.position.set(-roomWidth/2, 1.85, 10);
             leftWallRight.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftWallRight);
             
-            // Pared derecha con hueco de ventana
+            // Pared derecha con hueco de ventana (4x2.5 metros)
             const rightWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
             rightWallTop.position.set(roomWidth/2, roomHeight - 0.6, 0);
             rightWallTop.rotation.y = -Math.PI / 2;
@@ -2954,13 +2956,15 @@
             rightWallBottom.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWallBottom);
             
+            // Pared izquierda del hueco (lado izquierdo del hueco)
             const rightWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
-            rightWallLeft.position.set(roomWidth/2, 1.85, -7);
+            rightWallLeft.position.set(roomWidth/2, 1.85, -10);
             rightWallLeft.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWallLeft);
             
+            // Pared derecha del hueco (lado derecho del hueco)
             const rightWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
-            rightWallRight.position.set(roomWidth/2, 1.85, 7);
+            rightWallRight.position.set(roomWidth/2, 1.85, 10);
             rightWallRight.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightWallRight);
             // Pared frontal (con puerta)
@@ -4576,10 +4580,11 @@ function updateSelectedSkin() {
             console.log('=== INFORMACIÓN DE HUECOS DE VENTANA ===');
             console.log('Huecos en las paredes laterales:');
             console.log('  Ubicación: Pared izquierda y derecha');
-            console.log('  Tamaño: 4x2.5 metros');
+            console.log('  Tamaño: 4x2.5 metros (igual que las ventanas anteriores)');
             console.log('  Posición: Centrados en altura (1.85m)');
             console.log('  Tipo: Huecos reales en las paredes (sin vidrio)');
             console.log('  Ventajas: Visibilidad completa, sin obstrucciones');
+            console.log('  Dimensiones exactas: 4m de ancho x 2.5m de alto');
             console.log('==========================================');
         }
         
