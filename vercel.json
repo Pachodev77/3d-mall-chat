@@ -1,36 +1,10 @@
 {
-  "version": 2,
-  "name": "3d-mall-chat",
-  "builds": [
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/firebase-config.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "firebase-config.js",
-      "use": "@vercel/static"
+  "analytics": {
+    "enabled": true
+  },
+  "functions": {
+    "api/event.js": {
+      "runtime": "nodejs18.x"
     }
-  ],
-  "routes": [
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/firebase-config.js",
-      "dest": "/firebase-config.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  }
 } 
