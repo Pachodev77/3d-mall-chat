@@ -267,9 +267,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 1100px;
-            max-width: 99vw;
-            height: 700px;
+            width: 500px;
+            max-width: 95vw;
+            height: 400px;
             background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(30,30,30,0.98));
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
@@ -314,9 +314,9 @@
             padding: 20px;
             overflow-y: auto;
             color: #eee;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             min-height: 0;
             min-width: 0;
         }
@@ -767,9 +767,6 @@
             <button id="btn-floor-1" style="width: 70px; height: 44px; font-size: 18px; border-radius: 0 0 10px 10px; background: #4B0000; color: #fff; border: 2px solid #FFD700;">Piso 1</button>
         </div>
     </div>
-    
-    <!-- Panel de navegación de habitaciones -->
-    <div id="room-navigation-panel" style="position: fixed; top: 60px; left: 16px; width: 450px; height: 600px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
     
     <!-- Botón para regresar al mall desde la habitación -->
     <button id="return-to-mall-btn" title="Regresar al centro comercial" style="position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; background: #4B0000; color: #fff; border: none; border-radius: 50%; cursor: pointer; z-index: 22000; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 16px; transition: background 0.2s; pointer-events: auto;">🏢</button>
