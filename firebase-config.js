@@ -82,6 +82,7 @@ function connectToChat(alias) {
     positionsRef.on('child_added', (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
+        console.log('[Firebase] child_added recibido para:', alias, 'datos:', userData);
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] New user connected:', alias);
             updateAvatarPosition(
@@ -91,11 +92,14 @@ function connectToChat(alias) {
                 userData.rotation,
                 userData.skin // Pass skin
             );
+        } else {
+            console.log('[Firebase] child_added ignorado - alias propio o datos inválidos');
         }
     });
     positionsRef.on('child_changed', (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
+        console.log('[Firebase] child_changed recibido para:', alias, 'datos:', userData);
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] Position updated:', alias);
             updateAvatarPosition(
@@ -105,6 +109,8 @@ function connectToChat(alias) {
                 userData.rotation,
                 userData.skin // Pass skin
             );
+        } else {
+            console.log('[Firebase] child_changed ignorado - alias propio o datos inválidos');
         }
     });
     positionsRef.on('child_removed', (snapshot) => {
@@ -157,6 +163,7 @@ function sendPosition(position, floor, rotation) {
         skin: skin, // Send skin instead of colors
         timestamp: Date.now()
     };
+    console.log('[sendPosition] Enviando datos:', positionData, 'para usuario:', currentUser.alias);
     positionsRef.child(currentUser.alias).set(positionData);
 }
 

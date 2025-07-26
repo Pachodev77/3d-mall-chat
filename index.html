@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paseo Virtual por Centro Comercial</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
+     crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -3785,8 +3787,9 @@
             // Solo actualizar y renderizar si estamos en la escena del mall
             if (currentScene === 'mall') {
                 updateMovement();
-                updateAvatarPositions(); // Actualizar posiciones de avatares
-                updateAvatarAnimations(deltaTime); // Animaciones de avatares
+                            updateAvatarPositions(); // Actualizar posiciones de avatares
+            updateAvatarAnimations(deltaTime); // Animaciones de avatares
+            ensureAvatarVisibility(); // Verificar visibilidad de avatares
                 // --- Mostrar botones de piso si el usuario está sobre el pasillo rojo oscuro (solo móvil) ---
                 if (IS_MOBILE) {
                     // Raycast hacia abajo desde la cámara
@@ -4405,8 +4408,11 @@ function updateSelectedSkin() {
             }
         }
 
-        function updateAvatarPosition(alias, position, floor, rotation = 0, shirtColor, pantsColor, shoesColor) {
-            function updateAvatarPosition(alias, position, floor, rotation = 0) {
+        function updateAvatarPosition(alias, position, floor, rotation = 0, skin = null) {
+            console.log('[updateAvatarPosition] Llamada para alias:', alias, 'posición:', position, 'floor:', floor, 'skin:', skin);
+            console.log('[updateAvatarPosition] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
+            console.log('[updateAvatarPosition] Total avatares antes:', userAvatars.size);
+            
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
                 console.warn('Posición inválida para alias:', alias, position);
                 return;
@@ -4421,17 +4427,20 @@ function updateSelectedSkin() {
             }
             // No crear avatar para el usuario propio
             if (alias === userAlias) {
+                console.log('[updateAvatarPosition] Saltando avatar propio:', alias);
                 return;
             }
             let avatar = userAvatars.get(alias);
             if (!avatar) {
+                console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
                 // Solo pasar skin si existe
                 let custom = {};
-                if (typeof skin !== 'undefined') custom.skin = skin;
+                if (skin) custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
             }
             if (avatar) {
+                console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
                 // Actualización de posición y rotación en tiempo real
                 const floorStep = HALL_HEIGHT + 1;
                 const targetY = floor * floorStep;
@@ -4441,8 +4450,10 @@ function updateSelectedSkin() {
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
                 avatar.targetRotation = normalizedRotation;
+            } else {
+                console.warn('[updateAvatarPosition] No se pudo crear/obtener avatar para:', alias);
             }
-        }
+            console.log('[updateAvatarPosition] Total avatares después:', userAvatars.size);
         }
 
         // Asegurar que el DOM esté completamente cargado antes de inicializar
@@ -4454,8 +4465,22 @@ function updateSelectedSkin() {
         
         // Función para detectar dispositivo móvil
         function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                   window.innerWidth <= 768;
+            // Detección más robusta de dispositivos móviles
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const isMobileWidth = window.innerWidth <= 768;
+            const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            const isMobile = isMobileUA || isMobileWidth || hasTouchSupport;
+            
+            console.log('[Mobile Detection] User Agent:', userAgent);
+            console.log('[Mobile Detection] Window Width:', window.innerWidth);
+            console.log('[Mobile Detection] Touch Support:', hasTouchSupport);
+            console.log('[Mobile Detection] Mobile UA:', isMobileUA);
+            console.log('[Mobile Detection] Mobile Width:', isMobileWidth);
+            console.log('[Mobile Detection] Final Is Mobile:', isMobile);
+            
+            return isMobile;
         }
         
         // Función para mostrar/ocultar controles móviles
@@ -4485,6 +4510,45 @@ function updateSelectedSkin() {
         
         // Inicializar controles móviles al cargar
         document.addEventListener('DOMContentLoaded', toggleMobileControls);
+        
+        // Función de depuración para dispositivos móviles
+        function debugMobileDetection() {
+            console.log('=== DEBUG MOBILE DETECTION ===');
+            console.log('User Agent:', navigator.userAgent);
+            console.log('Window Width:', window.innerWidth);
+            console.log('Window Height:', window.innerHeight);
+            console.log('Screen Width:', screen.width);
+            console.log('Screen Height:', screen.height);
+            console.log('Device Pixel Ratio:', window.devicePixelRatio);
+            console.log('Touch Support:', 'ontouchstart' in window);
+            console.log('IS_MOBILE constant:', IS_MOBILE);
+            console.log('isMobileDevice() result:', isMobileDevice());
+            console.log('================================');
+        }
+        
+        // Ejecutar depuración al cargar
+        document.addEventListener('DOMContentLoaded', debugMobileDetection);
+        
+        // Función de prueba para crear avatar de test
+        function createTestAvatar() {
+            console.log('[createTestAvatar] Creando avatar de prueba');
+            const testPosition = { x: 0, y: 0, z: 0 };
+            const testCustom = { skin: 'humanMaleA' };
+            createUserAvatar('TEST_USER', testPosition, 0, testCustom);
+        }
+        
+        // Exponer función de prueba globalmente
+        window.createTestAvatar = createTestAvatar;
+        
+        // Función para simular datos de posición de otro usuario
+        function simulateOtherUserPosition() {
+            console.log('[simulateOtherUserPosition] Simulando posición de otro usuario');
+            const testPosition = { x: 5, y: 0, z: 5 };
+            updateAvatarPosition('SIMULATED_USER', testPosition, 0, 0, 'humanMaleA');
+        }
+        
+        // Exponer función de simulación globalmente
+        window.simulateOtherUserPosition = simulateOtherUserPosition;
 
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
@@ -4577,15 +4641,22 @@ const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario con animaciones correctamente cargadas ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
+    console.log('[createUserAvatar] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
-    if (pendingAvatarLoads.has(alias)) return;
+    if (pendingAvatarLoads.has(alias)) {
+        console.log('[createUserAvatar] Carga pendiente para:', alias);
+        return;
+    }
     
     // Elimina cualquier avatar anterior con el mismo alias para evitar duplicados
     removeUserAvatar(alias);
     
     // Si por alguna razón sigue existiendo, no continuar
-    if (userAvatars.has(alias)) return;
+    if (userAvatars.has(alias)) {
+        console.log('[createUserAvatar] Avatar ya existe para:', alias);
+        return;
+    }
     
     pendingAvatarLoads.add(alias);
     
@@ -4772,7 +4843,9 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
 }
         // --- Función para actualizar todas las posiciones de avatares ---
 function updateAvatarPositions() {
+    console.log('[updateAvatarPositions] Total avatares:', userAvatars.size, 'IS_MOBILE:', IS_MOBILE);
     userAvatars.forEach((avatar, alias) => {
+        console.log('[updateAvatarPositions] Procesando avatar:', alias, 'visible:', avatar.group.visible);
                 // Interpolar posición y rotación
         avatar.group.position.lerp(avatar.targetPosition, 0.2);
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
@@ -4836,6 +4909,16 @@ function updateAvatarPositions() {
                 }
             });
         }
+        
+        // --- Función para verificar y corregir visibilidad de avatares ---
+        function ensureAvatarVisibility() {
+            userAvatars.forEach((avatar, alias) => {
+                if (avatar.group && !avatar.group.visible) {
+                    console.log('[ensureAvatarVisibility] Forzando visibilidad para avatar:', alias);
+                    avatar.group.visible = true;
+                }
+            });
+        }
 
         
 
@@ -4876,7 +4959,10 @@ function updateAvatarPositions() {
                     };
                     const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
                     const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
+                    console.log('[sendUserPosition] Enviando posición:', position, 'floor:', floor, 'rotation:', rotation, 'IS_MOBILE:', IS_MOBILE);
                     sendPosition(position, floor, rotation);
+                } else {
+                    console.warn('[sendUserPosition] Camera no disponible o posición inválida');
                 }
         }
         
