@@ -4767,14 +4767,10 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
                 actions.idle.setLoop(THREE.LoopRepeat, Infinity);
-                // Ajustar velocidad según dispositivo
-                if (IS_MOBILE) {
-                    actions.idle.timeScale = 1.3; // Más rápida en móvil para evitar cortes
-                } else {
-                    actions.idle.timeScale = 1.0; // Velocidad normal en PC
-                }
+                actions.idle.timeScale = 1.0; // Velocidad normal para ambos dispositivos
+                actions.idle.clampWhenFinished = false;
                 actions.idle.play(); // Iniciar en 'idle' por defecto
-                console.log('Animación Idle cargada para:', alias, 'IS_MOBILE:', IS_MOBILE);
+                console.log('Animación Idle cargada para:', alias);
             }
             
             if (runClip) {
@@ -4783,14 +4779,9 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 actions.run = mixer.clipAction(runClip);
                 // Configurar animación de correr para que sea más fluida
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                // Ajustar velocidad según dispositivo
-                if (IS_MOBILE) {
-                    actions.run.timeScale = 1.5; // Mucho más rápida en móvil para evitar cortes
-                } else {
-                    actions.run.timeScale = 1.2; // Velocidad normal en PC
-                }
+                actions.run.timeScale = 1.0; // Velocidad normal para ambos dispositivos
                 actions.run.clampWhenFinished = false; // Evitar que se quede en la última pose
-                console.log('Animación Run cargada para:', alias, 'IS_MOBILE:', IS_MOBILE);
+                console.log('Animación Run cargada para:', alias);
                 
                 // Reasignar tracks para eliminar prefijo 'mixamorig:' si existe
                 if (runClip.tracks) {
@@ -4868,21 +4859,26 @@ function updateAvatarPositions() {
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        smoothAnimationTransition(avatar, avatar.actions.idle, avatar.actions.run, 0.1);
-                        console.log('[Animation] Transición idle -> run para:', alias);
+                        // Transición simple sin fade para evitar cortes
+                        avatar.actions.idle.stop();
+                        avatar.actions.run.reset().play();
+                        console.log('[Animation] Cambio directo idle -> run para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        smoothAnimationTransition(avatar, avatar.actions.default, avatar.actions.run, 0.1);
-                        console.log('[Animation] Transición default -> run para:', alias);
+                        avatar.actions.default.stop();
+                        avatar.actions.run.reset().play();
+                        console.log('[Animation] Cambio directo default -> run para:', alias);
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'run' a 'idle'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.idle, 0.1);
-                        console.log('[Animation] Transición run -> idle para:', alias);
+                        avatar.actions.run.stop();
+                        avatar.actions.idle.reset().play();
+                        console.log('[Animation] Cambio directo run -> idle para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.default, 0.1);
-                        console.log('[Animation] Transición run -> default para:', alias);
+                        avatar.actions.run.stop();
+                        avatar.actions.default.reset().play();
+                        console.log('[Animation] Cambio directo run -> default para:', alias);
                     }
                     avatar.isMoving = false;
                 }
@@ -4913,28 +4909,17 @@ function updateAvatarPositions() {
         function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.15) {
             if (!fromAction || !toAction) return;
             
-            // Ajustar duración según dispositivo
-            const transitionDuration = IS_MOBILE ? 0.05 : duration; // Transición más rápida en móvil
-            
             // Asegurar que las acciones estén configuradas correctamente
             fromAction.setLoop(THREE.LoopRepeat, Infinity);
             toAction.setLoop(THREE.LoopRepeat, Infinity);
             toAction.clampWhenFinished = false;
+            toAction.timeScale = 1.0; // Velocidad consistente
             
-            // Configurar velocidades específicas para móvil
-            if (IS_MOBILE) {
-                if (toAction === avatar.actions.run) {
-                    toAction.timeScale = 1.5; // Velocidad alta para correr en móvil
-                } else if (toAction === avatar.actions.idle) {
-                    toAction.timeScale = 1.3; // Velocidad alta para idle en móvil
-                }
-            }
+            // Transición suave con duración fija
+            fromAction.fadeOut(0.2);
+            toAction.reset().fadeIn(0.2).play();
             
-            // Transición suave
-            fromAction.fadeOut(transitionDuration);
-            toAction.reset().fadeIn(transitionDuration).play();
-            
-            console.log('[Animation] Transición con duración:', transitionDuration, 'IS_MOBILE:', IS_MOBILE);
+            console.log('[Animation] Transición completada para:', avatar.group.name);
         }
         
         // --- Función para asegurar que las animaciones estén siempre activas ---
@@ -4944,39 +4929,23 @@ function updateAvatarPositions() {
             // Verificar que siempre haya una animación activa
             let hasActiveAction = false;
             Object.values(avatar.actions).forEach(action => {
-                if (action.isRunning()) {
+                if (action.isRunning() && action.getEffectiveWeight() > 0.1) {
                     hasActiveAction = true;
                 }
             });
             
             // Si no hay animación activa, activar idle
             if (!hasActiveAction && avatar.actions.idle) {
-                avatar.actions.idle.play();
-                // En móvil, asegurar que la velocidad sea correcta
-                if (IS_MOBILE) {
-                    avatar.actions.idle.timeScale = 1.3;
-                }
-                console.log('[Animation] Reactivando animación idle, IS_MOBILE:', IS_MOBILE);
-            }
-            
-            // En móvil, verificar más frecuentemente que las animaciones estén activas
-            if (IS_MOBILE) {
-                Object.values(avatar.actions).forEach(action => {
-                    if (action.isRunning() && action.timeScale < 1.0) {
-                        // Asegurar que las animaciones en móvil tengan velocidad adecuada
-                        if (action === avatar.actions.run) {
-                            action.timeScale = 1.5;
-                        } else if (action === avatar.actions.idle) {
-                            action.timeScale = 1.3;
-                        }
-                    }
-                });
+                avatar.actions.idle.reset().play();
+                avatar.actions.idle.timeScale = 1.0;
+                avatar.actions.idle.setEffectiveWeight(1.0);
+                console.log('[Animation] Reactivando animación idle');
             }
         }
         
         // --- Función específica para prevenir pose T en móvil ---
         function preventTPoseOnMobile(avatar) {
-            if (!IS_MOBILE || !avatar.actions) return;
+            if (!avatar.actions) return;
             
             // Verificar si el avatar está en pose T (sin animación activa)
             let hasActiveAnimation = false;
@@ -4988,9 +4957,9 @@ function updateAvatarPositions() {
             
             // Si no hay animación activa, forzar la animación idle
             if (!hasActiveAnimation && avatar.actions.idle) {
-                console.log('[Mobile] Detectada pose T, forzando animación idle');
+                console.log('[Animation] Detectada pose T, forzando animación idle');
                 avatar.actions.idle.reset().play();
-                avatar.actions.idle.timeScale = 1.3;
+                avatar.actions.idle.timeScale = 1.0;
                 avatar.actions.idle.setEffectiveWeight(1.0);
             }
         }
