@@ -598,19 +598,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.15s ease-out;
             backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 215, 0, 0.3);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .mobile-btn:hover {
             background: rgba(128, 0, 0, 0.9);
             transform: scale(1.05);
+            border-color: rgba(255, 215, 0, 0.6);
         }
         
         .mobile-btn:active {
             background: rgba(255, 215, 0, 0.8);
             transform: scale(0.95);
+            border-color: rgba(255, 215, 0, 0.9);
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
         }
         
         /* Botones triangulares */
@@ -2512,18 +2519,43 @@
             const mobileLeftBtn = document.getElementById('mobile-left');
             const mobileRightBtn = document.getElementById('mobile-right');
             
-            // Función auxiliar para configurar controles de botones móviles
+            // Función auxiliar para configurar controles de botones móviles con efectos visuales
             function setupButtonControls(buttonId, flagSetter) {
                 const button = document.getElementById(buttonId);
                 if (button) {
                     const setFlag = (value) => (e) => { 
-                    e.preventDefault();
+                        e.preventDefault();
                         flagSetter(value); 
+                        
+                        // Efectos visuales para el botón
+                        if (value) {
+                            // Botón presionado
+                            button.style.background = 'rgba(255, 215, 0, 0.8)';
+                            button.style.transform = 'scale(0.95)';
+                            button.style.border = '3px solid rgba(255, 215, 0, 0.9)';
+                            button.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.4)';
+                        } else {
+                            // Botón liberado
+                            button.style.background = 'rgba(75, 0, 0, 0.8)';
+                            button.style.transform = 'scale(1)';
+                            button.style.border = '3px solid rgba(255, 215, 0, 0.3)';
+                            button.style.boxShadow = 'none';
+                        }
                     };
+                    
+                    // Eventos para touch
                     button.addEventListener('touchstart', setFlag(true));
                     button.addEventListener('touchend', setFlag(false));
+                    button.addEventListener('touchcancel', setFlag(false));
+                    
+                    // Eventos para mouse
                     button.addEventListener('mousedown', setFlag(true));
                     button.addEventListener('mouseup', setFlag(false));
+                    button.addEventListener('mouseleave', setFlag(false));
+                    
+                    // Prevenir selección de texto
+                    button.addEventListener('selectstart', (e) => e.preventDefault());
+                    button.addEventListener('dragstart', (e) => e.preventDefault());
                 }
             }
             
@@ -4585,6 +4617,19 @@ function updateSelectedSkin() {
             console.log('  Tipo: Huecos reales en las paredes (sin vidrio)');
             console.log('  Ventajas: Visibilidad completa, sin obstrucciones');
             console.log('  Dimensiones exactas: 4m de ancho x 2.5m de alto');
+            console.log('==========================================');
+        }
+        
+        // Función para debug de controles móviles
+        function debugMobileControls() {
+            console.log('=== DEBUG CONTROLES MÓVILES ===');
+            console.log('Estado actual de los controles:');
+            console.log('  Forward:', mobileForward);
+            console.log('  Backward:', mobileBackward);
+            console.log('  Left:', mobileLeft);
+            console.log('  Right:', mobileRight);
+            console.log('Dispositivo móvil detectado:', IS_MOBILE);
+            console.log('Controles visibles:', document.getElementById('mobile-controls').style.display !== 'none');
             console.log('==========================================');
         }
         
