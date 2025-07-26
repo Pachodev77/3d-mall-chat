@@ -3443,12 +3443,12 @@
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
                 const newPosition = personalRoomTargetPosition.clone().add(velocity);
                 
-                // --- Límites de la habitación (12x12 metros) ---
+                // --- Límites de la habitación (expandidos para exploración completa) ---
                 const roomBounds = {
-                    minX: -5.5,
-                    maxX: 5.5,
-                    minZ: -5.5,
-                    maxZ: 5.5
+                    minX: -8.0,  // Expandido hacia la izquierda
+                    maxX: 8.0,   // Expandido hacia la derecha
+                    minZ: -8.0,  // Expandido hacia atrás
+                    maxZ: 8.0    // Expandido hacia adelante
                 };
                 
                 // Aplicar límites de la habitación
@@ -3692,12 +3692,12 @@
                     break;
             }
             
-            // Aplicar límites de la habitación
+            // Aplicar límites de la habitación (expandidos)
             const roomBounds = {
-                minX: -5.5,
-                maxX: 5.5,
-                minZ: -5.5,
-                maxZ: 5.5
+                minX: -8.0,
+                maxX: 8.0,
+                minZ: -8.0,
+                maxZ: 8.0
             };
             
             currentPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, currentPosition.x));
@@ -4580,6 +4580,26 @@ function updateSelectedSkin() {
         
         // Exponer función de debug globalmente
         window.debugMobileAnimations = debugMobileAnimations;
+        
+        // Función para mostrar los límites de la habitación personal
+        function debugRoomBounds() {
+            console.log('=== LÍMITES DE LA HABITACIÓN PERSONAL ===');
+            console.log('Límites actuales:');
+            console.log('  X: de -8.0 a +8.0 (16 metros de ancho)');
+            console.log('  Z: de -8.0 a +8.0 (16 metros de largo)');
+            console.log('  Área total: 16x16 = 256 metros cuadrados');
+            
+            if (personalRoomCamera) {
+                console.log('Posición actual de la cámara:');
+                console.log('  X:', personalRoomCamera.position.x.toFixed(2));
+                console.log('  Y:', personalRoomCamera.position.y.toFixed(2));
+                console.log('  Z:', personalRoomCamera.position.z.toFixed(2));
+            }
+            console.log('==========================================');
+        }
+        
+        // Exponer función de debug globalmente
+        window.debugRoomBounds = debugRoomBounds;
 
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
