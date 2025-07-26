@@ -2960,27 +2960,38 @@
             handle.rotation.z = Math.PI / 2;
             handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
             personalRoomScene.add(handle);
-            // --- Ventanas grandes mejoradas ---
+            // --- Ventanas mejoradas con tamaño apropiado ---
             const skyColor = getSkyColorByHour();
-            // Ventana trasera grande (con bisel y reflejo)
-            const windowW = 9, windowH = 4.4;
+            // Ventanas con tamaño más apropiado para las paredes
+            const windowW = 4, windowH = 2.5; // Reducido de 9x4.4 a 4x2.5
             const windowGeometry = new THREE.BoxGeometry(windowW, windowH, 0.08);
-            const windowMaterial = new THREE.MeshPhysicalMaterial({ color: skyColor, transparent: true, opacity: 0.82, roughness: 0.15, metalness: 0.2, reflectivity: 0.45, clearcoat: 0.5, clearcoatRoughness: 0.1, transmission: 0.85, ior: 1.45 });
+            const windowMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: skyColor, 
+                transparent: true, 
+                opacity: 0.3, // Más transparente (era 0.82)
+                roughness: 0.1, 
+                metalness: 0.1, 
+                reflectivity: 0.3, 
+                clearcoat: 0.8, 
+                clearcoatRoughness: 0.05, 
+                transmission: 0.95, // Más transmisión de luz
+                ior: 1.33 // Índice de refracción del vidrio
+            });
             const backWindow = new THREE.Mesh(windowGeometry, windowMaterial);
             backWindow.position.set(0, 3.4, -roomDepth/2 + 0.13);
             personalRoomScene.add(backWindow);
-            // Bisel y marco ventana trasera
-            const frameGeometry = new THREE.BoxGeometry(windowW + 0.18, windowH + 0.18, 0.12);
+            // Marco ventana trasera (ajustado al nuevo tamaño)
+            const frameGeometry = new THREE.BoxGeometry(windowW + 0.2, windowH + 0.2, 0.12);
             const frameMaterial = getCachedMaterial(0xE0E0E0, 0.95, 0.18);
             const backFrame = new THREE.Mesh(frameGeometry, frameMaterial);
             backFrame.position.copy(backWindow.position);
             personalRoomScene.add(backFrame);
-            // Cruces del marco (vertical y horizontal)
+            // Cruces del marco (vertical y horizontal) - más delgados
             const crossMat = getCachedMaterial(0xD0D0D0, 0.9, 0.18);
-            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
             crossV.position.copy(backWindow.position);
             personalRoomScene.add(crossV);
-            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const crossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
             crossH.position.copy(backWindow.position);
             personalRoomScene.add(crossH);
             // Ventana izquierda grande
@@ -2992,12 +3003,12 @@
             leftFrame.position.copy(leftWindow.position);
             leftFrame.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftFrame);
-            // Cruces marco izquierdo
-            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            // Cruces marco izquierdo - más delgados
+            const leftCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
             leftCrossV.position.copy(leftWindow.position);
             leftCrossV.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftCrossV);
-            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const leftCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
             leftCrossH.position.copy(leftWindow.position);
             leftCrossH.rotation.y = Math.PI / 2;
             personalRoomScene.add(leftCrossH);
@@ -3010,12 +3021,12 @@
             rightFrame.position.copy(rightWindow.position);
             rightFrame.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightFrame);
-            // Cruces marco derecho
-            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.08, windowH + 0.1, 0.13), crossMat);
+            // Cruces marco derecho - más delgados
+            const rightCrossV = new THREE.Mesh(new THREE.BoxGeometry(0.06, windowH + 0.1, 0.13), crossMat);
             rightCrossV.position.copy(rightWindow.position);
             rightCrossV.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightCrossV);
-            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.08, 0.13), crossMat);
+            const rightCrossH = new THREE.Mesh(new THREE.BoxGeometry(windowW + 0.1, 0.06, 0.13), crossMat);
             rightCrossH.position.copy(rightWindow.position);
             rightCrossH.rotation.y = -Math.PI / 2;
             personalRoomScene.add(rightCrossH);
@@ -4600,6 +4611,23 @@ function updateSelectedSkin() {
         
         // Exponer función de debug globalmente
         window.debugRoomBounds = debugRoomBounds;
+        
+        // Función para mostrar información de las ventanas
+        function debugWindows() {
+            console.log('=== INFORMACIÓN DE VENTANAS ===');
+            console.log('Tamaño actual de ventanas:');
+            console.log('  Ancho: 4 metros (era 9 metros)');
+            console.log('  Alto: 2.5 metros (era 4.4 metros)');
+            console.log('Propiedades del vidrio:');
+            console.log('  Opacidad: 0.3 (era 0.82)');
+            console.log('  Transmisión: 0.95 (era 0.85)');
+            console.log('  Índice de refracción: 1.33 (era 1.45)');
+            console.log('  Clearcoat: 0.8 (era 0.5)');
+            console.log('================================');
+        }
+        
+        // Exponer función de debug globalmente
+        window.debugWindows = debugWindows;
 
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
