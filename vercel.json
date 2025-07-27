@@ -1,10 +1,7 @@
 {
-  "analytics": {
-    "enabled": true
-  },
   "functions": {
     "api/event.js": {
       "runtime": "nodejs18.x"
     }
   }
-} 
+}
