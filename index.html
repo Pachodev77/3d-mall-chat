@@ -4362,14 +4362,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 console.log('Alias guardado:', newAlias);
-                
-                // Evento de analíticas para guardar alias
-                if (window.trackEvent) {
-                    window.trackEvent('alias_saved', {
-                        alias: newAlias,
-                        length: newAlias.length
-                    });
-                }
             }
             
             // Aplicar la personalización al avatar antes de guardar
@@ -4377,14 +4369,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Guardar en localStorage
             localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
-            
-            // Evento de analíticas para personalización
-            if (window.trackEvent) {
-                window.trackEvent('customization_saved', {
-                    skin: currentCustomization.skin,
-                    shirtColor: currentCustomization.shirtColor
-                });
-            }
             
             closeSimplePanel();
             showNotification('✅ Personalización guardada exitosamente!', 'success');
@@ -5753,12 +5737,6 @@ function updateAvatarPositions() {
             privateChatListeners[alias] = () => privateRef.off('child_added', listener);
         }
         function appendPrivateMessage(messagesDiv, msg, otherAlias) {
-            // Verificar que messagesDiv existe y es válido
-            if (!messagesDiv || !messagesDiv.appendChild) {
-                console.warn('[appendPrivateMessage] messagesDiv no es válido:', messagesDiv);
-                return;
-            }
-            
             const isOwn = msg.from === userAlias;
             const div = document.createElement('div');
             div.className = isOwn ? 'chat-message own' : 'chat-message';
@@ -5766,16 +5744,9 @@ function updateAvatarPositions() {
             div.style.textAlign = isOwn ? 'right' : 'left';
             div.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${isOwn ? 'Tú' : otherAlias}:</span> <span style="color:#fff;">${msg.message}</span> <span style="color:#aaa; font-size:11px; margin-left:8px;">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>`;
             messagesDiv.appendChild(div);
-            
-            // Limitar a los últimos 20 mensajes (con verificación adicional)
-            if (messagesDiv.children && messagesDiv.children.length > 20) {
-                while (messagesDiv.children.length > 20) {
-                    if (messagesDiv.firstChild) {
-                        messagesDiv.removeChild(messagesDiv.firstChild);
-                    } else {
-                        break; // Evitar bucle infinito
-                    }
-                }
+            // Limitar a los últimos 20 mensajes
+            while (messagesDiv.children.length > 20) {
+                messagesDiv.removeChild(messagesDiv.firstChild);
             }
         }
         // UI: Al hacer clic en un usuario, abrir ventana privada
@@ -5846,67 +5817,5 @@ function updateAvatarPositions() {
             }
         // ... existing code ...
     </script>
-    <!-- Vercel Analytics -->
-    <script>
-        // Configuración manual de Vercel Analytics
-        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-        
-        // Función para enviar eventos de analíticas
-        function trackEvent(eventName, properties = {}) {
-            if (window.va) {
-                window.va('event', eventName, properties);
-            }
-            
-            // Fallback: enviar directamente al endpoint
-            fetch('/api/event', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    event: eventName,
-                    properties: properties,
-                    timestamp: new Date().toISOString(),
-                    url: window.location.href,
-                    userAgent: navigator.userAgent
-                })
-            }).catch(error => {
-                console.log('Analytics event sent (fallback):', eventName, properties);
-            });
-        }
-        
-        // Eventos automáticos
-        document.addEventListener('DOMContentLoaded', function() {
-            trackEvent('page_view', {
-                page: window.location.pathname,
-                title: document.title
-            });
-        });
-        
-        // Eventos de interacción del usuario
-        document.addEventListener('click', function(e) {
-            const target = e.target;
-            if (target.tagName === 'BUTTON' || target.closest('button')) {
-                const buttonText = target.textContent || target.innerText || 'Unknown Button';
-                trackEvent('button_click', {
-                    button: buttonText.trim(),
-                    page: window.location.pathname
-                });
-            }
-        });
-        
-        // Eventos de navegación
-        window.addEventListener('beforeunload', function() {
-            trackEvent('page_exit', {
-                page: window.location.pathname,
-                timeSpent: Date.now() - (window.pageLoadTime || Date.now())
-            });
-        });
-        
-        // Marcar tiempo de carga
-        window.pageLoadTime = Date.now();
-    </script>
-    
-    <!-- Vercel Analytics Script -->
-    <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+    <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
 </body>
