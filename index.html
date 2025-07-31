@@ -3115,11 +3115,7 @@
             // Limpiar muebles y decoraciones
             furnitureObjects = [];
             localStorage.removeItem('furniturePositions');
-            // Auto-poblar solo si no hay posiciones guardadas
-            if (!localStorage.getItem('furniturePositions')) {
-                autoPopulateApartmentFurniture();
-            }
-        
+        }
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
             // Limpiar array de muebles
