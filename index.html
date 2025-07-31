@@ -4594,13 +4594,13 @@ function updateSelectedSkin() {
         removeUserAvatar(alias);
         let custom = { skin };
         createUserAvatar(alias, position, floor, custom);
-        avatar = userAvatars.get(alias);
+        return;
     } else if (!avatar) {
         console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
         let custom = {};
         if (skin) custom.skin = skin;
         createUserAvatar(alias, position, floor, custom);
-        avatar = userAvatars.get(alias);
+        return;
     }
     if (avatar) {
                 console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
