@@ -3115,7 +3115,11 @@
             // Limpiar muebles y decoraciones
             furnitureObjects = [];
             localStorage.removeItem('furniturePositions');
-        }
+            // Auto-poblar solo si no hay posiciones guardadas
+            if (!localStorage.getItem('furniturePositions')) {
+                autoPopulateApartmentFurniture();
+            }
+        
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
             // Limpiar array de muebles
@@ -3793,26 +3797,6 @@
             
             // Mover el grupo completo
             selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
-            updateFurnitureList();
-            
-            // Guardar automáticamente la posición sin deseleccionar
-            saveFurniturePositionsSilently();
-        }
-        
-        function rotateSelectedFurniture() {
-            if (!selectedFurniture || !selectedFurniture.mesh) return;
-            
-            selectedFurniture.mesh.rotation.y += Math.PI / 4; // Rotar 45 grados
-            updateFurnitureList();
-            
-            // Guardar automáticamente la rotación sin deseleccionar
-            saveFurniturePositionsSilently();
-        }
-        
-        function saveFurniturePositions() {
-            // Guardar todas las posiciones de muebles en localStorage
-            const furniturePositions = {};
-            furnitureObjects.forEach(furniture => {
                 furniturePositions[furniture.id] = {
                     position: {
                         x: furniture.mesh.position.x,
@@ -5010,34 +4994,32 @@ function updateSelectedSkin() {
                         console.log(`Modelo cargado exitosamente: ${furnitureData.name}`);
 
                         // Configurar el objeto cargado
-                        object.position.set(position.x, position.y, position.z);
+                        // Elevar el mueble sobre el piso
+                        object.position.set(position.x, 0.3, position.z);
                         object.rotation.y = rotation;
 
                         // Calcular escala apropiada basada en el tamaño del modelo
-                const box = new THREE.Box3().setFromObject(object);
-                const size = box.getSize(new THREE.Vector3());
-                const maxDimension = Math.max(size.x, size.y, size.z);
+                        const box = new THREE.Box3().setFromObject(object);
+                        const size = box.getSize(new THREE.Vector3());
+                        const maxDimension = Math.max(size.x, size.y, size.z);
 
-                // Escala base para que el mueble sea más grande visualmente
-                let scale = 1.6; // Aumenta el tamaño general (antes 1.0)
-                if (maxDimension > 0) {
-                    // Si el mueble es muy grande, reducirlo
-                    if (maxDimension > 5) {
-                        scale = 0.8 / maxDimension;
-                    } else if (maxDimension > 2) {
-                        scale = 1.6 / maxDimension;
-                    } else if (maxDimension < 0.5) {
-                        scale = 1.8 / maxDimension;
-                    }
-                }
+                        // Escala base para que el mueble tenga un tamaño apropiado en la habitación
+                        let scale = 2.2; // Hacer todos los muebles más grandes
+                        if (maxDimension > 0) {
+                            // Si el mueble es muy grande, reducirlo
+                            if (maxDimension > 5) {
+                                scale = 1.2 / maxDimension;
+                            } else if (maxDimension > 2) {
+                                scale = 2.2 / maxDimension;
+                            } else if (maxDimension < 0.5) {
+                                scale = 2.2 / maxDimension;
+                            }
+                        }
 
-                // Aplicar escala
-                object.scale.set(scale, scale, scale);
+                        // Aplicar escala
+                        object.scale.set(scale, scale, scale);
 
-                // Elevar el mueble por defecto para que no quede "enterrado" en el piso
-                object.position.y += 0.35; // Puedes ajustar este valor según pruebas
-
-                console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)}) | Altura ajustada`);
+                        console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
 
                         // Aplicar materiales si es necesario
                         object.traverse((child) => {
@@ -5064,6 +5046,8 @@ function updateSelectedSkin() {
                         // Agregar a la escena y al array de muebles
                         personalRoomScene.add(object);
                         furnitureObjects.push(furnitureObject);
+                        // Guardar posición tras agregar
+                        saveFurniturePositionsSilently();
 
                         console.log(`Mueble agregado exitosamente: ${furnitureData.name} (ID: ${furnitureObject.id})`);
                         console.log(`Total de muebles en la habitación: ${furnitureObjects.length}`);
@@ -5182,60 +5166,6 @@ function updateSelectedSkin() {
         document.addEventListener('DOMContentLoaded', function() {
             const categoryFilter = document.getElementById('furniture-category-filter');
             if (categoryFilter) {
-
-// --- Distribución inicial de muebles tipo apartamento ---
-function setupDefaultApartmentFurniture() {
-    // Siempre agregar muebles, aunque ya existan, para garantizar decoración
-    // Helper para buscar mueble por nombre
-    function findFurnitureByName(name) {
-        return availableFurniture.find(f => f.name === name);
-    }
-    // Helper para buscar mueble alternativo por categoría
-    function findAlternativeByCategory(category, excludeNames = []) {
-        return availableFurniture.find(f => f.category === category && !excludeNames.includes(f.name));
-    }
-    // Sofá
-    let sofa = findFurnitureByName('Sofá Moderno') || findAlternativeByCategory('Sala');
-    if (sofa) {
-        console.log('[APT] Intentando cargar sofá:', sofa.name, sofa.file);
-        loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2).then(()=>console.log('[APT] Sofá cargado')).catch(e=>console.error('[APT] Error sofá',e));
-    } else {
-        console.warn('[APT] No se encontró ningún sofá para cargar');
-    }
-    // Mesa de centro
-    let coffeeTable = findFurnitureByName('Mesa de Centro') || findAlternativeByCategory('Mesas');
-    if (coffeeTable) loadFurnitureFBX(coffeeTable, { x: -6, y: 0, z: 7 }, 0);
-    // Mesa de comedor
-    let diningTable = findFurnitureByName('Mesa de Comedor') || findAlternativeByCategory('Mesas', [coffeeTable?.name]);
-    if (diningTable) loadFurnitureFBX(diningTable, { x: 0, y: 0, z: -4 }, 0);
-    // Sillas de comedor
-    let diningChair = findFurnitureByName('Silla Moderna') || findAlternativeByCategory('Sala', [sofa?.name]);
-    if (diningChair) loadFurnitureFBX(diningChair, { x: 1.2, y: 0, z: -5.5 }, Math.PI/2);
-    // Cama
-    let bed = findFurnitureByName('Cama con Cojín Bajo') || findAlternativeByCategory('Dormitorio');
-    if (bed) loadFurnitureFBX(bed, { x: -8, y: 0, z: -8 }, 0);
-    // Refrigerador
-    let fridge = findFurnitureByName('Refrigerador') || findAlternativeByCategory('Cocina');
-    if (fridge) loadFurnitureFBX(fridge, { x: 10, y: 0, z: -10 }, Math.PI/2);
-    // Cocina
-    let kitchen = findFurnitureByName('Cocina Modular') || findAlternativeByCategory('Cocina', [fridge?.name]);
-    if (kitchen) loadFurnitureFBX(kitchen, { x: 10, y: 0, z: -7 }, Math.PI/2);
-    // Escritorio
-    let desk = findFurnitureByName('Escritorio') || findAlternativeByCategory('Mesas', [coffeeTable?.name, diningTable?.name]);
-    if (desk) loadFurnitureFBX(desk, { x: 8, y: 0, z: 7 }, Math.PI/2);
-    // Silla de escritorio
-    let deskChair = findFurnitureByName('Silla de Oficina') || findAlternativeByCategory('Sala', [sofa?.name, diningChair?.name]);
-    if (deskChair) loadFurnitureFBX(deskChair, { x: 8, y: 0, z: 8.7 }, Math.PI/2);
-    // Baño: inodoro y lavabo
-    let toilet = findFurnitureByName('Inodoro') || findAlternativeByCategory('Baño');
-    if (toilet) loadFurnitureFBX(toilet, { x: -10, y: 0, z: -10 }, Math.PI/2);
-    let sink = findFurnitureByName('Lavabo') || findAlternativeByCategory('Baño', [toilet?.name]);
-    if (sink) loadFurnitureFBX(sink, { x: -9, y: 0, z: -10 }, Math.PI/2);
-    // Ducha
-    let shower = findFurnitureByName('Ducha') || findAlternativeByCategory('Baño', [toilet?.name, sink?.name]);
-    if (shower) loadFurnitureFBX(shower, { x: -8, y: 0, z: -10 }, 0);
-}
-
                 categoryFilter.addEventListener('change', updateAvailableFurnitureList);
             }
         });
