@@ -2966,8 +2966,7 @@
             // Crear habitación
             createPersonalRoom();
 
-            // Crear muebles por defecto
-            createRoomFurniture(24, 3.5, 24);
+            // (Eliminado) Crear muebles por defecto SOLO con modelos 3D del catálogo
 
             // Restaurar posiciones de muebles si existen
             loadFurniturePositions();
@@ -3124,41 +3123,149 @@
 
         }
         
-        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
-    // Limpiar array de muebles
-    furnitureObjects = [];
-    let furnitureId = 1;
-
-    // Selección de muebles modernos del catálogo (GLB)
-    // Puedes cambiar los modelos por otros del catálogo si prefieres
-    const defaultFurniture = [
-        { name: 'Cama con Cojín Bajo', file: 'benchCushionLow.glb', category: 'Dormitorio', position: { x: -5, y: 0, z: -5 }, rotation: 0 },
-        { name: 'Sofá Moderno', file: 'loungeDesignSofa.glb', category: 'Sala', position: { x: 4, y: 0, z: -4 }, rotation: Math.PI / 2 },
-        { name: 'Mesa de Centro', file: 'tableCoffee.glb', category: 'Mesas', position: { x: 0, y: 0, z: 0 }, rotation: 0 },
-        { name: 'Lámpara de Piso Cuadrada', file: 'lampSquareFloor.glb', category: 'Iluminación', position: { x: 7, y: 0, z: 6 }, rotation: 0 },
-        { name: 'Planta en Maceta', file: 'pottedPlant.glb', category: 'Decoración', position: { x: -7, y: 0, z: 7 }, rotation: 0 }
-    ];
-
-    // Agregar muebles modernos a la habitación
-    defaultFurniture.forEach((furnitureData, idx) => {
-        // Buscar datos completos en availableFurniture (por si hay más propiedades)
-        const catalogData = availableFurniture.find(f => f.name === furnitureData.name) || furnitureData;
-        // Usar loadFurnitureFBX para cargar el modelo GLB
-        loadFurnitureFBX(catalogData, furnitureData.position, furnitureData.rotation)
-            .then(furnitureObject => {
-                // Asignar ID único y registrar en el array
-                furnitureObject.id = furnitureId++;
-                furnitureObjects.push(furnitureObject);
-                // Añadir a la escena si no lo hizo loadFurnitureFBX
-                if (furnitureObject.mesh && !personalRoomScene.children.includes(furnitureObject.mesh)) {
-                    personalRoomScene.add(furnitureObject.mesh);
-                }
-            })
-            .catch(error => {
-                console.error('Error al cargar mueble por defecto:', furnitureData.name, error);
+        // function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+        //     // (ELIMINADO: ahora solo muebles 3D del catálogo con GLTFLoader)
+        // }
+            // Limpiar array de muebles
+            furnitureObjects = [];
+            let furnitureId = 1;
+            
+            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
+            
+            // Cama principal - Crear grupo para todas las partes
+            const bedGroup = new THREE.Group();
+            bedGroup.position.set(-4, 0, -3);
+            
+            // Marco de la cama
+            const bedFrameGeometry = new THREE.BoxGeometry(2.2, 0.4, 3.2);
+            const bedFrameMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
+            bedFrame.position.set(0, 0.2, 0);
+            bedGroup.add(bedFrame);
+            
+            // Registrar grupo de cama en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Cama',
+                mesh: bedGroup,
+                type: 'bed'
             });
-    });
-}
+            
+            // Colchón
+            const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
+            const mattressMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
+            const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+            mattress.position.set(0, 0.5, 0);
+            bedGroup.add(mattress);
+            
+            // Almohadas
+            const pillowGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.8);
+            const pillowMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+            const pillow1 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow1.position.set(-0.3, 0.65, -1.2);
+            bedGroup.add(pillow1);
+            
+            const pillow2 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+            pillow2.position.set(0.3, 0.65, -1.2);
+            bedGroup.add(pillow2);
+            
+            // Agregar el grupo completo a la escena
+            personalRoomScene.add(bedGroup);
+            
+            // Mesa de noche izquierda
+            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
+            const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandLeft.position.set(-5.5, 0.35, -3);
+            personalRoomScene.add(nightstandLeft);
+            
+            // Registrar mesa de noche izquierda en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Mesa de Noche Izquierda',
+                mesh: nightstandLeft,
+                type: 'nightstand'
+            });
+            
+            // Mesa de noche derecha
+            const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+            nightstandRight.position.set(-2.5, 0.35, -3);
+            personalRoomScene.add(nightstandRight);
+            
+            // Registrar mesa de noche derecha en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Mesa de Noche Derecha',
+                mesh: nightstandRight,
+                type: 'nightstand'
+            });
+            
+            // Lámpara de mesa - Crear grupo para todas las partes
+            const lampGroup = new THREE.Group();
+            lampGroup.position.set(-5.5, 0, -3);
+            
+            const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.1, 8);
+            const lampBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
+            lampBase.position.set(0, 0.75, 0);
+            lampGroup.add(lampBase);
+            
+            const lampPoleGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.4, 6);
+            const lampPoleMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+            const lampPole = new THREE.Mesh(lampPoleGeometry, lampPoleMaterial);
+            lampPole.position.set(0, 1, 0);
+            lampGroup.add(lampPole);
+            
+            const lampShadeGeometry = new THREE.ConeGeometry(0.3, 0.2, 8);
+            const lampShadeMaterial = getCachedMaterial(0xECF0F1, 0.9, 0.1);
+            const lampShade = new THREE.Mesh(lampShadeGeometry, lampShadeMaterial);
+            lampShade.position.set(0, 1.25, 0);
+            lampShade.rotation.x = Math.PI;
+            lampGroup.add(lampShade);
+            
+            // Registrar grupo de lámpara en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Lámpara de Mesa',
+                mesh: lampGroup,
+                type: 'lamp'
+            });
+            
+            // Agregar el grupo completo a la escena
+            personalRoomScene.add(lampGroup);
+            
+            // ===== ZONA DE TRABAJO (Lado derecho) =====
+            
+            // Escritorio principal - Crear grupo para todas las partes
+            const deskGroup = new THREE.Group();
+            deskGroup.position.set(4, 0, -3);
+            
+            // Mesa del escritorio
+            const deskGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.2);
+            const deskMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+            const desk = new THREE.Mesh(deskGeometry, deskMaterial);
+            desk.position.set(0, 0.7, 0);
+            deskGroup.add(desk);
+            
+            // Registrar grupo de escritorio en el array de muebles
+            furnitureObjects.push({
+                id: furnitureId++,
+                name: 'Escritorio',
+                mesh: deskGroup,
+                type: 'desk'
+            });
+            
+            // Patas del escritorio
+            for (let i = 0; i < 4; i++) {
+                const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6);
+                const legMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+                const leg = new THREE.Mesh(legGeometry, legMaterial);
+                const x = (i % 2 === 0 ? -1 : 1) * 1.2;
+                const z = (i < 2 ? -1 : 1) * 0.5;
+                leg.position.set(x, 0.35, z);
+                deskGroup.add(leg);
+            }
+            
             // Agregar el grupo completo a la escena
             personalRoomScene.add(deskGroup);
             
