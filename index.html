@@ -4432,15 +4432,17 @@ document.addEventListener('DOMContentLoaded', function() {
             customizationPanel.style.display = 'none';
             customizationPanelOpen = false;
         }
-
         function createSkinSelection() {
     const skinOptions = document.querySelectorAll('.skin-option');
     skinOptions.forEach(btn => {
         btn.onclick = () => {
             const selectedSkin = btn.getAttribute('data-skin');
             currentCustomization.skin = selectedSkin;
+            applyCustomizationToAvatar(); // Aplica y guarda la skin inmediatamente
             updateSelectedSkin();
             updateAvatarPreview();
+            // Guardar la selección en localStorage inmediatamente
+            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         };
     });
 }
