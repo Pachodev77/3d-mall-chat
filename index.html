@@ -5190,45 +5190,44 @@ function setupDefaultApartmentFurniture() {
     function findFurnitureByName(name) {
         return availableFurniture.find(f => f.name === name);
     }
-    // Sofá principal (sala)
-    const sofa = findFurnitureByName('Sofá Moderno');
-    if (sofa) loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2);
-    // Mesa de centro (sala)
-    const coffeeTable = findFurnitureByName('Mesa de Centro');
-    if (coffeeTable) loadFurnitureFBX(coffeeTable, { x: -6, y: 0, z: 1 }, 0);
-    // Cama principal (dormitorio)
-    const bed = findFurnitureByName('Cama Moderna');
-    if (bed) loadFurnitureFBX(bed, { x: 6, y: 0, z: -6 }, Math.PI);
-    // Mesa comedor
-    const diningTable = findFurnitureByName('Mesa de Comedor');
-    if (diningTable) loadFurnitureFBX(diningTable, { x: 4, y: 0, z: 5 }, Math.PI/2);
-    // Sillas comedor
-    const diningChair = findFurnitureByName('Silla de Comedor');
-    if (diningChair) {
-        loadFurnitureFBX(diningChair, { x: 4, y: 0, z: 7 }, 0);
-        loadFurnitureFBX(diningChair, { x: 6, y: 0, z: 5 }, Math.PI/2);
-        loadFurnitureFBX(diningChair, { x: 4, y: 0, z: 3 }, Math.PI);
-        loadFurnitureFBX(diningChair, { x: 2, y: 0, z: 5 }, -Math.PI/2);
+    // Helper para buscar mueble alternativo por categoría
+    function findAlternativeByCategory(category, excludeNames = []) {
+        return availableFurniture.find(f => f.category === category && !excludeNames.includes(f.name));
     }
-    // Cocina
-    const kitchen = findFurnitureByName('Cocina Modular');
-    if (kitchen) loadFurnitureFBX(kitchen, { x: -8, y: 0, z: -7 }, 0);
+    // Sofá
+    let sofa = findFurnitureByName('Sofá Moderno') || findAlternativeByCategory('Sala');
+    if (sofa) loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2);
+    // Mesa de centro
+    let coffeeTable = findFurnitureByName('Mesa de Centro') || findAlternativeByCategory('Mesas');
+    if (coffeeTable) loadFurnitureFBX(coffeeTable, { x: -6, y: 0, z: 7 }, 0);
+    // Mesa de comedor
+    let diningTable = findFurnitureByName('Mesa de Comedor') || findAlternativeByCategory('Mesas', [coffeeTable?.name]);
+    if (diningTable) loadFurnitureFBX(diningTable, { x: 0, y: 0, z: -4 }, 0);
+    // Sillas de comedor
+    let diningChair = findFurnitureByName('Silla Moderna') || findAlternativeByCategory('Sala', [sofa?.name]);
+    if (diningChair) loadFurnitureFBX(diningChair, { x: 1.2, y: 0, z: -5.5 }, Math.PI/2);
+    // Cama
+    let bed = findFurnitureByName('Cama con Cojín Bajo') || findAlternativeByCategory('Dormitorio');
+    if (bed) loadFurnitureFBX(bed, { x: -8, y: 0, z: -8 }, 0);
     // Refrigerador
-    const fridge = findFurnitureByName('Refrigerador');
-    if (fridge) loadFurnitureFBX(fridge, { x: -7, y: 0, z: -7 }, 0);
+    let fridge = findFurnitureByName('Refrigerador') || findAlternativeByCategory('Cocina');
+    if (fridge) loadFurnitureFBX(fridge, { x: 10, y: 0, z: -10 }, Math.PI/2);
+    // Cocina
+    let kitchen = findFurnitureByName('Cocina Modular') || findAlternativeByCategory('Cocina', [fridge?.name]);
+    if (kitchen) loadFurnitureFBX(kitchen, { x: 10, y: 0, z: -7 }, Math.PI/2);
     // Escritorio
-    const desk = findFurnitureByName('Escritorio Moderno');
-    if (desk) loadFurnitureFBX(desk, { x: 8, y: 0, z: 8 }, Math.PI/2);
+    let desk = findFurnitureByName('Escritorio') || findAlternativeByCategory('Mesas', [coffeeTable?.name, diningTable?.name]);
+    if (desk) loadFurnitureFBX(desk, { x: 8, y: 0, z: 7 }, Math.PI/2);
     // Silla de escritorio
-    const deskChair = findFurnitureByName('Silla de Oficina');
-    if (deskChair) loadFurnitureFBX(deskChair, { x: 8, y: 0, z: 7 }, Math.PI/2);
+    let deskChair = findFurnitureByName('Silla de Oficina') || findAlternativeByCategory('Sala', [sofa?.name, diningChair?.name]);
+    if (deskChair) loadFurnitureFBX(deskChair, { x: 8, y: 0, z: 8.7 }, Math.PI/2);
     // Baño: inodoro y lavabo
-    const toilet = findFurnitureByName('Inodoro');
+    let toilet = findFurnitureByName('Inodoro') || findAlternativeByCategory('Baño');
     if (toilet) loadFurnitureFBX(toilet, { x: -10, y: 0, z: -10 }, Math.PI/2);
-    const sink = findFurnitureByName('Lavabo');
+    let sink = findFurnitureByName('Lavabo') || findAlternativeByCategory('Baño', [toilet?.name]);
     if (sink) loadFurnitureFBX(sink, { x: -9, y: 0, z: -10 }, Math.PI/2);
     // Ducha
-    const shower = findFurnitureByName('Ducha');
+    let shower = findFurnitureByName('Ducha') || findAlternativeByCategory('Baño', [toilet?.name, sink?.name]);
     if (shower) loadFurnitureFBX(shower, { x: -8, y: 0, z: -10 }, 0);
 }
 
