@@ -3789,10 +3789,10 @@
             
             // Aplicar límites de la habitación (expandidos)
             const roomBounds = {
-                minX: -8.0,
-                maxX: 8.0,
-                minZ: -8.0,
-                maxZ: 8.0
+                minX: -11.6,
+                maxX: 11.6,
+                minZ: -11.6,
+                maxZ: 11.6
             };
             
             currentPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, currentPosition.x));
@@ -5027,7 +5027,8 @@ function updateSelectedSkin() {
                         let scale = targetMax / maxDimension;
                         // Limitar escala máxima para evitar muebles absurdamente grandes
                         if (scale > 6) scale = 6;
-                        // Aplicar escala
+                        // Aplicar escala 1.5x más grande
+                        scale = scale * 1.5;
                         object.scale.set(scale, scale, scale);
                         console.log(`Escala realista aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
                         // Recalcular bounding box después de escalar
