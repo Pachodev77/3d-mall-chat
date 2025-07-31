@@ -3793,6 +3793,26 @@
             
             // Mover el grupo completo
             selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
+            updateFurnitureList();
+            
+            // Guardar automáticamente la posición sin deseleccionar
+            saveFurniturePositionsSilently();
+        }
+        
+        function rotateSelectedFurniture() {
+            if (!selectedFurniture || !selectedFurniture.mesh) return;
+            
+            selectedFurniture.mesh.rotation.y += Math.PI / 4; // Rotar 45 grados
+            updateFurnitureList();
+            
+            // Guardar automáticamente la rotación sin deseleccionar
+            saveFurniturePositionsSilently();
+        }
+        
+        function saveFurniturePositions() {
+            // Guardar todas las posiciones de muebles en localStorage
+            const furniturePositions = {};
+            furnitureObjects.forEach(furniture => {
                 furniturePositions[furniture.id] = {
                     position: {
                         x: furniture.mesh.position.x,
@@ -4990,8 +5010,7 @@ function updateSelectedSkin() {
                         console.log(`Modelo cargado exitosamente: ${furnitureData.name}`);
 
                         // Configurar el objeto cargado
-                        // Elevar el mueble sobre el piso
-                        object.position.set(position.x, 0.3, position.z);
+                        object.position.set(position.x, position.y, position.z);
                         object.rotation.y = rotation;
 
                         // Calcular escala apropiada basada en el tamaño del modelo
@@ -5000,15 +5019,15 @@ function updateSelectedSkin() {
                         const maxDimension = Math.max(size.x, size.y, size.z);
 
                         // Escala base para que el mueble tenga un tamaño apropiado en la habitación
-                        let scale = 2.2; // Hacer todos los muebles más grandes
+                        let scale = 1.0;
                         if (maxDimension > 0) {
                             // Si el mueble es muy grande, reducirlo
                             if (maxDimension > 5) {
-                                scale = 1.2 / maxDimension;
+                                scale = 0.5 / maxDimension;
                             } else if (maxDimension > 2) {
-                                scale = 2.2 / maxDimension;
+                                scale = 1.0 / maxDimension;
                             } else if (maxDimension < 0.5) {
-                                scale = 2.2 / maxDimension;
+                                scale = 1.0 / maxDimension;
                             }
                         }
 
@@ -5042,8 +5061,6 @@ function updateSelectedSkin() {
                         // Agregar a la escena y al array de muebles
                         personalRoomScene.add(object);
                         furnitureObjects.push(furnitureObject);
-                        // Guardar posición tras agregar
-                        saveFurniturePositionsSilently();
 
                         console.log(`Mueble agregado exitosamente: ${furnitureData.name} (ID: ${furnitureObject.id})`);
                         console.log(`Total de muebles en la habitación: ${furnitureObjects.length}`);
