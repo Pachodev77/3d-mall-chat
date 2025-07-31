@@ -4432,17 +4432,15 @@ document.addEventListener('DOMContentLoaded', function() {
             customizationPanel.style.display = 'none';
             customizationPanelOpen = false;
         }
+
         function createSkinSelection() {
     const skinOptions = document.querySelectorAll('.skin-option');
     skinOptions.forEach(btn => {
         btn.onclick = () => {
             const selectedSkin = btn.getAttribute('data-skin');
             currentCustomization.skin = selectedSkin;
-            applyCustomizationToAvatar(); // Aplica y guarda la skin inmediatamente
             updateSelectedSkin();
             updateAvatarPreview();
-            // Guardar la selección en localStorage inmediatamente
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
         };
     });
 }
@@ -4588,21 +4586,15 @@ function updateSelectedSkin() {
                 return;
             }
             let avatar = userAvatars.get(alias);
-    // --- Si el avatar existe pero la skin ha cambiado, eliminar y recrear ---
-    if (avatar && skin && avatar.currentSkin !== skin) {
-        console.log('[updateAvatarPosition] Skin cambiada para', alias, ':', avatar.currentSkin, '->', skin, '. Recreando avatar.');
-        removeUserAvatar(alias);
-        let custom = { skin };
-        createUserAvatar(alias, position, floor, custom);
-        return;
-    } else if (!avatar) {
-        console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
-        let custom = {};
-        if (skin) custom.skin = skin;
-        createUserAvatar(alias, position, floor, custom);
-        return;
-    }
-    if (avatar) {
+            if (!avatar) {
+                console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
+                // Solo pasar skin si existe
+                let custom = {};
+                if (skin) custom.skin = skin;
+                createUserAvatar(alias, position, floor, custom);
+                avatar = userAvatars.get(alias);
+            }
+            if (avatar) {
                 console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
                 // Actualización de posición y rotación en tiempo real
                 const floorStep = HALL_HEIGHT + 1;
@@ -5022,27 +5014,30 @@ function updateSelectedSkin() {
                         object.rotation.y = rotation;
 
                         // Calcular escala apropiada basada en el tamaño del modelo
-                        const box = new THREE.Box3().setFromObject(object);
-                        const size = box.getSize(new THREE.Vector3());
-                        const maxDimension = Math.max(size.x, size.y, size.z);
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDimension = Math.max(size.x, size.y, size.z);
 
-                        // Escala base para que el mueble tenga un tamaño apropiado en la habitación
-                        let scale = 1.0;
-                        if (maxDimension > 0) {
-                            // Si el mueble es muy grande, reducirlo
-                            if (maxDimension > 5) {
-                                scale = 0.5 / maxDimension;
-                            } else if (maxDimension > 2) {
-                                scale = 1.0 / maxDimension;
-                            } else if (maxDimension < 0.5) {
-                                scale = 1.0 / maxDimension;
-                            }
-                        }
+                // Escala base para que el mueble sea más grande visualmente
+                let scale = 1.6; // Aumenta el tamaño general (antes 1.0)
+                if (maxDimension > 0) {
+                    // Si el mueble es muy grande, reducirlo
+                    if (maxDimension > 5) {
+                        scale = 0.8 / maxDimension;
+                    } else if (maxDimension > 2) {
+                        scale = 1.6 / maxDimension;
+                    } else if (maxDimension < 0.5) {
+                        scale = 1.8 / maxDimension;
+                    }
+                }
 
-                        // Aplicar escala
-                        object.scale.set(scale, scale, scale);
+                // Aplicar escala
+                object.scale.set(scale, scale, scale);
 
-                        console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
+                // Elevar el mueble por defecto para que no quede "enterrado" en el piso
+                object.position.y += 0.35; // Puedes ajustar este valor según pruebas
+
+                console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)}) | Altura ajustada`);
 
                         // Aplicar materiales si es necesario
                         object.traverse((child) => {
@@ -5187,6 +5182,56 @@ function updateSelectedSkin() {
         document.addEventListener('DOMContentLoaded', function() {
             const categoryFilter = document.getElementById('furniture-category-filter');
             if (categoryFilter) {
+
+// --- Distribución inicial de muebles tipo apartamento ---
+function setupDefaultApartmentFurniture() {
+    if (window.furnitureObjects && furnitureObjects.length > 0) return; // No duplicar muebles si ya hay
+    // Helper para buscar mueble por nombre
+    function findFurnitureByName(name) {
+        return availableFurniture.find(f => f.name === name);
+    }
+    // Sofá principal (sala)
+    const sofa = findFurnitureByName('Sofá Moderno');
+    if (sofa) loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2);
+    // Mesa de centro (sala)
+    const coffeeTable = findFurnitureByName('Mesa de Centro');
+    if (coffeeTable) loadFurnitureFBX(coffeeTable, { x: -6, y: 0, z: 1 }, 0);
+    // Cama principal (dormitorio)
+    const bed = findFurnitureByName('Cama Moderna');
+    if (bed) loadFurnitureFBX(bed, { x: 6, y: 0, z: -6 }, Math.PI);
+    // Mesa comedor
+    const diningTable = findFurnitureByName('Mesa de Comedor');
+    if (diningTable) loadFurnitureFBX(diningTable, { x: 4, y: 0, z: 5 }, Math.PI/2);
+    // Sillas comedor
+    const diningChair = findFurnitureByName('Silla de Comedor');
+    if (diningChair) {
+        loadFurnitureFBX(diningChair, { x: 4, y: 0, z: 7 }, 0);
+        loadFurnitureFBX(diningChair, { x: 6, y: 0, z: 5 }, Math.PI/2);
+        loadFurnitureFBX(diningChair, { x: 4, y: 0, z: 3 }, Math.PI);
+        loadFurnitureFBX(diningChair, { x: 2, y: 0, z: 5 }, -Math.PI/2);
+    }
+    // Cocina
+    const kitchen = findFurnitureByName('Cocina Modular');
+    if (kitchen) loadFurnitureFBX(kitchen, { x: -8, y: 0, z: -7 }, 0);
+    // Refrigerador
+    const fridge = findFurnitureByName('Refrigerador');
+    if (fridge) loadFurnitureFBX(fridge, { x: -7, y: 0, z: -7 }, 0);
+    // Escritorio
+    const desk = findFurnitureByName('Escritorio Moderno');
+    if (desk) loadFurnitureFBX(desk, { x: 8, y: 0, z: 8 }, Math.PI/2);
+    // Silla de escritorio
+    const deskChair = findFurnitureByName('Silla de Oficina');
+    if (deskChair) loadFurnitureFBX(deskChair, { x: 8, y: 0, z: 7 }, Math.PI/2);
+    // Baño: inodoro y lavabo
+    const toilet = findFurnitureByName('Inodoro');
+    if (toilet) loadFurnitureFBX(toilet, { x: -10, y: 0, z: -10 }, Math.PI/2);
+    const sink = findFurnitureByName('Lavabo');
+    if (sink) loadFurnitureFBX(sink, { x: -9, y: 0, z: -10 }, Math.PI/2);
+    // Ducha
+    const shower = findFurnitureByName('Ducha');
+    if (shower) loadFurnitureFBX(shower, { x: -8, y: 0, z: -10 }, 0);
+}
+
                 categoryFilter.addEventListener('change', updateAvailableFurnitureList);
             }
         });
@@ -5495,8 +5540,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
-                isMoving: false,
-                currentSkin: skinName // Guardar la skin aplicada para comparación
+                isMoving: false
             });
             
         }).catch(error => {
