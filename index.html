@@ -5007,28 +5007,28 @@ function updateSelectedSkin() {
                         object.position.set(position.x, position.y, position.z);
                         object.rotation.y = rotation;
                         
-                        // Calcular escala apropiada basada en el tamaño del modelo
+                        // Calcular escala realista basada en el tamaño del modelo
                         const box = new THREE.Box3().setFromObject(object);
                         const size = box.getSize(new THREE.Vector3());
                         const maxDimension = Math.max(size.x, size.y, size.z);
-                        
-                        // Escala base para que el mueble tenga un tamaño apropiado en la habitación
-                        let scale = 1.0;
-                        if (maxDimension > 0) {
-                            // Si el mueble es muy grande, reducirlo
-                            if (maxDimension > 5) {
-                                scale = 0.5 / maxDimension;
-                            } else if (maxDimension > 2) {
-                                scale = 1.0 / maxDimension;
-                            } else if (maxDimension < 0.5) {
-                                scale = 1.0 / maxDimension;
-                            }
-                        }
-                        
+                        // Queremos que los muebles grandes (sofás, mesas, camas) tengan ~2m de su dimensión mayor
+                        let targetMax = 2.0;
+                        // Si el modelo es muy pequeño, usar targetMax mayor (por ejemplo, para sillas pequeñas)
+                        if (maxDimension < 1.0) targetMax = 1.2;
+                        // Si es un objeto decorativo muy pequeño (menos de 0.3m), hacerlo de 0.5m
+                        if (maxDimension < 0.3) targetMax = 0.5;
+                        let scale = targetMax / maxDimension;
+                        // Limitar escala máxima para evitar muebles absurdamente grandes
+                        if (scale > 6) scale = 6;
                         // Aplicar escala
                         object.scale.set(scale, scale, scale);
-                        
-                        console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
+                        console.log(`Escala realista aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
+                        // Recalcular bounding box después de escalar
+                        box.setFromObject(object);
+                        // Ajustar posición Y para que el mueble repose sobre el suelo
+                        const minY = box.min.y;
+                        object.position.y = position.y - minY;
+                        console.log(`Ajuste Y para suelo: minY modelo = ${minY.toFixed(2)}, Y aplicado = ${object.position.y.toFixed(2)}`);
                         
                         // Aplicar materiales si es necesario
                         object.traverse((child) => {
