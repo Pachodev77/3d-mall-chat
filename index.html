@@ -5412,7 +5412,13 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             // Configurar posición y escala
             avatar.position.set(position.x, correctY, position.z);
             avatar.scale.set(0.009, 0.009, 0.009);
-            scene.add(avatar);
+            // Agregar el avatar a ambas escenas si existen y no hay duplicados
+            if (typeof scene !== 'undefined' && scene && !scene.children.includes(avatar)) {
+                scene.add(avatar);
+            }
+            if (typeof personalRoomScene !== 'undefined' && personalRoomScene && !personalRoomScene.children.includes(avatar)) {
+                personalRoomScene.add(avatar);
+            }
             
             // --- LÓGICA DE ANIMACIÓN CORRECTA ---
             const mixer = new THREE.AnimationMixer(avatar);
