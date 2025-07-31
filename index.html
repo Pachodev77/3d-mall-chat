@@ -5185,7 +5185,7 @@ function updateSelectedSkin() {
 
 // --- Distribución inicial de muebles tipo apartamento ---
 function setupDefaultApartmentFurniture() {
-    if (window.furnitureObjects && furnitureObjects.length > 0) return; // No duplicar muebles si ya hay
+    // Siempre agregar muebles, aunque ya existan, para garantizar decoración
     // Helper para buscar mueble por nombre
     function findFurnitureByName(name) {
         return availableFurniture.find(f => f.name === name);
