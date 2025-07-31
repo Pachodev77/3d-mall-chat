@@ -3336,9 +3336,9 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
             // Mouse
             const mouseGeometry = new THREE.BoxGeometry(0.12, 0.05, 0.2);
             const mouseMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
-            const mouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
-            mouse.position.set(1.2, 0.75, 0.5);
-            computerGroup.add(mouse);
+            const computerMouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
+            computerMouse.position.set(1.2, 0.75, 0.5);
+            computerGroup.add(computerMouse);
             
             // Registrar grupo de computadora en el array de muebles
             furnitureObjects.push({
