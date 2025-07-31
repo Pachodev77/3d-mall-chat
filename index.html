@@ -3116,9 +3116,9 @@
             ceiling.receiveShadow = false;
             personalRoomScene.add(ceiling);
 
-            // Limpiar muebles y decoraciones
+            // Limpiar solo el array de muebles (NO borrar posiciones guardadas)
             furnitureObjects = [];
-            localStorage.removeItem('furniturePositions');
+
         }
         
         function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
