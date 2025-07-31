@@ -3044,27 +3044,56 @@
             const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
             frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
             personalRoomScene.add(frontWallRight);
-            // Puerta mejorada (paneles y manija)
-            const doorGeometry = new THREE.BoxGeometry(1, 2.2, 0.1);
-            const doorMaterial = getCachedMaterial(0x7B4A1E, 0.85, 0.18); // Madera más cálida
+            // Puerta más grande y decorativa
+            const doorWidth = 1.8;
+            const doorHeight = 2.8;
+            const doorThickness = 0.12;
+            const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, doorThickness);
+            const doorMaterial = getCachedMaterial(0x8B5A2B, 0.92, 0.18); // Madera rica
             const door = new THREE.Mesh(doorGeometry, doorMaterial);
-            door.position.set(0, 1.1, roomDepth/2);
+            door.position.set(0, doorHeight/2, roomDepth/2 + 0.01);
+            door.castShadow = true;
             personalRoomScene.add(door);
-            // Paneles de la puerta (relieve)
-            const panelMat = getCachedMaterial(0xA67C52, 0.7, 0.25);
-            for (let i = 0; i < 3; i++) {
-                const panelGeo = new THREE.BoxGeometry(0.7, 0.4, 0.04);
+
+            // Marco decorativo
+            const frameMaterial = getCachedMaterial(0xA0522D, 0.7, 0.18);
+            const frameThickness = 0.14;
+            const frameDepth = 0.16;
+            // Lados
+            const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, doorHeight + 0.18, frameDepth), frameMaterial);
+            frameLeft.position.set(-doorWidth/2 - frameThickness/2, doorHeight/2, roomDepth/2 + 0.01);
+            personalRoomScene.add(frameLeft);
+            const frameRight = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, doorHeight + 0.18, frameDepth), frameMaterial);
+            frameRight.position.set(doorWidth/2 + frameThickness/2, doorHeight/2, roomDepth/2 + 0.01);
+            personalRoomScene.add(frameRight);
+            // Arriba
+            const frameTop = new THREE.Mesh(new THREE.BoxGeometry(doorWidth + frameThickness*2, frameThickness, frameDepth), frameMaterial);
+            frameTop.position.set(0, doorHeight + frameThickness/2, roomDepth/2 + 0.01);
+            personalRoomScene.add(frameTop);
+
+            // Paneles decorativos en la puerta
+            const panelMat = getCachedMaterial(0xC19A6B, 0.65, 0.22);
+            for (let i = 0; i < 4; i++) {
+                const panelGeo = new THREE.BoxGeometry(doorWidth * 0.7, 0.38, 0.04);
                 const panel = new THREE.Mesh(panelGeo, panelMat);
-                panel.position.set(0, 1.7 - i * 0.7, roomDepth/2 + 0.055);
+                panel.position.set(0, 2.1 - i * 0.6, roomDepth/2 + doorThickness/2 + 0.025);
                 personalRoomScene.add(panel);
             }
-            // Manija de la puerta
-            const handleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.18, 16);
-            const handleMat = getCachedMaterial(0xCCCCCC, 0.4, 0.7);
-            const handle = new THREE.Mesh(handleGeo, handleMat);
-            handle.rotation.z = Math.PI / 2;
-            handle.position.set(0.38, 1.1, roomDepth/2 + 0.09);
-            personalRoomScene.add(handle);
+
+            // Manija elegante (tipo pomo dorado)
+            const knobGeo = new THREE.SphereGeometry(0.09, 24, 24);
+            const knobMat = getCachedMaterial(0xFFD700, 0.7, 0.8); // Dorado
+            const knob = new THREE.Mesh(knobGeo, knobMat);
+            knob.position.set(doorWidth/2 - 0.18, doorHeight/2, roomDepth/2 + doorThickness/2 + 0.08);
+            personalRoomScene.add(knob);
+
+            // Placa bajo la manija
+            const plateGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.02, 24);
+            const plateMat = getCachedMaterial(0xB8860B, 0.6, 0.5);
+            const plate = new THREE.Mesh(plateGeo, plateMat);
+            plate.rotation.x = Math.PI / 2;
+            plate.position.set(doorWidth/2 - 0.18, doorHeight/2, roomDepth/2 + doorThickness/2 + 0.06);
+            personalRoomScene.add(plate);
             // --- Huecos de ventana en las paredes laterales ---
             // Los huecos están creados por las paredes segmentadas arriba
             // No se necesitan ventanas transparentes, solo los huecos en las paredes
@@ -4809,147 +4838,147 @@ function updateSelectedSkin() {
         // Lista de muebles disponibles de la carpeta 3d furniture
         const availableFurniture = [
             // Muebles de sala
-            { name: 'Sofá Moderno', file: 'loungeDesignSofa.fbx', category: 'Sala' },
-            { name: 'Sofá Largo', file: 'loungeSofaLong.fbx', category: 'Sala' },
-            { name: 'Sofá Esquinero', file: 'loungeSofaCorner.fbx', category: 'Sala' },
-            { name: 'Sofá con Otomán', file: 'loungeSofaOttoman.fbx', category: 'Sala' },
-            { name: 'Sofá Esquinero Moderno', file: 'loungeDesignSofaCorner.fbx', category: 'Sala' },
-            { name: 'Silla de Relajación', file: 'loungeChairRelax.fbx', category: 'Sala' },
-            { name: 'Silla Moderna', file: 'loungeChair.fbx', category: 'Sala' },
-            { name: 'Silla de Diseño', file: 'loungeDesignChair.fbx', category: 'Sala' },
+            { name: 'Sofá Moderno', file: 'loungeDesignSofa.glb', category: 'Sala' },
+            { name: 'Sofá Largo', file: 'loungeSofaLong.glb', category: 'Sala' },
+            { name: 'Sofá Esquinero', file: 'loungeSofaCorner.glb', category: 'Sala' },
+            { name: 'Sofá con Otomán', file: 'loungeSofaOttoman.glb', category: 'Sala' },
+            { name: 'Sofá Esquinero Moderno', file: 'loungeDesignSofaCorner.glb', category: 'Sala' },
+            { name: 'Silla de Relajación', file: 'loungeChairRelax.glb', category: 'Sala' },
+            { name: 'Silla Moderna', file: 'loungeChair.glb', category: 'Sala' },
+            { name: 'Silla de Diseño', file: 'loungeDesignChair.glb', category: 'Sala' },
             
             // Mesas
-            { name: 'Mesa de Centro', file: 'tableCoffee.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro Cuadrada', file: 'tableCoffeeSquare.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro de Vidrio', file: 'tableCoffeeGlass.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro Cuadrada de Vidrio', file: 'tableCoffeeGlassSquare.fbx', category: 'Mesas' },
-            { name: 'Mesa Redonda', file: 'tableRound.fbx', category: 'Mesas' },
-            { name: 'Mesa de Vidrio', file: 'tableGlass.fbx', category: 'Mesas' },
-            { name: 'Mesa Cruzada', file: 'tableCross.fbx', category: 'Mesas' },
-            { name: 'Mesa Cruzada con Tela', file: 'tableCrossCloth.fbx', category: 'Mesas' },
-            { name: 'Mesa con Tela', file: 'tableCloth.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro Cuadrada', file: 'tableCoffeeSquare.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro de Vidrio', file: 'tableCoffeeGlass.fbx', category: 'Mesas' },
-            { name: 'Mesa de Centro Cuadrada de Vidrio', file: 'tableCoffeeGlassSquare.fbx', category: 'Mesas' },
-            { name: 'Mesa Redonda', file: 'tableRound.fbx', category: 'Mesas' },
-            { name: 'Mesa de Vidrio', file: 'tableGlass.fbx', category: 'Mesas' },
-            { name: 'Mesa Cruzada', file: 'tableCross.fbx', category: 'Mesas' },
-            { name: 'Mesa Cruzada con Tela', file: 'tableCrossCloth.fbx', category: 'Mesas' },
-            { name: 'Mesa con Tela', file: 'tableCloth.fbx', category: 'Mesas' },
-            { name: 'Mesa', file: 'table.fbx', category: 'Mesas' },
+            { name: 'Mesa de Centro', file: 'tableCoffee.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro Cuadrada', file: 'tableCoffeeSquare.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro de Vidrio', file: 'tableCoffeeGlass.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro Cuadrada de Vidrio', file: 'tableCoffeeGlassSquare.glb', category: 'Mesas' },
+            { name: 'Mesa Redonda', file: 'tableRound.glb', category: 'Mesas' },
+            { name: 'Mesa de Vidrio', file: 'tableGlass.glb', category: 'Mesas' },
+            { name: 'Mesa Cruzada', file: 'tableCross.glb', category: 'Mesas' },
+            { name: 'Mesa Cruzada con Tela', file: 'tableCrossCloth.glb', category: 'Mesas' },
+            { name: 'Mesa con Tela', file: 'tableCloth.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro Cuadrada', file: 'tableCoffeeSquare.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro de Vidrio', file: 'tableCoffeeGlass.glb', category: 'Mesas' },
+            { name: 'Mesa de Centro Cuadrada de Vidrio', file: 'tableCoffeeGlassSquare.glb', category: 'Mesas' },
+            { name: 'Mesa Redonda', file: 'tableRound.glb', category: 'Mesas' },
+            { name: 'Mesa de Vidrio', file: 'tableGlass.glb', category: 'Mesas' },
+            { name: 'Mesa Cruzada', file: 'tableCross.glb', category: 'Mesas' },
+            { name: 'Mesa Cruzada con Tela', file: 'tableCrossCloth.glb', category: 'Mesas' },
+            { name: 'Mesa con Tela', file: 'tableCloth.glb', category: 'Mesas' },
+            { name: 'Mesa', file: 'table.glb', category: 'Mesas' },
             
             // Dormitorio
-            { name: 'Cama con Cojín Bajo', file: 'benchCushionLow.fbx', category: 'Dormitorio' },
-            { name: 'Cojín Azul', file: 'pillowBlue.fbx', category: 'Dormitorio' },
-            { name: 'Cojín Azul Largo', file: 'pillowBlueLong.fbx', category: 'Dormitorio' },
-            { name: 'Cojín Largo', file: 'pillowLong.fbx', category: 'Dormitorio' },
-            { name: 'Cojín', file: 'pillow.fbx', category: 'Dormitorio' },
+            { name: 'Cama con Cojín Bajo', file: 'benchCushionLow.glb', category: 'Dormitorio' },
+            { name: 'Cojín Azul', file: 'pillowBlue.glb', category: 'Dormitorio' },
+            { name: 'Cojín Azul Largo', file: 'pillowBlueLong.glb', category: 'Dormitorio' },
+            { name: 'Cojín Largo', file: 'pillowLong.glb', category: 'Dormitorio' },
+            { name: 'Cojín', file: 'pillow.glb', category: 'Dormitorio' },
             
             // Cocina
-            { name: 'Estufa Eléctrica', file: 'kitchenStoveElectric.fbx', category: 'Cocina' },
-            { name: 'Estufa', file: 'kitchenStove.fbx', category: 'Cocina' },
-            { name: 'Fregadero', file: 'kitchenSink.fbx', category: 'Cocina' },
-            { name: 'Microondas', file: 'kitchenMicrowave.fbx', category: 'Cocina' },
-            { name: 'Refrigerador Pequeño', file: 'kitchenFridgeSmall.fbx', category: 'Cocina' },
-            { name: 'Refrigerador Grande', file: 'kitchenFridgeLarge.fbx', category: 'Cocina' },
-            { name: 'Refrigerador Empotrado', file: 'kitchenFridgeBuiltIn.fbx', category: 'Cocina' },
-            { name: 'Refrigerador', file: 'kitchenFridge.fbx', category: 'Cocina' },
-            { name: 'Cafetera', file: 'kitchenCoffeeMachine.fbx', category: 'Cocina' },
-            { name: 'Licuadora', file: 'kitchenBlender.fbx', category: 'Cocina' },
-            { name: 'Gabinete Superior', file: 'kitchenCabinetUpper.fbx', category: 'Cocina' },
-            { name: 'Gabinete Superior Doble', file: 'kitchenCabinetUpperDouble.fbx', category: 'Cocina' },
-            { name: 'Gabinete Superior Bajo', file: 'kitchenCabinetUpperLow.fbx', category: 'Cocina' },
-            { name: 'Gabinete Superior Esquinero', file: 'kitchenCabinetUpperCorner.fbx', category: 'Cocina' },
-            { name: 'Gabinete con Cajones', file: 'kitchenCabinetDrawer.fbx', category: 'Cocina' },
-            { name: 'Gabinete Esquinero Redondo', file: 'kitchenCabinetCornerRound.fbx', category: 'Cocina' },
-            { name: 'Gabinete Esquinero Interior', file: 'kitchenCabinetCornerInner.fbx', category: 'Cocina' },
-            { name: 'Gabinete', file: 'kitchenCabinet.fbx', category: 'Cocina' },
-            { name: 'Barra de Cocina', file: 'kitchenBar.fbx', category: 'Cocina' },
-            { name: 'Extremo de Barra', file: 'kitchenBarEnd.fbx', category: 'Cocina' },
-            { name: 'Campana Moderna', file: 'hoodModern.fbx', category: 'Cocina' },
-            { name: 'Campana Grande', file: 'hoodLarge.fbx', category: 'Cocina' },
+            { name: 'Estufa Eléctrica', file: 'kitchenStoveElectric.glb', category: 'Cocina' },
+            { name: 'Estufa', file: 'kitchenStove.glb', category: 'Cocina' },
+            { name: 'Fregadero', file: 'kitchenSink.glb', category: 'Cocina' },
+            { name: 'Microondas', file: 'kitchenMicrowave.glb', category: 'Cocina' },
+            { name: 'Refrigerador Pequeño', file: 'kitchenFridgeSmall.glb', category: 'Cocina' },
+            { name: 'Refrigerador Grande', file: 'kitchenFridgeLarge.glb', category: 'Cocina' },
+            { name: 'Refrigerador Empotrado', file: 'kitchenFridgeBuiltIn.glb', category: 'Cocina' },
+            { name: 'Refrigerador', file: 'kitchenFridge.glb', category: 'Cocina' },
+            { name: 'Cafetera', file: 'kitchenCoffeeMachine.glb', category: 'Cocina' },
+            { name: 'Licuadora', file: 'kitchenBlender.glb', category: 'Cocina' },
+            { name: 'Gabinete Superior', file: 'kitchenCabinetUpper.glb', category: 'Cocina' },
+            { name: 'Gabinete Superior Doble', file: 'kitchenCabinetUpperDouble.glb', category: 'Cocina' },
+            { name: 'Gabinete Superior Bajo', file: 'kitchenCabinetUpperLow.glb', category: 'Cocina' },
+            { name: 'Gabinete Superior Esquinero', file: 'kitchenCabinetUpperCorner.glb', category: 'Cocina' },
+            { name: 'Gabinete con Cajones', file: 'kitchenCabinetDrawer.glb', category: 'Cocina' },
+            { name: 'Gabinete Esquinero Redondo', file: 'kitchenCabinetCornerRound.glb', category: 'Cocina' },
+            { name: 'Gabinete Esquinero Interior', file: 'kitchenCabinetCornerInner.glb', category: 'Cocina' },
+            { name: 'Gabinete', file: 'kitchenCabinet.glb', category: 'Cocina' },
+            { name: 'Barra de Cocina', file: 'kitchenBar.glb', category: 'Cocina' },
+            { name: 'Extremo de Barra', file: 'kitchenBarEnd.glb', category: 'Cocina' },
+            { name: 'Campana Moderna', file: 'hoodModern.glb', category: 'Cocina' },
+            { name: 'Campana Grande', file: 'hoodLarge.glb', category: 'Cocina' },
             
             // Baño
-            { name: 'Ducha Redonda', file: 'showerRound.fbx', category: 'Baño' },
-            { name: 'Ducha', file: 'shower.fbx', category: 'Baño' },
-            { name: 'Inodoro Cuadrado', file: 'toiletSquare.fbx', category: 'Baño' },
-            { name: 'Inodoro', file: 'toilet.fbx', category: 'Baño' },
-            { name: 'Lavadora y Secadora Apiladas', file: 'washerDryerStacked.fbx', category: 'Baño' },
-            { name: 'Lavadora', file: 'washer.fbx', category: 'Baño' },
-            { name: 'Secadora', file: 'dryer.fbx', category: 'Baño' },
+            { name: 'Ducha Redonda', file: 'showerRound.glb', category: 'Baño' },
+            { name: 'Ducha', file: 'shower.glb', category: 'Baño' },
+            { name: 'Inodoro Cuadrado', file: 'toiletSquare.glb', category: 'Baño' },
+            { name: 'Inodoro', file: 'toilet.glb', category: 'Baño' },
+            { name: 'Lavadora y Secadora Apiladas', file: 'washerDryerStacked.glb', category: 'Baño' },
+            { name: 'Lavadora', file: 'washer.glb', category: 'Baño' },
+            { name: 'Secadora', file: 'dryer.glb', category: 'Baño' },
             
             // Iluminación
-            { name: 'Lámpara de Pared', file: 'lampWall.fbx', category: 'Iluminación' },
-            { name: 'Lámpara de Mesa Cuadrada', file: 'lampSquareTable.fbx', category: 'Iluminación' },
-            { name: 'Lámpara de Piso Cuadrada', file: 'lampSquareFloor.fbx', category: 'Iluminación' },
-            { name: 'Lámpara de Techo Cuadrada', file: 'lampSquareCeiling.fbx', category: 'Iluminación' },
-            { name: 'Lámpara de Mesa Redonda', file: 'lampRoundTable.fbx', category: 'Iluminación' },
-            { name: 'Lámpara de Piso Redonda', file: 'lampRoundFloor.fbx', category: 'Iluminación' },
-            { name: 'Ventilador de Techo', file: 'ceilingFan.fbx', category: 'Iluminación' },
+            { name: 'Lámpara de Pared', file: 'lampWall.glb', category: 'Iluminación' },
+            { name: 'Lámpara de Mesa Cuadrada', file: 'lampSquareTable.glb', category: 'Iluminación' },
+            { name: 'Lámpara de Piso Cuadrada', file: 'lampSquareFloor.glb', category: 'Iluminación' },
+            { name: 'Lámpara de Techo Cuadrada', file: 'lampSquareCeiling.glb', category: 'Iluminación' },
+            { name: 'Lámpara de Mesa Redonda', file: 'lampRoundTable.glb', category: 'Iluminación' },
+            { name: 'Lámpara de Piso Redonda', file: 'lampRoundFloor.glb', category: 'Iluminación' },
+            { name: 'Ventilador de Techo', file: 'ceilingFan.glb', category: 'Iluminación' },
             
             // Electrónicos
-            { name: 'Televisión Moderna', file: 'televisionModern.fbx', category: 'Electrónicos' },
-            { name: 'Televisión Vintage', file: 'televisionVintage.fbx', category: 'Electrónicos' },
-            { name: 'Televisión con Antena', file: 'televisionAntenna.fbx', category: 'Electrónicos' },
-            { name: 'Radio', file: 'radio.fbx', category: 'Electrónicos' },
-            { name: 'Laptop', file: 'laptop.fbx', category: 'Electrónicos' },
-            { name: 'Pantalla de Computadora', file: 'computerScreen.fbx', category: 'Electrónicos' },
-            { name: 'Mouse de Computadora', file: 'computerMouse.fbx', category: 'Electrónicos' },
-            { name: 'Altavoz Pequeño', file: 'speakerSmall.fbx', category: 'Electrónicos' },
-            { name: 'Altavoz', file: 'speaker.fbx', category: 'Electrónicos' },
+            { name: 'Televisión Moderna', file: 'televisionModern.glb', category: 'Electrónicos' },
+            { name: 'Televisión Vintage', file: 'televisionVintage.glb', category: 'Electrónicos' },
+            { name: 'Televisión con Antena', file: 'televisionAntenna.glb', category: 'Electrónicos' },
+            { name: 'Radio', file: 'radio.glb', category: 'Electrónicos' },
+            { name: 'Laptop', file: 'laptop.glb', category: 'Electrónicos' },
+            { name: 'Pantalla de Computadora', file: 'computerScreen.glb', category: 'Electrónicos' },
+            { name: 'Mouse de Computadora', file: 'computerMouse.glb', category: 'Electrónicos' },
+            { name: 'Altavoz Pequeño', file: 'speakerSmall.glb', category: 'Electrónicos' },
+            { name: 'Altavoz', file: 'speaker.glb', category: 'Electrónicos' },
             
             // Escritorio
-            { name: 'Escritorio Esquinero', file: 'deskCorner.fbx', category: 'Escritorio' },
-            { name: 'Silla de Bar Cuadrada', file: 'stoolBarSquare.fbx', category: 'Escritorio' },
-            { name: 'Silla de Bar', file: 'stoolBar.fbx', category: 'Escritorio' },
+            { name: 'Escritorio Esquinero', file: 'deskCorner.glb', category: 'Escritorio' },
+            { name: 'Silla de Bar Cuadrada', file: 'stoolBarSquare.glb', category: 'Escritorio' },
+            { name: 'Silla de Bar', file: 'stoolBar.glb', category: 'Escritorio' },
             
             // Almacenamiento
-            { name: 'Estantería con Puertas', file: 'bookcaseClosedDoors.fbx', category: 'Almacenamiento' },
-            { name: 'Mesa Lateral con Cajones', file: 'sideTableDrawers.fbx', category: 'Almacenamiento' },
-            { name: 'Mesa Lateral', file: 'sideTable.fbx', category: 'Almacenamiento' },
-            { name: 'Gabinete de TV con Puertas', file: 'cabinetTelevisionDoors.fbx', category: 'Almacenamiento' },
-            { name: 'Perchero de Pared', file: 'coatRack.fbx', category: 'Almacenamiento' },
-            { name: 'Perchero de Pie', file: 'coatRackStanding.fbx', category: 'Almacenamiento' },
-            { name: 'Caja de Cartón Cerrada', file: 'cardboardBoxClosed.fbx', category: 'Almacenamiento' },
-            { name: 'Caja de Cartón Abierta', file: 'cardboardBoxOpen.fbx', category: 'Almacenamiento' },
+            { name: 'Estantería con Puertas', file: 'bookcaseClosedDoors.glb', category: 'Almacenamiento' },
+            { name: 'Mesa Lateral con Cajones', file: 'sideTableDrawers.glb', category: 'Almacenamiento' },
+            { name: 'Mesa Lateral', file: 'sideTable.glb', category: 'Almacenamiento' },
+            { name: 'Gabinete de TV con Puertas', file: 'cabinetTelevisionDoors.glb', category: 'Almacenamiento' },
+            { name: 'Perchero de Pared', file: 'coatRack.glb', category: 'Almacenamiento' },
+            { name: 'Perchero de Pie', file: 'coatRackStanding.glb', category: 'Almacenamiento' },
+            { name: 'Caja de Cartón Cerrada', file: 'cardboardBoxClosed.glb', category: 'Almacenamiento' },
+            { name: 'Caja de Cartón Abierta', file: 'cardboardBoxOpen.glb', category: 'Almacenamiento' },
             
             // Decoración
-            { name: 'Planta en Maceta', file: 'pottedPlant.fbx', category: 'Decoración' },
-            { name: 'Planta Pequeña 1', file: 'plantSmall1.fbx', category: 'Decoración' },
-            { name: 'Planta Pequeña 2', file: 'plantSmall2.fbx', category: 'Decoración' },
-            { name: 'Planta Pequeña 3', file: 'plantSmall3.fbx', category: 'Decoración' },
-            { name: 'Alfombra Cuadrada', file: 'rugSquare.fbx', category: 'Decoración' },
-            { name: 'Alfombra Redondeada', file: 'rugRounded.fbx', category: 'Decoración' },
-            { name: 'Alfombra Redonda', file: 'rugRound.fbx', category: 'Decoración' },
-            { name: 'Alfombra Rectangular', file: 'rugRectangle.fbx', category: 'Decoración' },
-            { name: 'Alfombra de Entrada', file: 'rugDoormat.fbx', category: 'Decoración' },
-            { name: 'Panel de Pared', file: 'paneling.fbx', category: 'Decoración' },
+            { name: 'Planta en Maceta', file: 'pottedPlant.glb', category: 'Decoración' },
+            { name: 'Planta Pequeña 1', file: 'plantSmall1.glb', category: 'Decoración' },
+            { name: 'Planta Pequeña 2', file: 'plantSmall2.glb', category: 'Decoración' },
+            { name: 'Planta Pequeña 3', file: 'plantSmall3.glb', category: 'Decoración' },
+            { name: 'Alfombra Cuadrada', file: 'rugSquare.glb', category: 'Decoración' },
+            { name: 'Alfombra Redondeada', file: 'rugRounded.glb', category: 'Decoración' },
+            { name: 'Alfombra Redonda', file: 'rugRound.glb', category: 'Decoración' },
+            { name: 'Alfombra Rectangular', file: 'rugRectangle.glb', category: 'Decoración' },
+            { name: 'Alfombra de Entrada', file: 'rugDoormat.glb', category: 'Decoración' },
+            { name: 'Panel de Pared', file: 'paneling.glb', category: 'Decoración' },
             
             // Misceláneos
-            { name: 'Tostadora', file: 'toaster.fbx', category: 'Misceláneos' },
-            { name: 'Papelera', file: 'trashcan.fbx', category: 'Misceláneos' },
-            { name: 'Escaleras Abiertas', file: 'stairsOpen.fbx', category: 'Misceláneos' },
-            { name: 'Escaleras Abiertas Individuales', file: 'stairsOpenSingle.fbx', category: 'Misceláneos' },
-            { name: 'Escaleras Esquineras', file: 'stairsCorner.fbx', category: 'Misceláneos' },
-            { name: 'Escaleras', file: 'stairs.fbx', category: 'Misceláneos' },
-            { name: 'Ventana Deslizante', file: 'wallWindowSlide.fbx', category: 'Misceláneos' },
-            { name: 'Ventana', file: 'wallWindow.fbx', category: 'Misceláneos' },
-            { name: 'Pared Media', file: 'wallHalf.fbx', category: 'Misceláneos' },
-            { name: 'Pared', file: 'wall.fbx', category: 'Misceláneos' },
-            { name: 'Pared Esquinera Redonda', file: 'wallCornerRond.fbx', category: 'Misceláneos' },
-            { name: 'Pared Esquinera', file: 'wallCorner.fbx', category: 'Misceláneos' },
-            { name: 'Puerta Ancha', file: 'wallDoorwayWide.fbx', category: 'Misceláneos' },
-            { name: 'Puerta', file: 'wallDoorway.fbx', category: 'Misceláneos' },
-            { name: 'Puerta Frontal', file: 'doorwayFront.fbx', category: 'Misceláneos' },
-            { name: 'Puerta Abierta', file: 'doorwayOpen.fbx', category: 'Misceláneos' },
-            { name: 'Piso Completo', file: 'floorFull.fbx', category: 'Misceláneos' },
-            { name: 'Piso Medio', file: 'floorHalf.fbx', category: 'Misceláneos' },
-            { name: 'Piso Esquinero Redondo', file: 'floorCornerRound.fbx', category: 'Misceláneos' },
-            { name: 'Piso Esquinero', file: 'floorCorner.fbx', category: 'Misceláneos' }
+            { name: 'Tostadora', file: 'toaster.glb', category: 'Misceláneos' },
+            { name: 'Papelera', file: 'trashcan.glb', category: 'Misceláneos' },
+            { name: 'Escaleras Abiertas', file: 'stairsOpen.glb', category: 'Misceláneos' },
+            { name: 'Escaleras Abiertas Individuales', file: 'stairsOpenSingle.glb', category: 'Misceláneos' },
+            { name: 'Escaleras Esquineras', file: 'stairsCorner.glb', category: 'Misceláneos' },
+            { name: 'Escaleras', file: 'stairs.glb', category: 'Misceláneos' },
+            { name: 'Ventana Deslizante', file: 'wallWindowSlide.glb', category: 'Misceláneos' },
+            { name: 'Ventana', file: 'wallWindow.glb', category: 'Misceláneos' },
+            { name: 'Pared Media', file: 'wallHalf.glb', category: 'Misceláneos' },
+            { name: 'Pared', file: 'wall.glb', category: 'Misceláneos' },
+            { name: 'Pared Esquinera Redonda', file: 'wallCornerRond.glb', category: 'Misceláneos' },
+            { name: 'Pared Esquinera', file: 'wallCorner.glb', category: 'Misceláneos' },
+            { name: 'Puerta Ancha', file: 'wallDoorwayWide.glb', category: 'Misceláneos' },
+            { name: 'Puerta', file: 'wallDoorway.glb', category: 'Misceláneos' },
+            { name: 'Puerta Frontal', file: 'doorwayFront.glb', category: 'Misceláneos' },
+            { name: 'Puerta Abierta', file: 'doorwayOpen.glb', category: 'Misceláneos' },
+            { name: 'Piso Completo', file: 'floorFull.glb', category: 'Misceláneos' },
+            { name: 'Piso Medio', file: 'floorHalf.glb', category: 'Misceláneos' },
+            { name: 'Piso Esquinero Redondo', file: 'floorCornerRound.glb', category: 'Misceláneos' },
+            { name: 'Piso Esquinero', file: 'floorCorner.glb', category: 'Misceláneos' }
         ];
         
-        // Función para cargar un mueble FBX
-        function loadFurnitureFBX(furnitureData, position = { x: 0, y: 0, z: 0 }, rotation = 0) {
+        // Función para cargar un mueble GLB
+        function loadFurnitureGLB(furnitureData, position = { x: 0, y: 0, z: 0 }, rotation = 0) {
             return new Promise((resolve, reject) => {
                 // Verificar que estamos en la habitación personal
                 if (currentScene !== 'personal-room') {
@@ -4963,14 +4992,15 @@ function updateSelectedSkin() {
                     return;
                 }
                 
-                const fbxLoader = new THREE.FBXLoader();
-                const modelPath = `assets/3d furniture/Models/FBX format/${furnitureData.file}`;
+                const gltfLoader = new THREE.GLTFLoader();
+                const modelPath = `assets/3d furniture/Models/GLTF format/${furnitureData.file}`;
                 
                 console.log(`Intentando cargar mueble: ${furnitureData.name} desde ${modelPath}`);
                 
-                fbxLoader.load(
+                gltfLoader.load(
                     modelPath,
-                    (object) => {
+                    (gltf) => {
+                        const object = gltf.scene || gltf.scenes[0];
                         console.log(`Modelo cargado exitosamente: ${furnitureData.name}`);
                         
                         // Configurar el objeto cargado
@@ -5060,7 +5090,7 @@ function updateSelectedSkin() {
             button.textContent = 'Cargando...';
             button.disabled = true;
             
-            loadFurnitureFBX(furnitureData, defaultPosition, 0)
+            loadFurnitureGLB(furnitureData, defaultPosition, 0)
                 .then((furnitureObject) => {
                     console.log(`Mueble agregado exitosamente: ${furnitureObject.name}`);
                     
@@ -5081,7 +5111,7 @@ function updateSelectedSkin() {
                     console.error('Error al agregar mueble:', error);
                     
                     // Mostrar mensaje de error
-                    showNotification(`❌ Error al agregar ${furnitureData.name}: ${error.message}`, 'error');
+                    showNotification(`❌ Error al agregar ${furnitureData.name}: ${error && error.message ? error.message : error}`, 'error');
                     
                     // Restaurar botón
                     button.textContent = originalText;
@@ -5328,7 +5358,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     
     pendingAvatarLoads.add(alias);
     
-    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
+    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.glb';
     
     // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
@@ -5350,8 +5380,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     // Usaremos Promises para manejar las cargas asíncronas de forma limpia
     const modelPromise = new Promise(resolve => fbxLoader.load(modelPath, resolve));
     const texturePromise = new Promise(resolve => textureLoader.load(texturePath, resolve));
-    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve));
-    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve));
+    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.glb', resolve));
+    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.glb', resolve));
     
     Promise.all([modelPromise, texturePromise, idleAnimPromise, runAnimPromise])
         .then(([avatar, texture, idleAnimation, runAnimation]) => {
@@ -5383,7 +5413,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             // Diagnóstico y selección inteligente de clip para 'run'
 let runClip = undefined;
 if (runAnimation && Array.isArray(runAnimation.animations) && runAnimation.animations.length > 0) {
-    console.log('--- CLIPS ENCONTRADOS EN run.fbx ---');
+    console.log('--- CLIPS ENCONTRADOS EN run.glb ---');
     runAnimation.animations.forEach((clip, i) => {
         console.log(`Clip #${i}: Nombre='${clip.name}', Duración=${clip.duration}, Tracks=${clip.tracks.length}`);
         clip.tracks.forEach((track, j) => {
