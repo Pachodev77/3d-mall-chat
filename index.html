@@ -930,11 +930,7 @@
     
     <!-- Panel de personalización de avatar -->
     <!-- Eliminado: <div id="customization-panel">...</div> -->
-    <script>
-// Definir IS_MOBILE global para evitar ReferenceError universal
-var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/umd/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.min.js"></script>
@@ -1022,7 +1018,7 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
         const HALL_HEIGHT = 4;
         // Ajustar velocidad de movimiento según dispositivo
-        
+        const IS_MOBILE = isMobileDevice();
         const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
@@ -2970,6 +2966,9 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
             // Crear habitación
             createPersonalRoom();
 
+            // Crear muebles por defecto
+            createRoomFurniture(24, 3.5, 24);
+
             // Restaurar posiciones de muebles si existen
             loadFurniturePositions();
             
@@ -3124,6 +3123,13 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
             furnitureObjects = [];
 
         }
+        
+        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+            // Limpiar array de muebles
+            furnitureObjects = [];
+            let furnitureId = 1;
+            
+            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
             
             // Cama principal - Crear grupo para todas las partes
             const bedGroup = new THREE.Group();
@@ -3336,9 +3342,9 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
             // Mouse
             const mouseGeometry = new THREE.BoxGeometry(0.12, 0.05, 0.2);
             const mouseMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
-            const computerMouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
-            computerMouse.position.set(1.2, 0.75, 0.5);
-            computerGroup.add(computerMouse);
+            const mouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
+            mouse.position.set(1.2, 0.75, 0.5);
+            computerGroup.add(mouse);
             
             // Registrar grupo de computadora en el array de muebles
             furnitureObjects.push({
@@ -3495,7 +3501,7 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
             const lampCable = new THREE.Mesh(lampCableGeometry, lampCableMaterial);
             lampCable.position.set(0, roomHeight - 0.35, 0);
             personalRoomScene.add(lampCable);
-
+        }
         
         function updatePersonalRoomMovement() {
             // Si el chat está abierto, no actualizar movimiento
