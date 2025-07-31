@@ -3117,18 +3117,356 @@
             personalRoomScene.add(ceiling);
 
             // Limpiar solo el array de muebles (NO borrar posiciones guardadas)
-            furnitureObjects = [];
 
-        }
-        
-        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
-            // Limpiar array de muebles
-            furnitureObjects = [];
-            let furnitureId = 1;
-            
-            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
-            
-            // Cama principal - Crear grupo para todas las partes
+    // Restaurar posiciones de muebles si existen
+    loadFurniturePositions();
+
+    // Iniciar animación de la habitación
+    animatePersonalRoom();
+}
+
+function createPersonalRoom() {
+    // Dimensiones de la habitación (el doble de grande)
+    const roomWidth = 24;
+    const roomHeight = 3.5;
+    const roomDepth = 24;
+    // Materiales
+    const wallMaterial = getCachedMaterial(0xE8E8E8, 0.9); // Gris claro
+    const floorMaterial = getCachedMaterial(0x8B4513, 0.8, 0.1); // Marrón madera
+    const ceilingMaterial = getCachedMaterial(0xF5F5F5, 0.9); // Blanco
+    // Paredes
+    const wallGeometry = new THREE.BoxGeometry(roomWidth, roomHeight, 0.2);
+    // Pared trasera
+    const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
+    backWall.position.set(0, roomHeight/2, -roomDepth/2);
+    personalRoomScene.add(backWall);
+    // Pared izquierda con hueco de ventana (4x2.5 metros)
+    const leftWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+    leftWallTop.position.set(-roomWidth/2, roomHeight - 0.6, 0);
+    leftWallTop.rotation.y = Math.PI / 2;
+    personalRoomScene.add(leftWallTop);
+
+    const leftWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+    leftWallBottom.position.set(-roomWidth/2, 0.6, 0);
+    leftWallBottom.rotation.y = Math.PI / 2;
+    personalRoomScene.add(leftWallBottom);
+
+    // Pared izquierda del hueco (lado izquierdo del hueco)
+    const leftWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+    leftWallLeft.position.set(-roomWidth/2, 1.85, -10);
+    leftWallLeft.rotation.y = Math.PI / 2;
+    personalRoomScene.add(leftWallLeft);
+
+    // Pared derecha del hueco (lado derecho del hueco)
+    const leftWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+    leftWallRight.position.set(-roomWidth/2, 1.85, 10);
+    leftWallRight.rotation.y = Math.PI / 2;
+    personalRoomScene.add(leftWallRight);
+
+    // Pared derecha con hueco de ventana (4x2.5 metros)
+    const rightWallTop = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+    rightWallTop.position.set(roomWidth/2, roomHeight - 0.6, 0);
+    rightWallTop.rotation.y = -Math.PI / 2;
+    personalRoomScene.add(rightWallTop);
+
+    const rightWallBottom = new THREE.Mesh(new THREE.BoxGeometry(roomWidth, 1.2, 0.2), wallMaterial);
+    rightWallBottom.position.set(roomWidth/2, 0.6, 0);
+    rightWallBottom.rotation.y = -Math.PI / 2;
+    personalRoomScene.add(rightWallBottom);
+
+    // Pared izquierda del hueco (lado izquierdo del hueco)
+    const rightWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+    rightWallLeft.position.set(roomWidth/2, 1.85, -10);
+    rightWallLeft.rotation.y = -Math.PI / 2;
+    personalRoomScene.add(rightWallLeft);
+
+    // Pared derecha del hueco (lado derecho del hueco)
+    const rightWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 2.5, 0.2), wallMaterial);
+    rightWallRight.position.set(roomWidth/2, 1.85, 10);
+    rightWallRight.rotation.y = -Math.PI / 2;
+    personalRoomScene.add(rightWallRight);
+    // Pared frontal (con puerta)
+    const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
+    frontWallLeft.position.set(-roomWidth/4 - 0.25, roomHeight/2, roomDepth/2);
+    personalRoomScene.add(frontWallLeft);
+    const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(roomWidth/2 - 0.5, roomHeight, 0.2), wallMaterial);
+    frontWallRight.position.set(roomWidth/4 + 0.25, roomHeight/2, roomDepth/2);
+    personalRoomScene.add(frontWallRight);
+    // Puerta más grande y decorativa
+    const doorWidth = 1.8;
+    const doorHeight = 2.8;
+    const doorThickness = 0.12;
+    const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, doorThickness);
+    const doorMaterial = getCachedMaterial(0x8B5A2B, 0.92, 0.18); // Madera rica
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, doorHeight/2, roomDepth/2 + 0.01);
+    door.castShadow = true;
+    personalRoomScene.add(door);
+
+    // Marco decorativo
+    const frameMaterial = getCachedMaterial(0xA0522D, 0.7, 0.18);
+    const frameThickness = 0.14;
+    const frameDepth = 0.16;
+    // Lados
+    const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, doorHeight + 0.18, frameDepth), frameMaterial);
+    frameLeft.position.set(-doorWidth/2 - frameThickness/2, doorHeight/2, roomDepth/2 + 0.01);
+    personalRoomScene.add(frameLeft);
+    const frameRight = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, doorHeight + 0.18, frameDepth), frameMaterial);
+    frameRight.position.set(doorWidth/2 + frameThickness/2, doorHeight/2, roomDepth/2 + 0.01);
+    personalRoomScene.add(frameRight);
+    // Arriba
+    const frameTop = new THREE.Mesh(new THREE.BoxGeometry(doorWidth + frameThickness*2, frameThickness, frameDepth), frameMaterial);
+    frameTop.position.set(0, doorHeight + frameThickness/2, roomDepth/2 + 0.01);
+    personalRoomScene.add(frameTop);
+
+    // Paneles decorativos en la puerta
+    const panelMat = getCachedMaterial(0xC19A6B, 0.65, 0.22);
+    for (let i = 0; i < 4; i++) {
+        const panelGeo = new THREE.BoxGeometry(doorWidth * 0.7, 0.38, 0.04);
+        const panel = new THREE.Mesh(panelGeo, panelMat);
+        panel.position.set(0, 2.1 - i * 0.6, roomDepth/2 + doorThickness/2 + 0.025);
+        personalRoomScene.add(panel);
+    }
+
+    // Manija elegante (tipo pomo dorado)
+    const knobGeo = new THREE.SphereGeometry(0.09, 24, 24);
+    const knobMat = getCachedMaterial(0xFFD700, 0.7, 0.8); // Dorado
+    const knob = new THREE.Mesh(knobGeo, knobMat);
+    knob.position.set(doorWidth/2 - 0.18, doorHeight/2, roomDepth/2 + doorThickness/2 + 0.08);
+    personalRoomScene.add(knob);
+
+    // Placa bajo la manija
+    const plateGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.02, 24);
+    const plateMat = getCachedMaterial(0xB8860B, 0.6, 0.5);
+    const plate = new THREE.Mesh(plateGeo, plateMat);
+    plate.rotation.x = Math.PI / 2;
+    plate.position.set(doorWidth/2 - 0.18, doorHeight/2, roomDepth/2 + doorThickness/2 + 0.06);
+    personalRoomScene.add(plate);
+    // --- Huecos de ventana en las paredes laterales ---
+    // Los huecos están creados por las paredes segmentadas arriba
+    // No se necesitan ventanas transparentes, solo los huecos en las paredes
+
+    // === Piso ===
+    const floorGeometry = new THREE.BoxGeometry(roomWidth, 0.2, roomDepth);
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.set(0, 0.1, 0);
+    floor.receiveShadow = true;
+    personalRoomScene.add(floor);
+
+    // === Techo ===
+    const ceilingGeometry = new THREE.BoxGeometry(roomWidth, 0.2, roomDepth);
+    const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+    ceiling.position.set(0, roomHeight + 0.1, 0);
+    ceiling.receiveShadow = false;
+    personalRoomScene.add(ceiling);
+
+    // Limpiar solo el array de muebles (NO borrar posiciones guardadas)
+    furnitureObjects = [];
+
+}
+
+function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+    // [ELIMINADO] No limpiar ni reiniciar furnitureObjects aquí. Solo manipularlo al agregar/eliminar muebles 3D desde el catálogo.
+    let furnitureId = 1;
+
+    // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
+
+    // Cama principal - Crear grupo para todas las partes
+    const bedGroup = new THREE.Group();
+    bedGroup.position.set(-4, 0, -3);
+
+    // Marco de la cama
+    const bedFrameGeometry = new THREE.BoxGeometry(2.2, 0.4, 3.2);
+    const bedFrameMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+    const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
+    bedFrame.position.set(0, 0.2, 0);
+    bedGroup.add(bedFrame);
+
+    // Registrar grupo de cama en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Cama',
+        mesh: bedGroup,
+        type: 'bed'
+    });
+
+    // Colchón
+    const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
+    const mattressMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
+    const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
+    mattress.position.set(0, 0.5, 0);
+    bedGroup.add(mattress);
+
+    // Almohadas
+    const pillowGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.8);
+    const pillowMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
+    const pillow1 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+    pillow1.position.set(-0.3, 0.65, -1.2);
+    bedGroup.add(pillow1);
+
+    const pillow2 = new THREE.Mesh(pillowGeometry, pillowMaterial);
+    pillow2.position.set(0.3, 0.65, -1.2);
+    bedGroup.add(pillow2);
+
+    // Agregar el grupo completo a la escena
+    personalRoomScene.add(bedGroup);
+
+    // Mesa de noche izquierda
+    const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
+    const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+    const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+    nightstandLeft.position.set(-5.5, 0.35, -3);
+    personalRoomScene.add(nightstandLeft);
+
+    // Registrar mesa de noche izquierda en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Mesa de Noche Izquierda',
+        mesh: nightstandLeft,
+        type: 'nightstand'
+    });
+
+    // Mesa de noche derecha
+    const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
+    nightstandRight.position.set(-2.5, 0.35, -3);
+    personalRoomScene.add(nightstandRight);
+
+    // Registrar mesa de noche derecha en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Mesa de Noche Derecha',
+        mesh: nightstandRight,
+        type: 'nightstand'
+    });
+
+    // Lámpara de mesa - Crear grupo para todas las partes
+    const lampGroup = new THREE.Group();
+    lampGroup.position.set(-5.5, 0, -3);
+
+    const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.1, 8);
+    const lampBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+    const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
+    lampBase.position.set(0, 0.75, 0);
+    lampGroup.add(lampBase);
+
+    const lampPoleGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.4, 6);
+    const lampPoleMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+    const lampPole = new THREE.Mesh(lampPoleGeometry, lampPoleMaterial);
+    lampPole.position.set(0, 1, 0);
+    lampGroup.add(lampPole);
+
+    const lampShadeGeometry = new THREE.ConeGeometry(0.3, 0.2, 8);
+    const lampShadeMaterial = getCachedMaterial(0xECF0F1, 0.9, 0.1);
+    const lampShade = new THREE.Mesh(lampShadeGeometry, lampShadeMaterial);
+    lampShade.position.set(0, 1.25, 0);
+    lampShade.rotation.x = Math.PI;
+    lampGroup.add(lampShade);
+
+    // Registrar grupo de lámpara en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Lámpara de Mesa',
+        mesh: lampGroup,
+        type: 'lamp'
+    });
+
+    // Agregar el grupo completo a la escena
+    personalRoomScene.add(lampGroup);
+
+    // ===== ZONA DE TRABAJO (Lado derecho) =====
+
+    // Escritorio principal - Crear grupo para todas las partes
+    const deskGroup = new THREE.Group();
+    deskGroup.position.set(4, 0, -3);
+
+    // Mesa del escritorio
+    const deskGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.2);
+    const deskMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+    const desk = new THREE.Mesh(deskGeometry, deskMaterial);
+    desk.position.set(0, 0.7, 0);
+    deskGroup.add(desk);
+
+    // Registrar grupo de escritorio en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Escritorio',
+        mesh: deskGroup,
+        type: 'desk'
+    });
+
+    // Patas del escritorio
+    for (let i = 0; i < 4; i++) {
+        const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6);
+        const legMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
+        const leg = new THREE.Mesh(legGeometry, legMaterial);
+        const x = (i % 2 === 0 ? -1 : 1) * 1.2;
+        const z = (i < 2 ? -1 : 1) * 0.5;
+        leg.position.set(x, 0.35, z);
+        deskGroup.add(leg);
+    }
+
+    // Agregar el grupo completo a la escena
+    personalRoomScene.add(deskGroup);
+
+    // Silla ergonómica del escritorio - Crear grupo para todas las partes
+    const chairGroup = new THREE.Group();
+    chairGroup.position.set(4, 0, -1.8);
+
+    // Asiento de la silla
+    const chairSeatGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.7);
+    const chairSeatMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+    const chairSeat = new THREE.Mesh(chairSeatGeometry, chairSeatMaterial);
+    chairSeat.position.set(0, 0.45, 0);
+    chairGroup.add(chairSeat);
+
+    // Registrar grupo de silla en el array de muebles
+    furnitureObjects.push({
+        id: furnitureId++,
+        name: 'Silla de Escritorio',
+        mesh: chairGroup,
+        type: 'chair'
+    });
+
+    // Respaldo de la silla
+    const chairBackGeometry = new THREE.BoxGeometry(0.7, 0.8, 0.1);
+    const chairBackMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+    const chairBack = new THREE.Mesh(chairBackGeometry, chairBackMaterial);
+    chairBack.position.set(0, 0.85, -0.4);
+    chairGroup.add(chairBack);
+
+    // Patas de la silla
+    for (let i = 0; i < 4; i++) {
+        const chairLegGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.45, 6);
+        const chairLegMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
+        const chairLeg = new THREE.Mesh(chairLegGeometry, chairLegMaterial);
+        const x = (i % 2 === 0 ? -1 : 1) * 0.3;
+        const z = (i < 2 ? -1 : 1) * 0.3;
+        chairLeg.position.set(x, 0.225, z);
+        chairGroup.add(chairLeg);
+    }
+
+    // Agregar el grupo completo a la escena
+    personalRoomScene.add(chairGroup);
+
+    // Computadora completa - Crear grupo para todas las partes
+    const computerGroup = new THREE.Group();
+    computerGroup.position.set(4, 0, -3);
+
+    const monitorGeometry = new THREE.BoxGeometry(1.4, 0.9, 0.1);
+    const monitorMaterial = getCachedMaterial(0x000000, 0.8, 0.2);
+    const monitor = new THREE.Mesh(monitorGeometry, monitorMaterial);
+    monitor.position.set(0, 1.3, 0);
+    computerGroup.add(monitor);
+
+    // Base del monitor
+    const monitorBaseGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.1, 8);
+    const monitorBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
+    const monitorBase = new THREE.Mesh(monitorBaseGeometry, monitorBaseMaterial);
+    monitorBase.position.set(0, 0.8, 0);
+    computerGroup.add(monitorBase);
+
+    // CPU/Torre
+    const cpuGeometry = new THREE.BoxGeometry(0.4, 0.6, 0.2);
             const bedGroup = new THREE.Group();
             bedGroup.position.set(-4, 0, -3);
             
