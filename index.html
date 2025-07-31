@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -3068,6 +3068,21 @@
             // --- Huecos de ventana en las paredes laterales ---
             // Los huecos están creados por las paredes segmentadas arriba
             // No se necesitan ventanas transparentes, solo los huecos en las paredes
+
+            // === Piso ===
+            const floorGeometry = new THREE.BoxGeometry(roomWidth, 0.2, roomDepth);
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.position.set(0, 0.1, 0);
+            floor.receiveShadow = true;
+            personalRoomScene.add(floor);
+
+            // === Techo ===
+            const ceilingGeometry = new THREE.BoxGeometry(roomWidth, 0.2, roomDepth);
+            const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+            ceiling.position.set(0, roomHeight + 0.1, 0);
+            ceiling.receiveShadow = false;
+            personalRoomScene.add(ceiling);
+
             // Limpiar muebles y decoraciones
             furnitureObjects = [];
             localStorage.removeItem('furniturePositions');
@@ -3489,10 +3504,10 @@
                 
                 // --- Límites de la habitación (expandidos para exploración completa) ---
                 const roomBounds = {
-                    minX: -8.0,  // Expandido hacia la izquierda
-                    maxX: 8.0,   // Expandido hacia la derecha
-                    minZ: -8.0,  // Expandido hacia atrás
-                    maxZ: 8.0    // Expandido hacia adelante
+                    minX: -11.6,  // Más cerca del muro izquierdo
+                    maxX: 11.6,   // Más cerca del muro derecho
+                    minZ: -11.6,  // Más cerca del muro trasero
+                    maxZ: 11.6    // Más cerca del muro frontal
                 };
                 
                 // Aplicar límites de la habitación
