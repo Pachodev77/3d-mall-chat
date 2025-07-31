@@ -2965,6 +2965,10 @@
             
             // Crear habitación
             createPersonalRoom();
+            
+            // Restaurar posiciones de muebles si existen
+            loadFurniturePositions();
+            
             // Crear y actualizar cielo visible desde las ventanas
             // Eliminar la línea:
             // createPersonalRoomSky();
@@ -5010,7 +5014,8 @@ function updateSelectedSkin() {
                         console.log(`Modelo cargado exitosamente: ${furnitureData.name}`);
 
                         // Configurar el objeto cargado
-                        object.position.set(position.x, position.y, position.z);
+                        // Subir el mueble más arriba del suelo
+object.position.set(position.x, position.y + 0.3, position.z);
                         object.rotation.y = rotation;
 
                         // Calcular escala apropiada basada en el tamaño del modelo
@@ -5031,8 +5036,9 @@ function updateSelectedSkin() {
                             }
                         }
 
-                        // Aplicar escala
-                        object.scale.set(scale, scale, scale);
+                        // Aplicar escala (más grande)
+                        const finalScale = scale * 2.0;
+                        object.scale.set(finalScale, finalScale, finalScale);
 
                         console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
 
