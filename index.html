@@ -1022,7 +1022,7 @@ var IS_MOBILE = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(n
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
         const HALL_HEIGHT = 4;
         // Ajustar velocidad de movimiento según dispositivo
-        const IS_MOBILE = isMobileDevice();
+        
         const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
