@@ -2931,6 +2931,8 @@
         }
         
         function setupPersonalRoom() {
+    // Cargar posiciones de muebles guardadas
+    loadFurniturePositions && loadFurniturePositions();
             // Ocultar escena del mall
             renderer.domElement.style.display = 'none';
             
@@ -2975,6 +2977,11 @@
             
             // Iniciar animación de la habitación
             animatePersonalRoom();
+            // Guardar posiciones al salir de la habitación personal
+            window.addEventListener('beforeunload', () => {
+                saveFurniturePositionsSilently && saveFurniturePositionsSilently();
+            });
+            // Si hay lógica de cambio de escena, también llama a saveFurniturePositionsSilently() allí.
         }
         
         function createPersonalRoom() {
@@ -5012,11 +5019,11 @@ function updateSelectedSkin() {
                         const size = box.getSize(new THREE.Vector3());
                         const maxDimension = Math.max(size.x, size.y, size.z);
                         // Queremos que los muebles grandes (sofás, mesas, camas) tengan ~2m de su dimensión mayor
-                        let targetMax = 2.0;
+                        let targetMax = 2.6; // ¡Más grandes!
                         // Si el modelo es muy pequeño, usar targetMax mayor (por ejemplo, para sillas pequeñas)
-                        if (maxDimension < 1.0) targetMax = 1.2;
-                        // Si es un objeto decorativo muy pequeño (menos de 0.3m), hacerlo de 0.5m
-                        if (maxDimension < 0.3) targetMax = 0.5;
+                        if (maxDimension < 1.0) targetMax = 1.6;
+                        // Si es un objeto decorativo muy pequeño (menos de 0.3m), hacerlo de 0.7m
+                        if (maxDimension < 0.3) targetMax = 0.7;
                         let scale = targetMax / maxDimension;
                         // Limitar escala máxima para evitar muebles absurdamente grandes
                         if (scale > 6) scale = 6;
@@ -5027,7 +5034,7 @@ function updateSelectedSkin() {
                         box.setFromObject(object);
                         // Ajustar posición Y para que el mueble repose sobre el suelo
                         const minY = box.min.y;
-                        object.position.y = position.y - minY;
+                        object.position.y = position.y - minY + 0.05; // elevar un poco más sobre el suelo
                         console.log(`Ajuste Y para suelo: minY modelo = ${minY.toFixed(2)}, Y aplicado = ${object.position.y.toFixed(2)}`);
                         
                         // Aplicar materiales si es necesario
@@ -5054,6 +5061,8 @@ function updateSelectedSkin() {
                         // Agregar a la escena y al array de muebles
                         personalRoomScene.add(object);
                         furnitureObjects.push(furnitureObject);
+                        // Guardar posiciones cada vez que se agrega un mueble
+                        saveFurniturePositionsSilently && saveFurniturePositionsSilently();
                         
                         console.log(`Mueble agregado exitosamente: ${furnitureData.name} (ID: ${furnitureObject.id})`);
                         console.log(`Total de muebles en la habitación: ${furnitureObjects.length}`);
