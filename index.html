@@ -4588,15 +4588,21 @@ function updateSelectedSkin() {
                 return;
             }
             let avatar = userAvatars.get(alias);
-            if (!avatar) {
-                console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
-                // Solo pasar skin si existe
-                let custom = {};
-                if (skin) custom.skin = skin;
-                createUserAvatar(alias, position, floor, custom);
-                avatar = userAvatars.get(alias);
-            }
-            if (avatar) {
+    // --- Si el avatar existe pero la skin ha cambiado, eliminar y recrear ---
+    if (avatar && skin && avatar.currentSkin !== skin) {
+        console.log('[updateAvatarPosition] Skin cambiada para', alias, ':', avatar.currentSkin, '->', skin, '. Recreando avatar.');
+        removeUserAvatar(alias);
+        let custom = { skin };
+        createUserAvatar(alias, position, floor, custom);
+        avatar = userAvatars.get(alias);
+    } else if (!avatar) {
+        console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
+        let custom = {};
+        if (skin) custom.skin = skin;
+        createUserAvatar(alias, position, floor, custom);
+        avatar = userAvatars.get(alias);
+    }
+    if (avatar) {
                 console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
                 // Actualización de posición y rotación en tiempo real
                 const floorStep = HALL_HEIGHT + 1;
@@ -5489,7 +5495,8 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 targetPosition: new THREE.Vector3(position.x, correctY, position.z),
                 targetRotation: 0,
                 currentFloor: floor,
-                isMoving: false
+                isMoving: false,
+                currentSkin: skinName // Guardar la skin aplicada para comparación
             });
             
         }).catch(error => {
