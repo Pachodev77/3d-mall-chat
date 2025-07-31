@@ -5196,7 +5196,12 @@ function setupDefaultApartmentFurniture() {
     }
     // Sofá
     let sofa = findFurnitureByName('Sofá Moderno') || findAlternativeByCategory('Sala');
-    if (sofa) loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2);
+    if (sofa) {
+        console.log('[APT] Intentando cargar sofá:', sofa.name, sofa.file);
+        loadFurnitureFBX(sofa, { x: -6, y: 0, z: 4 }, Math.PI/2).then(()=>console.log('[APT] Sofá cargado')).catch(e=>console.error('[APT] Error sofá',e));
+    } else {
+        console.warn('[APT] No se encontró ningún sofá para cargar');
+    }
     // Mesa de centro
     let coffeeTable = findFurnitureByName('Mesa de Centro') || findAlternativeByCategory('Mesas');
     if (coffeeTable) loadFurnitureFBX(coffeeTable, { x: -6, y: 0, z: 7 }, 0);
