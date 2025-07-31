@@ -5323,18 +5323,157 @@ function updateSelectedSkin() {
         // Sistema de Firebase listeners optimizado - manejado en firebase-config.js
         // Los listeners específicos (child_added, child_changed, child_removed) están configurados allí
 
-        // --- Eliminar avatar de usuario de la escena y del mapa ---
+// Función para debug de muebles disponibles
+function debugAvailableFurniture() {
+    console.log('=== DEBUG MUEBLES DISPONIBLES ===');
+    console.log('Total de muebles disponibles:', availableFurniture.length);
+    console.log('Categorías disponibles:');
+    const categories = [...new Set(availableFurniture.map(f => f.category))];
+    categories.forEach(category => {
+        const count = availableFurniture.filter(f => f.category === category).length;
+        console.log(`  ${category}: ${count} muebles`);
+    });
+    console.log('Muebles por categoría:');
+    availableFurniture.forEach(furniture => {
+        console.log(`  ${furniture.name} (${furniture.category}) - ${furniture.file}`);
+    });
+    console.log('==========================================');
+}
+
+// Función para mostrar notificaciones
+function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 50000;
+        max-width: 300px;
+        word-wrap: break-word;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transform: translateX(100%);
+        transition: transform 0.3s ease-out;
+    `;
+
+    // Configurar colores según el tipo
+    switch(type) {
+        case 'success':
+            notification.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            break;
+        case 'error':
+            notification.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            break;
+        case 'warning':
+            notification.style.background = 'linear-gradient(135deg, #f39c12, #e67e22)';
+            break;
+        default:
+            notification.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+    }
+
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    // Animar entrada
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+
+    // Auto-eliminar después de 3 segundos
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Exponer función de debug globalmente
+window.debugWindows = debugWindows;
+
+// Configurar overlay al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('ui-overlay');
+    if (overlay) {
+        overlay.style.pointerEvents = 'auto';
+    }
+});
+
+// Mostrar prompt de alias si no existe
+if (!userAlias) {
+    userAlias = prompt('Ingresa tu alias:');
+    if (userAlias) {
+        localStorage.setItem('userAlias', userAlias);
+    } else {
+        userAlias = 'Usuario_' + Math.floor(Math.random() * 10000);
+        localStorage.setItem('userAlias', userAlias);
+    }
+}
+
+// Conectar al chat de Firebase
+connectToChat(userAlias);
+
+// Sistema de posición centralizado - manejado por updatePeriodicSystems()
+
+// Función mejorada para mostrar mensajes en el chat
+function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+    let timeStr = '';
+    if (timestamp) {
+        const date = new Date(timestamp);
+        timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+    }
+    const isOwn = (alias === userAlias || type === 'own');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
+    msgDiv.style.margin = '6px 0';
+    msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+    if (isPrivate) {
+        msgDiv.style.background = 'rgba(255,215,0,0.12)';
+        msgDiv.style.border = '1px solid #FFD700';
+        msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+    } else {
+        msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+    }
+    chatMessages.appendChild(msgDiv);
+    // Limitar a los últimos 10 mensajes
+    while (chatMessages.children.length > 10) {
+        chatMessages.removeChild(chatMessages.firstChild);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+window.addMessageToChat = addMessageToChat;
+
+// Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
+// El listener principal está en firebase-config.js
+
+// Sistema de Firebase listeners optimizado - manejado en firebase-config.js
+// Los listeners específicos (child_added, child_changed, child_removed) están configurados allí
+
+// --- Eliminar avatar de usuario de la escena y del mapa ---
 function removeUserAvatar(alias) {
     const avatar = userAvatars.get(alias);
-            if (avatar) {
-                if (avatar.group) {
-        scene.remove(avatar.group);
-                }
-                // Limpiar mixer de animación
-                if (avatar.mixer) {
-                    avatar.mixer.stopAllAction();
-                    avatar.mixer.uncacheRoot(avatar.group);
-                }
+    if (avatar) {
+        if (avatar.group) {
+            if (typeof scene !== 'undefined' && scene && scene.children.includes(avatar.group)) {
+                scene.remove(avatar.group);
+            }
+            if (typeof personalRoomScene !== 'undefined' && personalRoomScene && personalRoomScene.children.includes(avatar.group)) {
+                personalRoomScene.remove(avatar.group);
+            }
+        }
+    }
+    // Limpiar mixer de animación
+    if (avatar.mixer) {
+        avatar.mixer.stopAllAction();
+        avatar.mixer.uncacheRoot(avatar.group);
     }
     userAvatars.delete(alias);
     pendingAvatarLoads.delete(alias);
@@ -5368,7 +5507,7 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     
     pendingAvatarLoads.add(alias);
     
-    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.glb';
+    const modelPath = 'assets/kenney 3d characters/Model/characterMedium.fbx';
     
     // Elegir el skin correcto
     let skinName = (custom && custom.skin) ? custom.skin : (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA');
@@ -5390,8 +5529,8 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
     // Usaremos Promises para manejar las cargas asíncronas de forma limpia
     const modelPromise = new Promise(resolve => fbxLoader.load(modelPath, resolve));
     const texturePromise = new Promise(resolve => textureLoader.load(texturePath, resolve));
-    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.glb', resolve));
-    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.glb', resolve));
+    const idleAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/idle.fbx', resolve));
+    const runAnimPromise = new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Animations/run.fbx', resolve));
     
     Promise.all([modelPromise, texturePromise, idleAnimPromise, runAnimPromise])
         .then(([avatar, texture, idleAnimation, runAnimation]) => {
