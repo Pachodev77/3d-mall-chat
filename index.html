@@ -2966,8 +2966,6 @@
             // Crear habitación
             createPersonalRoom();
 
-            // (Eliminado) Crear muebles por defecto SOLO con modelos 3D del catálogo
-
             // Restaurar posiciones de muebles si existen
             loadFurniturePositions();
             
@@ -3123,9 +3121,7 @@
 
         }
         
-        // function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
-        //     // (ELIMINADO: ahora solo muebles 3D del catálogo con GLTFLoader)
-        // }
+        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
             // Limpiar array de muebles
             furnitureObjects = [];
             let furnitureId = 1;
