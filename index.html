@@ -1061,10 +1061,6 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
         let roomNavigationPanelOpen = false;
         let personalRoomTargetPosition, personalRoomTargetRotationY;
         
-        // --- Sistema de cartel rotativo central ---
-        let rotatingSigns = [];
-        let rotatingSignTextIndexes = [];
-        
         // --- Variables para el sistema de edición de muebles ---
         let furnitureEditMode = false;
         let selectedFurniture = null;
@@ -1265,25 +1261,6 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             createCentralCubeScreens(HALL_SIZE / 2, centralStructureY + cubeSize * 1.6, HALL_SIZE / 2, cubeSize, storeLinks.slice(8, 12), 200, 1800);
             const clockCubeY = centralStructureY + cubeSize * 2.4;
             createDigitalClockCube(HALL_SIZE / 2, clockCubeY, HALL_SIZE / 2, cubeSize);
-
-            // --- Cartel Rotativo Central ---
-            // El cartel debe estar entre el primer y el tercer cubo central (centrado verticalmente)
-            const signHeight = (cubeSize * 1.6) - (cubeSize * 0.8); // Altura entre el primer y el tercer cubo
-            const signY = centralStructureY + cubeSize * 0.8 + signHeight / 2; // Centrado entre los cubos
-            const signWidth = cubeSize * 1.2; // Un poco más ancho que el cubo
-            const signTexts = [
-                'Bienvenido al Mall',
-                'Ofertas Especiales',
-                'Explora las Tiendas',
-                '¡Disfruta tu visita!'
-            ];
-            // Puedes personalizar la URL o dejarla vacía si solo quieres texto
-            const rotatingSign = createRotatingSign('', signTexts, signWidth, signHeight, 0);
-            rotatingSign.position.set(HALL_SIZE / 2, signY, HALL_SIZE / 2 + cubeSize / 1.5);
-            rotatingSign.rotation.y = 0; // Mirando hacia el pasillo principal
-            scene.add(rotatingSign);
-            // Pintar el primer texto inmediatamente
-            updateRotatingSign(rotatingSign.material, signTexts[0]);
 
             // Cúpula
             const pyramidHeight = cubeSize * 1.5;
@@ -2391,59 +2368,6 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             }
         }
 
-        function createRotatingSign(url, texts, width, height, colorIdx) {
-            const plane = createImagePlane(url, texts[0], width, height, colorIdx, false);
-            plane.material.transparent = true;
-            
-            // Agregar al sistema centralizado en lugar de usar setInterval
-            const signIndex = rotatingSigns.length;
-            rotatingSigns.push({
-                material: plane.material,
-                texts: texts
-            });
-            rotatingSignTextIndexes[signIndex] = 0;
-            
-            return plane;
-        }
-
-        function updateRotatingSign(material, text) {
-            // Create a new canvas if material.map doesn't exist or if it's not a canvas
-            let canvas = material.map ? material.map.image : null;
-            if (!canvas || !canvas.getContext) {
-                canvas = document.createElement('canvas');
-                canvas.width = 256;
-                canvas.height = 128;
-            }
-            
-            const context = canvas.getContext('2d');
-            const canvasW = canvas.width;
-            const canvasH = canvas.height;
-            
-            context.fillStyle = '#fff';
-            context.fillRect(0, 0, canvasW, canvasH);
-            context.strokeStyle = '#000';
-            context.lineWidth = 8;
-            context.strokeRect(4, 4, canvasW-8, canvasH-8);
-
-            let fontSize = canvasH * 0.3;
-            context.font = `bold ${fontSize}px Arial`;
-            context.fillStyle = '#000';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            while(context.measureText(text).width > canvasW - 20 && fontSize > 10) {
-                fontSize -= 2;
-                context.font = `bold ${fontSize}px Arial`;
-            }
-            context.fillText(text, canvasW/2, canvasH/2);
-            
-            // Create or update the texture
-            if (!material.map) {
-                material.map = new THREE.CanvasTexture(canvas);
-            } else {
-                material.map.needsUpdate = true;
-            }
-        }
-        
         function createDigitalClockCube(x, y, z, size) {
             const group = new THREE.Group();
             group.position.set(x, y, z);
@@ -3964,12 +3888,6 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
                 timingSystem.updateLastTime('POSITION');
             }
             
-            // Actualizar carteles rotativos
-            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
-                updateRotatingSigns();
-                timingSystem.updateLastTime('ROTATING_SIGN');
-            }
-            
             // Actualizar relojes digitales
             if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
                 updateDigitalClocks();
@@ -3977,12 +3895,8 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             }
         }
         
-        // Variables globales para carteles rotativos y relojes
-        
-        // Función para actualizar carteles rotativos
-        function updateRotatingSigns() {
-            rotatingSigns.forEach((sign, index) => {
-                if (sign.texts && sign.texts.length > 0) {
+        // Variables globales para relojes
+        let digitalClocks = [];
                     const textIndex = rotatingSignTextIndexes[index] || 0;
                     const nextIndex = (textIndex + 1) % sign.texts.length;
                     rotatingSignTextIndexes[index] = nextIndex;
@@ -5875,6 +5789,21 @@ function updateAvatarPositions() {
             } else {
                 return 0x223366; // Noche: azul oscuro
             }
+        }
+
+        // --- Variables globales para el cielo de la habitación personal ---
+        
+    </script>
+    <script>
+        // ... existing code ...
+        // --- Al final del setupEventListeners o en DOMContentLoaded ---
+        document.addEventListener('DOMContentLoaded', function() {
+            if (IS_MOBILE) {
+                // Ocultar botones al inicio
+                const floorBtns = document.getElementById('mobile-floor-buttons');
+                floorBtns.style.display = 'none';
+                // Listeners para los botones
+                document.getElementById('btn-floor-1').onclick = function(e) {
                     e.stopPropagation();
                     currentFloor = 0;
                     floorBtns.style.display = 'none';
@@ -5910,5 +5839,4 @@ function updateAvatarPositions() {
         // ... existing code ...
     </script>
     <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
-<!-- [FIX] Eliminada referencia a script.js inexistente -->
 </body>
