@@ -3888,6 +3888,12 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
                 timingSystem.updateLastTime('POSITION');
             }
             
+            // Actualizar carteles rotativos
+            if (timingSystem.shouldUpdate(lastRotatingSignUpdate, UPDATE_INTERVALS.ROTATING_SIGN)) {
+                updateRotatingSigns();
+                timingSystem.updateLastTime('ROTATING_SIGN');
+            }
+            
             // Actualizar relojes digitales
             if (timingSystem.shouldUpdate(lastClockUpdate, UPDATE_INTERVALS.CLOCK)) {
                 updateDigitalClocks();
@@ -3895,8 +3901,15 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             }
         }
         
-        // Variables globales para relojes
+        // Variables globales para carteles rotativos y relojes
+        let rotatingSigns = [];
         let digitalClocks = [];
+        let rotatingSignTextIndexes = {};
+        
+        // Función para actualizar carteles rotativos
+        function updateRotatingSigns() {
+            rotatingSigns.forEach((sign, index) => {
+                if (sign.texts && sign.texts.length > 0) {
                     const textIndex = rotatingSignTextIndexes[index] || 0;
                     const nextIndex = (textIndex + 1) % sign.texts.length;
                     rotatingSignTextIndexes[index] = nextIndex;
