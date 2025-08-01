@@ -4763,7 +4763,7 @@ function debugRoomBounds() {
         window.debugRoomBounds = debugRoomBounds;
         window.debugAvailableFurniture = debugAvailableFurniture;
         window.debugMobileControls = debugMobileControls;
-        window.debugWindows = debugWindows;
+        
         
         // Función para debug del estado de la habitación
         function debugRoomState() {
@@ -5274,7 +5274,7 @@ function debugAvailableFurniture() {
         }
         
         // Exponer función de debug globalmente
-        window.debugWindows = debugWindows;
+        
 
         // Configurar overlay al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
@@ -5884,7 +5884,7 @@ function updateAvatarPositions() {
         // ... existing code ...
         // --- En handleGameClick, después de raycaster.setFromCamera(mouse, camera); ---
             // Detectar si se hizo clic en la franja roja oscura de los pasillos (solo móvil)
-            if (IS_MOBILE) {
+            if (IS_MOBILE && scene && scene.children && raycaster && typeof raycaster.intersectObjects === 'function') {
                 const intersectsAll = raycaster.intersectObjects(scene.children, true);
                 for (let i = 0; i < intersectsAll.length; i++) {
                     const obj = intersectsAll[i].object;
