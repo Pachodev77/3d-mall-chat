@@ -2107,17 +2107,6 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             shopNumberSign.position.x = 0; // Centrar horizontalmente
             storeGroup.add(shopNumberSign);
 
-            // --- Carteles laterales (restaurar ambos carteles) ---
-            const sideSignTexts = [ `Ofertas en ${domain}`, `Visítanos ahora`, `Clic para ganar`, `Novedades aquí`];
-            const leftSign = createRotatingSign(url, sideSignTexts, 2.5, size.y * 0.6, linkIdx);
-            leftSign.position.set(-size.x / 2 + wallThickness + 0.01, (extendedHeight - size.y) / 2, -2);
-            leftSign.rotation.y = Math.PI / 2;
-
-            const rightSign = createRotatingSign(url, sideSignTexts.slice(2).concat(sideSignTexts.slice(0,2)), 2.5, size.y * 0.6, linkIdx + 1);
-            rightSign.position.set(size.x / 2 - wallThickness - 0.01, (extendedHeight - size.y) / 2, -2);
-            rightSign.rotation.y = -Math.PI / 2;
-            
-            storeGroup.add(leftSign, rightSign);
 
             // --- Letreros verticales completos para los pasillos ---
             const createVerticalSign = (text, width, height, colorIdx) => {
