@@ -1262,6 +1262,23 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             const clockCubeY = centralStructureY + cubeSize * 2.4;
             createDigitalClockCube(HALL_SIZE / 2, clockCubeY, HALL_SIZE / 2, cubeSize);
 
+            // --- Cartel Rotativo Central ---
+            // El cartel debe estar entre el primer y el tercer cubo central (centrado verticalmente)
+            const signHeight = (cubeSize * 1.6) - (cubeSize * 0.8); // Altura entre el primer y el tercer cubo
+            const signY = centralStructureY + cubeSize * 0.8 + signHeight / 2; // Centrado entre los cubos
+            const signWidth = cubeSize * 1.2; // Un poco más ancho que el cubo
+            const signTexts = [
+                'Bienvenido al Mall',
+                'Ofertas Especiales',
+                'Explora las Tiendas',
+                '¡Disfruta tu visita!'
+            ];
+            // Puedes personalizar la URL o dejarla vacía si solo quieres texto
+            const rotatingSign = createRotatingSign('', signTexts, signWidth, signHeight, 0);
+            rotatingSign.position.set(HALL_SIZE / 2, signY, HALL_SIZE / 2 + cubeSize / 1.5);
+            rotatingSign.rotation.y = 0; // Mirando hacia el pasillo principal
+            scene.add(rotatingSign);
+
             // Cúpula
             const pyramidHeight = cubeSize * 1.5;
             const pyramidGeometry = new THREE.ConeGeometry(cubeSize / Math.SQRT2 * 1.2, pyramidHeight, 4);
