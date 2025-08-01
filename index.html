@@ -5549,7 +5549,8 @@ function updateAvatarPositions() {
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
                 // --- LÓGICA DE CONTROL DE ANIMACIÓN MEJORADA ---
-                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
+                const moveThreshold = window.IS_MOBILE ? 0.02 : 0.1;
+        const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > moveThreshold;
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
