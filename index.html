@@ -1094,17 +1094,6 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             return shopNumberCounter++;
         };
 
-        // --- Variables de rendimiento y timing centralizado ---
-        let lastTime = 0;
-        let frameCount = 0;
-        let fps = 60;
-        const targetFPS = 60;
-        const frameInterval = 1000 / targetFPS;
-        
-        // Variables de timing para actualizaciones periódicas
-        let lastSkyUpdate = 0;
-        let lastPositionUpdate = 0;
-        let lastRotatingSignUpdate = 0;
         let lastClockUpdate = 0;
         
         // Configuración de intervalos (en milisegundos)
@@ -3813,6 +3802,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // Control de FPS
             const frameDeltaTime = currentTime - lastTime;
             if (frameDeltaTime < frameInterval) {
+                // Siempre actualizar animaciones de avatares aunque no renderices
+                updateAvatarAnimations(deltaTime);
                 return;
             }
             lastTime = currentTime - (frameDeltaTime % frameInterval);
