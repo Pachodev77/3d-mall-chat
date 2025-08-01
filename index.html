@@ -4438,7 +4438,10 @@ function updateSelectedSkin() {
 
         // --- Aplica una skin específica a cualquier avatar (propio o remoto) ---
 function applySkinToAvatar(avatarData, skinName) {
-    if (!avatarData || !avatarData.group || !skinName) return;
+    if (!avatarData || !avatarData.group || !skinName) {
+        console.warn('[applySkinToAvatar] Llamada inválida:', avatarData, skinName);
+        return;
+    }
     const group = avatarData.group;
     const skinFileMap = {
         'humanMaleA': 'humanMaleA.png',
@@ -4448,6 +4451,7 @@ function applySkinToAvatar(avatarData, skinName) {
     };
     const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
     const textureLoader = new THREE.TextureLoader();
+    console.log(`[applySkinToAvatar] Intentando aplicar skin '${skinName}' usando textura '${texturePath}'`);
     textureLoader.load(texturePath, (texture) => {
         group.traverse(child => {
             if (child.isMesh && child.material) {
@@ -4455,9 +4459,9 @@ function applySkinToAvatar(avatarData, skinName) {
                 child.material.needsUpdate = true;
             }
         });
-        console.log('[applySkinToAvatar] Skin aplicada a avatar remoto:', skinName);
+        console.log(`[applySkinToAvatar] Skin '${skinName}' aplicada correctamente a avatar.`);
     }, undefined, (error) => {
-        console.error('[applySkinToAvatar] Error al cargar textura remota:', error);
+        console.error(`[applySkinToAvatar] Error al cargar textura para skin '${skinName}':`, error);
     });
 }
 
@@ -4540,37 +4544,47 @@ function applyCustomizationToAvatar() {
         }
 
         function updateAvatarPosition(alias, position, floor, rotation = 0, skin = null) {
-            console.log('[updateAvatarPosition] Llamada para alias:', alias, 'posición:', position, 'floor:', floor, 'skin:', skin);
-            console.log('[updateAvatarPosition] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
-            console.log('[updateAvatarPosition] Total avatares antes:', userAvatars.size);
-            
-            if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
-                console.warn('Posición inválida para alias:', alias, position);
-                return;
-            }
-            if (typeof floor !== 'number') {
-                console.warn('Floor inválido para alias:', alias, floor);
-                return;
-            }
-            if (typeof rotation !== 'number') {
-                console.warn('Rotación inválida para alias:', alias, rotation);
-                return;
-            }
-            // No crear avatar para el usuario propio
-            if (alias === userAlias) {
-                console.log('[updateAvatarPosition] Saltando avatar propio:', alias);
-                return;
-            }
-            let avatar = userAvatars.get(alias);
-            if (!avatar) {
-                console.log('[updateAvatarPosition] Creando nuevo avatar para:', alias);
-                // Solo pasar skin si existe
-                let custom = {};
+    console.log('[updateAvatarPosition] Llamada para alias:', alias, 'posición:', position, 'floor:', floor, 'skin:', skin);
+    console.log('[updateAvatarPosition] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
+    console.log('[updateAvatarPosition] Total avatares antes:', userAvatars.size);
+    
+    if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
+        console.warn('Posición inválida para alias:', alias, position);
+        return;
+    }
+    // Asegurar que el avatar existe
+    if (!userAvatars.has(alias)) {
+        createUserAvatar(alias, position, floor, { skin });
+    }
+    const avatar = userAvatars.get(alias);
+    if (avatar) {
+        // Interpolar posición objetivo
+        avatar.targetPosition.set(position.x, position.y, position.z);
+        // Normalizar rotación
+        let normalizedRotation = rotation;
+        while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
+        while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
+        avatar.targetRotation = normalizedRotation;
+
+        // --- SINCRONIZAR SKIN REMOTA ---
+        if (skin && avatar.currentSkin !== skin) {
+            console.log(`[updateAvatarPosition] Cambio de skin detectado para ${alias}: ANTES='${avatar.currentSkin}', AHORA='${skin}'`);
+            applySkinToAvatar(avatar, skin);
+            avatar.currentSkin = skin;
+        } else {
+            console.log(`[updateAvatarPosition] Skin de ${alias} ya actualizada o no definida. Skin actual: '${avatar.currentSkin}', skin recibida: '${skin}'`);
+        }
+    } else {
+        console.warn('[updateAvatarPosition] No se pudo crear/obtener avatar para:', alias);
+    }
+    console.log('[updateAvatarPosition] Total avatares después:', userAvatars.size);
+}                let custom = {};
                 if (skin) custom.skin = skin;
                 createUserAvatar(alias, position, floor, custom);
                 avatar = userAvatars.get(alias);
             }
             if (avatar) {
+{{ ... }}
                 console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
                 // Actualización de posición y rotación en tiempo real
                 const floorStep = HALL_HEIGHT + 1;
