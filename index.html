@@ -5878,21 +5878,6 @@ function updateAvatarPositions() {
             } else {
                 return 0x223366; // Noche: azul oscuro
             }
-        }
-
-        // --- Variables globales para el cielo de la habitación personal ---
-        
-    </script>
-    <script>
-        // ... existing code ...
-        // --- Al final del setupEventListeners o en DOMContentLoaded ---
-        document.addEventListener('DOMContentLoaded', function() {
-            if (IS_MOBILE) {
-                // Ocultar botones al inicio
-                const floorBtns = document.getElementById('mobile-floor-buttons');
-                floorBtns.style.display = 'none';
-                // Listeners para los botones
-                document.getElementById('btn-floor-1').onclick = function(e) {
                     e.stopPropagation();
                     currentFloor = 0;
                     floorBtns.style.display = 'none';
@@ -5928,4 +5913,5 @@ function updateAvatarPositions() {
         // ... existing code ...
     </script>
     <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
+<!-- [FIX] Eliminada referencia a script.js inexistente -->
 </body>
