@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paseo Virtual por Centro Comercial</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
+    <script>
+// --- [FIX GLOBAL] Definir window.IS_MOBILE globalmente antes de cualquier otro script ---
+window.window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
     <style>
         body {
@@ -1017,11 +1021,11 @@
         // --- Constantes y Configuración Global ---
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
 const HALL_HEIGHT = 4;
-// --- [FIX] Definir IS_MOBILE globalmente antes de cualquier uso ---
-const IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// --- [FIX] Definir window.IS_MOBILE globalmente antes de cualquier uso ---
+const window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 // Ajustar velocidad de movimiento según dispositivo
-const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
-        const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
+const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
+        const ROTATE_SPEED = window.IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
         const MIN_FLOOR = 0;
@@ -3829,7 +3833,7 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
                 preventTPoseOnMobile(avatar);
             });
                 // --- Mostrar botones de piso si el usuario está sobre el pasillo rojo oscuro (solo móvil) ---
-                if (IS_MOBILE) {
+                if (window.IS_MOBILE) {
                     // Raycast hacia abajo desde la cámara
                     const downRay = new THREE.Raycaster();
                     const from = camera.position.clone();
@@ -4546,7 +4550,7 @@ function applyCustomizationToAvatar() {
 
         function updateAvatarPosition(alias, position, floor, rotation = 0, skin = null) {
             console.log('[updateAvatarPosition] Llamada para alias:', alias, 'posición:', position, 'floor:', floor, 'skin:', skin);
-            console.log('[updateAvatarPosition] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
+            console.log('[updateAvatarPosition] window.IS_MOBILE:', window.IS_MOBILE, 'userAlias:', userAlias);
             console.log('[updateAvatarPosition] Total avatares antes:', userAvatars.size);
             
             if (!position || typeof position.x !== 'number' || typeof position.y !== 'number' || typeof position.z !== 'number') {
@@ -4604,7 +4608,7 @@ function applyCustomizationToAvatar() {
             }
             console.log('[updateAvatarPosition] Total avatares después:', userAvatars.size);
         }
-{{ ... }}
+
 
         // Asegurar que el DOM esté completamente cargado antes de inicializar
         if (document.readyState === 'loading') {
@@ -4671,7 +4675,7 @@ function applyCustomizationToAvatar() {
             console.log('Screen Height:', screen.height);
             console.log('Device Pixel Ratio:', window.devicePixelRatio);
             console.log('Touch Support:', 'ontouchstart' in window);
-            console.log('IS_MOBILE constant:', IS_MOBILE);
+            console.log('window.IS_MOBILE constant:', window.IS_MOBILE);
             console.log('isMobileDevice() result:', isMobileDevice());
             console.log('================================');
         }
@@ -4704,7 +4708,7 @@ function applyCustomizationToAvatar() {
         // Función de debug específica para móvil
         /* [LIMPIEZA] Función de debug legacy no usada: debugMobileAnimations
 function debugMobileAnimations() {
-            if (!IS_MOBILE) {
+            if (!window.IS_MOBILE) {
                 console.log('[Debug] No es dispositivo móvil');
                 return;
             }
@@ -4831,7 +4835,7 @@ function debugMobileControls() {
             console.log('  Backward:', mobileBackward);
             console.log('  Left:', mobileLeft);
             console.log('  Right:', mobileRight);
-            console.log('Dispositivo móvil detectado:', IS_MOBILE);
+            console.log('Dispositivo móvil detectado:', window.IS_MOBILE);
             console.log('Controles visibles:', document.getElementById('mobile-controls').style.display !== 'none');
             console.log('==========================================');
         }
@@ -5352,7 +5356,7 @@ const pendingAvatarLoads = new Set();
 // --- Función para crear un avatar de usuario con animaciones correctamente cargadas ---
 function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom = {}) {
     console.log('[createUserAvatar] llamado para alias:', alias, position, floor, custom);
-    console.log('[createUserAvatar] IS_MOBILE:', IS_MOBILE, 'userAlias:', userAlias);
+    console.log('[createUserAvatar] window.IS_MOBILE:', window.IS_MOBILE, 'userAlias:', userAlias);
     
     // Si ya hay una carga pendiente para este alias, no la repitas
     if (pendingAvatarLoads.has(alias)) {
@@ -5538,7 +5542,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
 }
         // --- Función para actualizar todas las posiciones de avatares ---
 function updateAvatarPositions() {
-    console.log('[updateAvatarPositions] Total avatares:', userAvatars.size, 'IS_MOBILE:', IS_MOBILE);
+    console.log('[updateAvatarPositions] Total avatares:', userAvatars.size, 'window.IS_MOBILE:', window.IS_MOBILE);
     userAvatars.forEach((avatar, alias) => {
         console.log('[updateAvatarPositions] Procesando avatar:', alias, 'visible:', avatar.group.visible);
                 // Interpolar posición y rotación
@@ -5695,7 +5699,7 @@ function updateAvatarPositions() {
                     };
                     const floor = typeof currentFloor !== 'undefined' ? currentFloor : 0;
                     const rotation = typeof camera.rotation !== 'undefined' ? -camera.rotation.y : 0;
-                    console.log('[sendUserPosition] Enviando posición:', position, 'floor:', floor, 'rotation:', rotation, 'IS_MOBILE:', IS_MOBILE);
+                    console.log('[sendUserPosition] Enviando posición:', position, 'floor:', floor, 'rotation:', rotation, 'window.IS_MOBILE:', window.IS_MOBILE);
                     sendPosition(position, floor, rotation);
                 } else {
                     console.warn('[sendUserPosition] Camera no disponible o posición inválida');
@@ -5861,7 +5865,7 @@ function updateAvatarPositions() {
         // ... existing code ...
         // --- Al final del setupEventListeners o en DOMContentLoaded ---
         document.addEventListener('DOMContentLoaded', function() {
-            if (IS_MOBILE) {
+            if (window.IS_MOBILE) {
                 // Ocultar botones al inicio
                 const floorBtns = document.getElementById('mobile-floor-buttons');
                 floorBtns.style.display = 'none';
@@ -5881,7 +5885,7 @@ function updateAvatarPositions() {
         // ... existing code ...
         // --- En handleGameClick, después de raycaster.setFromCamera(mouse, camera); ---
             // Detectar si se hizo clic en la franja roja oscura de los pasillos (solo móvil)
-            if (IS_MOBILE && scene && scene.children && raycaster && typeof raycaster.intersectObjects === 'function') {
+            if (window.IS_MOBILE && scene && scene.children && raycaster && typeof raycaster.intersectObjects === 'function') {
                 const intersectsAll = raycaster.intersectObjects(scene.children, true);
                 for (let i = 0; i < intersectsAll.length; i++) {
                     const obj = intersectsAll[i].object;
