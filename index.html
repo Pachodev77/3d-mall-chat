@@ -2458,20 +2458,7 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
                 console.error('No se encontró el botón de personalización');
             }
             
-            if (saveCustomizationBtn) {
-                console.log('Botón de guardar personalización encontrado');
-                saveCustomizationBtn.onclick = saveCustomization;
-            } else {
-                console.error('No se encontró el botón de guardar personalización');
-            }
-            
-            if (resetCustomizationBtn) {
-                console.log('Botón de resetear personalización encontrado');
-                resetCustomizationBtn.onclick = resetCustomization;
-            } else {
-                console.error('No se encontró el botón de resetear personalización');
-            }
-            
+
             // Botón para regresar al mall
             const returnToMallBtn = document.getElementById('return-to-mall-btn');
             if (returnToMallBtn) {
