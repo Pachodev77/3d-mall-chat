@@ -1099,7 +1099,10 @@ const frameInterval = 1000 / targetFPS;
             return shopNumberCounter++;
         };
 
-        let lastClockUpdate = 0;
+        let lastSkyUpdate = 0;
+let lastPositionUpdate = 0;
+let lastRotatingSignUpdate = 0;
+let lastClockUpdate = 0;
         
         // Configuración de intervalos (en milisegundos)
         const UPDATE_INTERVALS = {
