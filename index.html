@@ -1053,7 +1053,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         // --- Variables de personalización de avatar ---
         
         
-        let currentCustomization = {
+        window.currentCustomization = {
             skin: 'humanMaleA' // Skin por defecto
         };
         
@@ -4297,7 +4297,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateSkinPreview(idx) {
         img.src = skinList[idx].img;
         label.textContent = skinList[idx].label;
-        currentCustomization.skin = skinList[idx].key;
+        window.currentCustomization.skin = skinList[idx].key;
         
         // Aplicar el skin al avatar inmediatamente
         applyCustomizationToAvatar();
@@ -4361,7 +4361,7 @@ document.addEventListener('DOMContentLoaded', function() {
             applyCustomizationToAvatar();
             
             // Guardar en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            localStorage.setItem('avatarCustomization', JSON.stringify(window.currentCustomization));
             
             closeSimplePanel();
             showNotification('✅ Personalización guardada exitosamente!', 'success');
@@ -4387,7 +4387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     skinOptions.forEach(btn => {
         btn.onclick = () => {
             const selectedSkin = btn.getAttribute('data-skin');
-            currentCustomization.skin = selectedSkin;
+            window.currentCustomization.skin = selectedSkin;
             updateSelectedSkin();
             updateAvatarPreview();
             // --- FORZAR ENVÍO INMEDIATO DE SKIN A TODOS ---
@@ -4430,9 +4430,9 @@ function updateSelectedSkin() {
             const saved = localStorage.getItem('avatarCustomization');
             if (saved) {
                 try {
-                    currentCustomization = JSON.parse(saved);
+                    window.currentCustomization = JSON.parse(saved);
                     // Si falta la propiedad skin, asignar valor por defecto
-                    if (!currentCustomization.skin) currentCustomization.skin = 'humanMaleA';
+                    if (!window.currentCustomization.skin) window.currentCustomization.skin = 'humanMaleA';
                     applyCustomizationToAvatar();
                 } catch (error) {
                     console.error('Error cargando personalización:', error);
@@ -4471,9 +4471,9 @@ function applySkinToAvatar(avatarData, skinName) {
 }
 
 function applyCustomizationToAvatar() {
-            if (!currentCustomization) return;
+            if (!window.currentCustomization) return;
             
-            console.log('[applyCustomizationToAvatar] Aplicando personalización:', currentCustomization);
+            console.log('[applyCustomizationToAvatar] Aplicando personalización:', window.currentCustomization);
             
             // Actualizar el avatar del usuario actual
             if (userAvatars.has(userAlias)) {
@@ -4482,7 +4482,7 @@ function applyCustomizationToAvatar() {
                     const group = avatarData.group;
                     
                     // Aplicar skin si está definido
-                    if (currentCustomization.skin) {
+                    if (window.currentCustomization.skin) {
                         console.log('[applyCustomizationToAvatar] Aplicando skin:', currentCustomization.skin);
                         
                         const skinFileMap = {
@@ -4529,7 +4529,7 @@ function applyCustomizationToAvatar() {
             }
             
             // Guardar la personalización en localStorage
-            localStorage.setItem('avatarCustomization', JSON.stringify(currentCustomization));
+            localStorage.setItem('avatarCustomization', JSON.stringify(window.currentCustomization));
             
             console.log('[applyCustomizationToAvatar] Personalización aplicada y guardada');
         }
