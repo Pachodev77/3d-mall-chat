@@ -1024,12 +1024,7 @@ const HALL_HEIGHT = 4;
 // --- [FIX] Definir window.IS_MOBILE globalmente antes de cualquier uso ---
 
 // Ajustar velocidad de movimiento según dispositivo
-let lastTime = 0;
-let frameCount = 0;
-let fps = 60;
-const targetFPS = window.IS_MOBILE ? 30 : 60;
-const frameInterval = 1000 / targetFPS;
-        const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
+const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = window.IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
@@ -1099,10 +1094,18 @@ const frameInterval = 1000 / targetFPS;
             return shopNumberCounter++;
         };
 
+        // --- Variables de rendimiento y timing centralizado ---
+        let lastTime = 0;
+        let frameCount = 0;
+        let fps = 60;
+        const targetFPS = 60;
+        const frameInterval = 1000 / targetFPS;
+        
+        // Variables de timing para actualizaciones periódicas
         let lastSkyUpdate = 0;
-let lastPositionUpdate = 0;
-let lastRotatingSignUpdate = 0;
-let lastClockUpdate = 0;
+        let lastPositionUpdate = 0;
+        let lastRotatingSignUpdate = 0;
+        let lastClockUpdate = 0;
         
         // Configuración de intervalos (en milisegundos)
         const UPDATE_INTERVALS = {
@@ -3810,8 +3813,6 @@ let lastClockUpdate = 0;
             // Control de FPS
             const frameDeltaTime = currentTime - lastTime;
             if (frameDeltaTime < frameInterval) {
-                // Siempre actualizar animaciones de avatares aunque no renderices
-                updateAvatarAnimations(deltaTime);
                 return;
             }
             lastTime = currentTime - (frameDeltaTime % frameInterval);
@@ -4184,23 +4185,7 @@ let lastClockUpdate = 0;
             }
         }
         
-        /* [LIMPIEZA] Función legacy no usada: resetSimpleCustomization
-function resetSimpleCustomization() {
-            console.log('Restableciendo personalización');
-            
-            // Restablecer alias
-            userAlias = '';
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.value = '';
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            console.log('✅ Personalización restablecida');
-        }
-        */
+
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
@@ -4691,8 +4676,7 @@ function applyCustomizationToAvatar() {
         }
         
         // Exponer función de prueba globalmente
-        // [LIMPIEZA] Exposición global de función de test eliminada para producción
-// window.createTestAvatar = createTestAvatar;
+
         
         // Función para simular datos de posición de otro usuario
         function simulateOtherUserPosition() {
@@ -4808,7 +4792,7 @@ function debugRoomBounds() {
             console.log('==========================================');
         }
         
-        // [LIMPIEZA] Exposición global de función de debug eliminada para producción
+
 // window.debugSkinSystem = debugSkinSystem;
         
         // Función para mostrar información de los huecos de ventana
@@ -5184,27 +5168,6 @@ object.position.set(position.x, position.y + 0.3, position.z);
         // Event listener para el filtro de categorías
         document.addEventListener('DOMContentLoaded', function() {
             const categoryFilter = document.getElementById('furniture-category-filter');
-            if (categoryFilter) {
-                categoryFilter.addEventListener('change', updateAvailableFurnitureList);
-            }
-        });
-        
-        // Función para debug de muebles disponibles
-        /* [LIMPIEZA] Función de debug legacy no usada: debugAvailableFurniture
-function debugAvailableFurniture() {
-            console.log('=== DEBUG MUEBLES DISPONIBLES ===');
-            console.log('Total de muebles disponibles:', availableFurniture.length);
-            console.log('Categorías disponibles:');
-            const categories = [...new Set(availableFurniture.map(f => f.category))];
-            categories.forEach(category => {
-                const count = availableFurniture.filter(f => f.category === category).length;
-                console.log(`  ${category}: ${count} muebles`);
-            });
-            console.log('Muebles por categoría:');
-            availableFurniture.forEach(furniture => {
-                console.log(`  ${furniture.name} (${furniture.category}) - ${furniture.file}`);
-            });
-            console.log('==========================================');
         }
 */
         // Función para mostrar notificaciones
@@ -5549,13 +5512,9 @@ function updateAvatarPositions() {
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
                 // --- LÓGICA DE CONTROL DE ANIMACIÓN MEJORADA ---
-                let isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > (window.IS_MOBILE ? 0.02 : 0.1);
-        // --- OVERRIDE: En móvil, si es el avatar local y mobileForward está activo, forzar run ---
-        if (window.IS_MOBILE && alias === userAlias && window.mobileForward) {
-            isNowMoving = true;
-        }
+                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
 
-        if (isNowMoving && !avatar.isMoving) {
+                if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
                         // Transición simple sin fade para evitar cortes
@@ -5906,10 +5865,7 @@ function updateAvatarPositions() {
                     }
                 }
             }
-        }
-    // ... existing code ...
-</script>
-<script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
-<script src="animation-mobile-loop.js"></script>
+        // ... existing code ...
+    </script>
+    <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
 </body>
-</html>
