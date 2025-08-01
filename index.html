@@ -5358,7 +5358,19 @@ function createUserAvatar(alias, position = {x:0, y:0, z:0}, floor = 0, custom =
             // --- LÓGICA DE ANIMACIÓN CORRECTA ---
             const mixer = new THREE.AnimationMixer(avatar);
             const actions = {};
-            
+
+            // REGISTRO ROBUSTO EN userAvatars
+            userAvatars.set(alias, {
+                group: avatar,
+                mixer,
+                actions,
+                targetPosition: avatar.position.clone(),
+                targetRotation: avatar.rotation.y,
+                isMoving: false,
+                currentFloor: floor
+            }); // Registro robusto tras setup
+
+
             // Los clips de animación vienen en el array `animations` de los archivos cargados
             const idleClip = idleAnimation.animations[0];
             // Diagnóstico y selección inteligente de clip para 'run'
@@ -5433,8 +5445,8 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
             });
             
         }).catch(error => {
-            console.error(`Error al cargar los recursos para el avatar ${alias}:`, error);
             pendingAvatarLoads.delete(alias);
+            console.error('[createUserAvatar] Error loading avatar for:', alias, error);
         });
 }
 
