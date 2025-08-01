@@ -5549,10 +5549,13 @@ function updateAvatarPositions() {
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
                 // --- LÓGICA DE CONTROL DE ANIMACIÓN MEJORADA ---
-                const moveThreshold = window.IS_MOBILE ? 0.02 : 0.1;
-        const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > moveThreshold;
+                let isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > (window.IS_MOBILE ? 0.02 : 0.1);
+        // --- OVERRIDE: En móvil, si es el avatar local y mobileForward está activo, forzar run ---
+        if (window.IS_MOBILE && alias === userAlias && window.mobileForward) {
+            isNowMoving = true;
+        }
 
-                if (isNowMoving && !avatar.isMoving) {
+        if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
                         // Transición simple sin fade para evitar cortes
