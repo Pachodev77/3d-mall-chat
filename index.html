@@ -1016,10 +1016,11 @@
 
         // --- Constantes y Configuración Global ---
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
-        const HALL_HEIGHT = 4;
-        // Ajustar velocidad de movimiento según dispositivo
-        const IS_MOBILE = isMobileDevice();
-        const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
+const HALL_HEIGHT = 4;
+// --- [FIX] Definir IS_MOBILE globalmente antes de cualquier uso ---
+const IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// Ajustar velocidad de movimiento según dispositivo
+const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
