@@ -1022,7 +1022,7 @@ window.window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevic
         const HALL_SIZE = 90; // Aumentado 1.5 veces (60 * 1.5 = 90)
 const HALL_HEIGHT = 4;
 // --- [FIX] Definir window.IS_MOBILE globalmente antes de cualquier uso ---
-const window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 // Ajustar velocidad de movimiento según dispositivo
 const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = window.IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
