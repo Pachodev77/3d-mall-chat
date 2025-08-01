@@ -1024,7 +1024,12 @@ const HALL_HEIGHT = 4;
 // --- [FIX] Definir window.IS_MOBILE globalmente antes de cualquier uso ---
 
 // Ajustar velocidad de movimiento según dispositivo
-const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
+let lastTime = 0;
+let frameCount = 0;
+let fps = 60;
+const targetFPS = window.IS_MOBILE ? 30 : 60;
+const frameInterval = 1000 / targetFPS;
+        const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
         const ROTATE_SPEED = window.IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
