@@ -4245,7 +4245,8 @@
             }
         }
         
-        function resetSimpleCustomization() {
+        /* [LIMPIEZA] Función legacy no usada: resetSimpleCustomization
+function resetSimpleCustomization() {
             console.log('Restableciendo personalización');
             
             // Restablecer alias
@@ -4260,6 +4261,7 @@
             
             console.log('✅ Personalización restablecida');
         }
+        */
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
@@ -4700,7 +4702,8 @@ function updateSelectedSkin() {
         }
         
         // Exponer función de prueba globalmente
-        window.createTestAvatar = createTestAvatar;
+        // [LIMPIEZA] Exposición global de función de test eliminada para producción
+// window.createTestAvatar = createTestAvatar;
         
         // Función para simular datos de posición de otro usuario
         function simulateOtherUserPosition() {
@@ -4713,7 +4716,8 @@ function updateSelectedSkin() {
         window.simulateOtherUserPosition = simulateOtherUserPosition;
         
         // Función de debug específica para móvil
-        function debugMobileAnimations() {
+        /* [LIMPIEZA] Función de debug legacy no usada: debugMobileAnimations
+function debugMobileAnimations() {
             if (!IS_MOBILE) {
                 console.log('[Debug] No es dispositivo móvil');
                 return;
@@ -4737,7 +4741,8 @@ function updateSelectedSkin() {
         window.debugMobileAnimations = debugMobileAnimations;
         
         // Función para mostrar los límites de la habitación personal
-        function debugRoomBounds() {
+        /* [LIMPIEZA] Función de debug legacy no usada: debugRoomBounds
+function debugRoomBounds() {
             console.log('=== LÍMITES DE LA HABITACIÓN PERSONAL ===');
             console.log('Límites actuales:');
             console.log('  X: de -8.0 a +8.0 (16 metros de ancho)');
@@ -4814,10 +4819,12 @@ function updateSelectedSkin() {
             console.log('==========================================');
         }
         
-        window.debugSkinSystem = debugSkinSystem;
+        // [LIMPIEZA] Exposición global de función de debug eliminada para producción
+// window.debugSkinSystem = debugSkinSystem;
         
         // Función para mostrar información de los huecos de ventana
-        function debugWindows() {
+        /* [LIMPIEZA] Función de debug legacy no usada: debugWindows
+function debugWindows() {
             console.log('=== INFORMACIÓN DE HUECOS DE VENTANA ===');
             console.log('Huecos en las paredes laterales:');
             console.log('  Ubicación: Pared izquierda y derecha');
@@ -4830,7 +4837,8 @@ function updateSelectedSkin() {
         }
         
         // Función para debug de controles móviles
-        function debugMobileControls() {
+        /* [LIMPIEZA] Función de debug legacy no usada: debugMobileControls
+function debugMobileControls() {
             console.log('=== DEBUG CONTROLES MÓVILES ===');
             console.log('Estado actual de los controles:');
             console.log('  Forward:', mobileForward);
@@ -5193,7 +5201,8 @@ object.position.set(position.x, position.y + 0.3, position.z);
         });
         
         // Función para debug de muebles disponibles
-        function debugAvailableFurniture() {
+        /* [LIMPIEZA] Función de debug legacy no usada: debugAvailableFurniture
+function debugAvailableFurniture() {
             console.log('=== DEBUG MUEBLES DISPONIBLES ===');
             console.log('Total de muebles disponibles:', availableFurniture.length);
             console.log('Categorías disponibles:');
