@@ -1203,6 +1203,18 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             // --- Configurar botones de UI ---
             setupUIButtons();
 
+            // --- Envío periódico robusto de posición/timestamp a Firebase ---
+            if (typeof sendPosition === 'function') {
+                setInterval(() => {
+                    // Obtén la posición, piso y rotación actual del usuario
+                    if (typeof camera !== 'undefined' && typeof currentFloor !== 'undefined' && typeof camera !== 'undefined') {
+                        const position = camera.position ? { x: camera.position.x, y: camera.position.y, z: camera.position.z } : { x: 0, y: 0, z: 0 };
+                        const rotation = camera.rotation ? camera.rotation.y : 0;
+                        sendPosition(position, currentFloor, rotation);
+                    }
+                }, 10000); // cada 10 segundos
+            }
+
             // --- Iniciar Animación ---
             animate();
         }
@@ -4418,7 +4430,32 @@ function updateSelectedSkin() {
             }
         }
 
-        function applyCustomizationToAvatar() {
+        // --- Aplica una skin específica a cualquier avatar (propio o remoto) ---
+function applySkinToAvatar(avatarData, skinName) {
+    if (!avatarData || !avatarData.group || !skinName) return;
+    const group = avatarData.group;
+    const skinFileMap = {
+        'humanMaleA': 'humanMaleA.png',
+        'humanFemaleA': 'humanFemaleA.png',
+        'zombieMaleA': 'zombieMaleA.png',
+        'zombieFemaleA': 'zombieFemaleA.png'
+    };
+    const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load(texturePath, (texture) => {
+        group.traverse(child => {
+            if (child.isMesh && child.material) {
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+            }
+        });
+        console.log('[applySkinToAvatar] Skin aplicada a avatar remoto:', skinName);
+    }, undefined, (error) => {
+        console.error('[applySkinToAvatar] Error al cargar textura remota:', error);
+    });
+}
+
+function applyCustomizationToAvatar() {
             if (!currentCustomization) return;
             
             console.log('[applyCustomizationToAvatar] Aplicando personalización:', currentCustomization);
@@ -4538,6 +4575,12 @@ function updateSelectedSkin() {
                 while (normalizedRotation > Math.PI) normalizedRotation -= 2 * Math.PI;
                 while (normalizedRotation < -Math.PI) normalizedRotation += 2 * Math.PI;
                 avatar.targetRotation = normalizedRotation;
+
+                // --- SINCRONIZAR SKIN REMOTA ---
+                if (skin && avatar.currentSkin !== skin) {
+                    applySkinToAvatar(avatar, skin);
+                    avatar.currentSkin = skin;
+                }
             } else {
                 console.warn('[updateAvatarPosition] No se pudo crear/obtener avatar para:', alias);
             }
