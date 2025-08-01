@@ -4386,6 +4386,12 @@ document.addEventListener('DOMContentLoaded', function() {
             currentCustomization.skin = selectedSkin;
             updateSelectedSkin();
             updateAvatarPreview();
+            // --- FORZAR ENVÍO INMEDIATO DE SKIN A TODOS ---
+            if (typeof sendPosition === 'function' && typeof camera !== 'undefined' && typeof currentFloor !== 'undefined') {
+                const position = camera.position ? { x: camera.position.x, y: camera.position.y, z: camera.position.z } : { x: 0, y: 0, z: 0 };
+                const rotation = camera.rotation ? camera.rotation.y : 0;
+                sendPosition(position, currentFloor, rotation);
+            }
         };
     });
 }

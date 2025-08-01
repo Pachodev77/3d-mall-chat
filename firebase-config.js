@@ -215,7 +215,7 @@ function cleanupDisconnectedUsers() {
         if (users) {
             Object.keys(users).forEach(alias => {
                 const user = users[alias];
-                if (now - user.timestamp > 30000) {
+                if (now - user.timestamp > 90000) {
                     usersRef.child(alias).remove();
                     positionsRef.child(alias).remove();
                 }
