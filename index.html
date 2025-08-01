@@ -1061,6 +1061,10 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
         let roomNavigationPanelOpen = false;
         let personalRoomTargetPosition, personalRoomTargetRotationY;
         
+        // --- Sistema de cartel rotativo central ---
+        let rotatingSigns = [];
+        let rotatingSignTextIndexes = [];
+        
         // --- Variables para el sistema de edición de muebles ---
         let furnitureEditMode = false;
         let selectedFurniture = null;
@@ -1278,6 +1282,8 @@ const MOVE_SPEED = IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en 
             rotatingSign.position.set(HALL_SIZE / 2, signY, HALL_SIZE / 2 + cubeSize / 1.5);
             rotatingSign.rotation.y = 0; // Mirando hacia el pasillo principal
             scene.add(rotatingSign);
+            // Pintar el primer texto inmediatamente
+            updateRotatingSign(rotatingSign.material, signTexts[0]);
 
             // Cúpula
             const pyramidHeight = cubeSize * 1.5;

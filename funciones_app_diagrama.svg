@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .title { font: bold 26px sans-serif; fill: #222; }
+    .area { font: bold 22px sans-serif; fill: #1a5276; }
+    .func { font: 17px sans-serif; fill: #212f3c; }
+    .box { fill: #d6eaf8; stroke: #2980b9; stroke-width: 2; rx: 12; }
+    .groupbox { fill: #aed6f1; stroke: #2980b9; stroke-width: 2; rx: 24; }
+    .arrow { stroke: #b9770e; stroke-width: 2; marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#b9770e" />
+    </marker>
+  </defs>
+  <text x="600" y="50" text-anchor="middle" class="title">Funciones Principales de la App</text>
+  <!-- Habitación y Muebles -->
+  <rect x="40" y="100" width="500" height="370" class="groupbox"/>
+  <text x="290" y="130" text-anchor="middle" class="area">Habitación Personal y Muebles</text>
+  <rect x="70" y="150" width="180" height="38" class="box"/>
+  <text x="160" y="175" text-anchor="middle" class="func">createPersonalRoom</text>
+  <rect x="270" y="150" width="180" height="38" class="box"/>
+  <text x="360" y="175" text-anchor="middle" class="func">createRoomFurniture</text>
+  <rect x="70" y="200" width="180" height="38" class="box"/>
+  <text x="160" y="225" text-anchor="middle" class="func">addFurnitureFromPanel</text>
+  <rect x="270" y="200" width="180" height="38" class="box"/>
+  <text x="360" y="225" text-anchor="middle" class="func">loadFurnitureFBX</text>
+  <rect x="70" y="250" width="180" height="38" class="box"/>
+  <text x="160" y="275" text-anchor="middle" class="func">saveFurniturePositions</text>
+  <rect x="270" y="250" width="180" height="38" class="box"/>
+  <text x="360" y="275" text-anchor="middle" class="func">saveFurniturePositionsSilently</text>
+  <rect x="70" y="300" width="180" height="38" class="box"/>
+  <text x="160" y="325" text-anchor="middle" class="func">loadFurniturePositions</text>
+  <rect x="270" y="300" width="180" height="38" class="box"/>
+  <text x="360" y="325" text-anchor="middle" class="func">updateFurnitureList</text>
+  <rect x="70" y="350" width="180" height="38" class="box"/>
+  <text x="160" y="375" text-anchor="middle" class="func">selectFurniture</text>
+  <rect x="270" y="350" width="180" height="38" class="box"/>
+  <text x="360" y="375" text-anchor="middle" class="func">deselectFurniture</text>
+  <rect x="70" y="400" width="180" height="38" class="box"/>
+  <text x="160" y="425" text-anchor="middle" class="func">moveSelectedFurniture</text>
+  <rect x="270" y="400" width="180" height="38" class="box"/>
+  <text x="360" y="425" text-anchor="middle" class="func">clearAllFurnitureHighlights</text>
+  <rect x="170" y="450" width="180" height="38" class="box"/>
+  <text x="260" y="475" text-anchor="middle" class="func">updateAvailableFurnitureList</text>
+  <rect x="370" y="450" width="180" height="38" class="box"/>
+  <text x="460" y="475" text-anchor="middle" class="func">debugAvailableFurniture</text>
+
+  <!-- Avatares y Movimiento -->
+  <rect x="600" y="100" width="540" height="190" class="groupbox"/>
+  <text x="870" y="130" text-anchor="middle" class="area">Avatares y Movimiento</text>
+  <rect x="630" y="150" width="200" height="38" class="box"/>
+  <text x="730" y="175" text-anchor="middle" class="func">createUserAvatar</text>
+  <rect x="850" y="150" width="200" height="38" class="box"/>
+  <text x="950" y="175" text-anchor="middle" class="func">updateAvatarPositions</text>
+  <rect x="630" y="200" width="200" height="38" class="box"/>
+  <text x="730" y="225" text-anchor="middle" class="func">updateAvatarPosition</text>
+  <rect x="850" y="200" width="200" height="38" class="box"/>
+  <text x="950" y="225" text-anchor="middle" class="func">updatePersonalRoomMovement</text>
+
+  <!-- Chat y Emojis -->
+  <rect x="600" y="320" width="250" height="110" class="groupbox"/>
+  <text x="725" y="350" text-anchor="middle" class="area">Chat y Emojis</text>
+  <rect x="630" y="370" width="200" height="38" class="box"/>
+  <text x="730" y="395" text-anchor="middle" class="func">addMessageToChat</text>
+  <rect x="630" y="420" width="200" height="38" class="box"/>
+  <text x="730" y="445" text-anchor="middle" class="func">createEmojiPanel</text>
+
+  <!-- Personalización (Skins) -->
+  <rect x="900" y="320" width="240" height="110" class="groupbox"/>
+  <text x="1020" y="350" text-anchor="middle" class="area">Personalización</text>
+  <rect x="930" y="370" width="180" height="38" class="box"/>
+  <text x="1020" y="395" text-anchor="middle" class="func">updateSkinPreview</text>
+  <rect x="930" y="420" width="180" height="38" class="box"/>
+  <text x="1020" y="445" text-anchor="middle" class="func">updateSelectedSkin</text>
+
+  <!-- UI y Utilidades -->
+  <rect x="40" y="530" width="1100" height="180" class="groupbox"/>
+  <text x="590" y="560" text-anchor="middle" class="area">UI y Utilidades</text>
+  <rect x="70" y="590" width="180" height="38" class="box"/>
+  <text x="160" y="615" text-anchor="middle" class="func">onWindowResize</text>
+  <rect x="270" y="590" width="180" height="38" class="box"/>
+  <text x="360" y="615" text-anchor="middle" class="func">closeRoomNavigation</text>
+  <rect x="470" y="590" width="180" height="38" class="box"/>
+  <text x="560" y="615" text-anchor="middle" class="func">debugMobileControls</text>
+  <rect x="670" y="590" width="180" height="38" class="box"/>
+  <text x="760" y="615" text-anchor="middle" class="func">handleGameClick</text>
+  <rect x="870" y="590" width="180" height="38" class="box"/>
+  <text x="960" y="615" text-anchor="middle" class="func">updatePeriodicSystems</text>
+  <rect x="1070" y="590" width="60" height="38" class="box"/>
+  <text x="1100" y="615" text-anchor="middle" class="func">createStoreRow</text>
+
+  <!-- Flechas (relaciones principales) -->
+  <line x1="160" y1="188" x2="360" y2="188" class="arrow"/>
+  <line x1="360" y1="238" x2="360" y2="262" class="arrow"/>
+  <line x1="160" y1="238" x2="160" y2="262" class="arrow"/>
+  <line x1="160" y1="288" x2="160" y2="312" class="arrow"/>
+  <line x1="360" y1="288" x2="360" y2="312" class="arrow"/>
+  <line x1="160" y1="338" x2="160" y2="362" class="arrow"/>
+  <line x1="360" y1="338" x2="360" y2="362" class="arrow"/>
+  <line x1="160" y1="388" x2="160" y2="412" class="arrow"/>
+  <line x1="360" y1="388" x2="360" y2="412" class="arrow"/>
+</svg>
