@@ -4143,7 +4143,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         
         
         
-        function updateAvatarPreview() {
+        function updateAvatarPreview(skinKey) {
     // Contenedor para el canvas 3D
     const container = document.getElementById('avatar-3d-preview-container');
     if (!container) return;
@@ -4176,7 +4176,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
     scene.add(dir);
 
     // Obtener skin seleccionada
-    let skinName = window.currentCustomization && window.currentCustomization.skin ? window.currentCustomization.skin : 'humanMaleA';
+    let skinName = typeof skinKey === 'string' ? skinKey : (window.currentCustomization && window.currentCustomization.skin ? window.currentCustomization.skin : 'humanMaleA');
     let skinFile = window.skinFileMap && window.skinFileMap[skinName] ? window.skinFileMap[skinName] : 'assets/kenney 3d characters/Skins/humanMaleA.png';
 
     // Cargar modelo FBX y textura
@@ -4198,7 +4198,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         });
         avatar.position.set(0, 0, 0);
-        avatar.scale.set(0.012, 0.012, 0.012); // Un poco más grande para preview
+        avatar.scale.set(0.004, 0.004, 0.004); // [FIX] Un tercio del tamaño anterior para preview
         avatar.rotation.y = Math.PI/6; // Ligeramente girado para mejor vista
         scene.add(avatar);
         avatarMesh = avatar;
@@ -4338,7 +4338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         applyCustomizationToAvatar();
         
         // Actualizar preview si existe
-        updateAvatarPreview && updateAvatarPreview();
+        updateAvatarPreview && updateAvatarPreview(skinList[idx].key);
         
         console.log('[updateSkinPreview] Skin cambiado a:', skinList[idx].key);
     }
