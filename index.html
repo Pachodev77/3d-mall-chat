@@ -4176,7 +4176,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
     scene.add(dir);
 
     // Obtener skin seleccionada
-    let skinName = typeof skinKey === 'string' ? skinKey : (window.currentCustomization && window.currentCustomization.skin ? window.currentCustomization.skin : 'humanMaleA');
+    let skinName = window.currentCustomization && window.currentCustomization.skin ? window.currentCustomization.skin : 'humanMaleA';
     let skinFile = window.skinFileMap && window.skinFileMap[skinName] ? window.skinFileMap[skinName] : 'assets/kenney 3d characters/Skins/humanMaleA.png';
 
     // Cargar modelo FBX y textura
@@ -4338,7 +4338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         applyCustomizationToAvatar();
         
         // Actualizar preview si existe
-        updateAvatarPreview && updateAvatarPreview(skinList[idx].key);
+        updateAvatarPreview && updateAvatarPreview();
         
         console.log('[updateSkinPreview] Skin cambiado a:', skinList[idx].key);
     }
@@ -4353,6 +4353,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Inicializar preview
     updateSkinPreview(currentIdx);
+    updateAvatarPreview();
 
     // Alias input para preview
     const aliasInput = document.getElementById('simple-alias-input');
