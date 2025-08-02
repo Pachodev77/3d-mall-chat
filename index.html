@@ -4473,23 +4473,42 @@ function applyCustomizationToAvatar() {
             if (userAvatars.has(userAlias)) {
                 const avatarData = userAvatars.get(userAlias);
                 if (avatarData && avatarData.group) {
-                    const group = avatarData.group;
-                    
-                            group.traverse(child => {
-                                if (child.isMesh && child.material) {
-                                    child.material.map = texture;
-                                    child.material.needsUpdate = true;
-                                }
-                            });
-                            
-                            console.log('[applyCustomizationToAvatar] Skin aplicado exitosamente:', currentCustomization.skin);
-                        }, undefined, (error) => {
-                            console.error('[applyCustomizationToAvatar] Error al cargar textura:', error);
-                        });
-                    }
-                    
-                    // Aplicar colores de camisa si están definidos
-                    if (currentCustomization.shirtColor) {
+    const group = avatarData.group;
+    // --- Aplicar skin seleccionada ---
+    const skinFileMap = {
+        // Kenney pack original
+        humanMaleA: 'assets/kenney 3d characters/Skins/humanMaleA.png',
+        humanFemaleA: 'assets/kenney 3d characters/Skins/humanFemaleA.png',
+        zombieMaleA: 'assets/kenney 3d characters/Skins/zombieMaleA.png',
+        zombieFemaleA: 'assets/kenney 3d characters/Skins/zombieFemaleA.png',
+        // Kannei 3d characters 1
+        criminalMaleA: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png',
+        cyborgFemaleA: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png',
+        skaterFemaleA: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png',
+        skaterMaleA: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png',
+        // Kennei 3d characters 2
+        survivorFemaleA: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png',
+        survivorMaleB: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png',
+        zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
+        zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
+    };
+    const skinKey = window.currentCustomization.skin || 'humanMaleA';
+    const texturePath = skinFileMap[skinKey] || skinFileMap['humanMaleA'];
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load(texturePath, (texture) => {
+        group.traverse(child => {
+            if (child.isMesh && child.material) {
+                child.material.map = texture;
+                child.material.needsUpdate = true;
+            }
+        });
+        console.log('[applyCustomizationToAvatar] Skin aplicado exitosamente:', skinKey);
+    }, undefined, (error) => {
+        console.error('[applyCustomizationToAvatar] Error al cargar textura:', error);
+    });
+
+    // --- Aplicar colores de camisa si están definidos ---
+    if (window.currentCustomization.shirtColor) {
                         console.log('[applyCustomizationToAvatar] Aplicando color de camisa:', currentCustomization.shirtColor);
                         
                         group.traverse(child => {
