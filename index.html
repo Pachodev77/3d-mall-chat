@@ -4185,23 +4185,6 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-        /* [LIMPIEZA] Función legacy no usada: resetSimpleCustomization
-function resetSimpleCustomization() {
-            console.log('Restableciendo personalización');
-            
-            // Restablecer alias
-            userAlias = '';
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (aliasInput) {
-                aliasInput.value = '';
-            }
-            
-            // Actualizar vista previa
-            updateAvatarPreview();
-            
-            console.log('✅ Personalización restablecida');
-        }
-        */
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
@@ -4492,34 +4475,6 @@ function applyCustomizationToAvatar() {
                 if (avatarData && avatarData.group) {
                     const group = avatarData.group;
                     
-                    // Aplicar skin si está definido
-                    if (window.currentCustomization.skin) {
-                        console.log('[applyCustomizationToAvatar] Aplicando skin:', window.currentCustomization.skin);
-                        
-                        const skinFileMap = {
-                            // Kenney pack original
-                            humanMaleA: 'assets/kenney 3d characters/Skins/humanMaleA.png',
-                            humanFemaleA: 'assets/kenney 3d characters/Skins/humanFemaleA.png',
-                            zombieMaleA: 'assets/kenney 3d characters/Skins/zombieMaleA.png',
-                            zombieFemaleA: 'assets/kenney 3d characters/Skins/zombieFemaleA.png',
-                            // Kannei 3d characters 1
-                            criminalMaleA: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png',
-                            cyborgFemaleA: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png',
-                            skaterFemaleA: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png',
-                            skaterMaleA: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png',
-                            // Kennei 3d characters 2
-                            survivorFemaleA: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png',
-                            survivorMaleB: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png',
-                            zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
-                            zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
-                        };
-                        
-                        const texturePath = skinFileMap[window.currentCustomization.skin] || 'assets/kenney 3d characters/Skins/humanMaleA.png';
-                        
-                        // Cargar nueva textura
-                        const textureLoader = new THREE.TextureLoader();
-                        textureLoader.load(texturePath, (texture) => {
-                            // Aplicar la textura al modelo
                             group.traverse(child => {
                                 if (child.isMesh && child.material) {
                                     child.material.map = texture;
