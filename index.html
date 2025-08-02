@@ -1091,7 +1091,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
+        const mouse = new THREE.Vector2(); // Declaración global única para evitar errores de redeclaración
         let targetPosition;
         let targetRotationY;
         let currentFloor = 0;
