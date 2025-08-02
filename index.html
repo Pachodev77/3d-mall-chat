@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paseo Virtual por Centro Comercial</title>
     <script>
+// --- [FIX GLOBAL] Definir función isMobileDevice antes de usar window.IS_MOBILE ---
+function isMobileDevice() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isMobileWidth = window.innerWidth <= 768;
+    const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    return isMobileUA || isMobileWidth || hasTouchSupport;
+}
 // --- [FIX GLOBAL] Definir window.IS_MOBILE globalmente antes de cualquier otro script ---
-window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+window.IS_MOBILE = isMobileDevice();
 // --- [SKIN MAP GLOBAL] ---
 window.skinFileMap = {
     // Kenney pack original
