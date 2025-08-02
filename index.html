@@ -7,6 +7,24 @@
     <script>
 // --- [FIX GLOBAL] Definir window.IS_MOBILE globalmente antes de cualquier otro script ---
 window.window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// --- [SKIN MAP GLOBAL] ---
+window.skinFileMap = {
+    // Kenney pack original
+    humanMaleA: 'assets/kenney 3d characters/Skins/humanMaleA.png',
+    humanFemaleA: 'assets/kenney 3d characters/Skins/humanFemaleA.png',
+    zombieMaleA: 'assets/kenney 3d characters/Skins/zombieMaleA.png',
+    zombieFemaleA: 'assets/kenney 3d characters/Skins/zombieFemaleA.png',
+    // Kannei 3d characters 1
+    criminalMaleA: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png',
+    cyborgFemaleA: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png',
+    skaterFemaleA: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png',
+    skaterMaleA: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png',
+    // Kennei 3d characters 2
+    survivorFemaleA: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png',
+    survivorMaleB: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png',
+    zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
+    zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
+};
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
@@ -4147,40 +4165,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
                         <!-- Skin thumbnail -->
                         <img src="${skinImgSrc}" alt="skin" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 2px; border-radius: 8px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" />
-                        <!-- Cabeza cuadrada -->
-                        <div style="width: 40px; height: 40px; background: #FFE4C4; border: 2px solid #333; position: relative; margin-bottom: 0;">
-                            <!-- Ojos -->
-                            <div style="position: absolute; top: 12px; left: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <div style="position: absolute; top: 12px; right: 10px; width: 6px; height: 6px; background: #222; border-radius: 1px;"></div>
-                            <!-- Boca -->
-                            <div style="position: absolute; bottom: 10px; left: 12px; width: 16px; height: 4px; background: #222; border-radius: 1px;"></div>
-                        </div>
-                        <!-- Torso y brazos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px;">
-                            <!-- Brazo izquierdo -->
-                            <div style="width: 16px; height: 50px; background: #8B4513; border: 2px solid #333; margin-right: 0;"></div>
-                            <!-- Torso -->
-                            <div style="width: 28px; height: 50px; background: #8B4513; border: 2px solid #333; margin: 0 0;"></div>
-                            <!-- Brazo derecho -->
-                            <div style="width: 16px; height: 50px; background: #8B4513; border: 2px solid #333; margin-left: 0;"></div>
-                        </div>
-                        <!-- Piernas -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 50px; margin-top: 0;">
-                            <!-- Pierna izquierda -->
-                            <div style="width: 16px; height: 50px; background: #2F4F4F; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pierna derecha -->
-                            <div style="width: 16px; height: 50px; background: #2F4F4F; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Zapatos -->
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; height: 12px; margin-top: -2px;">
-                            <!-- Pie izquierdo -->
-                            <div style="width: 16px; height: 12px; background: #696969; border: 2px solid #333; margin-right: 4px;"></div>
-                            <!-- Pie derecho -->
-                            <div style="width: 16px; height: 12px; background: #696969; border: 2px solid #333; margin-left: 4px;"></div>
-                        </div>
-                        <!-- Nombre del avatar -->
-                        <div style="color: #FFD700; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); width: 100%;">${currentAlias || 'Sin nombre'}</div>
-                    </div>
+                        
                 `;
             }
         }
@@ -4442,15 +4427,13 @@ function applySkinToAvatar(avatarData, skinName) {
         console.warn('[applySkinToAvatar] Avatar o skin inválido:', avatarData, skinName);
         return;
     }
-    if (!avatarData || !avatarData.group || !skinName) return;
     const group = avatarData.group;
-    const skinFileMap = {
-        'humanMaleA': 'humanMaleA.png',
-        'humanFemaleA': 'humanFemaleA.png',
-        'zombieMaleA': 'zombieMaleA.png',
-        'zombieFemaleA': 'zombieFemaleA.png'
-    };
-    const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[skinName] || 'humanMaleA.png'}`;
+    const skinFileMap = window.skinFileMap;
+    const texturePath = skinFileMap[skinName];
+    if (!texturePath) {
+        console.warn('[applySkinToAvatar] Skin no encontrada en skinFileMap:', skinName);
+        return;
+    }
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(texturePath, (texture) => {
         group.traverse(child => {
@@ -4476,25 +4459,13 @@ function applyCustomizationToAvatar() {
                 if (avatarData && avatarData.group) {
     const group = avatarData.group;
     // --- Aplicar skin seleccionada ---
-    const skinFileMap = {
-        // Kenney pack original
-        humanMaleA: 'assets/kenney 3d characters/Skins/humanMaleA.png',
-        humanFemaleA: 'assets/kenney 3d characters/Skins/humanFemaleA.png',
-        zombieMaleA: 'assets/kenney 3d characters/Skins/zombieMaleA.png',
-        zombieFemaleA: 'assets/kenney 3d characters/Skins/zombieFemaleA.png',
-        // Kannei 3d characters 1
-        criminalMaleA: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png',
-        cyborgFemaleA: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png',
-        skaterFemaleA: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png',
-        skaterMaleA: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png',
-        // Kennei 3d characters 2
-        survivorFemaleA: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png',
-        survivorMaleB: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png',
-        zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
-        zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
-    };
+    const skinFileMap = window.skinFileMap;
     const skinKey = window.currentCustomization.skin || 'humanMaleA';
-    const texturePath = skinFileMap[skinKey] || skinFileMap['humanMaleA'];
+    const texturePath = skinFileMap[skinKey];
+    if (!texturePath) {
+        console.warn('[applyCustomizationToAvatar] Skin no encontrada en skinFileMap:', skinKey);
+        return;
+    }
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(texturePath, (texture) => {
         group.traverse(child => {
@@ -4531,17 +4502,14 @@ function applyCustomizationToAvatar() {
             console.log('[applyCustomizationToAvatar] Personalización aplicada y guardada');
         }
 
-        // El manejo de cierre de paneles ahora está integrado en handleGlobalClick
-
-        // El manejo del overlay ahora está integrado en handleGlobalClick
+  
 
         // Cargar personalización al iniciar
         loadCustomization();
 
         function sendUserPosition() {
             if (userAlias) {
-                // TODO: Enviar posición a Firebase
-                // firebase.database().ref('positions').child(userAlias).set({ ... })
+                
             }
         }
 
@@ -4688,9 +4656,7 @@ function applyCustomizationToAvatar() {
             createUserAvatar('TEST_USER', testPosition, 0, testCustom);
         }
         
-        // Exponer función de prueba globalmente
-        // [LIMPIEZA] Exposición global de función de test eliminada para producción
-// window.createTestAvatar = createTestAvatar;
+        
         
         // Función para simular datos de posición de otro usuario
         function simulateOtherUserPosition() {
@@ -4702,141 +4668,7 @@ function applyCustomizationToAvatar() {
         // Exponer función de simulación globalmente
         window.simulateOtherUserPosition = simulateOtherUserPosition;
         
-        // Función de debug específica para móvil
-        /* [LIMPIEZA] Función de debug legacy no usada: debugMobileAnimations
-function debugMobileAnimations() {
-            if (!window.IS_MOBILE) {
-                console.log('[Debug] No es dispositivo móvil');
-                return;
-            }
-            
-            console.log('=== DEBUG ANIMACIONES MÓVIL ===');
-            console.log('Total avatares:', userAvatars.size);
-            
-            userAvatars.forEach((avatar, alias) => {
-                console.log(`Avatar: ${alias}`);
-                if (avatar.actions) {
-                    Object.entries(avatar.actions).forEach(([name, action]) => {
-                        console.log(`  ${name}: running=${action.isRunning()}, weight=${action.getEffectiveWeight()}, timeScale=${action.timeScale}`);
-                    });
-                }
-            });
-            console.log('================================');
-        }
-*/
-        // Exponer función de debug globalmente
-        // window.debugMobileAnimations = debugMobileAnimations;
         
-        // Función para mostrar los límites de la habitación personal
-        /* [LIMPIEZA] Función de debug legacy no usada: debugRoomBounds
-function debugRoomBounds() {
-            console.log('=== LÍMITES DE LA HABITACIÓN PERSONAL ===');
-            console.log('Límites actuales:');
-            console.log('  X: de -8.0 a +8.0 (16 metros de ancho)');
-            console.log('  Z: de -8.0 a +8.0 (16 metros de largo)');
-            console.log('  Área total: 16x16 = 256 metros cuadrados');
-            
-            if (personalRoomCamera) {
-                console.log('Posición actual de la cámara:');
-                console.log('  X:', personalRoomCamera.position.x.toFixed(2));
-                console.log('  Y:', personalRoomCamera.position.y.toFixed(2));
-                console.log('  Z:', personalRoomCamera.position.z.toFixed(2));
-            }
-            console.log('==========================================');
-        }
-        
-        // Exponer función de debug globalmente
-        window.debugRoomBounds = debugRoomBounds;
-        window.debugAvailableFurniture = debugAvailableFurniture;
-        window.debugMobileControls = debugMobileControls;
-        
-        
-        // Función para debug del estado de la habitación
-        function debugRoomState() {
-            console.log('=== DEBUG ESTADO DE HABITACIÓN ===');
-            console.log('Escena actual:', currentScene);
-            console.log('Escena de habitación personal existe:', !!personalRoomScene);
-            console.log('Total de muebles en la habitación:', furnitureObjects.length);
-            console.log('Muebles en la habitación:');
-            furnitureObjects.forEach((furniture, index) => {
-                console.log(`  ${index + 1}. ${furniture.name} (ID: ${furniture.id})`);
-                console.log(`     Posición: (${furniture.mesh.position.x.toFixed(2)}, ${furniture.mesh.position.y.toFixed(2)}, ${furniture.mesh.position.z.toFixed(2)})`);
-                console.log(`     Escala: (${furniture.mesh.scale.x.toFixed(2)}, ${furniture.mesh.scale.y.toFixed(2)}, ${furniture.mesh.scale.z.toFixed(2)})`);
-                console.log(`     En escena:`, personalRoomScene.children.includes(furniture.mesh));
-            });
-            console.log('==========================================');
-        }
-        
-        window.debugRoomState = debugRoomState;
-        
-        // Función para debug del sistema de skins
-        function debugSkinSystem() {
-            console.log('=== DEBUG SISTEMA DE SKINS ===');
-            console.log('Personalización actual:', currentCustomization);
-            console.log('Avatar del usuario existe:', userAvatars.has(userAlias));
-            
-            if (userAvatars.has(userAlias)) {
-                const avatarData = userAvatars.get(userAlias);
-                console.log('Datos del avatar:', avatarData);
-                
-                if (avatarData && avatarData.group) {
-                    console.log('Materiales del avatar:');
-                    avatarData.group.traverse(child => {
-                        if (child.isMesh && child.material) {
-                            console.log(`  - ${child.name}:`, {
-                                material: child.material.name || 'Sin nombre',
-                                hasTexture: !!child.material.map,
-                                texturePath: child.material.map ? 'Cargada' : 'No cargada'
-                            });
-                        }
-                    });
-                }
-            }
-            
-            console.log('Skins disponibles:');
-            const skinList = [
-                { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-                { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-                { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-                { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-            ];
-            skinList.forEach(skin => {
-                console.log(`  - ${skin.key}: ${skin.label}`);
-            });
-            console.log('==========================================');
-        }
-        
-        // [LIMPIEZA] Exposición global de función de debug eliminada para producción
-// window.debugSkinSystem = debugSkinSystem;
-        
-        // Función para mostrar información de los huecos de ventana
-        /* [LIMPIEZA] Función de debug legacy no usada: debugWindows
-function debugWindows() {
-            console.log('=== INFORMACIÓN DE HUECOS DE VENTANA ===');
-            console.log('Huecos en las paredes laterales:');
-            console.log('  Ubicación: Pared izquierda y derecha');
-            console.log('  Tamaño: 4x2.5 metros (igual que las ventanas anteriores)');
-            console.log('  Posición: Centrados en altura (1.85m)');
-            console.log('  Tipo: Huecos reales en las paredes (sin vidrio)');
-            console.log('  Ventajas: Visibilidad completa, sin obstrucciones');
-            console.log('  Dimensiones exactas: 4m de ancho x 2.5m de alto');
-            console.log('==========================================');
-        }
-*/
-        // Función para debug de controles móviles
-        /* [LIMPIEZA] Función de debug legacy no usada: debugMobileControls
-function debugMobileControls() {
-            console.log('=== DEBUG CONTROLES MÓVILES ===');
-            console.log('Estado actual de los controles:');
-            console.log('  Forward:', mobileForward);
-            console.log('  Backward:', mobileBackward);
-            console.log('  Left:', mobileLeft);
-            console.log('  Right:', mobileRight);
-            console.log('Dispositivo móvil detectado:', window.IS_MOBILE);
-            console.log('Controles visibles:', document.getElementById('mobile-controls').style.display !== 'none');
-            console.log('==========================================');
-        }
-*/
         // Lista de muebles disponibles de la carpeta 3d furniture
         const availableFurniture = [
             // Muebles de sala
