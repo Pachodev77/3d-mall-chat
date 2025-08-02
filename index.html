@@ -4280,11 +4280,22 @@ function resetSimpleCustomization() {
 document.addEventListener('DOMContentLoaded', function() {
     // Skins disponibles
     const skinList = [
-        { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
-        { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
-        { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
-        { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' }
-    ];
+    // Kenney pack original
+    { key: 'humanMaleA', label: 'Humano Masculino', img: 'assets/kenney 3d characters/Skins/humanMaleA.png' },
+    { key: 'humanFemaleA', label: 'Humano Femenino', img: 'assets/kenney 3d characters/Skins/humanFemaleA.png' },
+    { key: 'zombieMaleA', label: 'Zombie Masculino', img: 'assets/kenney 3d characters/Skins/zombieMaleA.png' },
+    { key: 'zombieFemaleA', label: 'Zombie Femenino', img: 'assets/kenney 3d characters/Skins/zombieFemaleA.png' },
+    // Kannei 3d characters 1
+    { key: 'criminalMaleA', label: 'Criminal Masculino', img: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png' },
+    { key: 'cyborgFemaleA', label: 'Cyborg Femenino', img: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png' },
+    { key: 'skaterFemaleA', label: 'Skater Femenina', img: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png' },
+    { key: 'skaterMaleA', label: 'Skater Masculino', img: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png' },
+    // Kennei 3d characters 2
+    { key: 'survivorFemaleA', label: 'Sobreviviente Femenina', img: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png' },
+    { key: 'survivorMaleB', label: 'Sobreviviente Masculino', img: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png' },
+    { key: 'zombieA', label: 'Zombie A', img: 'assets/kennei 3d characters 2/Skins/zombieA.png' },
+    { key: 'zombieC', label: 'Zombie C', img: 'assets/kennei 3d characters 2/Skins/zombieC.png' }
+];
     // Obtener elementos
     const prevBtn = document.getElementById('skin-prev-btn');
     const nextBtn = document.getElementById('skin-next-btn');
@@ -4486,13 +4497,24 @@ function applyCustomizationToAvatar() {
                         console.log('[applyCustomizationToAvatar] Aplicando skin:', currentCustomization.skin);
                         
                         const skinFileMap = {
-                            'humanMaleA': 'humanMaleA.png',
-                            'humanFemaleA': 'humanFemaleA.png',
-                            'zombieMaleA': 'zombieMaleA.png',
-                            'zombieFemaleA': 'zombieFemaleA.png'
+                            // Kenney pack original
+                            humanMaleA: 'assets/kenney 3d characters/Skins/humanMaleA.png',
+                            humanFemaleA: 'assets/kenney 3d characters/Skins/humanFemaleA.png',
+                            zombieMaleA: 'assets/kenney 3d characters/Skins/zombieMaleA.png',
+                            zombieFemaleA: 'assets/kenney 3d characters/Skins/zombieFemaleA.png',
+                            // Kannei 3d characters 1
+                            criminalMaleA: 'assets/kannei 3d characters 1/Skins/criminalMaleA.png',
+                            cyborgFemaleA: 'assets/kannei 3d characters 1/Skins/cyborgFemaleA.png',
+                            skaterFemaleA: 'assets/kannei 3d characters 1/Skins/skaterFemaleA.png',
+                            skaterMaleA: 'assets/kannei 3d characters 1/Skins/skaterMaleA.png',
+                            // Kennei 3d characters 2
+                            survivorFemaleA: 'assets/kennei 3d characters 2/Skins/survivorFemaleA.png',
+                            survivorMaleB: 'assets/kennei 3d characters 2/Skins/survivorMaleB.png',
+                            zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
+                            zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
                         };
                         
-                        const texturePath = `assets/kenney 3d characters/Skins/${skinFileMap[currentCustomization.skin] || 'humanMaleA.png'}`;
+                        const texturePath = skinFileMap[currentCustomization.skin] || 'humanMaleA.png';
                         
                         // Cargar nueva textura
                         const textureLoader = new THREE.TextureLoader();
