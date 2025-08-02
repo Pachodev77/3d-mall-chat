@@ -3294,110 +3294,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             keyboard.position.set(0, 0.75, 0.5);
             computerGroup.add(keyboard);
             
-            // Mouse
-            const mouseGeometry = new THREE.BoxGeometry(0.12, 0.05, 0.2);
-            const mouseMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
-            const mouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
-            mouse.position.set(1.2, 0.75, 0.5);
-            computerGroup.add(mouse);
-            
-            // Registrar grupo de computadora en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Computadora',
-                mesh: computerGroup,
-                type: 'computer'
-            });
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(computerGroup);
-            
-            // ===== ZONA DE ALMACENAMIENTO =====
-            
-            // Estantería grande - Crear grupo para todas las partes
-            const shelfGroup = new THREE.Group();
-            shelfGroup.position.set(5.5, 0, 0);
-            
-            // Estructura principal de la estantería
-            const shelfGeometry = new THREE.BoxGeometry(2, 2.2, 0.5);
-            const shelfMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
-            shelf.position.set(0, 1.1, 0);
-            shelfGroup.add(shelf);
-            
-            // Registrar grupo de estantería en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Estantería',
-                mesh: shelfGroup,
-                type: 'shelf'
-            });
-            
-            // Estantes de la estantería
-            for (let i = 0; i < 4; i++) {
-                const shelfLevelGeometry = new THREE.BoxGeometry(2, 0.05, 0.5);
-                const shelfLevel = new THREE.Mesh(shelfLevelGeometry, shelfMaterial);
-                shelfLevel.position.set(0, 0.3 + i * 0.5, 0);
-                shelfGroup.add(shelfLevel);
-            }
-            
-            // Libros en la estantería
-            for (let i = 0; i < 8; i++) {
-                const bookGeometry = new THREE.BoxGeometry(0.15, 0.25, 0.4);
-                const bookMaterial = getCachedMaterial(0xE74C3C + i * 0x111111, 0.8, 0.1);
-                const book = new THREE.Mesh(bookGeometry, bookMaterial);
-                const row = Math.floor(i / 4);
-                const col = i % 4;
-                book.position.set((col - 1.5) * 0.2, 0.4 + row * 0.5, 0);
-                shelfGroup.add(book);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(shelfGroup);
-            
-            // ===== ZONA DE RELAX (Centro) =====
-            
-            // Sofá pequeño - Crear grupo para todas las partes
-            const sofaGroup = new THREE.Group();
-            sofaGroup.position.set(0, 0, 2);
-            
-            // Estructura principal del sofá
-            const sofaGeometry = new THREE.BoxGeometry(2.5, 0.8, 1);
-            const sofaMaterial = getCachedMaterial(0x3498DB, 0.8, 0.1);
-            const sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
-            sofa.position.set(0, 0.4, 0);
-            sofaGroup.add(sofa);
-            
-            // Registrar grupo de sofá en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Sofá',
-                mesh: sofaGroup,
-                type: 'sofa'
-            });
-            
-            // Cojines del sofá
-            for (let i = 0; i < 3; i++) {
-                const cushionGeometry = new THREE.BoxGeometry(0.7, 0.2, 0.8);
-                const cushionMaterial = getCachedMaterial(0x2980B9, 0.8, 0.1);
-                const cushion = new THREE.Mesh(cushionGeometry, cushionMaterial);
-                cushion.position.set(-0.8 + i * 0.8, 0.6, 0);
-                sofaGroup.add(cushion);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(sofaGroup);
-            
-            // Mesa de centro - Crear grupo para todas las partes
-            const coffeeTableGroup = new THREE.Group();
-            coffeeTableGroup.position.set(0, 0, 3.5);
-            
-            const coffeeTableGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.8);
-            const coffeeTableMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const coffeeTable = new THREE.Mesh(coffeeTableGeometry, coffeeTableMaterial);
-            coffeeTable.position.set(0, 0.5, 0);
-            coffeeTableGroup.add(coffeeTable);
-            
+            // [ELIMINADO] Muebles antiguos (escritorio, silla, computadora, estantería, sofá, mesa, etc. creados por geometría). Ahora solo se cargan muebles GLB desde la persistencia.
+
+            // Si deseas añadir decoración por defecto, hazlo únicamente cargando modelos GLB desde la carpeta correspondiente y usando loadFurnitureFBX o similar.
+
+            // Fin de bloque de muebles antiguos eliminados.
             // Patas de la mesa de centro
             for (let i = 0; i < 4; i++) {
                 const tableLegGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 6);
