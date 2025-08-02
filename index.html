@@ -3602,9 +3602,8 @@ function loadFurniturePositions() {
     // Ahora solo delega en el nuevo sistema robusto
     loadFurnitureInventory();
 }
-        }
-        
-        function selectFurniture(furnitureId) {
+
+         function selectFurniture(furnitureId) {
             const furniture = furnitureObjects.find(f => f.id === furnitureId);
             if (!furniture) return;
             
