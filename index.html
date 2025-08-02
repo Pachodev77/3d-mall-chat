@@ -4494,7 +4494,7 @@ function applyCustomizationToAvatar() {
                     
                     // Aplicar skin si está definido
                     if (window.currentCustomization.skin) {
-                        console.log('[applyCustomizationToAvatar] Aplicando skin:', currentCustomization.skin);
+                        console.log('[applyCustomizationToAvatar] Aplicando skin:', window.currentCustomization.skin);
                         
                         const skinFileMap = {
                             // Kenney pack original
@@ -4514,7 +4514,7 @@ function applyCustomizationToAvatar() {
                             zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
                         };
                         
-                        const texturePath = skinFileMap[currentCustomization.skin] || 'humanMaleA.png';
+                        const texturePath = skinFileMap[window.currentCustomization.skin] || 'assets/kenney 3d characters/Skins/humanMaleA.png';
                         
                         // Cargar nueva textura
                         const textureLoader = new THREE.TextureLoader();
