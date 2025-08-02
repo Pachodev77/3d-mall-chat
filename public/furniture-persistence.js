@@ -60,10 +60,7 @@ async function loadFurnitureInventory() {
             if (entry.type === 'custom' && entry.file) {
                 // Mueble personalizado, cargar GLB
                 await loadFurnitureFBX(entry, entry.position, entry.rotation.y);
-            } else {
-                // Mueble por defecto, recrear por tipo
-                createDefaultFurniture(entry);
-            }
+            } // Solo cargar muebles GLB. Muebles antiguos ignorados.
         }
         console.log('[persistencia] Inventario de muebles restaurado:', inventory);
         return inventory;
@@ -74,13 +71,10 @@ async function loadFurnitureInventory() {
 }
 
 // Crea un mueble por defecto (cama, escritorio, etc) en la posición/rotación indicada
-function createDefaultFurniture(entry) {
-    if (!personalRoomScene) return;
-    let mesh = null;
-    let obj = null;
-    switch (entry.type) {
-        case 'bed': {
-            const bedGroup = new THREE.Group();
+// [ELIMINADO] function createDefaultFurniture(entry) { /* Eliminado: solo se permiten muebles GLB */ }
+
+
+
             bedGroup.position.set(entry.position.x, entry.position.y, entry.position.z);
             bedGroup.rotation.y = entry.rotation.y;
             // Marco
@@ -108,8 +102,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        case 'nightstand': {
-            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
+
+
             const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
             mesh = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
             mesh.position.set(entry.position.x, entry.position.y, entry.position.z);
@@ -117,8 +111,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        case 'lamp': {
-            const lampGroup = new THREE.Group();
+
+
             lampGroup.position.set(entry.position.x, entry.position.y, entry.position.z);
             lampGroup.rotation.y = entry.rotation.y;
             const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.1, 8);
@@ -141,8 +135,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        case 'desk': {
-            const deskGroup = new THREE.Group();
+
+
             deskGroup.position.set(entry.position.x, entry.position.y, entry.position.z);
             deskGroup.rotation.y = entry.rotation.y;
             const deskGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.2);
@@ -163,8 +157,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        case 'chair': {
-            const chairGroup = new THREE.Group();
+
+
             chairGroup.position.set(entry.position.x, entry.position.y, entry.position.z);
             chairGroup.rotation.y = entry.rotation.y;
             const chairSeatGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.7);
@@ -190,8 +184,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        case 'computer': {
-            const computerGroup = new THREE.Group();
+
+
             computerGroup.position.set(entry.position.x, entry.position.y, entry.position.z);
             computerGroup.rotation.y = entry.rotation.y;
             const monitorGeometry = new THREE.BoxGeometry(1.4, 0.9, 0.1);
@@ -223,10 +217,8 @@ function createDefaultFurniture(entry) {
             obj = { id: entry.id, name: entry.name, mesh, type: entry.type };
             break;
         }
-        default:
-            return;
-    }
-    if (mesh && personalRoomScene) {
+
+
         personalRoomScene.add(mesh);
         furnitureObjects.push(obj);
     }

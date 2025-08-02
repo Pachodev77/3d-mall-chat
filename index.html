@@ -2924,9 +2924,6 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // Crear habitación
             createPersonalRoom();
 
-            // Crear muebles por defecto
-            createRoomFurniture(24, 3.5, 24);
-
             // Restaurar posiciones de muebles si existen
             loadFurniturePositions();
             
@@ -3082,7 +3079,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
 
         }
         
-        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
+        // [ELIMINADO] function createRoomFurniture(roomWidth, roomHeight, roomDepth) { /* Eliminado: solo muebles GLB */ }
             // Limpiar array de muebles
             furnitureObjects = [];
             let furnitureId = 1;
@@ -5591,8 +5588,13 @@ function updateAvatarPositions() {
             connectToChat(userAlias);
         });
         
-        // Limpiar al cerrar la página
+        // Guardar muebles y limpiar al cerrar la página
         window.addEventListener('beforeunload', () => {
+            try {
+                if (typeof saveFurnitureInventory === 'function') saveFurnitureInventory();
+                if (typeof saveFurniturePositionsSilently === 'function') saveFurniturePositionsSilently();
+            } catch (e) { console.warn('Error guardando muebles al salir:', e); }
+            cleanup();
             disconnectFromChat();
         });
 
