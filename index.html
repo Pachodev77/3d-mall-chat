@@ -4185,7 +4185,23 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-
+        /* [LIMPIEZA] Función legacy no usada: resetSimpleCustomization
+function resetSimpleCustomization() {
+            console.log('Restableciendo personalización');
+            
+            // Restablecer alias
+            userAlias = '';
+            const aliasInput = document.getElementById('simple-alias-input');
+            if (aliasInput) {
+                aliasInput.value = '';
+            }
+            
+            // Actualizar vista previa
+            updateAvatarPreview();
+            
+            console.log('✅ Personalización restablecida');
+        }
+        */
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
@@ -4676,7 +4692,8 @@ function applyCustomizationToAvatar() {
         }
         
         // Exponer función de prueba globalmente
-
+        // [LIMPIEZA] Exposición global de función de test eliminada para producción
+// window.createTestAvatar = createTestAvatar;
         
         // Función para simular datos de posición de otro usuario
         function simulateOtherUserPosition() {
@@ -4792,7 +4809,7 @@ function debugRoomBounds() {
             console.log('==========================================');
         }
         
-
+        // [LIMPIEZA] Exposición global de función de debug eliminada para producción
 // window.debugSkinSystem = debugSkinSystem;
         
         // Función para mostrar información de los huecos de ventana
@@ -5098,6 +5115,8 @@ object.position.set(position.x, position.y + 0.3, position.z);
                     
                     // Seleccionar el mueble recién agregado
                     selectFurniture(furnitureObject.id);
+                    // Guardar posición inicial automáticamente
+                    saveFurniturePositionsSilently();
                     
                     // Mostrar mensaje de éxito
                     showNotification(`✅ ${furnitureData.name} agregado exitosamente`, 'success');
@@ -5168,6 +5187,27 @@ object.position.set(position.x, position.y + 0.3, position.z);
         // Event listener para el filtro de categorías
         document.addEventListener('DOMContentLoaded', function() {
             const categoryFilter = document.getElementById('furniture-category-filter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', updateAvailableFurnitureList);
+            }
+        });
+        
+        // Función para debug de muebles disponibles
+        /* [LIMPIEZA] Función de debug legacy no usada: debugAvailableFurniture
+function debugAvailableFurniture() {
+            console.log('=== DEBUG MUEBLES DISPONIBLES ===');
+            console.log('Total de muebles disponibles:', availableFurniture.length);
+            console.log('Categorías disponibles:');
+            const categories = [...new Set(availableFurniture.map(f => f.category))];
+            categories.forEach(category => {
+                const count = availableFurniture.filter(f => f.category === category).length;
+                console.log(`  ${category}: ${count} muebles`);
+            });
+            console.log('Muebles por categoría:');
+            availableFurniture.forEach(furniture => {
+                console.log(`  ${furniture.name} (${furniture.category}) - ${furniture.file}`);
+            });
+            console.log('==========================================');
         }
 */
         // Función para mostrar notificaciones
