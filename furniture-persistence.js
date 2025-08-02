@@ -19,6 +19,11 @@
 
 const FURNITURE_PERSIST_KEY = 'furnitureInventory';
 
+// Exponer funciones globalmente para compatibilidad con <script src=...>
+window.loadFurnitureInventory = loadFurnitureInventory;
+window.saveFurnitureInventory = saveFurnitureInventory;
+
+
 function saveFurnitureInventory() {
     const inventory = furnitureObjects.map(f => ({
         id: f.id,
