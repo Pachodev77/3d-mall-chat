@@ -908,7 +908,7 @@ window.skinFileMap = {
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
                         <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
-                            <img id="skin-preview-img" src="assets/kenney 3d characters/Skins/humanMaleA.png" alt="Skin Preview" style="width: 64px; height: 64px; object-fit: contain; border-radius: 10px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px;" />
+                            <div id="avatar-3d-preview-container" style="width: 120px; height: 160px; background: #222; border-radius: 10px; border: 2px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
                             <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
                         </div>
                         <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
@@ -4144,32 +4144,87 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         
         
         function updateAvatarPreview() {
-            const previewDiv = document.getElementById('avatar-preview');
-            const aliasInput = document.getElementById('simple-alias-input');
-            if (previewDiv) {
-                // Obtener el skin seleccionado
-                let skinName = currentCustomization && currentCustomization.skin ? currentCustomization.skin : (typeof skin !== 'undefined' ? skin : 'humanMaleA');
-                // Mapear nombre a archivo
-                const skinFileMap = {
-                    'humanMaleA': 'humanMaleA.png',
-                    'humanFemaleA': 'humanFemaleA.png',
-                    'zombieMaleA': 'zombieMaleA.png',
-                    'zombieFemaleA': 'zombieFemaleA.png'
-                };
-                const skinFile = skinFileMap[skinName] || 'humanMaleA.png';
-                const skinImgSrc = `assets/kenney 3d characters/Skins/${skinFile}`;
+    // Contenedor para el canvas 3D
+    const container = document.getElementById('avatar-3d-preview-container');
+    if (!container) return;
 
-                // Actualizar el alias en la vista previa
-                const currentAlias = aliasInput ? aliasInput.value.trim() : userAlias;
-                previewDiv.innerHTML = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; width: 90px; height: 200px;">
-                        <!-- Skin thumbnail -->
-                        <img src="${skinImgSrc}" alt="skin" style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 2px; border-radius: 8px; border: 2px solid #FFD700; background: #222; box-shadow: 0 2px 8px rgba(0,0,0,0.2);" />
-                        
-                `;
+    // Limpiar canvas anterior si existe
+    if (container._threePreviewCleanup) {
+        container._threePreviewCleanup();
+        container._threePreviewCleanup = null;
+    }
+    container.innerHTML = '';
+
+    // Crear renderer Three.js
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setClearColor(0x222222, 1);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Crear escena y cámara para preview
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 10);
+    camera.position.set(0, 1.1, 2.0);
+    camera.lookAt(0, 1, 0);
+
+    // Luz direccional y ambiental
+    const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambient);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+    dir.position.set(2, 4, 4);
+    scene.add(dir);
+
+    // Obtener skin seleccionada
+    let skinName = window.currentCustomization && window.currentCustomization.skin ? window.currentCustomization.skin : 'humanMaleA';
+    let skinFile = window.skinFileMap && window.skinFileMap[skinName] ? window.skinFileMap[skinName] : 'assets/kenney 3d characters/Skins/humanMaleA.png';
+
+    // Cargar modelo FBX y textura
+    const fbxLoader = new THREE.FBXLoader();
+    const textureLoader = new THREE.TextureLoader();
+    let avatarMesh = null;
+    let animationFrameId = null;
+    let disposed = false;
+
+    Promise.all([
+        new Promise(resolve => fbxLoader.load('assets/kenney 3d characters/Model/characterMedium.fbx', resolve)),
+        new Promise(resolve => textureLoader.load(skinFile, resolve))
+    ]).then(([avatar, texture]) => {
+        if (disposed) return;
+        avatar.traverse(child => {
+            if (child.isMesh) {
+                child.material.map = texture;
+                child.material.needsUpdate = true;
             }
+        });
+        avatar.position.set(0, 0, 0);
+        avatar.scale.set(0.012, 0.012, 0.012); // Un poco más grande para preview
+        avatar.rotation.y = Math.PI/6; // Ligeramente girado para mejor vista
+        scene.add(avatar);
+        avatarMesh = avatar;
+        animate();
+    });
+
+    // Animación de rotación lenta
+    function animate() {
+        if (disposed) return;
+        if (avatarMesh) {
+            avatarMesh.rotation.y += 0.012;
         }
-        
+        renderer.render(scene, camera);
+        animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // Cleanup para evitar fugas
+    container._threePreviewCleanup = function() {
+        disposed = true;
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        renderer.dispose();
+        while(scene.children.length > 0) scene.remove(scene.children[0]);
+        if (renderer.domElement && renderer.domElement.parentNode)
+            renderer.domElement.parentNode.removeChild(renderer.domElement);
+    };
+}           
         
         function saveSimpleCustomization() {
             console.log('Guardando personalización');
@@ -4502,7 +4557,6 @@ function applyCustomizationToAvatar() {
             console.log('[applyCustomizationToAvatar] Personalización aplicada y guardada');
         }
 
-  
 
         // Cargar personalización al iniciar
         loadCustomization();
