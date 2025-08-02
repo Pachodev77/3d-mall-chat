@@ -8,6 +8,7 @@
 // --- [FIX GLOBAL] Definir window.IS_MOBILE globalmente antes de cualquier otro script ---
 window.window.IS_MOBILE = (typeof isMobileDevice === 'function') ? isMobileDevice() : /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 </script>
+<script src="furniture-persistence.js"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
     <style>
@@ -2906,11 +2907,14 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // Crear habitación
             createPersonalRoom();
 
-            // Crear muebles por defecto
-            createRoomFurniture(24, 3.5, 24);
-
-            // Restaurar posiciones de muebles si existen
-            loadFurniturePositions();
+            // --- NUEVA PERSISTENCIA ROBUSTA DE MUEBLES ---
+            loadFurnitureInventory().then(inventory => {
+                if (!inventory || inventory.length === 0) {
+                    // Si no hay persistencia, crear muebles por defecto
+                    createRoomFurniture(24, 3.5, 24);
+                    saveFurnitureInventory();
+                }
+            });
             
             // Crear y actualizar cielo visible desde las ventanas
             // Eliminar la línea:
@@ -3593,29 +3597,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             });
         }
         
-        function loadFurniturePositions() {
-            const savedPositions = localStorage.getItem('furniturePositions');
-            if (savedPositions) {
-                try {
-                    const furniturePositions = JSON.parse(savedPositions);
-                    furnitureObjects.forEach(furniture => {
-                        const savedData = furniturePositions[furniture.id];
-                        if (savedData && furniture.mesh) {
-                            // Aplicar posición guardada
-                            furniture.mesh.position.set(
-                                savedData.position.x,
-                                savedData.position.y,
-                                savedData.position.z
-                            );
-                            // Aplicar rotación guardada
-                            furniture.mesh.rotation.y = savedData.rotation.y;
-                        }
-                    });
-                    console.log('Posiciones de muebles cargadas desde localStorage');
-                } catch (error) {
-                    console.error('Error al cargar posiciones de muebles:', error);
-                }
-            }
+        // Wrapper legacy para compatibilidad
+function loadFurniturePositions() {
+    // Ahora solo delega en el nuevo sistema robusto
+    loadFurnitureInventory();
+}
         }
         
         function selectFurniture(furnitureId) {
@@ -3757,24 +3743,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         }
         
         function saveFurniturePositions() {
-            // Guardar todas las posiciones de muebles en localStorage
-            const furniturePositions = {};
-            furnitureObjects.forEach(furniture => {
-                furniturePositions[furniture.id] = {
-                    position: {
-                        x: furniture.mesh.position.x,
-                        y: furniture.mesh.position.y,
-                        z: furniture.mesh.position.z
-                    },
-                    rotation: {
-                        y: furniture.mesh.rotation.y
-                    }
-                };
-            });
-            
-            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
-            console.log('Posiciones de muebles guardadas en localStorage');
-            
+            saveFurnitureInventory();
             // Si hay un mueble seleccionado, deseleccionarlo
             if (selectedFurniture) {
                 deselectFurniture();
@@ -3788,22 +3757,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         }
         
         function saveFurniturePositionsSilently() {
-            // Guardar todas las posiciones de muebles en localStorage sin deseleccionar
-            const furniturePositions = {};
-            furnitureObjects.forEach(furniture => {
-                furniturePositions[furniture.id] = {
-                    position: {
-                        x: furniture.mesh.position.x,
-                        y: furniture.mesh.position.y,
-                        z: furniture.mesh.position.z
-                    },
-                    rotation: {
-                        y: furniture.mesh.rotation.y
-                    }
-                };
-            });
-            
-            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
+            saveFurnitureInventory();
         }
 
         function animate(currentTime) {
