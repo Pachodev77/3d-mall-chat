@@ -891,7 +891,7 @@ window.skinFileMap = {
         </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
-    <div id="simple-panel" class="customization-panel">
+    <div id="simple-panel" class="customization-panel" style="min-width:340px; max-width:420px; width:90vw; min-height:480px; max-height:90vh; height:auto; display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(24,24,24,0.98); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.6); z-index:31000; flex-direction:column; overflow:auto; pointer-events:auto; padding:0;">
         <!-- Header elegante -->
         <div class="panel-header">
             <div>
@@ -908,7 +908,7 @@ window.skinFileMap = {
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <button id="skin-prev-btn" class="skin-arrow-btn" title="Anterior" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">◀</button>
                         <div id="skin-preview-container" style="display: flex; flex-direction: column; align-items: center;">
-                            <div id="avatar-3d-preview-container" style="width: 120px; height: 160px; background: #222; border-radius: 10px; border: 2px solid #FFD700; box-shadow: 0 2px 8px rgba(0,0,0,0.2); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
+                            <div id="avatar-3d-preview-container" style="width: 180px; height: 240px; background: #222; border-radius: 14px; border: 2px solid #FFD700; box-shadow: 0 2px 12px rgba(0,0,0,0.3); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;"></div>
                             <div id="skin-preview-label" style="color: #FFD700; font-size: 14px; font-weight: bold; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">Humano Masculino</div>
                         </div>
                         <button id="skin-next-btn" class="skin-arrow-btn" title="Siguiente" style="font-size: 28px; background: none; border: none; color: #FFD700; cursor: pointer;">▶</button>
@@ -919,7 +919,7 @@ window.skinFileMap = {
                         <span class="section-icon">📝</span>
                         Nombre del Avatar
                     </h3>
-                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #FFD700; background: #232323; color: #FFD700; font-size: 16px; font-weight: bold; text-align: center;">
+                    <input type="text" id="simple-alias-input" placeholder="Escribe tu nombre..." maxlength="20" style="width: 100%; min-width: 180px; padding: 14px; border-radius: 8px; border: 2px solid #FFD700; background: #232323; color: #FFD700; font-size: 18px; font-weight: bold; text-align: center; margin-top: 6px; margin-bottom: 6px;">
                 </div>
             </div>
         </div>
@@ -4323,23 +4323,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Obtener elementos
     const prevBtn = document.getElementById('skin-prev-btn');
     const nextBtn = document.getElementById('skin-next-btn');
-    const img = document.getElementById('skin-preview-img');
+    // Eliminado img, solo canvas 3D y label
     const label = document.getElementById('skin-preview-label');
     // Inicializar índice
     let currentIdx = skinList.findIndex(s => s.key === (currentCustomization && currentCustomization.skin ? currentCustomization.skin : 'humanMaleA'));
     if (currentIdx === -1) currentIdx = 0;
     // Función para actualizar preview
     function updateSkinPreview(idx) {
-        img.src = skinList[idx].img;
         label.textContent = skinList[idx].label;
         window.currentCustomization.skin = skinList[idx].key;
-        
         // Aplicar el skin al avatar inmediatamente
         applyCustomizationToAvatar();
-        
         // Actualizar preview si existe
-        updateAvatarPreview && updateAvatarPreview();
-        
+        if (typeof updateAvatarPreview === 'function') updateAvatarPreview();
         console.log('[updateSkinPreview] Skin cambiado a:', skinList[idx].key);
     }
     // Asignar eventos
