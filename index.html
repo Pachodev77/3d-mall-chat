@@ -4165,8 +4165,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
     // Crear escena y cámara para preview
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 10);
-    camera.position.set(0, 1.45, 2.2); // Más arriba para mostrar desde los pies
-    camera.lookAt(0, 1.1, 0);
+    camera.position.set(0, 1.0, 3.1); // Más lejos y centrado
+    camera.lookAt(0, 1.0, 0);
 
     // Luz direccional y ambiental
     const ambient = new THREE.AmbientLight(0xffffff, 0.8);
