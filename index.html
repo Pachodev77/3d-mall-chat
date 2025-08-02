@@ -4197,7 +4197,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 child.material.needsUpdate = true;
             }
         });
-        avatar.position.set(0, 0, 0);
+        avatar.position.set(0, 0.45, 0); // Subir el modelo para que se vea completo
         avatar.scale.set(0.0027, 0.0027, 0.0027); // Más pequeño para que quepa completo en el recuadro
         avatar.rotation.y = Math.PI/6; // Ligeramente girado para mejor vista
         scene.add(avatar);
