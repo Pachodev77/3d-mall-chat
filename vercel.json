@@ -17,6 +17,10 @@
     {
       "src": "firebase-config.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/style.css",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -27,6 +31,10 @@
     {
       "src": "/firebase-config.js",
       "dest": "/firebase-config.js"
+    },
+    {
+      "src": "/public/style.css",
+      "dest": "/public/style.css"
     },
     {
       "src": "/(.*)",
