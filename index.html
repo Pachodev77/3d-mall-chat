@@ -403,9 +403,59 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         };
 
-        // --- Cache de materiales para reutilización ---
-        const materialCache = new Map();
+        // --- Performance Monitoring ---
+        const stats = new (function() {
+            this.fps = 0;
+            this.lastFpsUpdate = 0;
+            this.frameCount = 0;
+            this.memory = {
+                textures: 0,
+                geometries: 0,
+                materials: 0
+            };
+            
+            this.update = function(currentTime) {
+                this.frameCount++;
+                if (!this.lastFpsUpdate) this.lastFpsUpdate = currentTime;
+                
+                if (currentTime - this.lastFpsUpdate >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastFpsUpdate));
+                    this.frameCount = 0;
+                    this.lastFpsUpdate = currentTime;
+                    
+                    // Log memory usage every 5 seconds
+                    if (performance.memory) {
+                        console.log('Memory Usage (MB):', {
+                            used: Math.round(performance.memory.usedJSHeapSize / 1048576 * 100) / 100,
+                            total: Math.round(performance.memory.totalJSHeapSize / 1048576 * 100) / 100,
+                            limit: Math.round(performance.memory.jsHeapSizeLimit / 1048576 * 100) / 100
+                        });
+                    }
+                }
+            };
+        })();
+        
+        // --- Texture and Material Management ---
         const textureCache = new Map();
+        const materialCache = new Map();
+        const loadedTextures = new Set();
+        
+        // Device capability detection
+        const isLowEndDevice = (() => {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+            const memory = performance.memory;
+            const isLowMemory = memory ? memory.totalJSHeapSize < 1073741824 : true; // < 1GB
+            return isMobile || isLowMemory;
+        })();
+        
+        // Texture quality settings based on device
+        const textureSettings = {
+            maxSize: isLowEndDevice ? 1024 : 2048,  // Lower max texture size for mobile
+            quality: isLowEndDevice ? 0.7 : 1.0,    // Lower quality for mobile
+            mipmaps: !isLowEndDevice,                // Disable mipmaps on low-end
+            anisotropy: isLowEndDevice ? 1 : 2       // Lower anisotropy on mobile
+        };
 
         function getCachedMaterial(color, roughness = 0.8, metalness = 0.2) {
             const key = `${color}-${roughness}-${metalness}`;
@@ -3230,8 +3280,95 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             rotatingSignTextIndexes = {};
         }
         
-        // Limpiar al cerrar la página
+        // Enhanced cleanup function
+        function cleanup() {
+            console.log('Cleaning up resources...');
+            
+            // Remove event listeners
+            window.removeEventListener('resize', onWindowResize);
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+            window.removeEventListener('click', handleGlobalClick);
+            window.removeEventListener('beforeunload', cleanup);
+            
+            // Remove mobile touch controls if they exist
+            if (mobileJoystick) {
+                mobileJoystick.destroy();
+                document.body.removeChild(mobileJoystick.element);
+            }
+            
+            // Dispose of all textures
+            textureCache.forEach((texture, key) => {
+                if (texture && texture.dispose) {
+                    texture.dispose();
+                    if (texture.image && texture.image.src) {
+                        URL.revokeObjectURL(texture.image.src);
+                    }
+                }
+            });
+            textureCache.clear();
+            
+            // Dispose of all materials
+            materialCache.forEach((material, key) => {
+                if (material && material.dispose) {
+                    material.dispose();
+                }
+            });
+            materialCache.clear();
+            
+            // Dispose of geometries
+            scene.traverse((object) => {
+                if (object.geometry) {
+                    object.geometry.dispose();
+                }
+                if (object.material) {
+                    if (Array.isArray(object.material)) {
+                        object.material.forEach(material => material.dispose());
+                    } else {
+                        object.material.dispose();
+                    }
+                }
+            });
+            
+            // Clear the scene
+            while(scene.children.length > 0) { 
+                scene.remove(scene.children[0]); 
+            }
+            
+            // Dispose of renderer
+            if (renderer) {
+                renderer.dispose();
+                renderer.forceContextLoss();
+                renderer.domElement = null;
+                renderer = null;
+            }
+            
+            // Clear all intervals and timeouts
+            let id = window.setTimeout(function() {}, 0);
+            while (id--) {
+                window.clearTimeout(id);
+            }
+            
+            id = window.setInterval(function() {}, 0);
+            while (id--) {
+                window.clearInterval(id);
+            }
+            
+            console.log('Cleanup completed');
+        }
+        
+        // Add cleanup on page unload
         window.addEventListener('beforeunload', cleanup);
+        
+        // Add visibility change handler to pause rendering when tab is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // Free up memory when tab is not visible
+                if (renderer) {
+                    renderer.clear();
+                }
+            }
+        });
 
         function lerpAngle(a, b, t) {
             let diff = b - a;
