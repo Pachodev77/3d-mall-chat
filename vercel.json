@@ -25,6 +25,10 @@
     {
       "src": "public/furniture-persistence.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/availableFurniture.json",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -43,6 +47,10 @@
     {
       "src": "/public/furniture-persistence.js",
       "dest": "/public/furniture-persistence.js"
+    },
+    {
+      "src": "/public/availableFurniture.json",
+      "dest": "/public/availableFurniture.json"
     },
     {
       "src": "/(.*)",
