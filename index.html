@@ -48,6 +48,15 @@ window.skinFileMap = {
     <!-- Botón para regresar al mall desde la habitación -->
     <button id="return-to-mall-btn" title="Regresar al centro comercial" style="position: fixed; top: 16px; right: 16px; width: 36px; height: 36px; background: #4B0000; color: #fff; border: none; border-radius: 50%; cursor: pointer; z-index: 22000; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 16px; transition: background 0.2s; pointer-events: auto;">🏢</button>
     
+    <!-- Indicador de carga para móviles -->
+    <div id="loading-indicator" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 50000; pointer-events: none;">
+        <div style="background: rgba(30,30,30,0.95); color: #fff; padding: 20px; border-radius: 10px; text-align: center; pointer-events: auto;">
+            <div style="font-size: 24px; margin-bottom: 10px;">🔄</div>
+            <div style="font-weight: bold; margin-bottom: 5px;">Cargando habitación</div>
+            <div style="font-size: 12px; color: #aaa;">Por favor espera...</div>
+        </div>
+    </div>
+    
     <!-- Panel de edición de muebles -->
     <div id="furniture-edit-panel" style="position: fixed; top: 60px; right: 16px; width: 380px; height: 500px; background: rgba(30,30,30,0.95); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); z-index: 31000; display: none; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); pointer-events: auto;">
         <div style="background: rgba(24,24,24,0.9); color: #fff; padding: 12px 16px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
@@ -2167,9 +2176,16 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             if (currentScene === 'personal-room') return;
             
             console.log('[Habitación] Entrando a la habitación personal...');
-            currentScene = 'personal-room';
+            
+            // Mostrar indicador de carga en móviles
+            const loadingIndicator = document.getElementById('loading-indicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'flex';
+            }
             
             try {
+                currentScene = 'personal-room';
+                
                 // Configurar la habitación
                 await setupPersonalRoom();
                 closeRoomNavigation();
@@ -2188,18 +2204,44 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                     console.log('[Habitación] No hay muebles guardados o hubo un error al cargarlos');
                 }
                 
-                // Mostrar botón de regreso al mall
+                // Mostrar botón de regreso al mall y otros controles
                 const returnToMallBtn = document.getElementById('return-to-mall-btn');
                 if (returnToMallBtn) {
                     returnToMallBtn.style.display = 'flex';
+                    // Asegurar que el botón esté al frente
+                    returnToMallBtn.style.zIndex = '22000';
                 }
+                
+                // Mostrar botón de agregar muebles en móviles
+                const addFurnitureBtn = document.getElementById('add-furniture-btn');
+                if (addFurnitureBtn) {
+                    addFurnitureBtn.style.display = 'flex';
+                }
+                
+                // Ajustar controles para móviles
+                toggleMobileControls();
                 
                 console.log('[Habitación] Habitación personal lista');
                 
             } catch (error) {
                 console.error('[Habitación] Error al entrar a la habitación personal:', error);
-                // Mostrar mensaje de error al usuario
-                alert('Ocurrió un error al cargar la habitación. Por favor, recarga la página e inténtalo de nuevo.');
+                
+                // Mostrar mensaje de error amigable
+                const errorMessage = isMobileDevice() 
+                    ? 'Error al cargar la habitación. Por favor, verifica tu conexión y toca para reintentar.'
+                    : 'Error al cargar la habitación. Por favor, verifica tu conexión e inténtalo de nuevo.';
+                
+                alert(errorMessage);
+                
+                // Volver al mall en caso de error
+                if (currentScene === 'personal-room') {
+                    returnToMall();
+                }
+            } finally {
+                // Ocultar indicador de carga
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
             }
         }
         
@@ -3732,22 +3774,56 @@ function applyCustomizationToAvatar() {
         function toggleMobileControls() {
             const mobileControls = document.getElementById('mobile-controls');
             const mobileRotationControls = document.getElementById('mobile-rotation-controls');
+            const returnToMallBtn = document.getElementById('return-to-mall-btn');
             
+            const isMobile = isMobileDevice();
+            
+            // Actualizar controles de movimiento táctil
             if (mobileControls) {
-                if (isMobileDevice()) {
-                    mobileControls.style.display = 'block';
-                } else {
-                    mobileControls.style.display = 'none';
-                }
+                mobileControls.style.display = isMobile ? 'block' : 'none';
             }
             
             if (mobileRotationControls) {
-                if (isMobileDevice()) {
-                    mobileRotationControls.style.display = 'block';
+                mobileRotationControls.style.display = isMobile ? 'block' : 'none';
+            }
+            
+            // Asegurar que el botón de regreso sea más grande en móviles
+            if (returnToMallBtn) {
+                if (isMobile) {
+                    returnToMallBtn.style.width = '48px';
+                    returnToMallBtn.style.height = '48px';
+                    returnToMallBtn.style.fontSize = '24px';
+                    returnToMallBtn.style.top = '20px';
+                    returnToMallBtn.style.right = '20px';
                 } else {
-                    mobileRotationControls.style.display = 'none';
+                    returnToMallBtn.style.width = '36px';
+                    returnToMallBtn.style.height = '36px';
+                    returnToMallBtn.style.fontSize = '16px';
+                    returnToMallBtn.style.top = '16px';
+                    returnToMallBtn.style.right = '16px';
                 }
             }
+            
+            // Ajustar estilos de los paneles en móviles
+            const panels = ['furniture-edit-panel', 'furniture-selection-panel', 'room-navigation-panel'];
+            panels.forEach(panelId => {
+                const panel = document.getElementById(panelId);
+                if (panel) {
+                    if (isMobile) {
+                        panel.style.width = 'calc(100% - 32px)';
+                        panel.style.maxWidth = '400px';
+                        panel.style.left = '16px';
+                        panel.style.right = '16px';
+                        panel.style.margin = '0 auto';
+                    } else {
+                        panel.style.width = '';
+                        panel.style.maxWidth = '';
+                        panel.style.left = '';
+                        panel.style.right = '';
+                        panel.style.margin = '';
+                    }
+                }
+            });
         }
         
         // Detectar cambios de tamaño de ventana
