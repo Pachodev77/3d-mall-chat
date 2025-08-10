@@ -4074,12 +4074,16 @@ function applyCustomizationToAvatar() {
         }
         
         // Función para agregar mueble desde el panel
-        function addFurnitureFromPanel(furnitureData) {
+        function addFurnitureFromPanel(furnitureData, button) {
             console.log(`Intentando agregar mueble: ${furnitureData.name}`);
             
             // Verificar que estamos en la habitación personal
             if (currentScene !== 'personal-room') {
-                alert('Debes estar en tu habitación personal para agregar muebles. Entra primero a tu habitación.');
+                showNotification('Debes estar en tu habitación personal para agregar muebles. Entra primero a tu habitación.', 'error');
+                if (button) {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
                 return;
             }
             
@@ -4087,17 +4091,18 @@ function applyCustomizationToAvatar() {
             const defaultPosition = { x: 0, y: 0, z: 0 };
             
             // Mostrar indicador de carga
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = 'Cargando...';
-            button.disabled = true;
+            const originalText = button ? button.textContent : 'Agregar';
+            if (button) {
+                button.textContent = 'Cargando...';
+                button.disabled = true;
+            }
             
             loadFurnitureGLB(furnitureData, defaultPosition, 0)
                 .then((furnitureObject) => {
                     console.log(`Mueble agregado exitosamente: ${furnitureObject.name}`);
                     
                     // Actualizar la lista de muebles
-                    updateFurnitureList();
+                    updateAvailableFurnitureList(); // Re-render the list to reflect changes
                     
                     // Seleccionar el mueble recién agregado
                     selectFurniture(furnitureObject.id);
@@ -4106,8 +4111,10 @@ function applyCustomizationToAvatar() {
                     showNotification(`✅ ${furnitureData.name} agregado exitosamente`, 'success');
                     
                     // Restaurar botón
-                    button.textContent = originalText;
-                    button.disabled = false;
+                    if (button) {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }
                 })
                 .catch((error) => {
                     console.error('Error al agregar mueble:', error);
@@ -4116,8 +4123,10 @@ function applyCustomizationToAvatar() {
                     showNotification(`❌ Error al agregar ${furnitureData.name}: ${error.message}`, 'error');
                     
                     // Restaurar botón
-                    button.textContent = originalText;
-                    button.disabled = false;
+                    if (button) {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }
                 });
         }
         
@@ -4160,7 +4169,7 @@ function applyCustomizationToAvatar() {
                         <div style="font-weight: bold; color: #fff; font-size: 14px; margin-bottom: 4px;">${furniture.name}</div>
                         <div style="font-size: 12px; color: #bdc3c7;">${furniture.category}</div>
                     </div>
-                    <button onclick="addFurnitureFromPanel(${JSON.stringify(furniture).replace(/"/g, '&quot;')})" style="padding: 6px 12px; background: #27ae60; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">+</button>
+                    <button class="add-furniture-btn" data-furniture='${JSON.stringify(furniture)}' style="padding: 6px 12px; background: #27ae60; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">+</button>
                 `;
                 
                 furnitureItem.onmouseenter = () => furnitureItem.style.borderColor = '#3498db';
@@ -4175,6 +4184,22 @@ function applyCustomizationToAvatar() {
             const categoryFilter = document.getElementById('furniture-category-filter');
             if (categoryFilter) {
                 categoryFilter.addEventListener('change', updateAvailableFurnitureList);
+            }
+
+            const furnitureList = document.getElementById('available-furniture-list');
+            if (furnitureList) {
+                furnitureList.addEventListener('click', function(event) {
+                    const target = event.target;
+                    if (target.classList.contains('add-furniture-btn')) {
+                        const furnitureDataString = target.dataset.furniture;
+                        try {
+                            const furnitureData = JSON.parse(furnitureDataString);
+                            addFurnitureFromPanel(furnitureData, target); // Pass the button element as well
+                        } catch (e) {
+                            console.error('Error parsing furniture data from button:', e);
+                        }
+                    }
+                });
             }
         });
         

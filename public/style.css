@@ -710,6 +710,20 @@
                 max-height: 300px !important; /* Adjust as needed, or remove if not necessary */
             }
             
+            #furniture-selection-panel {
+                width: 95vw !important;
+                height: auto !important;
+                max-height: 80vh !important;
+                top: 50% !important;
+                left: 50% !important;
+                right: auto !important; /* Ensure it doesn't conflict with right: 16px */
+                transform: translate(-50%, -50%) !important;
+                border-radius: 16px !important;
+            }
+            #available-furniture-list {
+                max-height: 300px !important; /* Adjust as needed, or remove if not necessary */
+            }
+            
             /* Ajustar contenido interno para móvil */
             #room-navigation-panel > div:last-child {
                 padding: 16px !important;
