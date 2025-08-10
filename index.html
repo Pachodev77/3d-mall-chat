@@ -205,6 +205,12 @@ const DEFAULT_FURNITURE_LAYOUT = [
             <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
         </div>
     </div>
+    
+    <!-- Controles de muebles móviles -->
+    <div id="mobile-furniture-controls" style="position: fixed; bottom: 100px; right: 20px; z-index: 10000; display: none; flex-direction: column; gap: 10px; pointer-events: auto;">
+        <button class="mobile-btn" id="mobile-rotate-furniture-btn" title="Rotar Mueble" style="width: 60px; height: 60px; font-size: 24px;">🔄</button>
+        <button class="mobile-btn" id="mobile-place-furniture-btn" title="Colocar Mueble" style="width: 60px; height: 60px; font-size: 24px;">✅</button>
+    </div>
         <!-- Panel de personalización completamente rediseñado -->
     <div id="simple-panel" class="customization-panel" style="min-width:340px; max-width:420px; width:90vw; min-height:480px; max-height:90vh; height:auto; display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(24,24,24,0.98); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.6); z-index:31000; flex-direction:column; overflow:auto; pointer-events:auto; padding:0;">
         <!-- Header elegante -->
@@ -406,6 +412,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         let selectedFurniture = null;
         // furnitureObjects ahora está definido en furniture-persistence.js
         let furnitureEditPanelOpen = false;
+        let mobileFurnitureMovingModeActive = false; // Nuevo: para controlar el modo de movimiento de muebles en móvil
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -1875,6 +1882,25 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             // Configurar controles móviles
             setupMobileControls();
+
+            // --- NUEVO: Configurar botones de control de muebles móviles ---
+            const mobileRotateFurnitureBtn = document.getElementById('mobile-rotate-furniture-btn');
+            const mobilePlaceFurnitureBtn = document.getElementById('mobile-place-furniture-btn');
+
+            if (mobileRotateFurnitureBtn) {
+                mobileRotateFurnitureBtn.onclick = () => {
+                    if (selectedFurniture) {
+                        rotateSelectedFurniture();
+                        showNotification('🔄 Mueble rotado.', 'info');
+                    }
+                };
+            }
+
+            if (mobilePlaceFurnitureBtn) {
+                mobilePlaceFurnitureBtn.onclick = () => {
+                    placeSelectedFurnitureMobile();
+                };
+            }
         }
         
         function setupMobileControls() {
@@ -1963,7 +1989,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
             
             // Controles de edición de muebles en la habitación personal
-            if (currentScene === 'personal-room' && furnitureEditMode && selectedFurniture) {
+            if (!mobileFurnitureMovingModeActive && currentScene === 'personal-room' && furnitureEditMode && selectedFurniture) {
                 if (event.code === 'KeyW' || event.code === 'ArrowUp') {
                     moveSelectedFurniture('forward');
                 }
@@ -2772,6 +2798,24 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 }
             }
             
+            // --- NUEVO: Lógica para movimiento de muebles en móvil ---
+            if (window.IS_MOBILE) {
+                mobileFurnitureMovingModeActive = true;
+                // Remover el mueble de la escena principal de la habitación
+                personalRoomScene.remove(selectedFurniture.mesh);
+                // Añadir el mueble como hijo de la cámara para que se mueva con ella
+                // Posicionarlo ligeramente delante de la cámara
+                personalRoomCamera.add(selectedFurniture.mesh);
+                selectedFurniture.mesh.position.set(0, -0.5, -2); // Ajustar posición relativa a la cámara
+                selectedFurniture.mesh.rotation.y = 0; // Resetear rotación relativa a la cámara
+                
+                // Mostrar los botones de control de muebles móviles
+                const mobileFurnitureControls = document.getElementById('mobile-furniture-controls');
+                if (mobileFurnitureControls) {
+                    mobileFurnitureControls.style.display = 'flex';
+                }
+            }
+            
             updateFurnitureList();
         }
         
@@ -2829,6 +2873,38 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             if (furnitureEditPanel && furnitureEditMode) {
                 furnitureEditPanel.style.display = 'flex';
             }
+            
+            // --- NUEVO: Lógica para movimiento de muebles en móvil ---
+            if (mobileFurnitureMovingModeActive) {
+                // Si el mueble estaba siendo movido en móvil, desparentarlo de la cámara
+                if (selectedFurniture && selectedFurniture.mesh && selectedFurniture.mesh.parent === personalRoomCamera) {
+                    // Obtener la posición y rotación global del mueble antes de desparentar
+                    selectedFurniture.mesh.updateMatrixWorld(true);
+                    const worldPosition = new THREE.Vector3();
+                    selectedFurniture.mesh.getWorldPosition(worldPosition);
+                    const worldQuaternion = new THREE.Quaternion();
+                    selectedFurniture.mesh.getWorldQuaternion(worldQuaternion);
+                    
+                    // Remover de la cámara
+                    personalRoomCamera.remove(selectedFurniture.mesh);
+                    // Añadir de nuevo a la escena principal de la habitación
+                    personalRoomScene.add(selectedFurniture.mesh);
+                    
+                    // Aplicar la posición y rotación global
+                    selectedFurniture.mesh.position.copy(worldPosition);
+                    selectedFurniture.mesh.quaternion.copy(worldQuaternion);
+                    
+                    // Asegurarse de que la posición Y sea la correcta para el suelo
+                    // Asumiendo que el punto de pivote del mueble está en su base
+                    selectedFurniture.mesh.position.y = 0; 
+                }
+                mobileFurnitureMovingModeActive = false;
+                // Ocultar los botones de control de muebles móviles
+                const mobileFurnitureControls = document.getElementById('mobile-furniture-controls');
+                if (mobileFurnitureControls) {
+                    mobileFurnitureControls.style.display = 'none';
+                }
+            }
         }
         
         function moveSelectedFurniture(direction) {
@@ -2879,6 +2955,13 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             // Guardar automáticamente la rotación sin deseleccionar
             saveFurnitureInventory();
+        }
+        
+        function placeSelectedFurnitureMobile() {
+            if (!selectedFurniture) return;
+            // El deseleccionar ya maneja la lógica de desparentar y guardar
+            deselectFurniture();
+            showNotification(`✅ Mueble colocado.`, 'success');
         }
         
         
