@@ -413,6 +413,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         // furnitureObjects ahora está definido en furniture-persistence.js
         let furnitureEditPanelOpen = false;
         let mobileFurnitureMovingModeActive = false; // Nuevo: para controlar el modo de movimiento de muebles en móvil
+        let mobileFurnitureWrapper = null; // Nuevo: Objeto 3D para envolver el mueble en modo móvil
 
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
@@ -2801,17 +2802,54 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // --- NUEVO: Lógica para movimiento de muebles en móvil ---
             if (window.IS_MOBILE) {
                 mobileFurnitureMovingModeActive = true;
+                
                 // Remover el mueble de la escena principal de la habitación
                 personalRoomScene.remove(selectedFurniture.mesh);
-                // Añadir el mueble como hijo de la cámara para que se mueva con ella
-                // Posicionarlo ligeramente delante de la cámara
-                personalRoomCamera.add(selectedFurniture.mesh);
-                // Ajustar posición y escala para que sea visible y manejable frente a la cámara
-                selectedFurniture.mesh.position.set(0, -0.5, -1.5); // Más cerca y ligeramente más bajo
-                selectedFurniture.mesh.scale.set(0.2, 0.2, 0.2); // Escala fija para visualización
-                selectedFurniture.mesh.rotation.y = 0; // Resetear rotación relativa a la cámara
-                console.log('Mueble seleccionado para móvil. Posición relativa a cámara:', selectedFurniture.mesh.position, 'Escala:', selectedFurniture.mesh.scale);
+
+                // Crear o reutilizar el wrapper
+                if (!mobileFurnitureWrapper) {
+                    mobileFurnitureWrapper = new THREE.Object3D();
+                    personalRoomCamera.add(mobileFurnitureWrapper);
+                    console.log('mobileFurnitureWrapper created and added to personalRoomCamera');
+                } else {
+                    // Ensure it's still parented to the camera
+                    if (mobileFurnitureWrapper.parent !== personalRoomCamera) {
+                        personalRoomCamera.add(mobileFurnitureWrapper);
+                        console.log('mobileFurnitureWrapper re-parented to personalRoomCamera');
+                    }
+                }
                 
+                // Añadir el mueble como hijo del wrapper
+                mobileFurnitureWrapper.add(selectedFurniture.mesh);
+                
+                // Posicionar el wrapper ligeramente delante de la cámara
+                // These values are relative to the camera
+                mobileFurnitureWrapper.position.set(0, -0.5, -1.5); // Y: slightly below camera, Z: 1.5 units in front
+                mobileFurnitureWrapper.scale.set(0.2, 0.2, 0.2); // Scale down the wrapper
+                mobileFurnitureWrapper.rotation.y = 0; // Reset rotation relative to camera
+                
+                // Resetear la posición y rotación del mueble dentro del wrapper
+                // This is crucial: the mesh itself should be at (0,0,0) relative to its new parent (the wrapper) and its original scale
+                selectedFurniture.mesh.position.set(0, 0, 0);
+                selectedFurniture.mesh.rotation.set(0, 0, 0); // Reset its local rotation
+                
+                // Restore original scale of the mesh itself, as the wrapper handles the display scale
+                if (selectedFurniture.originalScale) {
+                    selectedFurniture.mesh.scale.copy(selectedFurniture.originalScale);
+                } else {
+                    // Fallback if originalScale is not stored (should be from loadFurnitureGLB)
+                    selectedFurniture.mesh.scale.set(1, 1, 1);
+                }
+
+                console.log('Mueble seleccionado para móvil. Wrapper position (relative to camera):', mobileFurnitureWrapper.position, 'Wrapper scale:', mobileFurnitureWrapper.scale);
+                console.log('Mueble mesh position (relative to wrapper):', selectedFurniture.mesh.position, 'Mueble mesh rotation (relative to wrapper):', selectedFurniture.mesh.rotation, 'Mueble mesh scale (relative to wrapper):', selectedFurniture.mesh.scale);
+                
+                // Add a BoxHelper for debugging
+                const boxHelper = new THREE.BoxHelper(selectedFurniture.mesh, 0xffff00); // Yellow box
+                boxHelper.name = 'furniture_debug_box_helper';
+                mobileFurnitureWrapper.add(boxHelper);
+                console.log('BoxHelper added to mobileFurnitureWrapper');
+
                 // Mostrar los botones de control de muebles móviles
                 const mobileFurnitureControls = document.getElementById('mobile-furniture-controls');
                 if (mobileFurnitureControls) {
@@ -2879,17 +2917,26 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             // --- NUEVO: Lógica para movimiento de muebles en móvil ---
             if (mobileFurnitureMovingModeActive) {
-                // Si el mueble estaba siendo movido en móvil, desparentarlo de la cámara
-                if (selectedFurniture && selectedFurniture.mesh && selectedFurniture.mesh.parent === personalRoomCamera) {
+                // Remover el BoxHelper de depuración
+                const boxHelper = mobileFurnitureWrapper.getObjectByName('furniture_debug_box_helper');
+                if (boxHelper) {
+                    mobileFurnitureWrapper.remove(boxHelper);
+                    console.log('BoxHelper removed from mobileFurnitureWrapper');
+                }
+
+                // Si el mueble estaba siendo movido en móvil, desparentarlo del wrapper
+                if (selectedFurniture && selectedFurniture.mesh && selectedFurniture.mesh.parent === mobileFurnitureWrapper) {
                     // Obtener la posición y rotación global del mueble antes de desparentar
-                    selectedFurniture.mesh.updateMatrixWorld(true);
+                    selectedFurniture.mesh.updateWorldMatrix(true, false); // Update only this object's world matrix
                     const worldPosition = new THREE.Vector3();
                     selectedFurniture.mesh.getWorldPosition(worldPosition);
                     const worldQuaternion = new THREE.Quaternion();
                     selectedFurniture.mesh.getWorldQuaternion(worldQuaternion);
                     
-                    // Remover de la cámara
-                    personalRoomCamera.remove(selectedFurniture.mesh);
+                    console.log('Deseleccionando mueble móvil. World Position antes de desparentar:', worldPosition, 'World Quaternion:', worldQuaternion);
+
+                    // Remover del wrapper
+                    mobileFurnitureWrapper.remove(selectedFurniture.mesh);
                     // Añadir de nuevo a la escena principal de la habitación
                     personalRoomScene.add(selectedFurniture.mesh);
                     
@@ -2901,10 +2948,23 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                     // Usar la altura del modelo para posicionar correctamente su base en Y=0
                     if (selectedFurniture.modelHeight !== undefined) {
                         selectedFurniture.mesh.position.y = selectedFurniture.modelHeight / 2;
+                        console.log('Mueble colocado en Y usando modelHeight/2:', selectedFurniture.mesh.position.y);
                     } else {
                         // Fallback si modelHeight no está disponible (debería estarlo)
                         selectedFurniture.mesh.position.y = 0; 
+                        console.log('Mueble colocado en Y=0 (fallback)');
                     }
+                    
+                    // Restaurar la escala original del mueble
+                    if (selectedFurniture.originalScale) {
+                        selectedFurniture.mesh.scale.copy(selectedFurniture.originalScale);
+                        console.log('Escala original del mueble restaurada:', selectedFurniture.mesh.scale);
+                    } else {
+                        selectedFurniture.mesh.scale.set(1, 1, 1);
+                        console.log('Escala del mueble restaurada a 1,1,1 (fallback)');
+                    }
+
+                    console.log('Mueble colocado. Final Position:', selectedFurniture.mesh.position, 'Final Rotation:', selectedFurniture.mesh.rotation, 'Final Scale:', selectedFurniture.mesh.scale);
                 }
                 mobileFurnitureMovingModeActive = false;
                 // Ocultar los botones de control de muebles móviles
@@ -4208,7 +4268,8 @@ function applyCustomizationToAvatar() {
                                 x: (furnitureData.scale?.x !== undefined) ? furnitureData.scale.x : 1,
                                 y: (furnitureData.scale?.y !== undefined) ? furnitureData.scale.y : 1,
                                 z: (furnitureData.scale?.z !== undefined) ? furnitureData.scale.z : 1
-                            }
+                            },
+                            originalScale: { x: finalScale, y: finalScale, z: finalScale } // Store the actual applied scale
                         };
                         
                         console.log('[loadFurnitureGLB] Mueble creado:', furnitureObject);
