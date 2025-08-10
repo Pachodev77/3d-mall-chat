@@ -21,6 +21,10 @@
     {
       "src": "public/style.css",
       "use": "@vercel/static"
+    },
+    {
+      "src": "public/furniture-persistence.js",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -35,6 +39,10 @@
     {
       "src": "/public/style.css",
       "dest": "/public/style.css"
+    },
+    {
+      "src": "/public/furniture-persistence.js",
+      "dest": "/public/furniture-persistence.js"
     },
     {
       "src": "/(.*)",
