@@ -166,27 +166,9 @@ function saveFurnitureInventory() {
  * Todos los muebles se cargan como modelos GLB.
  */
 async function loadFurnitureInventory() {
-    console.log('[persistencia] Iniciando carga de inventario...');
-    
     if (!personalRoomScene) {
         console.error('[persistencia] La escena de la habitación personal no está inicializada');
-        // Intentar obtener la escena de la ventana global si está disponible
-        if (window.personalRoomScene) {
-            console.log('[persistencia] Usando escena de la ventana global');
-            personalRoomScene = window.personalRoomScene;
-        } else {
-            console.error('[persistencia] No se pudo obtener la escena de la habitación');
-            return [];
-        }
-    }
-
-    // Asegurarse de que furnitureObjects esté inicializado
-    if (!Array.isArray(furnitureObjects)) {
-        console.log('[persistencia] Inicializando array de muebles');
-        furnitureObjects = [];
-        if (window.furnitureObjects) {
-            furnitureObjects = window.furnitureObjects;
-        }
+        return null;
     }
 
     const saved = localStorage.getItem(FURNITURE_PERSIST_KEY);
@@ -197,7 +179,6 @@ async function loadFurnitureInventory() {
 
     try {
         const inventory = JSON.parse(saved);
-        console.log(`[persistencia] Inventario cargado: ${inventory.length} muebles`);
         
         // Limpiar completamente los muebles actuales de la escena y del array
         while(furnitureObjects.length > 0) {
@@ -220,11 +201,10 @@ async function loadFurnitureInventory() {
                                     }
                                 }
                             }
-                            return child;
                         });
                     }
-                } catch (cleanupError) {
-                    console.error('[persistencia] Error al limpiar mueble:', cleanupError);
+                } catch (e) {
+                    console.error('Error al limpiar mueble:', e);
                 }
             }
         }
