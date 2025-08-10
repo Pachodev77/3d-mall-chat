@@ -1899,19 +1899,58 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             const mobileFurniturePlaceBtn = document.getElementById('mobile-furniture-place');
 
             // Helper function to attach touch/mouse events
-            function setupFurnitureButton(button, action) {
+            let moveInterval = null; // Variable para el intervalo de movimiento continuo
+
+            function setupFurnitureButton(button, action, isContinuous = false) {
                 if (button) {
-                    button.addEventListener('touchstart', (e) => { e.preventDefault(); action(); });
-                    button.addEventListener('touchend', (e) => { e.preventDefault(); });
-                    button.addEventListener('mousedown', (e) => { e.preventDefault(); action(); });
-                    button.addEventListener('mouseup', (e) => { e.preventDefault(); });
+                    if (isContinuous) {
+                        button.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            action(); // Ejecutar una vez al inicio
+                            moveInterval = setInterval(action, 100); // Mover continuamente cada 100ms
+                        });
+                        button.addEventListener('touchend', (e) => {
+                            e.preventDefault();
+                            clearInterval(moveInterval);
+                            moveInterval = null;
+                        });
+                        button.addEventListener('touchcancel', (e) => {
+                            e.preventDefault();
+                            clearInterval(moveInterval);
+                            moveInterval = null;
+                        });
+                        // Para compatibilidad con mouse en desarrollo/depuración
+                        button.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            action();
+                            moveInterval = setInterval(action, 100);
+                        });
+                        button.addEventListener('mouseup', (e) => {
+                            e.preventDefault();
+                            clearInterval(moveInterval);
+                            moveInterval = null;
+                        });
+                        button.addEventListener('mouseleave', (e) => {
+                            // Detener movimiento si el mouse sale del botón mientras está presionado
+                            if (moveInterval) {
+                                clearInterval(moveInterval);
+                                moveInterval = null;
+                            }
+                        });
+                    } else {
+                        // Comportamiento de un solo clic para botones no continuos
+                        button.addEventListener('touchstart', (e) => { e.preventDefault(); action(); });
+                        button.addEventListener('touchend', (e) => { e.preventDefault(); });
+                        button.addEventListener('mousedown', (e) => { e.preventDefault(); action(); });
+                        button.addEventListener('mouseup', (e) => { e.preventDefault(); });
+                    }
                 }
             }
 
-            setupFurnitureButton(mobileFurnitureUpBtn, () => { if (selectedFurniture) moveSelectedFurniture('forward'); });
-            setupFurnitureButton(mobileFurnitureDownBtn, () => { if (selectedFurniture) moveSelectedFurniture('backward'); });
-            setupFurnitureButton(mobileFurnitureLeftBtn, () => { if (selectedFurniture) moveSelectedFurniture('left'); });
-            setupFurnitureButton(mobileFurnitureRightBtn, () => { if (selectedFurniture) moveSelectedFurniture('right'); });
+            setupFurnitureButton(mobileFurnitureUpBtn, () => { if (selectedFurniture) moveSelectedFurniture('forward'); }, true);
+            setupFurnitureButton(mobileFurnitureDownBtn, () => { if (selectedFurniture) moveSelectedFurniture('backward'); }, true);
+            setupFurnitureButton(mobileFurnitureLeftBtn, () => { if (selectedFurniture) moveSelectedFurniture('left'); }, true);
+            setupFurnitureButton(mobileFurnitureRightBtn, () => { if (selectedFurniture) moveSelectedFurniture('right'); }, true);
             setupFurnitureButton(mobileFurnitureRotateBtn, () => { if (selectedFurniture) rotateSelectedFurniture(); });
             setupFurnitureButton(mobileFurniturePlaceBtn, () => { if (selectedFurniture) deselectFurniture(); });
         }

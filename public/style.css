@@ -1,5 +1,4 @@
-
-        body {
+body {
             margin: 0;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -666,6 +665,9 @@
             box-shadow: none; /* Sin sombra */
             backdrop-filter: none; /* Sin filtro de desenfoque */
             border: none; /* Sin borde */
+            right: 20px; /* Alineado a la derecha */
+            left: auto; /* Desactivar alineación izquierda */
+            transform: none; /* Desactivar transformación de centrado */
         }
 
         .mobile-furniture-btn {
