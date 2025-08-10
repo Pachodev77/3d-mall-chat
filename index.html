@@ -1917,7 +1917,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                     rotateSelectedFurniture();
                 }
                 if (event.code === 'Enter') {
-                    saveFurniturePositions();
+                    saveFurnitureInventory();
                 }
                 if (event.code === 'Escape') {
                     deselectFurniture();
@@ -2229,11 +2229,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // Crear habitación
             createPersonalRoom();
 
-            // Crear muebles por defecto
-            createRoomFurniture(24, 3.5, 24);
-
             // Restaurar posiciones de muebles si existen
-            loadFurniturePositions();
+            loadFurnitureInventory();
             
             // Crear y actualizar cielo visible desde las ventanas
             // Eliminar la línea:
@@ -2387,384 +2384,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
 
         }
         
-        function createRoomFurniture(roomWidth, roomHeight, roomDepth) {
-            // Limpiar array de muebles
-            furnitureObjects = [];
-            let furnitureId = 1;
-            
-            // ===== ZONA DE DORMITORIO (Lado izquierdo) =====
-            
-            // Cama principal - Crear grupo para todas las partes
-            const bedGroup = new THREE.Group();
-            bedGroup.position.set(-4, 0, -3);
-            
-            // Marco de la cama
-            const bedFrameGeometry = new THREE.BoxGeometry(2.2, 0.4, 3.2);
-            const bedFrameMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const bedFrame = new THREE.Mesh(bedFrameGeometry, bedFrameMaterial);
-            bedFrame.position.set(0, 0.2, 0);
-            bedGroup.add(bedFrame);
-            
-            // Registrar grupo de cama en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Cama',
-                mesh: bedGroup,
-                type: 'bed'
-            });
-            
-            // Colchón
-            const mattressGeometry = new THREE.BoxGeometry(2, 0.3, 3);
-            const mattressMaterial = getCachedMaterial(0x4A90E2, 0.8, 0.1); // Azul
-            const mattress = new THREE.Mesh(mattressGeometry, mattressMaterial);
-            mattress.position.set(0, 0.5, 0);
-            bedGroup.add(mattress);
-            
-            // Almohadas
-            const pillowGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.8);
-            const pillowMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
-            const pillow1 = new THREE.Mesh(pillowGeometry, pillowMaterial);
-            pillow1.position.set(-0.3, 0.65, -1.2);
-            bedGroup.add(pillow1);
-            
-            const pillow2 = new THREE.Mesh(pillowGeometry, pillowMaterial);
-            pillow2.position.set(0.3, 0.65, -1.2);
-            bedGroup.add(pillow2);
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(bedGroup);
-            
-            // Mesa de noche izquierda
-            const nightstandGeometry = new THREE.BoxGeometry(0.8, 0.7, 0.8);
-            const nightstandMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const nightstandLeft = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
-            nightstandLeft.position.set(-5.5, 0.35, -3);
-            personalRoomScene.add(nightstandLeft);
-            
-            // Registrar mesa de noche izquierda en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Mesa de Noche Izquierda',
-                mesh: nightstandLeft,
-                type: 'nightstand'
-            });
-            
-            // Mesa de noche derecha
-            const nightstandRight = new THREE.Mesh(nightstandGeometry, nightstandMaterial);
-            nightstandRight.position.set(-2.5, 0.35, -3);
-            personalRoomScene.add(nightstandRight);
-            
-            // Registrar mesa de noche derecha en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Mesa de Noche Derecha',
-                mesh: nightstandRight,
-                type: 'nightstand'
-            });
-            
-            // Lámpara de mesa - Crear grupo para todas las partes
-            const lampGroup = new THREE.Group();
-            lampGroup.position.set(-5.5, 0, -3);
-            
-            const lampBaseGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.1, 8);
-            const lampBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
-            const lampBase = new THREE.Mesh(lampBaseGeometry, lampBaseMaterial);
-            lampBase.position.set(0, 0.75, 0);
-            lampGroup.add(lampBase);
-            
-            const lampPoleGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.4, 6);
-            const lampPoleMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
-            const lampPole = new THREE.Mesh(lampPoleGeometry, lampPoleMaterial);
-            lampPole.position.set(0, 1, 0);
-            lampGroup.add(lampPole);
-            
-            const lampShadeGeometry = new THREE.ConeGeometry(0.3, 0.2, 8);
-            const lampShadeMaterial = getCachedMaterial(0xECF0F1, 0.9, 0.1);
-            const lampShade = new THREE.Mesh(lampShadeGeometry, lampShadeMaterial);
-            lampShade.position.set(0, 1.25, 0);
-            lampShade.rotation.x = Math.PI;
-            lampGroup.add(lampShade);
-            
-            // Registrar grupo de lámpara en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Lámpara de Mesa',
-                mesh: lampGroup,
-                type: 'lamp'
-            });
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(lampGroup);
-            
-            // ===== ZONA DE TRABAJO (Lado derecho) =====
-            
-            // Escritorio principal - Crear grupo para todas las partes
-            const deskGroup = new THREE.Group();
-            deskGroup.position.set(4, 0, -3);
-            
-            // Mesa del escritorio
-            const deskGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.2);
-            const deskMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const desk = new THREE.Mesh(deskGeometry, deskMaterial);
-            desk.position.set(0, 0.7, 0);
-            deskGroup.add(desk);
-            
-            // Registrar grupo de escritorio en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Escritorio',
-                mesh: deskGroup,
-                type: 'desk'
-            });
-            
-            // Patas del escritorio
-            for (let i = 0; i < 4; i++) {
-                const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6);
-                const legMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-                const leg = new THREE.Mesh(legGeometry, legMaterial);
-                const x = (i % 2 === 0 ? -1 : 1) * 1.2;
-                const z = (i < 2 ? -1 : 1) * 0.5;
-                leg.position.set(x, 0.35, z);
-                deskGroup.add(leg);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(deskGroup);
-            
-            // Silla ergonómica del escritorio - Crear grupo para todas las partes
-            const chairGroup = new THREE.Group();
-            chairGroup.position.set(4, 0, -1.8);
-            
-            // Asiento de la silla
-            const chairSeatGeometry = new THREE.BoxGeometry(0.7, 0.1, 0.7);
-            const chairSeatMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
-            const chairSeat = new THREE.Mesh(chairSeatGeometry, chairSeatMaterial);
-            chairSeat.position.set(0, 0.45, 0);
-            chairGroup.add(chairSeat);
-            
-            // Registrar grupo de silla en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Silla de Escritorio',
-                mesh: chairGroup,
-                type: 'chair'
-            });
-            
-            // Respaldo de la silla
-            const chairBackGeometry = new THREE.BoxGeometry(0.7, 0.8, 0.1);
-            const chairBackMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
-            const chairBack = new THREE.Mesh(chairBackGeometry, chairBackMaterial);
-            chairBack.position.set(0, 0.85, -0.4);
-            chairGroup.add(chairBack);
-            
-            // Patas de la silla
-            for (let i = 0; i < 4; i++) {
-                const chairLegGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.45, 6);
-                const chairLegMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
-                const chairLeg = new THREE.Mesh(chairLegGeometry, chairLegMaterial);
-                const x = (i % 2 === 0 ? -1 : 1) * 0.3;
-                const z = (i < 2 ? -1 : 1) * 0.3;
-                chairLeg.position.set(x, 0.225, z);
-                chairGroup.add(chairLeg);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(chairGroup);
-            
-            // Computadora completa - Crear grupo para todas las partes
-            const computerGroup = new THREE.Group();
-            computerGroup.position.set(4, 0, -3);
-            
-            const monitorGeometry = new THREE.BoxGeometry(1.4, 0.9, 0.1);
-            const monitorMaterial = getCachedMaterial(0x000000, 0.8, 0.2);
-            const monitor = new THREE.Mesh(monitorGeometry, monitorMaterial);
-            monitor.position.set(0, 1.3, 0);
-            computerGroup.add(monitor);
-            
-            // Base del monitor
-            const monitorBaseGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.1, 8);
-            const monitorBaseMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
-            const monitorBase = new THREE.Mesh(monitorBaseGeometry, monitorBaseMaterial);
-            monitorBase.position.set(0, 0.8, 0);
-            computerGroup.add(monitorBase);
-            
-            // CPU/Torre
-            const cpuGeometry = new THREE.BoxGeometry(0.4, 0.6, 0.2);
-            const cpuMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.2);
-            const cpu = new THREE.Mesh(cpuGeometry, cpuMaterial);
-            cpu.position.set(1.5, 0.7, 0);
-            computerGroup.add(cpu);
-            
-            // Teclado
-            const keyboardGeometry = new THREE.BoxGeometry(1.2, 0.05, 0.4);
-            const keyboardMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
-            const keyboard = new THREE.Mesh(keyboardGeometry, keyboardMaterial);
-            keyboard.position.set(0, 0.75, 0.5);
-            computerGroup.add(keyboard);
-            
-            // Mouse
-            const mouseGeometry = new THREE.BoxGeometry(0.12, 0.05, 0.2);
-            const mouseMaterial = getCachedMaterial(0x34495E, 0.8, 0.1);
-            const mouse = new THREE.Mesh(mouseGeometry, mouseMaterial);
-            mouse.position.set(1.2, 0.75, 0.5);
-            computerGroup.add(mouse);
-            
-            // Registrar grupo de computadora en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Computadora',
-                mesh: computerGroup,
-                type: 'computer'
-            });
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(computerGroup);
-            
-            // ===== ZONA DE ALMACENAMIENTO =====
-            
-            // Estantería grande - Crear grupo para todas las partes
-            const shelfGroup = new THREE.Group();
-            shelfGroup.position.set(5.5, 0, 0);
-            
-            // Estructura principal de la estantería
-            const shelfGeometry = new THREE.BoxGeometry(2, 2.2, 0.5);
-            const shelfMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
-            shelf.position.set(0, 1.1, 0);
-            shelfGroup.add(shelf);
-            
-            // Registrar grupo de estantería en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Estantería',
-                mesh: shelfGroup,
-                type: 'shelf'
-            });
-            
-            // Estantes de la estantería
-            for (let i = 0; i < 4; i++) {
-                const shelfLevelGeometry = new THREE.BoxGeometry(2, 0.05, 0.5);
-                const shelfLevel = new THREE.Mesh(shelfLevelGeometry, shelfMaterial);
-                shelfLevel.position.set(0, 0.3 + i * 0.5, 0);
-                shelfGroup.add(shelfLevel);
-            }
-            
-            // Libros en la estantería
-            for (let i = 0; i < 8; i++) {
-                const bookGeometry = new THREE.BoxGeometry(0.15, 0.25, 0.4);
-                const bookMaterial = getCachedMaterial(0xE74C3C + i * 0x111111, 0.8, 0.1);
-                const book = new THREE.Mesh(bookGeometry, bookMaterial);
-                const row = Math.floor(i / 4);
-                const col = i % 4;
-                book.position.set((col - 1.5) * 0.2, 0.4 + row * 0.5, 0);
-                shelfGroup.add(book);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(shelfGroup);
-            
-            // ===== ZONA DE RELAX (Centro) =====
-            
-            // Sofá pequeño - Crear grupo para todas las partes
-            const sofaGroup = new THREE.Group();
-            sofaGroup.position.set(0, 0, 2);
-            
-            // Estructura principal del sofá
-            const sofaGeometry = new THREE.BoxGeometry(2.5, 0.8, 1);
-            const sofaMaterial = getCachedMaterial(0x3498DB, 0.8, 0.1);
-            const sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
-            sofa.position.set(0, 0.4, 0);
-            sofaGroup.add(sofa);
-            
-            // Registrar grupo de sofá en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Sofá',
-                mesh: sofaGroup,
-                type: 'sofa'
-            });
-            
-            // Cojines del sofá
-            for (let i = 0; i < 3; i++) {
-                const cushionGeometry = new THREE.BoxGeometry(0.7, 0.2, 0.8);
-                const cushionMaterial = getCachedMaterial(0x2980B9, 0.8, 0.1);
-                const cushion = new THREE.Mesh(cushionGeometry, cushionMaterial);
-                cushion.position.set(-0.8 + i * 0.8, 0.6, 0);
-                sofaGroup.add(cushion);
-            }
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(sofaGroup);
-            
-            // Mesa de centro - Crear grupo para todas las partes
-            const coffeeTableGroup = new THREE.Group();
-            coffeeTableGroup.position.set(0, 0, 3.5);
-            
-            const coffeeTableGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.8);
-            const coffeeTableMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-            const coffeeTable = new THREE.Mesh(coffeeTableGeometry, coffeeTableMaterial);
-            coffeeTable.position.set(0, 0.5, 0);
-            coffeeTableGroup.add(coffeeTable);
-            
-            // Patas de la mesa de centro
-            for (let i = 0; i < 4; i++) {
-                const tableLegGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 6);
-                const tableLegMaterial = getCachedMaterial(0x8B4513, 0.7, 0.1);
-                const tableLeg = new THREE.Mesh(tableLegGeometry, tableLegMaterial);
-                const x = (i % 2 === 0 ? -1 : 1) * 0.5;
-                const z = (i < 2 ? -1 : 1) * 0.3;
-                tableLeg.position.set(x, 0.25, z);
-                coffeeTableGroup.add(tableLeg);
-            }
-            
-            // Registrar grupo de mesa de centro en el array de muebles
-            furnitureObjects.push({
-                id: furnitureId++,
-                name: 'Mesa de Centro',
-                mesh: coffeeTableGroup,
-                type: 'table'
-            });
-            
-            // Agregar el grupo completo a la escena
-            personalRoomScene.add(coffeeTableGroup);
-            
-            // ===== ELEMENTOS DECORATIVOS =====
-            
-            // Ventana principal (más grande)
-            const windowGeometry = new THREE.BoxGeometry(3, 2, 0.1);
-            const windowMaterial = getCachedMaterial(0x87CEEB, 0.3, 0.8);
-            const window = new THREE.Mesh(windowGeometry, windowMaterial);
-            window.position.set(0, 1.75, roomDepth/2 - 0.1);
-            personalRoomScene.add(window);
-            
-            // Marco de la ventana
-            const windowFrameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
-            const windowFrameMaterial = getCachedMaterial(0xFFFFFF, 0.9, 0.1);
-            const windowFrame = new THREE.Mesh(windowFrameGeometry, windowFrameMaterial);
-            windowFrame.position.set(0, 1.75, roomDepth/2 - 0.05);
-            personalRoomScene.add(windowFrame);
-            
-            // Alfombra
-            const carpetGeometry = new THREE.BoxGeometry(8, 0.05, 6);
-            const carpetMaterial = getCachedMaterial(0xE67E22, 0.8, 0.1);
-            const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
-            carpet.position.set(0, 0.025, 0);
-            personalRoomScene.add(carpet);
-            
-            // Lámpara de techo
-            const ceilingLampGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 8);
-            const ceilingLampMaterial = getCachedMaterial(0xF1C40F, 0.8, 0.2);
-            const ceilingLamp = new THREE.Mesh(ceilingLampGeometry, ceilingLampMaterial);
-            ceilingLamp.position.set(0, roomHeight - 0.1, 0);
-            personalRoomScene.add(ceilingLamp);
-            
-            // Cable de la lámpara
-            const lampCableGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 6);
-            const lampCableMaterial = getCachedMaterial(0x2C3E50, 0.8, 0.1);
-            const lampCable = new THREE.Mesh(lampCableGeometry, lampCableMaterial);
-            lampCable.position.set(0, roomHeight - 0.35, 0);
-            personalRoomScene.add(lampCable);
-        }
+        
         
         function updatePersonalRoomMovement() {
             // Si el chat está abierto, no actualizar movimiento
@@ -2916,30 +2536,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             });
         }
         
-        function loadFurniturePositions() {
-            const savedPositions = localStorage.getItem('furniturePositions');
-            if (savedPositions) {
-                try {
-                    const furniturePositions = JSON.parse(savedPositions);
-                    furnitureObjects.forEach(furniture => {
-                        const savedData = furniturePositions[furniture.id];
-                        if (savedData && furniture.mesh) {
-                            // Aplicar posición guardada
-                            furniture.mesh.position.set(
-                                savedData.position.x,
-                                savedData.position.y,
-                                savedData.position.z
-                            );
-                            // Aplicar rotación guardada
-                            furniture.mesh.rotation.y = savedData.rotation.y;
-                        }
-                    });
-                    console.log('Posiciones de muebles cargadas desde localStorage');
-                } catch (error) {
-                    console.error('Error al cargar posiciones de muebles:', error);
-                }
-            }
-        }
+        
         
         function selectFurniture(furnitureId) {
             const furniture = furnitureObjects.find(f => f.id === furnitureId);
@@ -3066,7 +2663,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             updateFurnitureList();
             
             // Guardar automáticamente la posición sin deseleccionar
-            saveFurniturePositionsSilently();
+            saveFurnitureInventory();
         }
         
         function rotateSelectedFurniture() {
@@ -3076,58 +2673,10 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             updateFurnitureList();
             
             // Guardar automáticamente la rotación sin deseleccionar
-            saveFurniturePositionsSilently();
+            saveFurnitureInventory();
         }
         
-        function saveFurniturePositions() {
-            // Guardar todas las posiciones de muebles en localStorage
-            const furniturePositions = {};
-            furnitureObjects.forEach(furniture => {
-                furniturePositions[furniture.id] = {
-                    position: {
-                        x: furniture.mesh.position.x,
-                        y: furniture.mesh.position.y,
-                        z: furniture.mesh.position.z
-                    },
-                    rotation: {
-                        y: furniture.mesh.rotation.y
-                    }
-                };
-            });
-            
-            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
-            console.log('Posiciones de muebles guardadas en localStorage');
-            
-            // Si hay un mueble seleccionado, deseleccionarlo
-            if (selectedFurniture) {
-                deselectFurniture();
-                
-                // Mostrar la ventana de la habitación después de guardar
-                const roomNavigationPanel = document.getElementById('room-navigation-panel');
-                if (roomNavigationPanel && roomNavigationPanelOpen) {
-                    roomNavigationPanel.style.display = 'flex';
-                }
-            }
-        }
         
-        function saveFurniturePositionsSilently() {
-            // Guardar todas las posiciones de muebles en localStorage sin deseleccionar
-            const furniturePositions = {};
-            furnitureObjects.forEach(furniture => {
-                furniturePositions[furniture.id] = {
-                    position: {
-                        x: furniture.mesh.position.x,
-                        y: furniture.mesh.position.y,
-                        z: furniture.mesh.position.z
-                    },
-                    rotation: {
-                        y: furniture.mesh.rotation.y
-                    }
-                };
-            });
-            
-            localStorage.setItem('furniturePositions', JSON.stringify(furniturePositions));
-        }
 
         function animate(currentTime) {
             requestAnimationFrame(animate);
@@ -4255,7 +3804,7 @@ function applyCustomizationToAvatar() {
         ];
         
         // Función para cargar un mueble GLB (antes FBX)
-        function loadFurnitureFBX(furnitureData, position = { x: 0, y: 0, z: 0 }, rotation = 0) {
+        function loadFurnitureGLB(furnitureData, position = { x: 0, y: 0, z: 0 }, rotation = 0, scale = { x: 1, y: 1, z: 1 }) {
             return new Promise((resolve, reject) => {
                 // Verificar que estamos en la habitación personal
                 if (currentScene !== 'personal-room') {
@@ -4378,7 +3927,7 @@ object.position.set(position.x, position.y + 0.3, position.z);
             button.textContent = 'Cargando...';
             button.disabled = true;
             
-            loadFurnitureFBX(furnitureData, defaultPosition, 0)
+            loadFurnitureGLB(furnitureData, defaultPosition, 0)
                 .then((furnitureObject) => {
                     console.log(`Mueble agregado exitosamente: ${furnitureObject.name}`);
                     
@@ -4423,7 +3972,7 @@ object.position.set(position.x, position.y + 0.3, position.z);
             }
         }
         
-        function updateAvailableFurnitureList() {
+        async function updateAvailableFurnitureList() {
             const furnitureList = document.getElementById('available-furniture-list');
             const categoryFilter = document.getElementById('furniture-category-filter');
             if (!furnitureList) return;
@@ -4431,6 +3980,8 @@ object.position.set(position.x, position.y + 0.3, position.z);
             const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
             
             furnitureList.innerHTML = '';
+
+            const availableFurniture = await getAvailableFurniture();
             
             const filteredFurniture = selectedCategory === 'all' 
                 ? availableFurniture 
@@ -4462,24 +4013,7 @@ object.position.set(position.x, position.y + 0.3, position.z);
             }
         });
         
-        // Función para debug de muebles disponibles
-        /* [LIMPIEZA] Función de debug legacy no usada: debugAvailableFurniture
-function debugAvailableFurniture() {
-            console.log('=== DEBUG MUEBLES DISPONIBLES ===');
-            console.log('Total de muebles disponibles:', availableFurniture.length);
-            console.log('Categorías disponibles:');
-            const categories = [...new Set(availableFurniture.map(f => f.category))];
-            categories.forEach(category => {
-                const count = availableFurniture.filter(f => f.category === category).length;
-                console.log(`  ${category}: ${count} muebles`);
-            });
-            console.log('Muebles por categoría:');
-            availableFurniture.forEach(furniture => {
-                console.log(`  ${furniture.name} (${furniture.category}) - ${furniture.file}`);
-            });
-            console.log('==========================================');
-        }
-*/
+        
         // Función para mostrar notificaciones
         function showNotification(message, type = 'info') {
             // Crear elemento de notificación

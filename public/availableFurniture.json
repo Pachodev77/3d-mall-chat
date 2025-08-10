@@ -1,0 +1,697 @@
+[
+    {
+        "name": "Sofá Lounge",
+        "category": "Sala",
+        "file": "loungeSofa.glb"
+    },
+    {
+        "name": "Sillón Lounge",
+        "category": "Sala",
+        "file": "loungeChair.glb"
+    },
+    {
+        "name": "Sillón de Diseño",
+        "category": "Sala",
+        "file": "loungeDesignChair.glb"
+    },
+    {
+        "name": "Sofá de Diseño",
+        "category": "Sala",
+        "file": "loungeDesignSofa.glb"
+    },
+    {
+        "name": "Sofá de Diseño (Esquina)",
+        "category": "Sala",
+        "file": "loungeDesignSofaCorner.glb"
+    },
+    {
+        "name": "Sofá Largo",
+        "category": "Sala",
+        "file": "loungeSofaLong.glb"
+    },
+    {
+        "name": "Sofá (Esquina)",
+        "category": "Sala",
+        "file": "loungeSofaCorner.glb"
+    },
+    {
+        "name": "Otomana",
+        "category": "Sala",
+        "file": "loungeSofaOttoman.glb"
+    },
+    {
+        "name": "Mesa de Café",
+        "category": "Mesas",
+        "file": "tableCoffee.glb"
+    },
+    {
+        "name": "Mesa de Café (Cristal)",
+        "category": "Mesas",
+        "file": "tableCoffeeGlass.glb"
+    },
+    {
+        "name": "Mesa de Café (Cuadrada)",
+        "category": "Mesas",
+        "file": "tableCoffeeSquare.glb"
+    },
+    {
+        "name": "Mesa de Café (Cristal, Cuadrada)",
+        "category": "Mesas",
+        "file": "tableCoffeeGlassSquare.glb"
+    },
+    {
+        "name": "Mesa",
+        "category": "Mesas",
+        "file": "table.glb"
+    },
+    {
+        "name": "Mesa Redonda",
+        "category": "Mesas",
+        "file": "tableRound.glb"
+    },
+    {
+        "name": "Mesa con Mantel",
+        "category": "Mesas",
+        "file": "tableCloth.glb"
+    },
+    {
+        "name": "Mesa de Cruz",
+        "category": "Mesas",
+        "file": "tableCross.glb"
+    },
+    {
+        "name": "Mesa de Cruz con Mantel",
+        "category": "Mesas",
+        "file": "tableCrossCloth.glb"
+    },
+    {
+        "name": "Mesa de Cristal",
+        "category": "Mesas",
+        "file": "tableGlass.glb"
+    },
+    {
+        "name": "Mesa Auxiliar",
+        "category": "Mesas",
+        "file": "sideTable.glb"
+    },
+    {
+        "name": "Mesa Auxiliar con Cajones",
+        "category": "Mesas",
+        "file": "sideTableDrawers.glb"
+    },
+    {
+        "name": "Cama Individual",
+        "category": "Dormitorio",
+        "file": "bedSingle.glb"
+    },
+    {
+        "name": "Cama Doble",
+        "category": "Dormitorio",
+        "file": "bedDouble.glb"
+    },
+    {
+        "name": "Litera",
+        "category": "Dormitorio",
+        "file": "bedBunk.glb"
+    },
+    {
+        "name": "Armario de Cama",
+        "category": "Dormitorio",
+        "file": "cabinetBed.glb"
+    },
+    {
+        "name": "Cajón de Armario de Cama",
+        "category": "Dormitorio",
+        "file": "cabinetBedDrawer.glb"
+    },
+    {
+        "name": "Mesa de Armario de Cama",
+        "category": "Dormitorio",
+        "file": "cabinetBedDrawerTable.glb"
+    },
+    {
+        "name": "Barra de Cocina",
+        "category": "Cocina",
+        "file": "kitchenBar.glb"
+    },
+    {
+        "name": "Barra de Cocina (Final)",
+        "category": "Cocina",
+        "file": "kitchenBarEnd.glb"
+    },
+    {
+        "name": "Licuadora",
+        "category": "Cocina",
+        "file": "kitchenBlender.glb"
+    },
+    {
+        "name": "Gabinete de Cocina",
+        "category": "Cocina",
+        "file": "kitchenCabinet.glb"
+    },
+    {
+        "name": "Gabinete de Cocina (Esquina)",
+        "category": "Cocina",
+        "file": "kitchenCabinetCornerInner.glb"
+    },
+    {
+        "name": "Gabinete de Cocina (Redondo)",
+        "category": "Cocina",
+        "file": "kitchenCabinetCornerRound.glb"
+    },
+    {
+        "name": "Gabinete de Cocina con Cajón",
+        "category": "Cocina",
+        "file": "kitchenCabinetDrawer.glb"
+    },
+    {
+        "name": "Gabinete Superior",
+        "category": "Cocina",
+        "file": "kitchenCabinetUpper.glb"
+    },
+    {
+        "name": "Gabinete Superior (Esquina)",
+        "category": "Cocina",
+        "file": "kitchenCabinetUpperCorner.glb"
+    },
+    {
+        "name": "Gabinete Superior (Doble)",
+        "category": "Cocina",
+        "file": "kitchenCabinetUpperDouble.glb"
+    },
+    {
+        "name": "Gabinete Superior (Bajo)",
+        "category": "Cocina",
+        "file": "kitchenCabinetUpperLow.glb"
+    },
+    {
+        "name": "Cafetera",
+        "category": "Cocina",
+        "file": "kitchenCoffeeMachine.glb"
+    },
+    {
+        "name": "Nevera",
+        "category": "Cocina",
+        "file": "kitchenFridge.glb"
+    },
+    {
+        "name": "Nevera Empotrada",
+        "category": "Cocina",
+        "file": "kitchenFridgeBuiltIn.glb"
+    },
+    {
+        "name": "Nevera Grande",
+        "category": "Cocina",
+        "file": "kitchenFridgeLarge.glb"
+    },
+    {
+        "name": "Nevera Pequeña",
+        "category": "Cocina",
+        "file": "kitchenFridgeSmall.glb"
+    },
+    {
+        "name": "Microondas",
+        "category": "Cocina",
+        "file": "kitchenMicrowave.glb"
+    },
+    {
+        "name": "Fregadero",
+        "category": "Cocina",
+        "file": "kitchenSink.glb"
+    },
+    {
+        "name": "Estufa",
+        "category": "Cocina",
+        "file": "kitchenStove.glb"
+    },
+    {
+        "name": "Estufa Eléctrica",
+        "category": "Cocina",
+        "file": "kitchenStoveElectric.glb"
+    },
+    {
+        "name": "Tostadora",
+        "category": "Cocina",
+        "file": "toaster.glb"
+    },
+    {
+        "name": "Campana Extractora Grande",
+        "category": "Cocina",
+        "file": "hoodLarge.glb"
+    },
+    {
+        "name": "Campana Extractora Moderna",
+        "category": "Cocina",
+        "file": "hoodModern.glb"
+    },
+    {
+        "name": "Bañera",
+        "category": "Baño",
+        "file": "bathtub.glb"
+    },
+    {
+        "name": "Gabinete de Baño",
+        "category": "Baño",
+        "file": "bathroomCabinet.glb"
+    },
+    {
+        "name": "Cajón de Gabinete de Baño",
+        "category": "Baño",
+        "file": "bathroomCabinetDrawer.glb"
+    },
+    {
+        "name": "Espejo de Baño",
+        "category": "Baño",
+        "file": "bathroomMirror.glb"
+    },
+    {
+        "name": "Lavabo",
+        "category": "Baño",
+        "file": "bathroomSink.glb"
+    },
+    {
+        "name": "Lavabo Cuadrado",
+        "category": "Baño",
+        "file": "bathroomSinkSquare.glb"
+    },
+    {
+        "name": "Ducha",
+        "category": "Baño",
+        "file": "shower.glb"
+    },
+    {
+        "name": "Ducha Redonda",
+        "category": "Baño",
+        "file": "showerRound.glb"
+    },
+    {
+        "name": "Inodoro",
+        "category": "Baño",
+        "file": "toilet.glb"
+    },
+    {
+        "name": "Inodoro Cuadrado",
+        "category": "Baño",
+        "file": "toiletSquare.glb"
+    },
+    {
+        "name": "Lavadora",
+        "category": "Baño",
+        "file": "washer.glb"
+    },
+    {
+        "name": "Secadora",
+        "category": "Baño",
+        "file": "dryer.glb"
+    },
+    {
+        "name": "Lavadora y Secadora Apiladas",
+        "category": "Baño",
+        "file": "washerDryerStacked.glb"
+    },
+    {
+        "name": "Lámpara de Techo Cuadrada",
+        "category": "Iluminación",
+        "file": "lampSquareCeiling.glb"
+    },
+    {
+        "name": "Lámpara de Pared",
+        "category": "Iluminación",
+        "file": "lampWall.glb"
+    },
+    {
+        "name": "Lámpara de Suelo Redonda",
+        "category": "Iluminación",
+        "file": "lampRoundFloor.glb"
+    },
+    {
+        "name": "Lámpara de Mesa Redonda",
+        "category": "Iluminación",
+        "file": "lampRoundTable.glb"
+    },
+    {
+        "name": "Lámpara de Suelo Cuadrada",
+        "category": "Iluminación",
+        "file": "lampSquareFloor.glb"
+    },
+    {
+        "name": "Lámpara de Mesa Cuadrada",
+        "category": "Iluminación",
+        "file": "lampSquareTable.glb"
+    },
+    {
+        "name": "Ventilador de Techo",
+        "category": "Iluminación",
+        "file": "ceilingFan.glb"
+    },
+    {
+        "name": "Televisión (Antena)",
+        "category": "Electrónicos",
+        "file": "televisionAntenna.glb"
+    },
+    {
+        "name": "Televisión (Moderna)",
+        "category": "Electrónicos",
+        "file": "televisionModern.glb"
+    },
+    {
+        "name": "Televisión (Vintage)",
+        "category": "Electrónicos",
+        "file": "televisionVintage.glb"
+    },
+    {
+        "name": "Radio",
+        "category": "Electrónicos",
+        "file": "radio.glb"
+    },
+    {
+        "name": "Altavoz",
+        "category": "Electrónicos",
+        "file": "speaker.glb"
+    },
+    {
+        "name": "Altavoz Pequeño",
+        "category": "Electrónicos",
+        "file": "speakerSmall.glb"
+    },
+    {
+        "name": "Escritorio",
+        "category": "Escritorio",
+        "file": "desk.glb"
+    },
+    {
+        "name": "Escritorio de Esquina",
+        "category": "Escritorio",
+        "file": "deskCorner.glb"
+    },
+    {
+        "name": "Silla de Escritorio",
+        "category": "Escritorio",
+        "file": "chairDesk.glb"
+    },
+    {
+        "name": "Silla",
+        "category": "Escritorio",
+        "file": "chair.glb"
+    },
+    {
+        "name": "Silla con Cojín",
+        "category": "Escritorio",
+        "file": "chairCushion.glb"
+    },
+    {
+        "name": "Silla Moderna con Cojín",
+        "category": "Escritorio",
+        "file": "chairModernCushion.glb"
+    },
+    {
+        "name": "Silla Moderna con Marco y Cojín",
+        "category": "Escritorio",
+        "file": "chairModernFrameCushion.glb"
+    },
+    {
+        "name": "Silla Redonda",
+        "category": "Escritorio",
+        "file": "chairRounded.glb"
+    },
+    {
+        "name": "Laptop",
+        "category": "Escritorio",
+        "file": "laptop.glb"
+    },
+    {
+        "name": "Pantalla de Computadora",
+        "category": "Escritorio",
+        "file": "computerScreen.glb"
+    },
+    {
+        "name": "Teclado",
+        "category": "Escritorio",
+        "file": "computerKeyboard.glb"
+    },
+    {
+        "name": "Mouse",
+        "category": "Escritorio",
+        "file": "computerMouse.glb"
+    },
+    {
+        "name": "Estantería Abierta",
+        "category": "Almacenamiento",
+        "file": "bookcaseOpen.glb"
+    },
+    {
+        "name": "Estantería Abierta (Baja)",
+        "category": "Almacenamiento",
+        "file": "bookcaseOpenLow.glb"
+    },
+    {
+        "name": "Estantería Cerrada",
+        "category": "Almacenamiento",
+        "file": "bookcaseClosed.glb"
+    },
+    {
+        "name": "Estantería Cerrada con Puertas",
+        "category": "Almacenamiento",
+        "file": "bookcaseClosedDoors.glb"
+    },
+    {
+        "name": "Estantería Cerrada (Ancha)",
+        "category": "Almacenamiento",
+        "file": "bookcaseClosedWide.glb"
+    },
+    {
+        "name": "Gabinete de Televisión",
+        "category": "Almacenamiento",
+        "file": "cabinetTelevision.glb"
+    },
+    {
+        "name": "Gabinete de Televisión con Puertas",
+        "category": "Almacenamiento",
+        "file": "cabinetTelevisionDoors.glb"
+    },
+    {
+        "name": "Banco",
+        "category": "Almacenamiento",
+        "file": "bench.glb"
+    },
+    {
+        "name": "Banco con Cojín",
+        "category": "Almacenamiento",
+        "file": "benchCushion.glb"
+    },
+    {
+        "name": "Banco con Cojín (Bajo)",
+        "category": "Almacenamiento",
+        "file": "benchCushionLow.glb"
+    },
+    {
+        "name": "Oso de Peluche",
+        "category": "Decoración",
+        "file": "bear.glb"
+    },
+    {
+        "name": "Libros",
+        "category": "Decoración",
+        "file": "books.glb"
+    },
+    {
+        "name": "Planta Pequeña 1",
+        "category": "Decoración",
+        "file": "plantSmall1.glb"
+    },
+    {
+        "name": "Planta Pequeña 2",
+        "category": "Decoración",
+        "file": "plantSmall2.glb"
+    },
+    {
+        "name": "Planta Pequeña 3",
+        "category": "Decoración",
+        "file": "plantSmall3.glb"
+    },
+    {
+        "name": "Planta en Maceta",
+        "category": "Decoración",
+        "file": "pottedPlant.glb"
+    },
+    {
+        "name": "Almohada",
+        "category": "Decoración",
+        "file": "pillow.glb"
+    },
+    {
+        "name": "Almohada Azul",
+        "category": "Decoración",
+        "file": "pillowBlue.glb"
+    },
+    {
+        "name": "Almohada Larga",
+        "category": "Decoración",
+        "file": "pillowLong.glb"
+    },
+    {
+        "name": "Almohada Larga Azul",
+        "category": "Decoración",
+        "file": "pillowBlueLong.glb"
+    },
+    {
+        "name": "Alfombra (Felpudo)",
+        "category": "Decoración",
+        "file": "rugDoormat.glb"
+    },
+    {
+        "name": "Alfombra Rectangular",
+        "category": "Decoración",
+        "file": "rugRectangle.glb"
+    },
+    {
+        "name": "Alfombra Redonda",
+        "category": "Decoración",
+        "file": "rugRound.glb"
+    },
+    {
+        "name": "Alfombra Redondeada",
+        "category": "Decoración",
+        "file": "rugRounded.glb"
+    },
+    {
+        "name": "Alfombra Cuadrada",
+        "category": "Decoración",
+        "file": "rugSquare.glb"
+    },
+    {
+        "name": "Caja de Cartón (Cerrada)",
+        "category": "Misceláneos",
+        "file": "cardboardBoxClosed.glb"
+    },
+    {
+        "name": "Caja de Cartón (Abierta)",
+        "category": "Misceláneos",
+        "file": "cardboardBoxOpen.glb"
+    },
+    {
+        "name": "Perchero",
+        "category": "Misceláneos",
+        "file": "coatRack.glb"
+    },
+    {
+        "name": "Perchero de Pie",
+        "category": "Misceláneos",
+        "file": "coatRackStanding.glb"
+    },
+    {
+        "name": "Taburete de Bar",
+        "category": "Misceláneos",
+        "file": "stoolBar.glb"
+    },
+    {
+        "name": "Taburete de Bar (Cuadrado)",
+        "category": "Misceláneos",
+        "file": "stoolBarSquare.glb"
+    },
+    {
+        "name": "Papelera",
+        "category": "Misceláneos",
+        "file": "trashcan.glb"
+    },
+    {
+        "name": "Escaleras",
+        "category": "Misceláneos",
+        "file": "stairs.glb"
+    },
+    {
+        "name": "Escaleras (Esquina)",
+        "category": "Misceláneos",
+        "file": "stairsCorner.glb"
+    },
+    {
+        "name": "Escaleras Abiertas",
+        "category": "Misceláneos",
+        "file": "stairsOpen.glb"
+    },
+    {
+        "name": "Escaleras Abiertas (Individual)",
+        "category": "Misceláneos",
+        "file": "stairsOpenSingle.glb"
+    },
+    {
+        "name": "Panel de Revestimiento",
+        "category": "Misceláneos",
+        "file": "paneling.glb"
+    },
+    {
+        "name": "Pared",
+        "category": "Misceláneos",
+        "file": "wall.glb"
+    },
+    {
+        "name": "Pared (Esquina)",
+        "category": "Misceláneos",
+        "file": "wallCorner.glb"
+    },
+    {
+        "name": "Pared (Esquina Redonda)",
+        "category": "Misceláneos",
+        "file": "wallCornerRond.glb"
+    },
+    {
+        "name": "Pared con Puerta",
+        "category": "Misceláneos",
+        "file": "wallDoorway.glb"
+    },
+    {
+        "name": "Pared con Puerta Ancha",
+        "category": "Misceláneos",
+        "file": "wallDoorwayWide.glb"
+    },
+    {
+        "name": "Media Pared",
+        "category": "Misceláneos",
+        "file": "wallHalf.glb"
+    },
+    {
+        "name": "Pared con Ventana",
+        "category": "Misceláneos",
+        "file": "wallWindow.glb"
+    },
+    {
+        "name": "Pared con Ventana Deslizante",
+        "category": "Misceláneos",
+        "file": "wallWindowSlide.glb"
+    },
+    {
+        "name": "Puerta",
+        "category": "Misceláneos",
+        "file": "doorway.glb"
+    },
+    {
+        "name": "Puerta Frontal",
+        "category": "Misceláneos",
+        "file": "doorwayFront.glb"
+    },
+    {
+        "name": "Puerta Abierta",
+        "category": "Misceláneos",
+        "file": "doorwayOpen.glb"
+    },
+    {
+        "name": "Suelo (Esquina)",
+        "category": "Misceláneos",
+        "file": "floorCorner.glb"
+    },
+    {
+        "name": "Suelo (Esquina Redonda)",
+        "category": "Misceláneos",
+        "file": "floorCornerRound.glb"
+    },
+    {
+        "name": "Suelo Completo",
+        "category": "Misceláneos",
+        "file": "floorFull.glb"
+    },
+    {
+        "name": "Medio Suelo",
+        "category": "Misceláneos",
+        "file": "floorHalf.glb"
+    }
+]
