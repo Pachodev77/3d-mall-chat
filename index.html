@@ -207,7 +207,7 @@ const DEFAULT_FURNITURE_LAYOUT = [
     </div>
     
     <!-- Controles de muebles móviles -->
-    <div id="mobile-furniture-controls" style="position: fixed; bottom: 100px; right: 20px; z-index: 10000; display: none; flex-direction: column; gap: 10px; pointer-events: auto;">
+    <div id="mobile-furniture-controls" style="position: fixed; bottom: 200px; right: 20px; z-index: 10000; display: none; flex-direction: column; gap: 10px; pointer-events: auto;">
         <button class="mobile-btn" id="mobile-rotate-furniture-btn" title="Rotar Mueble" style="width: 60px; height: 60px; font-size: 24px;">🔄</button>
         <button class="mobile-btn" id="mobile-place-furniture-btn" title="Colocar Mueble" style="width: 60px; height: 60px; font-size: 24px;">✅</button>
     </div>
@@ -2806,7 +2806,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 // Añadir el mueble como hijo de la cámara para que se mueva con ella
                 // Posicionarlo ligeramente delante de la cámara
                 personalRoomCamera.add(selectedFurniture.mesh);
-                selectedFurniture.mesh.position.set(0, -0.5, -2); // Ajustar posición relativa a la cámara
+                selectedFurniture.mesh.position.set(0, 0, -2); // Ajustar posición relativa a la cámara (Y=0, Z=-2 para estar delante)
                 selectedFurniture.mesh.rotation.y = 0; // Resetear rotación relativa a la cámara
                 
                 // Mostrar los botones de control de muebles móviles
