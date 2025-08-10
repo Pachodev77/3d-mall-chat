@@ -2564,17 +2564,102 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             furnitureList.innerHTML = '';
             
+            if (furnitureObjects.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.style.cssText = 'padding: 16px; text-align: center; color: #bdc3c7; font-style: italic;';
+                emptyMessage.textContent = 'No hay muebles en la habitación. Usa el botón "Agregar Mueble" para comenzar.';
+                furnitureList.appendChild(emptyMessage);
+                return;
+            }
+            
             furnitureObjects.forEach(furniture => {
                 const furnitureItem = document.createElement('div');
-                furnitureItem.style.cssText = 'padding: 12px; margin: 6px 0; background: rgba(52,73,94,0.8); border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;';
-                furnitureItem.innerHTML = `
+                furnitureItem.style.cssText = 'padding: 12px; margin: 6px 0; background: rgba(52,73,94,0.8); border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative;';
+                
+                // Crear contenedor para el contenido y el botón
+                const content = document.createElement('div');
+                content.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+                
+                // Contenido del mueble
+                const furnitureInfo = document.createElement('div');
+                furnitureInfo.innerHTML = `
                     <div style="font-weight: bold; color: #fff; font-size: 16px; margin-bottom: 4px;">${furniture.name}</div>
                     <div style="font-size: 14px; color: #bdc3c7;">Posición: (${furniture.mesh.position.x.toFixed(1)}, ${furniture.mesh.position.z.toFixed(1)})</div>
                 `;
                 
-                furnitureItem.onclick = () => selectFurniture(furniture.id);
-                furnitureItem.onmouseenter = () => furnitureItem.style.borderColor = '#3498db';
-                furnitureItem.onmouseleave = () => furnitureItem.style.borderColor = 'transparent';
+                // Botón de eliminar
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '🗑️';
+                deleteButton.title = 'Eliminar mueble';
+                deleteButton.style.cssText = 'background: rgba(231, 76, 60, 0.2); border: none; color: #e74c3c; font-size: 16px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;';
+                
+                // Efectos hover para el botón
+                deleteButton.onmouseenter = (e) => {
+                    e.stopPropagation();
+                    deleteButton.style.background = 'rgba(231, 76, 60, 0.8)';
+                    deleteButton.style.color = 'white';
+                };
+                
+                deleteButton.onmouseleave = (e) => {
+                    e.stopPropagation();
+                    deleteButton.style.background = 'rgba(231, 76, 60, 0.2)';
+                    deleteButton.style.color = '#e74c3c';
+                };
+                
+                // Manejar clic en el botón de eliminar
+                deleteButton.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm(`¿Estás seguro de que quieres eliminar "${furniture.name}"?`)) {
+                        const success = removeFurniture(furniture.id);
+                        if (success) {
+                            showNotification(`✅ ${furniture.name} eliminado correctamente`, 'success');
+                            updateFurnitureList();
+                            selectedFurniture = null;
+                        } else {
+                            showNotification('❌ No se pudo eliminar el mueble', 'error');
+                        }
+                    }
+                };
+                
+                // Agregar elementos al contenedor
+                content.appendChild(furnitureInfo);
+                content.appendChild(deleteButton);
+                furnitureItem.appendChild(content);
+                
+                // Manejar selección del mueble
+                furnitureItem.onclick = (e) => {
+                    // Evitar que el clic en el botón de eliminar active la selección
+                    if (e.target === deleteButton || deleteButton.contains(e.target)) {
+                        return;
+                    }
+                    selectFurniture(furniture.id);
+                };
+                
+                furnitureItem.onmouseenter = () => {
+                    furnitureItem.style.borderColor = '#3498db';
+                    // Resaltar el mueble en la escena
+                    if (furniture.mesh) {
+                        furniture.mesh.traverse(child => {
+                            if (child.isMesh) {
+                                child.material.emissive = new THREE.Color(0x444444);
+                            }
+                        });
+                    }
+                };
+                
+                furnitureItem.onmouseleave = () => {
+                    if (!selectedFurniture || selectedFurniture.id !== furniture.id) {
+                        furnitureItem.style.borderColor = 'transparent';
+                        // Quitar resaltado del mueble en la escena
+                        if (furniture.mesh) {
+                            furniture.mesh.traverse(child => {
+                                if (child.isMesh) {
+                                    child.material.emissive = new THREE.Color(0x000000);
+                                }
+                            });
+                        }
+                    }
+                };
                 
                 if (selectedFurniture && selectedFurniture.id === furniture.id) {
                     furnitureItem.style.borderColor = '#27ae60';
@@ -3885,13 +3970,27 @@ function applyCustomizationToAvatar() {
                         console.log(`Modelo cargado exitosamente: ${furnitureData.name}`);
 
                         // Configurar el objeto cargado
-                        // Subir el mueble más arriba del suelo
-object.position.set(position.x, position.y + 0.3, position.z);
-                        object.rotation.y = rotation;
-
-                        // Calcular escala apropiada basada en el tamaño del modelo
+                        // Calcular la caja delimitadora para determinar la altura del modelo
                         const box = new THREE.Box3().setFromObject(object);
                         const size = box.getSize(new THREE.Vector3());
+                        
+                        // Guardar la altura del modelo para usarla al guardar
+                        furnitureData.modelHeight = size.y;
+                        
+                        // Establecer la posición del objeto
+                        // La posición Y proporcionada siempre es 0 (base del modelo)
+                        // Ajustamos la posición para que la base del modelo esté en Y=0
+                        object.position.set(
+                            position.x || 0,
+                            (position.y || 0) + (size.y / 2), // Ajustar para que la base esté en Y=0
+                            position.z || 0
+                        );
+                        
+                        // Establecer la rotación
+                        object.rotation.y = rotation || 0;
+
+                        // Calcular escala apropiada basada en el tamaño del modelo
+                        // Reutilizamos la caja delimitadora ya calculada
                         const maxDimension = Math.max(size.x, size.y, size.z);
 
                         // Escala base para que el mueble tenga un tamaño apropiado en la habitación

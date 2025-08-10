@@ -22,10 +22,68 @@ const FURNITURE_PERSIST_KEY = 'furnitureInventory';
 let furnitureObjects = [];
 let personalRoomScene = null;
 
+/**
+ * Elimina un mueble de la escena y del array de muebles
+ * @param {string} furnitureId - ID del mueble a eliminar
+ * @returns {boolean} - true si se eliminó correctamente, false en caso contrario
+ */
+function removeFurniture(furnitureId) {
+    if (!furnitureId) {
+        console.error('[persistencia] Se intentó eliminar un mueble sin ID');
+        return false;
+    }
+
+    // Encontrar el índice del mueble en el array
+    const index = furnitureObjects.findIndex(f => f.id === furnitureId);
+    if (index === -1) {
+        console.error(`[persistencia] No se encontró el mueble con ID: ${furnitureId}`);
+        return false;
+    }
+
+    const furniture = furnitureObjects[index];
+    
+    try {
+        // Remover de la escena
+        if (furniture.mesh && personalRoomScene) {
+            personalRoomScene.remove(furniture.mesh);
+            
+            // Limpiar recursos
+            if (furniture.mesh.traverse) {
+                furniture.mesh.traverse(child => {
+                    if (child.isMesh) {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(m => m.dispose());
+                            } else {
+                                child.material.dispose();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Eliminar del array
+        furnitureObjects.splice(index, 1);
+        
+        console.log(`[persistencia] Mueble eliminado: ${furniture.name} (ID: ${furnitureId})`);
+        
+        // Guardar cambios
+        saveFurnitureInventory();
+        
+        return true;
+    } catch (error) {
+        console.error(`[persistencia] Error al eliminar el mueble ${furnitureId}:`, error);
+        return false;
+    }
+}
+
 // Exponer funciones globalmente
 window.loadFurnitureInventory = loadFurnitureInventory;
 window.getAvailableFurniture = getAvailableFurniture;
 window.saveFurnitureInventory = saveFurnitureInventory;
+window.removeFurniture = removeFurniture;
 
 // Función para inicializar las referencias necesarias
 function initFurniturePersistence(scene, furnitureArray) {
@@ -66,11 +124,15 @@ function saveFurnitureInventory() {
                 name: f.name || 'Mueble sin nombre',
                 file: f.file || '',
                 category: f.category || 'general',
+                // Guardar la posición base (Y=0) para evitar acumulación de altura
+                // La posición Y se ajustará al cargar el mueble basado en su altura
                 position: {
                     x: f.mesh.position.x || 0,
-                    y: f.mesh.position.y || 0,
+                    y: 0, // Siempre guardamos Y=0 como base
                     z: f.mesh.position.z || 0,
                 },
+                // Guardar la altura del modelo para posicionamiento correcto
+                modelHeight: f.modelHeight || 0,
                 rotation: {
                     y: f.mesh.rotation.y || 0,
                 },
