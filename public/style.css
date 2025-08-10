@@ -1,4 +1,5 @@
-body {
+
+        body {
             margin: 0;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -659,20 +660,20 @@ body {
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            background: rgba(30, 30, 30, 0.7);
+            background: transparent; /* Fondo transparente */
             border-radius: 15px;
             padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: none; /* Sin sombra */
+            backdrop-filter: none; /* Sin filtro de desenfoque */
+            border: none; /* Sin borde */
         }
 
         .mobile-furniture-btn {
             width: 50px;
             height: 50px;
-            border: none;
+            border: 2px solid rgba(255, 255, 255, 0.5); /* Borde blanco semitransparente */
             border-radius: 10px;
-            background: rgba(75, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.3); /* Fondo muy sutil */
             color: white;
             font-size: 22px;
             cursor: pointer;
@@ -687,12 +688,12 @@ body {
         }
 
         .mobile-furniture-btn:hover {
-            background: rgba(128, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.5); /* Fondo un poco más visible al pasar el ratón */
             transform: scale(1.05);
         }
 
         .mobile-furniture-btn:active {
-            background: rgba(255, 215, 0, 0.8);
+            background: rgba(255, 215, 0, 0.8); /* Color de activación */
             transform: scale(0.95);
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
         }

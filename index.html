@@ -207,15 +207,17 @@ const DEFAULT_FURNITURE_LAYOUT = [
     </div>
 
     <!-- NUEVOS Controles de muebles móviles (Cruz) -->
-    <div id="mobile-furniture-cross-controls" style="position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; pointer-events: auto;">
-        <div style="display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 5px; justify-items: center; align-items: center;">
+    <div id="mobile-furniture-cross-controls" style="position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; pointer-events: auto; flex-direction: column; align-items: center;">
+        <div style="display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 2px; justify-items: center; align-items: center;">
             <div style="grid-column: 2; grid-row: 1;"><button class="mobile-furniture-btn" id="mobile-furniture-up">▲</button></div>
             <div style="grid-column: 1; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-left">◀</button></div>
-            <div style="grid-column: 2; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-rotate">🔄</button></div>
             <div style="grid-column: 3; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-right">▶</button></div>
             <div style="grid-column: 2; grid-row: 3;"><button class="mobile-furniture-btn" id="mobile-furniture-down">▼</button></div>
         </div>
-        <button class="mobile-furniture-btn" id="mobile-furniture-place" style="width: 100px; height: 40px; font-size: 16px; margin-top: 10px;">✅ Colocar</button>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="mobile-furniture-btn" id="mobile-furniture-rotate" style="width: 60px; height: 60px; font-size: 24px;">🔄</button>
+            <button class="mobile-furniture-btn" id="mobile-furniture-place" style="width: 60px; height: 60px; font-size: 24px;">✅</button>
+        </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
     <div id="simple-panel" class="customization-panel" style="min-width:340px; max-width:420px; width:90vw; min-height:480px; max-height:90vh; height:auto; display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(24,24,24,0.98); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.6); z-index:31000; flex-direction:column; overflow:auto; pointer-events:auto; padding:0;">
