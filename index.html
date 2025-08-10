@@ -25,6 +25,66 @@ window.skinFileMap = {
     zombieA: 'assets/kennei 3d characters 2/Skins/zombieA.png',
     zombieC: 'assets/kennei 3d characters 2/Skins/zombieC.png'
 };
+
+// --- [DEFAULT FURNITURE LAYOUT] ---
+const DEFAULT_FURNITURE_LAYOUT = [
+    {
+        name: "Sofá Lounge",
+        file: "loungeSofa.glb",
+        category: "Sala",
+        position: { x: 0, y: 0, z: -4 },
+        rotation: { y: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Mesa de Café",
+        file: "tableCoffee.glb",
+        category: "Mesas",
+        position: { x: 0, y: 0, z: -2 },
+        rotation: { y: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Cama Doble",
+        file: "bedDouble.glb",
+        category: "Dormitorio",
+        position: { x: 4, y: 0, z: 0 },
+        rotation: { y: Math.PI / 2 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Escritorio",
+        file: "desk.glb",
+        category: "Escritorio",
+        position: { x: -4, y: 0, z: 0 },
+        rotation: { y: -Math.PI / 2 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Silla de Escritorio",
+        file: "chairDesk.glb",
+        category: "Escritorio",
+        position: { x: -4, y: 0, z: 1 },
+        rotation: { y: -Math.PI / 2 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Estantería Abierta",
+        file: "bookcaseOpen.glb",
+        category: "Almacenamiento",
+        position: { x: -5.5, y: 0, z: -4 },
+        rotation: { y: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+    },
+    {
+        name: "Planta en Maceta",
+        file: "pottedPlant.glb",
+        category: "Decoración",
+        position: { x: 2, y: 0, z: -5.5 },
+        rotation: { y: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+    }
+];
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
@@ -214,7 +274,7 @@ window.skinFileMap = {
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="/public/furniture-persistence.js"></script>
+    <script type="module" src="/public/furniture-persistence.js"></script>
     <script src="./firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
@@ -2174,6 +2234,16 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 await setupPersonalRoom();
                 closeRoomNavigation();
                 
+                // Initialize furniture persistence with the created scene
+                // This needs to happen BEFORE loadFurnitureInventory is called
+                if (window.initFurniturePersistence) {
+                    window.initFurniturePersistence(personalRoomScene, window.furnitureObjects);
+                    console.log('[DEBUG] After initFurniturePersistence call in enterPersonalRoom, personalRoomScene:', personalRoomScene);
+                } else {
+                    console.error('[Habitación] Error: initFurniturePersistence no está disponible.');
+                    return; // Prevent further errors
+                }
+                
                 // Cargar el inventario de muebles guardado
                 console.log('[Habitación] Cargando inventario de muebles...');
                 const inventory = await loadFurnitureInventory();
@@ -2225,7 +2295,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-        function setupPersonalRoom() {
+        async function setupPersonalRoom() {
             console.log('[Habitación] Inicializando habitación personal...');
             
             // Ocultar escena del mall
@@ -2233,6 +2303,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             // Crear nueva escena para la habitación personal
             personalRoomScene = new THREE.Scene();
+            console.log('[DEBUG] personalRoomScene created:', personalRoomScene); // Add this
             personalRoomScene.background = new THREE.Color(0x2C3E50); // Azul oscuro
             
             // Inicializar el array de muebles si no existe
@@ -2240,13 +2311,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 window.furnitureObjects = [];
             }
             
-            // Inicializar el sistema de persistencia
-            if (window.initFurniturePersistence) {
-                console.log('[Habitación] Inicializando sistema de persistencia...');
-                window.initFurniturePersistence(personalRoomScene, window.furnitureObjects);
-            } else {
-                console.error('[Habitación] Error: No se pudo inicializar el sistema de persistencia');
-            }
+            
             
             // Crear cámara para la habitación
             personalRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -2682,6 +2747,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             if (roomNavigationPanel) {
                 roomNavigationPanel.style.display = 'none';
             }
+            // Ocultar el panel de edición de muebles cuando se selecciona un mueble
+            const furnitureEditPanel = document.getElementById('furniture-edit-panel');
+            if (furnitureEditPanel) {
+                furnitureEditPanel.style.display = 'none';
+            }
             
             // Resaltar SOLO el mueble seleccionado
             if (furniture.mesh) {
@@ -2753,6 +2823,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             const roomNavigationPanel = document.getElementById('room-navigation-panel');
             if (roomNavigationPanel && roomNavigationPanelOpen) {
                 roomNavigationPanel.style.display = 'flex';
+            }
+            // Mostrar el panel de edición de muebles cuando se deselecciona un mueble
+            const furnitureEditPanel = document.getElementById('furniture-edit-panel');
+            if (furnitureEditPanel && furnitureEditMode) {
+                furnitureEditPanel.style.display = 'flex';
             }
         }
         
