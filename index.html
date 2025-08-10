@@ -2806,8 +2806,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 // Añadir el mueble como hijo de la cámara para que se mueva con ella
                 // Posicionarlo ligeramente delante de la cámara
                 personalRoomCamera.add(selectedFurniture.mesh);
-                selectedFurniture.mesh.position.set(0, 0, -2); // Ajustar posición relativa a la cámara (Y=0, Z=-2 para estar delante)
+                // Ajustar posición y escala para que sea visible y manejable frente a la cámara
+                selectedFurniture.mesh.position.set(0, -0.5, -1.5); // Más cerca y ligeramente más bajo
+                selectedFurniture.mesh.scale.set(0.2, 0.2, 0.2); // Escala fija para visualización
                 selectedFurniture.mesh.rotation.y = 0; // Resetear rotación relativa a la cámara
+                console.log('Mueble seleccionado para móvil. Posición relativa a cámara:', selectedFurniture.mesh.position, 'Escala:', selectedFurniture.mesh.scale);
                 
                 // Mostrar los botones de control de muebles móviles
                 const mobileFurnitureControls = document.getElementById('mobile-furniture-controls');
@@ -2895,8 +2898,13 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                     selectedFurniture.mesh.quaternion.copy(worldQuaternion);
                     
                     // Asegurarse de que la posición Y sea la correcta para el suelo
-                    // Asumiendo que el punto de pivote del mueble está en su base
-                    selectedFurniture.mesh.position.y = 0; 
+                    // Usar la altura del modelo para posicionar correctamente su base en Y=0
+                    if (selectedFurniture.modelHeight !== undefined) {
+                        selectedFurniture.mesh.position.y = selectedFurniture.modelHeight / 2;
+                    } else {
+                        // Fallback si modelHeight no está disponible (debería estarlo)
+                        selectedFurniture.mesh.position.y = 0; 
+                    }
                 }
                 mobileFurnitureMovingModeActive = false;
                 // Ocultar los botones de control de muebles móviles
