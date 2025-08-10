@@ -335,14 +335,16 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         
         // --- Variables para el sistema de habitaciones personales ---
         let currentScene = 'mall'; // 'mall' o 'personal-room'
-        let personalRoomScene, personalRoomCamera, personalRoomRenderer;
+        // --- Variables de la habitación personal ---
+        // personalRoomScene está definido en furniture-persistence.js
+        let personalRoomCamera, personalRoomRenderer;
         let roomNavigationPanelOpen = false;
         let personalRoomTargetPosition, personalRoomTargetRotationY;
         
         // --- Variables para el sistema de edición de muebles ---
         let furnitureEditMode = false;
         let selectedFurniture = null;
-        let furnitureObjects = [];
+        // furnitureObjects ahora está definido en furniture-persistence.js
         let furnitureEditPanelOpen = false;
 
         // --- Variables de Interacción y Movimiento ---
@@ -2161,17 +2163,43 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-        function enterPersonalRoom() {
+        async function enterPersonalRoom() {
             if (currentScene === 'personal-room') return;
             
+            console.log('[Habitación] Entrando a la habitación personal...');
             currentScene = 'personal-room';
-            setupPersonalRoom();
-            closeRoomNavigation();
             
-            // Mostrar botón de regreso al mall
-            const returnToMallBtn = document.getElementById('return-to-mall-btn');
-            if (returnToMallBtn) {
-                returnToMallBtn.style.display = 'flex';
+            try {
+                // Configurar la habitación
+                await setupPersonalRoom();
+                closeRoomNavigation();
+                
+                // Cargar el inventario de muebles guardado
+                console.log('[Habitación] Cargando inventario de muebles...');
+                const inventory = await loadFurnitureInventory();
+                
+                if (inventory && inventory.length > 0) {
+                    console.log(`[Habitación] Se cargaron ${inventory.length} muebles correctamente`);
+                    // Actualizar la lista de muebles en la UI
+                    if (window.updateFurnitureList) {
+                        updateFurnitureList();
+                    }
+                } else {
+                    console.log('[Habitación] No hay muebles guardados o hubo un error al cargarlos');
+                }
+                
+                // Mostrar botón de regreso al mall
+                const returnToMallBtn = document.getElementById('return-to-mall-btn');
+                if (returnToMallBtn) {
+                    returnToMallBtn.style.display = 'flex';
+                }
+                
+                console.log('[Habitación] Habitación personal lista');
+                
+            } catch (error) {
+                console.error('[Habitación] Error al entrar a la habitación personal:', error);
+                // Mostrar mensaje de error al usuario
+                alert('Ocurrió un error al cargar la habitación. Por favor, recarga la página e inténtalo de nuevo.');
             }
         }
         
@@ -2198,12 +2226,27 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         }
         
         function setupPersonalRoom() {
+            console.log('[Habitación] Inicializando habitación personal...');
+            
             // Ocultar escena del mall
             renderer.domElement.style.display = 'none';
             
             // Crear nueva escena para la habitación personal
             personalRoomScene = new THREE.Scene();
             personalRoomScene.background = new THREE.Color(0x2C3E50); // Azul oscuro
+            
+            // Inicializar el array de muebles si no existe
+            if (!window.furnitureObjects) {
+                window.furnitureObjects = [];
+            }
+            
+            // Inicializar el sistema de persistencia
+            if (window.initFurniturePersistence) {
+                console.log('[Habitación] Inicializando sistema de persistencia...');
+                window.initFurniturePersistence(personalRoomScene, window.furnitureObjects);
+            } else {
+                console.error('[Habitación] Error: No se pudo inicializar el sistema de persistencia');
+            }
             
             // Crear cámara para la habitación
             personalRoomCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -2218,7 +2261,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             personalRoomRenderer = new THREE.WebGLRenderer({ antialias: true });
             personalRoomRenderer.setSize(window.innerWidth, window.innerHeight);
             personalRoomRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            personalRoomRenderer.shadowMap.enabled = false;
+            personalRoomRenderer.shadowMap.enabled = true;
+            personalRoomRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
             personalRoomRenderer.domElement.style.zIndex = '1';
             document.body.appendChild(personalRoomRenderer.domElement);
             
@@ -2228,17 +2272,18 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 1024;
+            directionalLight.shadow.mapSize.height = 1024;
             personalRoomScene.add(directionalLight);
             
             // Crear habitación
             createPersonalRoom();
-
-            // Restaurar posiciones de muebles si existen
-            loadFurnitureInventory();
             
-            // Crear y actualizar cielo visible desde las ventanas
-            // Eliminar la línea:
-            // createPersonalRoomSky();
+            // Iniciar la animación de la habitación
+            animatePersonalRoom();
+            
+            console.log('[Habitación] Habitación personal inicializada correctamente');
             // Y también:
             // if (personalRoomSkyInterval) clearInterval(personalRoomSkyInterval);
             // personalRoomSkyInterval = setInterval(updatePersonalRoomSky, 60000); // Actualizar cada minuto
@@ -3880,15 +3925,32 @@ object.position.set(position.x, position.y + 0.3, position.z);
                             }
                         });
 
-                        // Crear objeto de mueble
+                        // Crear objeto de mueble con todos los campos necesarios
                         const furnitureObject = {
-                            id: `furniture_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                            name: furnitureData.name,
-                            category: furnitureData.category,
+                            id: furnitureData.id || `furniture_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            name: furnitureData.name || 'Mueble sin nombre',
+                            category: furnitureData.category || 'general',
+                            file: furnitureData.file || '',
                             mesh: object,
                             originalPosition: { ...position },
-                            originalRotation: rotation
+                            originalRotation: rotation || 0,
+                            // Asegurarse de que las propiedades de posición, rotación y escala estén presentes
+                            position: {
+                                x: position?.x || 0,
+                                y: position?.y || 0,
+                                z: position?.z || 0
+                            },
+                            rotation: {
+                                y: rotation || 0
+                            },
+                            scale: {
+                                x: (furnitureData.scale?.x !== undefined) ? furnitureData.scale.x : 1,
+                                y: (furnitureData.scale?.y !== undefined) ? furnitureData.scale.y : 1,
+                                z: (furnitureData.scale?.z !== undefined) ? furnitureData.scale.z : 1
+                            }
                         };
+                        
+                        console.log('[loadFurnitureGLB] Mueble creado:', furnitureObject);
 
                         // Agregar a la escena y al array de muebles
                         personalRoomScene.add(object);
