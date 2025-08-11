@@ -658,7 +658,7 @@ body {
             display: none; /* Oculto por defecto, se muestra con JS */
             position: fixed;
             right: 15px;
-            bottom: 150px; /* Mover más arriba */
+            bottom: 110px;
             z-index: 10000;
             pointer-events: auto;
             background: none;
@@ -668,38 +668,16 @@ body {
             margin: 0;
         }
         
-        /* Asegurar que el panel de edición no se vea afectado por los controles */
-        #furniture-edit-panel {
-            z-index: 11000 !important; /* Mayor z-index que los controles */
-            right: 16px !important;
-            left: auto !important;
-        }
-        
-        /* Ajuste para móviles */
-        @media (max-width: 480px) {
-            #furniture-edit-panel {
-                width: calc(100% - 32px) !important;
-                max-width: 400px !important;
-                right: 16px !important;
-                left: auto !important;
-            }
-        }
-        
         .furniture-controls-grid {
             display: flex;
             flex-direction: column;
-            gap: 3px; /* Reducir espacio entre filas */
+            gap: 5px;
         }
         
         .furniture-controls-row {
             display: flex;
             justify-content: center;
-            gap: 3px; /* Reducir espacio entre botones */
-        }
-        
-        /* Agrupar más los botones de dirección */
-        .furniture-controls-row:nth-child(2) {
-            gap: 1px !important; /* Mínimo espacio entre botones de dirección */
+            gap: 5px;
         }
         
         .furniture-controls-spacer {
@@ -775,7 +753,7 @@ body {
         @media (max-width: 480px) {
             #mobile-furniture-cross-controls {
                 right: 8px;
-                bottom: 120px; /* Ajustar para móvil también */
+                bottom: 90px;
             }
             
             .mobile-furniture-btn {
