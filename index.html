@@ -225,7 +225,9 @@ const DEFAULT_FURNITURE_LAYOUT = [
             <div style="grid-column: 1; grid-row: 2; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
                 <button class="mobile-furniture-btn" id="mobile-furniture-left" style="width: 100%; height: 100%;">◀</button>
             </div>
-            <div style="grid-column: 2; grid-row: 2; width: 100%; height: 100%;"></div> <!-- Celda central vacía -->
+            <div style="grid-column: 2; grid-row: 2; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                <button class="mobile-furniture-btn mobile-furniture-small-btn" id="mobile-furniture-delete" title="Eliminar mueble" style="width: 40px; height: 40px; background-color: #ff4444; color: white; font-size: 16px; border: 2px solid #cc0000;">🗑️</button>
+            </div>
             <div style="grid-column: 3; grid-row: 2; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
                 <button class="mobile-furniture-btn" id="mobile-furniture-right" style="width: 100%; height: 100%;">▶</button>
             </div>
@@ -1982,6 +1984,37 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             // Configurar botones de movimiento vertical
             setupFurnitureButton(mobileFurnitureMoveUpBtn, () => { if (selectedFurniture) moveSelectedFurniture('up'); }, true);
             setupFurnitureButton(mobileFurnitureMoveDownBtn, () => { if (selectedFurniture) moveSelectedFurniture('down'); }, true);
+            
+            // Configurar botón de eliminar mueble
+            const mobileFurnitureDeleteBtn = document.getElementById('mobile-furniture-delete');
+            if (mobileFurnitureDeleteBtn) {
+                mobileFurnitureDeleteBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (selectedFurniture && confirm('¿Estás seguro de que quieres eliminar este mueble?')) {
+                        // Eliminar el mueble de la escena
+                        if (selectedFurniture.mesh && selectedFurniture.mesh.parent) {
+                            selectedFurniture.mesh.parent.remove(selectedFurniture.mesh);
+                        }
+                        
+                        // Eliminar el mueble del inventario
+                        const furnitureList = document.getElementById('furniture-list');
+                        const furnitureItem = document.querySelector(`.furniture-item[data-id="${selectedFurniture.id}"]`);
+                        if (furnitureItem && furnitureList) {
+                            furnitureList.removeChild(furnitureItem);
+                        }
+                        
+                        // Deseleccionar el mueble
+                        deselectFurniture();
+                        
+                        // Guardar cambios
+                        saveFurnitureInventory();
+                    }
+                });
+                
+                // Asegurar que el botón de eliminar no active el movimiento continuo
+                mobileFurnitureDeleteBtn.addEventListener('mousedown', (e) => e.preventDefault());
+                mobileFurnitureDeleteBtn.addEventListener('touchstart', (e) => e.preventDefault());
+            }
         }
         
         function setupMobileControls() {
@@ -4352,11 +4385,24 @@ function applyCustomizationToAvatar() {
                 .then((furnitureObject) => {
                     console.log(`Mueble agregado exitosamente: ${furnitureObject.name}`);
                     
-                    // Actualizar la lista de muebles
-                    updateAvailableFurnitureList(); // Re-render the list to reflect changes
+                    // Cerrar el panel de selección de muebles
+                    closeFurnitureSelectionPanel();
                     
-                    // Seleccionar el mueble recién agregado
-                    selectFurniture(furnitureObject.id);
+                    // Mostrar controles de edición
+                    const mobileControls = document.getElementById('mobile-furniture-cross-controls');
+                    if (mobileControls) {
+                        mobileControls.style.display = 'flex';
+                    }
+                    
+                    // Seleccionar automáticamente el mueble recién agregado
+                    if (furnitureObject.userData && furnitureObject.userData.furnitureId) {
+                        selectFurniture(furnitureObject.userData.furnitureId);
+                    } else {
+                        selectFurniture(furnitureObject.id);
+                    }
+                    
+                    // Actualizar la lista de muebles
+                    updateAvailableFurnitureList();
                     
                     // Mostrar mensaje de éxito
                     showNotification(`✅ ${furnitureData.name} agregado exitosamente`, 'success');
