@@ -207,16 +207,14 @@ const DEFAULT_FURNITURE_LAYOUT = [
     </div>
 
     <!-- NUEVOS Controles de muebles móviles (Cruz) -->
-    <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; display: none; pointer-events: auto; flex-direction: column; align-items: center;">
+    <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; pointer-events: auto; flex-direction: column; align-items: center;">
         <div style="display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 2px; justify-items: center; align-items: center;">
             <div style="grid-column: 2; grid-row: 1;"><button class="mobile-furniture-btn" id="mobile-furniture-up">▲</button></div>
             <div style="grid-column: 1; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-left">◀</button></div>
             <div style="grid-column: 3; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-right">▶</button></div>
+            <div style="grid-column: 1; grid-row: 3;"><button class="mobile-furniture-btn mobile-furniture-small-btn" id="mobile-furniture-rotate">🔄</button></div>
             <div style="grid-column: 2; grid-row: 3;"><button class="mobile-furniture-btn" id="mobile-furniture-down">▼</button></div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button class="mobile-furniture-btn" id="mobile-furniture-rotate" style="width: 60px; height: 60px; font-size: 24px;">🔄</button>
-            <button class="mobile-furniture-btn" id="mobile-furniture-place" style="width: 60px; height: 60px; font-size: 24px;">✅</button>
+            <div style="grid-column: 3; grid-row: 3;"><button class="mobile-furniture-btn mobile-furniture-small-btn" id="mobile-furniture-place">✅</button></div>
         </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
@@ -2664,22 +2662,18 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 clearAllFurnitureHighlights();
                 openFurnitureEditPanel();
                 setupFurnitureSelection();
-                // Mostrar controles de muebles móviles si es móvil
-                if (window.IS_MOBILE) {
-                    const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
-                    if (mobileFurnitureCrossControls) {
-                        mobileFurnitureCrossControls.style.display = 'flex';
-                    }
+                // Mostrar controles de muebles móviles si es móvil o pantalla pequeña
+                const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
+                if (mobileFurnitureCrossControls) {
+                    mobileFurnitureCrossControls.style.display = 'flex';
                 }
             } else {
                 closeFurnitureEditPanel();
                 deselectFurniture();
-                // Ocultar controles de muebles móviles si es móvil
-                if (window.IS_MOBILE) {
-                    const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
-                    if (mobileFurnitureCrossControls) {
-                        mobileFurnitureCrossControls.style.display = 'none';
-                    }
+                // Ocultar controles de muebles móviles
+                const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
+                if (mobileFurnitureCrossControls) {
+                    mobileFurnitureCrossControls.style.display = 'none';
                 }
             }
         }
@@ -2840,10 +2834,14 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 roomNavigationPanel.style.display = 'none';
             }
             // Ocultar el panel de edición de muebles cuando se selecciona un mueble
+            // REMOVED: furnitureEditPanel.style.display = 'none';
+            // Ocultar el panel de edición de muebles cuando se selecciona un mueble
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel) {
                 furnitureEditPanel.style.display = 'none';
             }
+            // The panel should remain open to allow selecting other furniture from the list or scene
+            // Its visibility is now solely controlled by furnitureEditMode in toggleFurnitureEditMode()
             
             // Resaltar SOLO el mueble seleccionado
             if (furniture.mesh) {
@@ -2936,16 +2934,17 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 roomNavigationPanel.style.display = 'flex';
             }
             // Mostrar el panel de edición de muebles cuando se deselecciona un mueble
+            // REMOVED: furnitureEditPanel.style.display = 'flex';
+            // Mostrar el panel de edición de muebles cuando se deselecciona un mueble
             const furnitureEditPanel = document.getElementById('furniture-edit-panel');
             if (furnitureEditPanel && furnitureEditMode) {
                 furnitureEditPanel.style.display = 'flex';
             }
-            // Ocultar controles de muebles móviles si es móvil
-            if (window.IS_MOBILE) {
-                const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
-                if (mobileFurnitureCrossControls) {
-                    mobileFurnitureCrossControls.style.display = 'none';
-                }
+            // The panel's visibility is now solely controlled by furnitureEditMode in toggleFurnitureEditMode()
+            // Ocultar controles de muebles móviles
+            const mobileFurnitureCrossControls = document.getElementById('mobile-furniture-cross-controls');
+            if (mobileFurnitureCrossControls) {
+                mobileFurnitureCrossControls.style.display = 'none';
             }
         }
         
