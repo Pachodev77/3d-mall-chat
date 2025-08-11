@@ -653,119 +653,22 @@ body {
             }
         }
         
-        /* ===== CONTROLES DE MUEBLES MÓVILES ===== */
+        /* NUEVOS ESTILOS PARA CONTROLES DE MUEBLES MÓVILES (CRUZ) */
         #mobile-furniture-cross-controls {
             display: none; /* Oculto por defecto, se muestra con JS */
-            position: fixed;
-            right: 15px;
-            bottom: 110px;
-            z-index: 10000;
-            pointer-events: auto;
-            background: none;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .furniture-controls-grid {
-            display: flex;
             flex-direction: column;
-            gap: 5px;
-        }
-        
-        .furniture-controls-row {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .furniture-controls-spacer {
-            width: 40px;
-            height: 40px;
-            margin: 2px;
-        }
-        
-        .mobile-furniture-btn {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(30, 30, 30, 0.7) !important;
-            color: #fff;
-            font-size: 18px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            margin: 2px;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .mobile-furniture-btn:active {
-            background: rgba(60, 60, 60, 0.8) !important;
-            transform: scale(0.95);
-        }
-        
-        /* Estilos específicos para botones de movimiento vertical */
-        #mobile-furniture-vertical-up {
-            background: rgba(46, 204, 113, 0.7) !important;
-        }
-        
-        #mobile-furniture-vertical-down {
-            background: rgba(231, 76, 60, 0.7) !important;
-        }
-        
-        #mobile-furniture-rotate {
-            background: rgba(52, 152, 219, 0.7) !important;
-        }
-        
-        #mobile-furniture-place {
-            background: rgba(46, 204, 113, 0.7) !important;
-        }
-        
-        /* Efecto hover para desktop */
-        @media (hover: hover) {
-            .mobile-furniture-btn:hover {
-                background: rgba(60, 60, 60, 0.9) !important;
-            }
-            
-            #mobile-furniture-vertical-up:hover {
-                background: rgba(46, 204, 113, 0.9) !important;
-            }
-            
-            #mobile-furniture-vertical-down:hover {
-                background: rgba(231, 76, 60, 0.9) !important;
-            }
-            
-            #mobile-furniture-rotate:hover {
-                background: rgba(52, 152, 219, 0.9) !important;
-            }
-            
-            #mobile-furniture-place:hover {
-                background: rgba(46, 204, 113, 0.9) !important;
-            }
-        }
-        
-        /* Ajustes para pantallas pequeñas */
-        @media (max-width: 480px) {
-            #mobile-furniture-cross-controls {
-                right: 8px;
-                bottom: 90px;
-            }
-            
-            .mobile-furniture-btn {
-                width: 42px !important;
-                height: 42px !important;
-                font-size: 20px !important;
-            }
-            
-            .furniture-controls-spacer {
-                width: 42px;
-                height: 42px;
-            }
+            gap: 10px;
+            background: transparent; /* Fondo transparente */
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: none; /* Sin sombra */
+            backdrop-filter: none; /* Sin filtro de desenfoque */
+            border: none; /* Sin borde */
+            right: 20px; /* Alineado a la derecha */
+            left: auto; /* Desactivar alineación izquierda */
+            transform: none; /* Desactivar transformación de centrado */
+            bottom: 120px; /* Posición desde abajo */
         }
 
         .mobile-furniture-btn {
@@ -796,6 +699,65 @@ body {
             background: rgba(255, 215, 0, 0.8); /* Color de activación */
             transform: scale(0.95);
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* Estilo base para todos los botones */
+        .mobile-furniture-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.15s ease-out;
+            box-sizing: border-box;
+        }
+        
+        /* Estilo para los botones de movimiento (flechas) */
+        #mobile-furniture-up,
+        #mobile-furniture-down,
+        #mobile-furniture-left,
+        #mobile-furniture-right {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+        
+        /* Estilo para los botones de acción (rotar, colocar, vertical) */
+        .mobile-furniture-vertical-btn,
+        .mobile-furniture-small-btn {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 20px !important;
+            line-height: 1;
+            padding: 0;
+        }
+        
+        #mobile-furniture-move-up {
+            background: rgba(0, 100, 0, 0.6) !important;
+        }
+        
+        #mobile-furniture-move-down {
+            background: rgba(139, 0, 0, 0.6) !important;
+        }
+        
+        .mobile-furniture-vertical-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+        
+        #mobile-furniture-move-up:active {
+            background: rgba(0, 200, 0, 0.8) !important;
+        }
+        
+        #mobile-furniture-move-down:active {
+            background: rgba(255, 0, 0, 0.8) !important;
         }
 
         .mobile-furniture-small-btn {

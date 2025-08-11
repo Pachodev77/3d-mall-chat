@@ -125,10 +125,10 @@ function saveFurnitureInventory() {
                 name: f.name || 'Mueble sin nombre',
                 file: f.file || '',
                 category: f.category || 'general',
-                // Guardar la posición real incluyendo la altura (posición Y)
+                // Guardar la posición exacta incluyendo la altura (Y)
                 position: {
                     x: f.mesh.position.x || 0,
-                    y: f.mesh.position.y || 0, // Guardar la posición Y real
+                    y: f.mesh.position.y || 0, // Guardar la posición Y actual
                     z: f.mesh.position.z || 0,
                 },
                 // Guardar la altura del modelo para referencia
