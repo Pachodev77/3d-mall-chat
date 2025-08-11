@@ -125,9 +125,29 @@ const DEFAULT_FURNITURE_LAYOUT = [
             <div style="border-top: 1px solid #333; padding-top: 16px;">
                 <h4 style="margin: 0 0 12px 0; color: #F39C12; font-size: 18px;">Controles:</h4>
                 <p style="margin: 0 0 6px 0; font-size: 14px;">• WASD/Flechas: Mover mueble seleccionado</p>
+                <p style="margin: 0 0 6px 0; font-size: 14px;">• T/Shift+T: Subir/Bajar mueble</p>
                 <p style="margin: 0 0 6px 0; font-size: 14px;">• R: Rotar mueble</p>
                 <p style="margin: 0 0 6px 0; font-size: 14px;">• ESC: Deseleccionar</p>
                 <p style="margin: 0; font-size: 14px;">• Enter: Guardar posición</p>
+                <style>
+                    @media (max-width: 480px) {
+                        #furniture-edit-panel {
+                            width: 95% !important;
+                            right: 2.5% !important;
+                            left: auto !important;
+                            max-height: 90vh !important;
+                        }
+                        #furniture-edit-panel > div:last-child {
+                            overflow-y: auto;
+                            max-height: calc(90vh - 60px) !important;
+                        }
+                        #move-up-btn, #move-down-btn {
+                            width: 60px !important;
+                            height: 60px !important;
+                            font-size: 28px !important;
+                        }
+                    }
+                </style>
             </div>
         </div>
     </div>
@@ -206,15 +226,29 @@ const DEFAULT_FURNITURE_LAYOUT = [
         </div>
     </div>
 
-    <!-- NUEVOS Controles de muebles móviles (Cruz) -->
-    <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; pointer-events: auto; flex-direction: column; align-items: center;">
-        <div style="display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 2px; justify-items: center; align-items: center;">
-            <div style="grid-column: 2; grid-row: 1;"><button class="mobile-furniture-btn" id="mobile-furniture-up">▲</button></div>
-            <div style="grid-column: 1; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-left">◀</button></div>
-            <div style="grid-column: 3; grid-row: 2;"><button class="mobile-furniture-btn" id="mobile-furniture-right">▶</button></div>
-            <div style="grid-column: 1; grid-row: 3;"><button class="mobile-furniture-btn mobile-furniture-small-btn" id="mobile-furniture-rotate">🔄</button></div>
-            <div style="grid-column: 2; grid-row: 3;"><button class="mobile-furniture-btn" id="mobile-furniture-down">▼</button></div>
-            <div style="grid-column: 3; grid-row: 3;"><button class="mobile-furniture-btn mobile-furniture-small-btn" id="mobile-furniture-place">✅</button></div>
+    <!-- Controles de muebles móviles - Versión mejorada -->
+    <div id="mobile-furniture-cross-controls">
+        <div class="furniture-controls-grid">
+            <!-- Fila superior: Controles de movimiento vertical -->
+            <div class="furniture-controls-row">
+                <button class="mobile-furniture-btn" id="mobile-furniture-vertical-up" title="Mover arriba">T</button>
+                <button class="mobile-furniture-btn" id="mobile-furniture-up" title="Mover adelante">▲</button>
+                <button class="mobile-furniture-btn" id="mobile-furniture-vertical-down" title="Mover abajo" style="transform: rotate(180deg);">T</button>
+            </div>
+            
+            <!-- Fila media: Controles laterales -->
+            <div class="furniture-controls-row">
+                <button class="mobile-furniture-btn" id="mobile-furniture-left" title="Mover izquierda">◀</button>
+                <div class="furniture-controls-spacer"></div>
+                <button class="mobile-furniture-btn" id="mobile-furniture-right" title="Mover derecha">▶</button>
+            </div>
+            
+            <!-- Fila inferior: Controles de acción -->
+            <div class="furniture-controls-row">
+                <button class="mobile-furniture-btn" id="mobile-furniture-rotate" title="Rotar">🔄</button>
+                <button class="mobile-furniture-btn" id="mobile-furniture-down" title="Mover atrás">▼</button>
+                <button class="mobile-furniture-btn" id="mobile-furniture-place" title="Colocar">✅</button>
+            </div>
         </div>
     </div>
         <!-- Panel de personalización completamente rediseñado -->
@@ -1845,8 +1879,42 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         document.addEventListener('click', handleGlobalClick);
         }
         
+        function setupVerticalMovementControls() {
+            // Botones de movimiento vertical
+            const moveUpBtn = document.getElementById('move-up-btn');
+            const moveDownBtn = document.getElementById('move-down-btn');
+            
+            if (moveUpBtn) {
+                moveUpBtn.addEventListener('click', () => moveSelectedFurniture('up'));
+            }
+            
+            if (moveDownBtn) {
+                moveDownBtn.addEventListener('click', () => moveSelectedFurniture('down'));
+            }
+            
+            // Manejar teclas T (subir) y Shift+T (bajar)
+            document.addEventListener('keydown', (e) => {
+                if (!selectedFurniture || !selectedFurniture.mesh) return;
+                
+                if (e.key.toLowerCase() === 't') {
+                    if (e.shiftKey) {
+                        // Shift + T: Bajar
+                        moveSelectedFurniture('down');
+                        e.preventDefault(); // Evitar que se active el atajo de búsqueda del navegador
+                    } else {
+                        // Solo T: Subir
+                        moveSelectedFurniture('up');
+                        e.preventDefault(); // Evitar que se active el atajo de búsqueda del navegador
+                    }
+                }
+            });
+        }
+        
         function setupUIButtons() {
             console.log('Configurando botones de UI...');
+            
+            // Configurar controles de movimiento vertical
+            setupVerticalMovementControls();
             
             // Botón de habitaciones personales
             const roomToggleBtn = document.getElementById('room-toggle-btn');
@@ -1895,6 +1963,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             const mobileFurnitureRightBtn = document.getElementById('mobile-furniture-right');
             const mobileFurnitureRotateBtn = document.getElementById('mobile-furniture-rotate');
             const mobileFurniturePlaceBtn = document.getElementById('mobile-furniture-place');
+            const mobileFurnitureVerticalUpBtn = document.getElementById('mobile-furniture-vertical-up');
+            const mobileFurnitureVerticalDownBtn = document.getElementById('mobile-furniture-vertical-down');
 
             // Helper function to attach touch/mouse events
             let moveInterval = null; // Variable para el intervalo de movimiento continuo
@@ -1945,10 +2015,17 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 }
             }
 
+            // Configurar botones de movimiento estándar
             setupFurnitureButton(mobileFurnitureUpBtn, () => { if (selectedFurniture) moveSelectedFurniture('forward'); }, true);
             setupFurnitureButton(mobileFurnitureDownBtn, () => { if (selectedFurniture) moveSelectedFurniture('backward'); }, true);
             setupFurnitureButton(mobileFurnitureLeftBtn, () => { if (selectedFurniture) moveSelectedFurniture('left'); }, true);
             setupFurnitureButton(mobileFurnitureRightBtn, () => { if (selectedFurniture) moveSelectedFurniture('right'); }, true);
+            
+            // Configurar botones de movimiento vertical
+            setupFurnitureButton(mobileFurnitureVerticalUpBtn, () => { if (selectedFurniture) moveSelectedFurniture('up'); }, true);
+            setupFurnitureButton(mobileFurnitureVerticalDownBtn, () => { if (selectedFurniture) moveSelectedFurniture('down'); }, true);
+            
+            // Configurar botones de acción
             setupFurnitureButton(mobileFurnitureRotateBtn, () => { if (selectedFurniture) rotateSelectedFurniture(); });
             setupFurnitureButton(mobileFurniturePlaceBtn, () => { if (selectedFurniture) deselectFurniture(); });
         }
@@ -2952,6 +3029,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             if (!selectedFurniture || !selectedFurniture.mesh) return;
             
             const moveSpeed = 0.12; // velocidad reducida para controles móviles
+            const verticalMoveSpeed = 0.08; // velocidad reducida para movimiento vertical
             const currentPosition = selectedFurniture.mesh.position.clone();
             
             switch (direction) {
@@ -2967,18 +3045,33 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 case 'right':
                     currentPosition.x += moveSpeed;
                     break;
+                case 'up':
+                    currentPosition.y += verticalMoveSpeed;
+                    break;
+                case 'down':
+                    currentPosition.y -= verticalMoveSpeed;
+                    // Prevenir que el mueble vaya por debajo del piso
+                    if (currentPosition.y < 0) currentPosition.y = 0;
+                    break;
             }
             
-            // Aplicar límites de la habitación (expandidos)
+            // Aplicar límites de la habitación (ajustados para mantener los muebles a 11 unidades del centro)
             const roomBounds = {
-                minX: -8.0,
-                maxX: 8.0,
-                minZ: -8.0,
-                maxZ: 8.0
+                minX: -11.0,  // 1.0 unidades de margen desde la pared izquierda
+                maxX: 11.0,   // 1.0 unidades de margen desde la pared derecha
+                minZ: -11.0,  // 1.0 unidades de margen desde la pared trasera
+                maxZ: 11.0,   // 1.0 unidades de margen desde la pared frontal
+                maxY: 10.0    // Límite superior para evitar que los muebles suban demasiado
             };
             
+            // Aplicar límites horizontales
             currentPosition.x = Math.max(roomBounds.minX, Math.min(roomBounds.maxX, currentPosition.x));
             currentPosition.z = Math.max(roomBounds.minZ, Math.min(roomBounds.maxZ, currentPosition.z));
+            
+            // Aplicar límite superior
+            if (currentPosition.y > roomBounds.maxY) {
+                currentPosition.y = roomBounds.maxY;
+            }
             
             // Mover el grupo completo
             selectedFurniture.mesh.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
@@ -4166,13 +4259,15 @@ function applyCustomizationToAvatar() {
                         furnitureData.modelHeight = size.y;
                         
                         // Establecer la posición del objeto
-                        // La posición Y proporcionada siempre es 0 (base del modelo)
-                        // Ajustamos la posición para que la base del modelo esté en Y=0
+                        // Usar la posición Y guardada si existe, de lo contrario calcularla
+                        const yPosition = position.y !== undefined ? position.y : (size.y / 2);
                         object.position.set(
                             position.x || 0,
-                            (position.y || 0) + (size.y / 2), // Ajustar para que la base esté en Y=0
+                            yPosition, // Usar la posición Y guardada o la posición calculada
                             position.z || 0
                         );
+                        
+                        console.log(`Posición Y establecida: ${yPosition.toFixed(2)} (guardada: ${position.y !== undefined ? position.y.toFixed(2) : 'no'}, altura modelo: ${size.y.toFixed(2)})`);
                         
                         // Establecer la rotación
                         object.rotation.y = rotation || 0;
