@@ -4177,25 +4177,44 @@ function applyCustomizationToAvatar() {
                         // Establecer la rotación
                         object.rotation.y = rotation || 0;
 
-                        // Calcular escala apropiada basada en el tamaño del modelo
-                        // Reutilizamos la caja delimitadora ya calculada
+                        // Mostrar dimensiones reales del modelo en metros
+                        console.log(`[loadFurnitureGLB] Modelo: ${modelPath}`);
+                        console.log(`  - Dimensiones originales (metros):`, {
+                            ancho: size.x.toFixed(2),
+                            alto: size.y.toFixed(2),
+                            profundo: size.z.toFixed(2)
+                        });
+                        
+                        // Tamaño máximo permitido para cualquier dimensión (en metros)
+                        const MAX_DIMENSION = 6.0; // Aumentado a 6.0 para muebles más grandes
+                        
+                        // Encontrar la dimensión más grande para el escalado
                         const maxDimension = Math.max(size.x, size.y, size.z);
-
-                        // Escala base para que el mueble tenga un tamaño apropiado en la habitación
+                        
+                        // Determinar si el mueble necesita ser escalado
+                        const needsScaling = size.x > MAX_DIMENSION || 
+                                          size.y > MAX_DIMENSION || 
+                                          size.z > MAX_DIMENSION;
+                        
+                        // Si el mueble es demasiado grande, reducirlo
                         let scale = 1.0;
-                        if (maxDimension > 0) {
-                            // Si el mueble es muy grande, reducirlo
-                            if (maxDimension > 5) {
-                                scale = 0.5 / maxDimension;
-                            } else if (maxDimension > 2) {
-                                scale = 1.0 / maxDimension;
-                            } else if (maxDimension < 0.5) {
-                                scale = 1.0 / maxDimension;
-                            }
+                        if (needsScaling) {
+                            // Calcular el factor de escala necesario para que la dimensión más grande sea MAX_DIMENSION
+                            scale = MAX_DIMENSION / maxDimension;
+                            
+                            console.log(`  - Mueble demasiado grande. Reduciendo escala a: ${scale.toFixed(4)}`);
+                            console.log(`  - Nuevas dimensiones (metros):`, {
+                                ancho: (size.x * scale).toFixed(2),
+                                alto: (size.y * scale).toFixed(2),
+                                profundo: (size.z * scale).toFixed(2)
+                            });
+                        } else {
+                            console.log(`  - Mueble con dimensiones adecuadas. No se aplica escalado.`);
                         }
 
-                        // Aplicar escala (más grande)
-                        const finalScale = scale * 2.0;
+                        // Aplicar escala con un factor adicional para hacer los muebles más grandes
+                        const SCALE_FACTOR = 2.0; // Aumentado a 2.0 para hacer los muebles más grandes
+                        const finalScale = scale * SCALE_FACTOR;
                         object.scale.set(finalScale, finalScale, finalScale);
 
                         console.log(`Escala aplicada: ${scale} (tamaño original: ${maxDimension.toFixed(2)})`);
