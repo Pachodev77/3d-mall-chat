@@ -2030,121 +2030,188 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             const leftThumb = leftJoystick.querySelector('.joystick-thumb');
             const rightThumb = rightJoystick.querySelector('.joystick-thumb');
             
-            // Función para manejar el inicio del toque en un joystick
-            function handleJoystickStart(joystick, isLeft) {
-                return function(e) {
-                    e.preventDefault();
-                    const touch = e.touches ? e.touches[0] : e;
-                    const rect = joystick.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    
-                    if (isLeft) {
-                        leftJoystickActive = true;
-                    } else {
-                        rightJoystickActive = true;
-                    }
-                    
-                    updateJoystickPosition(joystick, isLeft ? leftThumb : rightThumb, touch, centerX, centerY, isLeft);
-                    
-                    // Agregar listeners para el movimiento y fin del toque
-                    document.addEventListener('touchmove', handleJoystickMove);
-                    document.addEventListener('touchend', handleJoystickEnd);
-                    document.addEventListener('mousemove', handleJoystickMove);
-                    document.addEventListener('mouseup', handleJoystickEnd);
-                };
+            // Track touch identifiers for multi-touch support
+            let leftTouchId = null;
+            let rightTouchId = null;
+            
+            // Function to find touch by identifier
+            function findTouchById(touches, id) {
+                return Array.from(touches).find(t => t.identifier === id);
             }
             
-            // Función para manejar el movimiento del joystick
-            function handleJoystickMove(e) {
+            // Left joystick handlers
+            function handleLeftJoystickStart(e) {
                 e.preventDefault();
                 const touch = e.touches ? e.touches[0] : e;
                 
-                if (leftJoystickActive) {
-                    const rect = leftJoystick.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    updateJoystickPosition(leftJoystick, leftThumb, touch, centerX, centerY, true);
+                // Store touch identifier for multi-touch support
+                if (e.touches) {
+                    leftTouchId = touch.identifier;
                 }
                 
-                if (rightJoystickActive) {
-                    const rect = rightJoystick.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    updateJoystickPosition(rightJoystick, rightThumb, touch, centerX, centerY, false);
-                }
+                leftJoystickActive = true;
+                updateLeftJoystickPosition(touch);
+                
+                // Add move/end listeners for this joystick only
+                document.addEventListener('touchmove', handleLeftJoystickMove, { passive: false });
+                document.addEventListener('touchend', handleLeftJoystickEnd);
+                document.addEventListener('mousemove', handleLeftJoystickMove);
+                document.addEventListener('mouseup', handleLeftJoystickEnd);
             }
             
-            // Función para actualizar la posición del joystick
-            function updateJoystickPosition(joystick, thumb, touch, centerX, centerY, isLeft) {
-                // Calcular la distancia desde el centro
+            function handleLeftJoystickMove(e) {
+                e.preventDefault();
+                if (!leftJoystickActive) return;
+                
+                let touch = e;
+                if (e.touches) {
+                    // Find the touch that started on this joystick
+                    touch = findTouchById(e.touches, leftTouchId);
+                    if (!touch) return;
+                }
+                
+                updateLeftJoystickPosition(touch);
+            }
+            
+            function handleLeftJoystickEnd(e) {
+                e.preventDefault();
+                if (!leftJoystickActive) return;
+                
+                // Reset left joystick
+                leftThumb.style.transform = 'translate(-50%, -50%)';
+                leftJoystickX = 0;
+                leftJoystickY = 0;
+                leftJoystickActive = false;
+                leftJoystick.classList.remove('active');
+                leftTouchId = null;
+                
+                // Remove event listeners for this joystick
+                document.removeEventListener('touchmove', handleLeftJoystickMove);
+                document.removeEventListener('touchend', handleLeftJoystickEnd);
+                document.removeEventListener('mousemove', handleLeftJoystickMove);
+                document.removeEventListener('mouseup', handleLeftJoystickEnd);
+            }
+            
+            function updateLeftJoystickPosition(touch) {
+                const rect = leftJoystick.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // Calculate distance from center
                 const deltaX = touch.clientX - centerX;
                 const deltaY = touch.clientY - centerY;
                 const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), JOYSTICK_RADIUS);
                 
-                // Calcular el ángulo
+                // Calculate angle
                 const angle = Math.atan2(deltaY, deltaX);
                 
-                // Calcular la nueva posición del thumb
+                // Calculate new thumb position
                 const thumbX = Math.cos(angle) * distance;
                 const thumbY = Math.sin(angle) * distance;
                 
-                // Actualizar la posición visual del thumb
-                thumb.style.transform = `translate(calc(-50% + ${thumbX}px), calc(-50% + ${thumbY}px))`;
+                // Update thumb position
+                leftThumb.style.transform = `translate(calc(-50% + ${thumbX}px), calc(-50% + ${thumbY}px))`;
                 
-                // Calcular valores normalizados (-1 a 1)
-                const normalizedX = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : (deltaX / JOYSTICK_RADIUS);
-                const normalizedY = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : (deltaY / JOYSTICK_RADIUS);
+                // Calculate normalized values (-1 to 1)
+                leftJoystickX = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : 
+                    Math.max(-1, Math.min(1, deltaX / JOYSTICK_RADIUS));
+                leftJoystickY = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : 
+                    Math.max(-1, Math.min(1, deltaY / JOYSTICK_RADIUS));
                 
-                // Actualizar las variables de control
-                if (isLeft) {
-                    leftJoystickX = Math.max(-1, Math.min(1, normalizedX));
-                    leftJoystickY = Math.max(-1, Math.min(1, normalizedY));
-                } else {
-                    rightJoystickX = Math.max(-1, Math.min(1, normalizedX));
-                    rightJoystickY = Math.max(-1, Math.min(1, normalizedY));
-                }
-                
-                // Añadir clase activa para feedback visual
-                joystick.classList.add('active');
+                // Add active class for visual feedback
+                leftJoystick.classList.add('active');
             }
             
-            // Función para manejar el fin del toque en un joystick
-            function handleJoystickEnd(e) {
+            // Right joystick handlers (similar to left but for rotation)
+            function handleRightJoystickStart(e) {
                 e.preventDefault();
+                const touch = e.touches ? e.touches[0] : e;
                 
-                if (leftJoystickActive) {
-                    // Restablecer el joystick izquierdo
-                    leftThumb.style.transform = 'translate(-50%, -50%)';
-                    leftJoystickX = 0;
-                    leftJoystickY = 0;
-                    leftJoystickActive = false;
-                    leftJoystick.classList.remove('active');
+                // Store touch identifier for multi-touch support
+                if (e.touches) {
+                    rightTouchId = touch.identifier;
                 }
                 
-                if (rightJoystickActive) {
-                    // Restablecer el joystick derecho
-                    rightThumb.style.transform = 'translate(-50%, -50%)';
-                    rightJoystickX = 0;
-                    rightJoystickY = 0;
-                    rightJoystickActive = false;
-                    rightJoystick.classList.remove('active');
-                }
+                rightJoystickActive = true;
+                updateRightJoystickPosition(touch);
                 
-                // Eliminar listeners globales
-                document.removeEventListener('touchmove', handleJoystickMove);
-                document.removeEventListener('touchend', handleJoystickEnd);
-                document.removeEventListener('mousemove', handleJoystickMove);
-                document.removeEventListener('mouseup', handleJoystickEnd);
+                // Add move/end listeners for this joystick only
+                document.addEventListener('touchmove', handleRightJoystickMove, { passive: false });
+                document.addEventListener('touchend', handleRightJoystickEnd);
+                document.addEventListener('mousemove', handleRightJoystickMove);
+                document.addEventListener('mouseup', handleRightJoystickEnd);
             }
             
-            // Agregar event listeners a los joysticks
-            leftJoystick.addEventListener('touchstart', handleJoystickStart(leftJoystick, true));
-            leftJoystick.addEventListener('mousedown', handleJoystickStart(leftJoystick, true));
-            rightJoystick.addEventListener('touchstart', handleJoystickStart(rightJoystick, false));
-            rightJoystick.addEventListener('mousedown', handleJoystickStart(rightJoystick, false));
+            function handleRightJoystickMove(e) {
+                e.preventDefault();
+                if (!rightJoystickActive) return;
+                
+                let touch = e;
+                if (e.touches) {
+                    // Find the touch that started on this joystick
+                    touch = findTouchById(e.touches, rightTouchId);
+                    if (!touch) return;
+                }
+                
+                updateRightJoystickPosition(touch);
+            }
             
-            // Prevenir el menú contextual en dispositivos táctiles
+            function handleRightJoystickEnd(e) {
+                e.preventDefault();
+                if (!rightJoystickActive) return;
+                
+                // Reset right joystick
+                rightThumb.style.transform = 'translate(-50%, -50%)';
+                rightJoystickX = 0;
+                rightJoystickY = 0;
+                rightJoystickActive = false;
+                rightJoystick.classList.remove('active');
+                rightTouchId = null;
+                
+                // Remove event listeners for this joystick
+                document.removeEventListener('touchmove', handleRightJoystickMove);
+                document.removeEventListener('touchend', handleRightJoystickEnd);
+                document.removeEventListener('mousemove', handleRightJoystickMove);
+                document.removeEventListener('mouseup', handleRightJoystickEnd);
+            }
+            
+            function updateRightJoystickPosition(touch) {
+                const rect = rightJoystick.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // Calculate distance from center
+                const deltaX = touch.clientX - centerX;
+                const deltaY = touch.clientY - centerY;
+                const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), JOYSTICK_RADIUS);
+                
+                // Calculate angle
+                const angle = Math.atan2(deltaY, deltaX);
+                
+                // Calculate new thumb position
+                const thumbX = Math.cos(angle) * distance;
+                const thumbY = Math.sin(angle) * distance;
+                
+                // Update thumb position
+                rightThumb.style.transform = `translate(calc(-50% + ${thumbX}px), calc(-50% + ${thumbY}px))`;
+                
+                // Calculate normalized values (-1 to 1)
+                rightJoystickX = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : 
+                    Math.max(-1, Math.min(1, deltaX / JOYSTICK_RADIUS));
+                rightJoystickY = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : 
+                    Math.max(-1, Math.min(1, deltaY / JOYSTICK_RADIUS));
+                
+                // Add active class for visual feedback
+                rightJoystick.classList.add('active');
+            }
+            
+            // Add event listeners to joysticks
+            leftJoystick.addEventListener('touchstart', handleLeftJoystickStart, { passive: false });
+            leftJoystick.addEventListener('mousedown', handleLeftJoystickStart);
+            rightJoystick.addEventListener('touchstart', handleRightJoystickStart, { passive: false });
+            rightJoystick.addEventListener('mousedown', handleRightJoystickStart);
+            
+            // Prevent context menu on touch devices
             leftJoystick.addEventListener('contextmenu', (e) => e.preventDefault());
             rightJoystick.addEventListener('contextmenu', (e) => e.preventDefault());
         }
