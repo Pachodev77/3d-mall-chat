@@ -94,7 +94,18 @@ const DEFAULT_FURNITURE_LAYOUT = [
     <!-- Contenedor de UI completamente separado del canvas -->
     <div id="ui-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 30000;">
         <div id="ui-overlay"></div>
-    <div id="crosshair"></div>
+        <div id="crosshair"></div>
+        
+        <!-- Joystick Controls -->
+        <div id="left-joystick" class="joystick-container" style="left: 80px; bottom: 80px;">
+            <div class="joystick-bg"></div>
+            <div class="joystick-thumb"></div>
+        </div>
+        
+        <div id="right-joystick" class="joystick-container" style="right: 80px; bottom: 80px;">
+            <div class="joystick-bg"></div>
+            <div class="joystick-thumb"></div>
+        </div>
         <button id="chat-toggle-btn" title="Abrir chat" style="pointer-events: auto;">💬</button>
         <button id="change-alias-btn" title="Personalizar avatar" style="pointer-events: auto;">👤</button>
         <button id="room-toggle-btn" title="Mi habitación" style="pointer-events: auto;">🏠</button>
@@ -189,24 +200,8 @@ const DEFAULT_FURNITURE_LAYOUT = [
     
     <!-- Contenedor para ventanas de chats privados -->
     <div id="private-chats-container" style="position:fixed; bottom:20px; right:20px; z-index:40000; pointer-events:none;"></div>
-    
-    <!-- Controles móviles -->
-    <div id="mobile-controls">
-        <div class="movement-controls">
-            <button class="mobile-btn forward" id="mobile-forward" title="Mover adelante">▲</button>
-            <button class="mobile-btn backward" id="mobile-backward" title="Mover atrás">▼</button>
-        </div>
-    </div>
-    
-    <!-- Controles de rotación móviles (separados a la derecha) -->
-    <div id="mobile-rotation-controls">
-        <div class="rotation-controls">
-            <button class="mobile-btn left" id="mobile-left" title="Rotar izquierda">◀</button>
-            <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
-        </div>
-    </div>
 
-    <!-- NUEVOS Controles de muebles móviles (Cruz) -->
+    <!-- Controles de muebles móviles (Cruz) -->
     <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; pointer-events: auto; flex-direction: column; align-items: center;">
         <!-- Controles de movimiento con botones verticales integrados -->
         <div style="display: grid; grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; gap: 4px; justify-items: center; align-items: center;">
@@ -409,7 +404,10 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         let scene, camera, renderer;
         const clickableObjects = [];
         const collisionObjects = [];
-        const keys = { W: false, S: false, A: false, D: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+        const keys = {};
+        let keyA = false, keyD = false, keyW = false, keyS = false; // Para controles de teclado
+        let targetRotationY = 0; // Rotación objetivo en Y para suavizado
+        let targetPosition = new THREE.Vector3(); // Posición objetivo para suavizado
         
         // Reloj para animaciones
         const clock = new THREE.Clock();
@@ -449,13 +447,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         // --- Variables de Interacción y Movimiento ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        let targetPosition;
-        let targetRotationY;
         let currentFloor = 0;
-        let keyA = false;
-        let keyD = false;
-        let keyW = false;
-        let keyS = false;
         let shopNumberCounter = 1; // Contador global para numerar las tiendas
         
         // --- Variables para controles móviles ---
@@ -631,6 +623,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             // --- Configurar botones de UI ---
             setupUIButtons();
+            
+            // Configurar controles móviles
+            if (window.IS_MOBILE) {
+                setupMobileControls();
+            }
 
             // --- Envío periódico robusto de posición/timestamp a Firebase ---
             if (typeof sendPosition === 'function') {
@@ -2017,57 +2014,139 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
+        // Variables para el control de joystick
+        let leftJoystickActive = false;
+        let rightJoystickActive = false;
+        let leftJoystickX = 0;
+        let leftJoystickY = 0;
+        let rightJoystickX = 0;
+        let rightJoystickY = 0;
+        const JOYSTICK_RADIUS = 60; // Radio del joystick en píxeles
+        const JOYSTICK_DEADZONE = 0.2; // Zona muerta del joystick
+
         function setupMobileControls() {
-            const mobileForwardBtn = document.getElementById('mobile-forward');
-            const mobileBackwardBtn = document.getElementById('mobile-backward');
-            const mobileLeftBtn = document.getElementById('mobile-left');
-            const mobileRightBtn = document.getElementById('mobile-right');
+            const leftJoystick = document.getElementById('left-joystick');
+            const rightJoystick = document.getElementById('right-joystick');
+            const leftThumb = leftJoystick.querySelector('.joystick-thumb');
+            const rightThumb = rightJoystick.querySelector('.joystick-thumb');
             
-            // Función auxiliar para configurar controles de botones móviles con efectos visuales
-            function setupButtonControls(buttonId, flagSetter) {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    const setFlag = (value) => (e) => { 
+            // Función para manejar el inicio del toque en un joystick
+            function handleJoystickStart(joystick, isLeft) {
+                return function(e) {
                     e.preventDefault();
-                        flagSetter(value); 
-                        
-                        // Efectos visuales para el botón
-                        if (value) {
-                            // Botón presionado
-                            button.style.background = 'rgba(255, 215, 0, 0.8)';
-                            button.style.transform = 'scale(0.95)';
-                            button.style.border = '3px solid rgba(255, 215, 0, 0.9)';
-                            button.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.4)';
-                        } else {
-                            // Botón liberado
-                            button.style.background = 'rgba(75, 0, 0, 0.8)';
-                            button.style.transform = 'scale(1)';
-                            button.style.border = '3px solid rgba(255, 215, 0, 0.3)';
-                            button.style.boxShadow = 'none';
-                        }
-                    };
+                    const touch = e.touches ? e.touches[0] : e;
+                    const rect = joystick.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
                     
-                    // Eventos para touch
-                    button.addEventListener('touchstart', setFlag(true));
-                    button.addEventListener('touchend', setFlag(false));
-                    button.addEventListener('touchcancel', setFlag(false));
+                    if (isLeft) {
+                        leftJoystickActive = true;
+                    } else {
+                        rightJoystickActive = true;
+                    }
                     
-                    // Eventos para mouse
-                    button.addEventListener('mousedown', setFlag(true));
-                    button.addEventListener('mouseup', setFlag(false));
-                    button.addEventListener('mouseleave', setFlag(false));
+                    updateJoystickPosition(joystick, isLeft ? leftThumb : rightThumb, touch, centerX, centerY, isLeft);
                     
-                    // Prevenir selección de texto
-                    button.addEventListener('selectstart', (e) => e.preventDefault());
-                    button.addEventListener('dragstart', (e) => e.preventDefault());
+                    // Agregar listeners para el movimiento y fin del toque
+                    document.addEventListener('touchmove', handleJoystickMove);
+                    document.addEventListener('touchend', handleJoystickEnd);
+                    document.addEventListener('mousemove', handleJoystickMove);
+                    document.addEventListener('mouseup', handleJoystickEnd);
+                };
+            }
+            
+            // Función para manejar el movimiento del joystick
+            function handleJoystickMove(e) {
+                e.preventDefault();
+                const touch = e.touches ? e.touches[0] : e;
+                
+                if (leftJoystickActive) {
+                    const rect = leftJoystick.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    updateJoystickPosition(leftJoystick, leftThumb, touch, centerX, centerY, true);
+                }
+                
+                if (rightJoystickActive) {
+                    const rect = rightJoystick.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    updateJoystickPosition(rightJoystick, rightThumb, touch, centerX, centerY, false);
                 }
             }
             
-            // Configurar controles móviles usando la función auxiliar
-            setupButtonControls('mobile-forward', value => mobileForward = value);
-            setupButtonControls('mobile-backward', value => mobileBackward = value);
-            setupButtonControls('mobile-left', value => mobileLeft = value);
-            setupButtonControls('mobile-right', value => mobileRight = value);
+            // Función para actualizar la posición del joystick
+            function updateJoystickPosition(joystick, thumb, touch, centerX, centerY, isLeft) {
+                // Calcular la distancia desde el centro
+                const deltaX = touch.clientX - centerX;
+                const deltaY = touch.clientY - centerY;
+                const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), JOYSTICK_RADIUS);
+                
+                // Calcular el ángulo
+                const angle = Math.atan2(deltaY, deltaX);
+                
+                // Calcular la nueva posición del thumb
+                const thumbX = Math.cos(angle) * distance;
+                const thumbY = Math.sin(angle) * distance;
+                
+                // Actualizar la posición visual del thumb
+                thumb.style.transform = `translate(calc(-50% + ${thumbX}px), calc(-50% + ${thumbY}px))`;
+                
+                // Calcular valores normalizados (-1 a 1)
+                const normalizedX = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : (deltaX / JOYSTICK_RADIUS);
+                const normalizedY = distance < JOYSTICK_DEADZONE * JOYSTICK_RADIUS ? 0 : (deltaY / JOYSTICK_RADIUS);
+                
+                // Actualizar las variables de control
+                if (isLeft) {
+                    leftJoystickX = Math.max(-1, Math.min(1, normalizedX));
+                    leftJoystickY = Math.max(-1, Math.min(1, normalizedY));
+                } else {
+                    rightJoystickX = Math.max(-1, Math.min(1, normalizedX));
+                    rightJoystickY = Math.max(-1, Math.min(1, normalizedY));
+                }
+                
+                // Añadir clase activa para feedback visual
+                joystick.classList.add('active');
+            }
+            
+            // Función para manejar el fin del toque en un joystick
+            function handleJoystickEnd(e) {
+                e.preventDefault();
+                
+                if (leftJoystickActive) {
+                    // Restablecer el joystick izquierdo
+                    leftThumb.style.transform = 'translate(-50%, -50%)';
+                    leftJoystickX = 0;
+                    leftJoystickY = 0;
+                    leftJoystickActive = false;
+                    leftJoystick.classList.remove('active');
+                }
+                
+                if (rightJoystickActive) {
+                    // Restablecer el joystick derecho
+                    rightThumb.style.transform = 'translate(-50%, -50%)';
+                    rightJoystickX = 0;
+                    rightJoystickY = 0;
+                    rightJoystickActive = false;
+                    rightJoystick.classList.remove('active');
+                }
+                
+                // Eliminar listeners globales
+                document.removeEventListener('touchmove', handleJoystickMove);
+                document.removeEventListener('touchend', handleJoystickEnd);
+                document.removeEventListener('mousemove', handleJoystickMove);
+                document.removeEventListener('mouseup', handleJoystickEnd);
+            }
+            
+            // Agregar event listeners a los joysticks
+            leftJoystick.addEventListener('touchstart', handleJoystickStart(leftJoystick, true));
+            leftJoystick.addEventListener('mousedown', handleJoystickStart(leftJoystick, true));
+            rightJoystick.addEventListener('touchstart', handleJoystickStart(rightJoystick, false));
+            rightJoystick.addEventListener('mousedown', handleJoystickStart(rightJoystick, false));
+            
+            // Prevenir el menú contextual en dispositivos táctiles
+            leftJoystick.addEventListener('contextmenu', (e) => e.preventDefault());
+            rightJoystick.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
         function onKeyDown(event) {
@@ -2280,11 +2359,17 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
+            // --- Rotación con joystick derecho (solo rotación) ---
+            if (rightJoystickActive && Math.abs(rightJoystickX) > 0.1) {
+                targetRotationY += rightJoystickX * ROTATE_SPEED * 2;
+            }
+            // Rotación con teclado (mantener compatibilidad)
+            else {
+                if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
+                if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
+            }
 
-            // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
+            // --- Movimiento con teclado/controles táctiles ---
             const direction = new THREE.Vector3();
             camera.getWorldDirection(direction);
             direction.y = 0;
@@ -2292,19 +2377,42 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             const velocity = new THREE.Vector3();
             
-            // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (keys.ArrowUp || mobileForward) velocity.add(direction);
-            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            // --- Movimiento con joystick izquierdo ---
+            if (leftJoystickActive) {
+                // Movimiento hacia adelante/atrás basado en el eje Y del joystick
+                if (Math.abs(leftJoystickY) > 0.1) {
+                    const moveDirection = direction.clone().multiplyScalar(-leftJoystickY);
+                    velocity.add(moveDirection);
+                }
+                
+                // Movimiento lateral basado en el eje X del joystick
+                if (Math.abs(leftJoystickX) > 0.1) {
+                    const rightDirection = new THREE.Vector3();
+                    rightDirection.setFromMatrixColumn(camera.matrix, 0);
+                    rightDirection.y = 0;
+                    rightDirection.normalize();
+                    
+                    const strafeDirection = rightDirection.multiplyScalar(leftJoystickX);
+                    velocity.add(strafeDirection);
+                }
+            }
+            // Movimiento con teclado (mantener compatibilidad)
+            else {
+                // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
+                if (keys.ArrowUp || mobileForward) velocity.add(direction);
+                if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+                
+                // Movimiento lateral con A y D (teclas)
+                const rightDirection = new THREE.Vector3();
+                rightDirection.setFromMatrixColumn(camera.matrix, 0);
+                rightDirection.y = 0;
+                rightDirection.normalize();
+                
+                if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
+                if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            }
             
-            // Movimiento lateral con A y D (teclas)
-            const rightDirection = new THREE.Vector3();
-            rightDirection.setFromMatrixColumn(camera.matrix, 0);
-            rightDirection.y = 0;
-            rightDirection.normalize();
-            
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
-            
+            // Aplicar movimiento si hay velocidad
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
                 const newPosition = targetPosition.clone().add(velocity);
