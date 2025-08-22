@@ -2038,17 +2038,32 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             let moveY = 0;
             let rotateX = 0;
 
-            // Configurar eventos del joystick izquierdo (movimiento)
+            // Configurar eventos del joystick izquierdo (movimiento y strafe)
             leftJoystick.on('move', function(evt, data) {
                 const force = data.force > 1 ? 1 : data.force;
                 moveX = data.vector.x * force;
                 moveY = data.vector.y * force;
                 
-                // Actualizar variables de movimiento
-                mobileForward = moveY < -0.3;
-                mobileBackward = moveY > 0.3;
-                mobileLeft = moveX < -0.3;
-                mobileRight = moveX > 0.3;
+                // Actualizar variables de movimiento (invertir Y para que hacia arriba sea adelante)
+                mobileForward = moveY > 0.3;  // Invertido: positivo es adelante
+                mobileBackward = moveY < -0.3; // Invertido: negativo es atrás
+                
+                // Strafe lateral (sin afectar la rotación)
+                if (Math.abs(moveX) > 0.3) {
+                    if (moveX > 0) {
+                        // Strafe derecho (usamos las teclas A/D que normalmente son para rotar)
+                        // En la función de movimiento, usaremos estas variables para strafe
+                        mobileRight = true;
+                        mobileLeft = false;
+                    } else {
+                        // Strafe izquierdo
+                        mobileLeft = true;
+                        mobileRight = false;
+                    }
+                } else {
+                    mobileLeft = false;
+                    mobileRight = false;
+                }
             });
 
             leftJoystick.on('end', function() {
@@ -2060,21 +2075,24 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 mobileRight = false;
             });
 
-            // Configurar eventos del joystick derecho (rotación)
+            // Configurar eventos del joystick derecho (solo rotación)
             rightJoystick.on('move', function(evt, data) {
                 const force = data.force > 1 ? 1 : data.force;
                 rotateX = data.vector.x * force;
                 
-                // Actualizar variables de rotación
+                // Solo actualizamos las variables de rotación
                 if (Math.abs(rotateX) > 0.3) {
                     if (rotateX > 0) {
+                        // Rotación derecha
                         mobileRight = true;
                         mobileLeft = false;
                     } else {
+                        // Rotación izquierda
                         mobileLeft = true;
                         mobileRight = false;
                     }
                 } else {
+                    // Sin rotación
                     mobileLeft = false;
                     mobileRight = false;
                 }
@@ -2297,11 +2315,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) targetRotationY += ROTATE_SPEED;
+            // --- Rotación con flechas izquierda/derecha y joystick derecho ---
+            if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
+            if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
 
-            // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
+            // --- Movimiento con teclas y joystick izquierdo ---
             const direction = new THREE.Vector3();
             camera.getWorldDirection(direction);
             direction.y = 0;
@@ -2309,18 +2327,35 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             const velocity = new THREE.Vector3();
             
-            // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (keys.ArrowUp || mobileForward) velocity.add(direction);
-            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            // Movimiento hacia adelante/atrás con flechas y joystick izquierdo (eje Y)
+            if (keys.ArrowUp) velocity.add(direction);
+            if (keys.ArrowDown) velocity.sub(direction);
             
-            // Movimiento lateral con A y D (teclas)
+            // Movimiento con joystick izquierdo (eje Y para adelante/atrás)
+            if (mobileForward) velocity.add(direction);
+            if (mobileBackward) velocity.sub(direction);
+            
+            // Obtener dirección derecha para el strafe
             const rightDirection = new THREE.Vector3();
             rightDirection.setFromMatrixColumn(camera.matrix, 0);
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            // Strafe con teclas A/D
+            if (keyA) velocity.sub(rightDirection);
+            if (keyD) velocity.add(rightDirection);
+            
+            // Strafe con joystick izquierdo (eje X)
+            if (mobileLeft) velocity.sub(rightDirection);
+            if (mobileRight) velocity.add(rightDirection);
+            
+            // Aplicar rotación del joystick derecho (si está activo)
+            if (mobileLeft && !keyA) {
+                targetRotationY -= ROTATE_SPEED * 1.5; // Rotación más suave
+            }
+            if (mobileRight && !keyD) {
+                targetRotationY += ROTATE_SPEED * 1.5; // Rotación más suave
+            }
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
