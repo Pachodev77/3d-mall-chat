@@ -456,8 +456,12 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
         // --- Variables para controles móviles ---
         let mobileForward = false;
         let mobileBackward = false;
-        let mobileLeft = false;
-        let mobileRight = false;
+        let mobileLeft = false;           // Para rotación
+        let mobileRight = false;          // Para rotación
+        let mobileStrafeLeft = false;     // Para movimiento lateral
+        let mobileStrafeRight = false;    // Para movimiento lateral
+        let mobileRotateLeft = false;     // Para rotación con joystick derecho
+        let mobileRotateRight = false;    // Para rotación con joystick derecho
 
         // Función para obtener el siguiente número de tienda solo cuando se crea una
         const getNextShopNumber = () => {
@@ -2302,13 +2306,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             handleGlobalClick(event);
         }
 
-        // Variables para controles móviles
-        let mobileForward = false;
-        let mobileBackward = false;
-        let mobileStrafeLeft = false;
-        let mobileStrafeRight = false;
-        let mobileRotateLeft = false;
-        let mobileRotateRight = false;
+        // Variables para controles móviles - declared at the top of the file
         
         function updateMovement() {
             // Si el chat está abierto, no actualizar movimiento
@@ -5238,10 +5236,9 @@ function updateAvatarPositions() {
                             floorBtns.style.display = 'none';
                         }, 4000);
                         break;
-                    }
                 }
             }
-        // ... existing code ...
-    </script>
-    <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
+        }
+    // ... existing code ...
+</script>
 </body>
