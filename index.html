@@ -192,10 +192,10 @@ const DEFAULT_FURNITURE_LAYOUT = [
     
     <!-- Controles de joystick -->
     <div id="mobile-controls">
-        <div id="left-joystick" class="joystick-container" style="position: fixed; left: 30px; bottom: 30px; width: 120px; height: 120px; z-index: 10000;">
+        <div id="left-joystick" class="joystick-container" style="position: fixed; left: 20px; bottom: 20px; width: 90px; height: 90px; z-index: 10000;">
             <div class="joystick" style="width: 100%; height: 100%; border-radius: 50%; background: rgba(75, 0, 0, 0.2); border: 2px solid rgba(255, 215, 0, 0.3);"></div>
         </div>
-        <div id="right-joystick" class="joystick-container" style="position: fixed; right: 30px; bottom: 30px; width: 120px; height: 120px; z-index: 10000;">
+        <div id="right-joystick" class="joystick-container" style="position: fixed; right: 20px; bottom: 20px; width: 90px; height: 90px; z-index: 10000;">
             <div class="joystick" style="width: 100%; height: 100%; border-radius: 50%; background: rgba(75, 0, 0, 0.2); border: 2px solid rgba(255, 215, 0, 0.3);"></div>
         </div>
     </div>
@@ -392,8 +392,9 @@ const HALL_HEIGHT = 4;
 // --- [FIX] Definir window.IS_MOBILE globalmente antes de cualquier uso ---
 
 // Ajustar velocidad de movimiento según dispositivo
-const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún más en móvil
-        const ROTATE_SPEED = window.IS_MOBILE ? 0.06 : 0.07; // Rotación más lenta también
+const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
+        const ROTATE_SPEED = window.IS_MOBILE ? 0.02 : 0.03; // Rotación más lenta
+        const STRAFE_SPEED = window.IS_MOBILE ? 0.1 : 0.15;  // Velocidad de strafe reducida
         const CAMERA_HEIGHT = 1.6;
         const MAX_FLOOR = 1; // Cambiado de 4 a 1 (solo 2 pisos: planta baja + 1 piso superior)
         const MIN_FLOOR = 0;
@@ -2022,8 +2023,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 zone: document.getElementById('left-joystick'),
                 mode: 'static',
                 position: { left: '50%', top: '50%' },
-                color: 'rgba(255, 215, 0, 0.8)',
-                size: 120,
+                color: 'rgba(0, 0, 0, 0.8)',
+                size: 90,
                 dynamicPage: true
             });
 
@@ -2032,8 +2033,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 zone: document.getElementById('right-joystick'),
                 mode: 'static',
                 position: { left: '50%', top: '50%' },
-                color: 'rgba(255, 215, 0, 0.8)',
-                size: 120,
+                color: 'rgba(0, 0, 0, 0.8)',
+                size: 90,
                 dynamicPage: true
             });
 
@@ -2341,12 +2342,12 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             rightDirection.normalize();
             
             // Strafe con teclas A/D
-            if (keyA) velocity.sub(rightDirection);
-            if (keyD) velocity.add(rightDirection);
+            if (keyA) velocity.sub(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
+            if (keyD) velocity.add(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
             
             // Strafe con joystick izquierdo (eje X)
-            if (mobileStrafeLeft) velocity.sub(rightDirection);
-            if (mobileStrafeRight) velocity.add(rightDirection);
+            if (mobileStrafeLeft) velocity.sub(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
+            if (mobileStrafeRight) velocity.add(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
@@ -2689,11 +2690,11 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha y controles móviles ---
-            if (keys.ArrowLeft || mobileLeft) personalRoomTargetRotationY += ROTATE_SPEED;
-            if (keys.ArrowRight || mobileRight) personalRoomTargetRotationY -= ROTATE_SPEED;
+            // --- Rotación con flechas y joystick derecho ---
+            if (keys.ArrowLeft || mobileRotateLeft) personalRoomTargetRotationY += ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRotateRight) personalRoomTargetRotationY -= ROTATE_SPEED;
 
-            // --- Movimiento hacia adelante/atrás con flechas y controles móviles ---
+            // --- Movimiento con teclas y joystick izquierdo ---
             const direction = new THREE.Vector3();
             personalRoomCamera.getWorldDirection(direction);
             direction.y = 0;
@@ -2701,18 +2702,27 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             
             const velocity = new THREE.Vector3();
             
-            // Movimiento hacia adelante/atrás con flechas arriba/abajo y controles móviles
-            if (keys.ArrowUp || mobileForward) velocity.add(direction);
-            if (keys.ArrowDown || mobileBackward) velocity.sub(direction);
+            // Movimiento hacia adelante/atrás con flechas y joystick izquierdo
+            if (keys.ArrowUp) velocity.add(direction);
+            if (keys.ArrowDown) velocity.sub(direction);
             
-            // Movimiento lateral con A y D (teclas)
+            // Movimiento con joystick izquierdo (eje Y para adelante/atrás)
+            if (mobileForward) velocity.add(direction);
+            if (mobileBackward) velocity.sub(direction);
+            
+            // Obtener dirección derecha para el strafe
             const rightDirection = new THREE.Vector3();
             rightDirection.setFromMatrixColumn(personalRoomCamera.matrix, 0);
             rightDirection.y = 0;
             rightDirection.normalize();
             
-            if (keyA) velocity.sub(rightDirection); // Moverse hacia la izquierda
-            if (keyD) velocity.add(rightDirection); // Moverse hacia la derecha
+            // Strafe con teclas A/D
+            if (keyA) velocity.sub(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
+            if (keyD) velocity.add(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
+            
+            // Strafe con joystick izquierdo (eje X)
+            if (mobileStrafeLeft) velocity.sub(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED));
+            if (mobileStrafeRight) velocity.add(rightDirection.multiplyScalar(STRAFE_SPEED / MOVE_SPEED))
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
