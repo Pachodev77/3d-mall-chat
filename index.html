@@ -89,6 +89,7 @@ const DEFAULT_FURNITURE_LAYOUT = [
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
         <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" href="public/joystick.css">
 </head>
 <body>
     <!-- Contenedor de UI completamente separado del canvas -->
@@ -190,19 +191,13 @@ const DEFAULT_FURNITURE_LAYOUT = [
     <!-- Contenedor para ventanas de chats privados -->
     <div id="private-chats-container" style="position:fixed; bottom:20px; right:20px; z-index:40000; pointer-events:none;"></div>
     
-    <!-- Controles móviles -->
-    <div id="mobile-controls">
-        <div class="movement-controls">
-            <button class="mobile-btn forward" id="mobile-forward" title="Mover adelante">▲</button>
-            <button class="mobile-btn backward" id="mobile-backward" title="Mover atrás">▼</button>
+    <!-- Joystick Controls -->
+    <div id="joystick-container">
+        <div id="left-joystick" class="joystick">
+            <div class="joystick-knob" id="left-knob"></div>
         </div>
-    </div>
-    
-    <!-- Controles de rotación móviles (separados a la derecha) -->
-    <div id="mobile-rotation-controls">
-        <div class="rotation-controls">
-            <button class="mobile-btn left" id="mobile-left" title="Rotar izquierda">◀</button>
-            <button class="mobile-btn right" id="mobile-right" title="Rotar derecha">▶</button>
+        <div id="right-joystick" class="joystick">
+            <div class="joystick-knob" id="right-knob"></div>
         </div>
     </div>
 
@@ -314,6 +309,7 @@ const DEFAULT_FURNITURE_LAYOUT = [
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script type="module" src="/public/furniture-persistence.js"></script>
+    <script src="public/joystick.js"></script>
     <script src="./firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
@@ -2017,58 +2013,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-        function setupMobileControls() {
-            const mobileForwardBtn = document.getElementById('mobile-forward');
-            const mobileBackwardBtn = document.getElementById('mobile-backward');
-            const mobileLeftBtn = document.getElementById('mobile-left');
-            const mobileRightBtn = document.getElementById('mobile-right');
-            
-            // Función auxiliar para configurar controles de botones móviles con efectos visuales
-            function setupButtonControls(buttonId, flagSetter) {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    const setFlag = (value) => (e) => { 
-                    e.preventDefault();
-                        flagSetter(value); 
-                        
-                        // Efectos visuales para el botón
-                        if (value) {
-                            // Botón presionado
-                            button.style.background = 'rgba(255, 215, 0, 0.8)';
-                            button.style.transform = 'scale(0.95)';
-                            button.style.border = '3px solid rgba(255, 215, 0, 0.9)';
-                            button.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.4)';
-                        } else {
-                            // Botón liberado
-                            button.style.background = 'rgba(75, 0, 0, 0.8)';
-                            button.style.transform = 'scale(1)';
-                            button.style.border = '3px solid rgba(255, 215, 0, 0.3)';
-                            button.style.boxShadow = 'none';
-                        }
-                    };
-                    
-                    // Eventos para touch
-                    button.addEventListener('touchstart', setFlag(true));
-                    button.addEventListener('touchend', setFlag(false));
-                    button.addEventListener('touchcancel', setFlag(false));
-                    
-                    // Eventos para mouse
-                    button.addEventListener('mousedown', setFlag(true));
-                    button.addEventListener('mouseup', setFlag(false));
-                    button.addEventListener('mouseleave', setFlag(false));
-                    
-                    // Prevenir selección de texto
-                    button.addEventListener('selectstart', (e) => e.preventDefault());
-                    button.addEventListener('dragstart', (e) => e.preventDefault());
-                }
-            }
-            
-            // Configurar controles móviles usando la función auxiliar
-            setupButtonControls('mobile-forward', value => mobileForward = value);
-            setupButtonControls('mobile-backward', value => mobileBackward = value);
-            setupButtonControls('mobile-left', value => mobileLeft = value);
-            setupButtonControls('mobile-right', value => mobileRight = value);
-        }
+        // Mobile controls are now handled by joystick.js
 
         function onKeyDown(event) {
             // Si el chat está abierto, no procesar controles del juego
