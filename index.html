@@ -201,44 +201,11 @@ const DEFAULT_FURNITURE_LAYOUT = [
     </div>
 
     <!-- NUEVOS Controles de muebles móviles (Cruz) -->
-    <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; pointer-events: auto; display: none; flex-direction: column; align-items: center; left: 50%; bottom: 120px; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); border-radius: 20px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(5px);">
-        <div style="color: white; margin-bottom: 8px; font-size: 14px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Controles de Muebles</div>
+    <div id="mobile-furniture-cross-controls" style="position: fixed; z-index: 10000; pointer-events: auto; flex-direction: column; align-items: center;">
         <!-- Controles de movimiento con botones verticales integrados -->
         <div style="display: grid; grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; gap: 4px; justify-items: center; align-items: center;">
             <!-- Fila superior con botón de movimiento hacia arriba y controles verticales -->
             <div style="grid-column: 1; grid-row: 1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
-                <style>
-                    .mobile-furniture-btn {
-                        background: rgba(255, 255, 255, 0.2);
-                        border: 2px solid rgba(255, 255, 255, 0.3);
-                        color: white;
-                        border-radius: 10px;
-                        font-size: 18px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                    }
-                    .mobile-furniture-btn:active {
-                        transform: scale(0.95);
-                        background: rgba(255, 255, 255, 0.3);
-                    }
-                    .mobile-furniture-vertical-btn {
-                        height: 40px;
-                        width: 40px;
-                    }
-                    .mobile-furniture-small-btn {
-                        width: 40px !important;
-                        height: 40px !important;
-                    }
-                    #mobile-furniture-delete {
-                        background: rgba(255, 75, 75, 0.7);
-                        border-color: #ff4444;
-                    }
-                </style>
                 <button class="mobile-furniture-btn mobile-furniture-vertical-btn" id="mobile-furniture-move-down" title="Bajar">-</button>
             </div>
             <div style="grid-column: 2; grid-row: 1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">

@@ -667,10 +667,9 @@ body {
             box-shadow: none; /* Sin sombra */
             backdrop-filter: none; /* Sin filtro de desenfoque */
             border: none; /* Sin borde */
-            right: 20px; /* Alineado a la derecha */
-            left: auto; /* Desactivar alineación izquierda */
-            transform: none; /* Desactivar transformación de centrado */
-            bottom: 120px; /* Posición desde abajo */
+            left: 50%; /* Centrado horizontal */
+            transform: translateX(-50%); /* Ajuste fino para centrado exacto */
+            bottom: 20px; /* Posición desde abajo, cerca de los joysticks */
         }
 
         .mobile-furniture-btn {
