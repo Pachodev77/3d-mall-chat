@@ -23,12 +23,21 @@ const mimeTypes = {
     '.wasm': 'application/wasm'
 };
 
-// Serve static files with proper MIME types
-app.use(express.static(path.join(__dirname), {
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: (res, filePath) => {
         const extname = path.extname(filePath);
         if (mimeTypes[extname]) {
             res.setHeader('Content-Type', mimeTypes[extname]);
+        }
+    }
+}));
+
+// Serve index.html from the root
+app.use(express.static(__dirname, {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('firebase-config.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
         }
     }
 }));
