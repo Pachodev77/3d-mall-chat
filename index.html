@@ -89,7 +89,6 @@ const DEFAULT_FURNITURE_LAYOUT = [
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2409695903679883"
      crossorigin="anonymous"></script>
         <link rel="stylesheet" href="/public/style.css">
-    <link rel="stylesheet" href="public/joystick.css">
 </head>
 <body>
     <!-- Contenedor de UI completamente separado del canvas -->
@@ -191,13 +190,13 @@ const DEFAULT_FURNITURE_LAYOUT = [
     <!-- Contenedor para ventanas de chats privados -->
     <div id="private-chats-container" style="position:fixed; bottom:20px; right:20px; z-index:40000; pointer-events:none;"></div>
     
-    <!-- Joystick Controls -->
-    <div id="joystick-container">
-        <div id="left-joystick" class="joystick">
-            <div class="joystick-knob" id="left-knob"></div>
+    <!-- Controles de joystick -->
+    <div id="mobile-controls">
+        <div id="left-joystick" class="joystick-container" style="position: fixed; left: 30px; bottom: 30px; width: 120px; height: 120px; z-index: 10000;">
+            <div class="joystick" style="width: 100%; height: 100%; border-radius: 50%; background: rgba(75, 0, 0, 0.2); border: 2px solid rgba(255, 215, 0, 0.3);"></div>
         </div>
-        <div id="right-joystick" class="joystick">
-            <div class="joystick-knob" id="right-knob"></div>
+        <div id="right-joystick" class="joystick-container" style="position: fixed; right: 30px; bottom: 30px; width: 120px; height: 120px; z-index: 10000;">
+            <div class="joystick" style="width: 100%; height: 100%; border-radius: 50%; background: rgba(75, 0, 0, 0.2); border: 2px solid rgba(255, 215, 0, 0.3);"></div>
         </div>
     </div>
 
@@ -299,32 +298,18 @@ const DEFAULT_FURNITURE_LAYOUT = [
         </div>
     </div>
     
-    <!-- Joystick Controls -->
-    <div id="joystick-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 10000; display: none;">
-        <div id="left-joystick" class="joystick">
-            <div id="left-knob" class="joystick-knob"></div>
-        </div>
-    </div>
-    <div id="right-joystick-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: none;">
-        <div id="right-joystick" class="joystick">
-            <div id="right-knob" class="joystick-knob"></div>
-        </div>
-    </div>
-    
-    <link rel="stylesheet" href="/public/joystick.css">
-    
     <!-- Panel de personalización de avatar -->
     <!-- Eliminado: <div id="customization-panel">...</div> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/umd/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.9.0/dist/nipplejs.min.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="/firebase-config.js"></script>
-    <script src="/public/joystick.js"></script>
     <script type="module" src="/public/furniture-persistence.js"></script>
+    <script src="./firebase-config.js"></script>
     <script>
         // URLs de las tiendas proporcionadas por el usuario (duplicadas para llenar todos los pisos)
         const originalStoreLinks = [
@@ -1922,9 +1907,10 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 console.error('No se encontró el botón de regreso al mall');
             }
             
-            // Controles móviles manejados por joystick.js
+            // Configurar controles móviles
+            setupMobileControls();
 
-            // --- Configuración de botones de control de muebles móviles (Cruz) ---
+            // --- NUEVO: Configurar botones de control de muebles móviles (Cruz) ---
             const mobileFurnitureUpBtn = document.getElementById('mobile-furniture-up');
             const mobileFurnitureDownBtn = document.getElementById('mobile-furniture-down');
             const mobileFurnitureLeftBtn = document.getElementById('mobile-furniture-left');
@@ -2026,7 +2012,80 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             }
         }
         
-        // Mobile controls are now handled by joystick.js
+        function setupMobileControls() {
+            // Inicializar joystick izquierdo (movimiento)
+            const leftJoystick = nipplejs.create({
+                zone: document.getElementById('left-joystick'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                color: 'rgba(255, 215, 0, 0.8)',
+                size: 120,
+                dynamicPage: true
+            });
+
+            // Inicializar joystick derecho (rotación)
+            const rightJoystick = nipplejs.create({
+                zone: document.getElementById('right-joystick'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                color: 'rgba(255, 215, 0, 0.8)',
+                size: 120,
+                dynamicPage: true
+            });
+
+            // Variables para el seguimiento del estado del joystick
+            let moveX = 0;
+            let moveY = 0;
+            let rotateX = 0;
+
+            // Configurar eventos del joystick izquierdo (movimiento)
+            leftJoystick.on('move', function(evt, data) {
+                const force = data.force > 1 ? 1 : data.force;
+                moveX = data.vector.x * force;
+                moveY = data.vector.y * force;
+                
+                // Actualizar variables de movimiento
+                mobileForward = moveY < -0.3;
+                mobileBackward = moveY > 0.3;
+                mobileLeft = moveX < -0.3;
+                mobileRight = moveX > 0.3;
+            });
+
+            leftJoystick.on('end', function() {
+                moveX = 0;
+                moveY = 0;
+                mobileForward = false;
+                mobileBackward = false;
+                mobileLeft = false;
+                mobileRight = false;
+            });
+
+            // Configurar eventos del joystick derecho (rotación)
+            rightJoystick.on('move', function(evt, data) {
+                const force = data.force > 1 ? 1 : data.force;
+                rotateX = data.vector.x * force;
+                
+                // Actualizar variables de rotación
+                if (Math.abs(rotateX) > 0.3) {
+                    if (rotateX > 0) {
+                        mobileRight = true;
+                        mobileLeft = false;
+                    } else {
+                        mobileLeft = true;
+                        mobileRight = false;
+                    }
+                } else {
+                    mobileLeft = false;
+                    mobileRight = false;
+                }
+            });
+
+            rightJoystick.on('end', function() {
+                rotateX = 0;
+                mobileLeft = false;
+                mobileRight = false;
+            });
+        }
 
         function onKeyDown(event) {
             // Si el chat está abierto, no procesar controles del juego
@@ -5156,4 +5215,5 @@ function updateAvatarPositions() {
             }
         // ... existing code ...
     </script>
+    <script defer src="https://analytics.vercel.com/script.js" data-api="/api/event" data-domain="3d-mall-chat.vercel.app"></script>
 </body>
