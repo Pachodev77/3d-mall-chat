@@ -187,8 +187,7 @@ const DEFAULT_FURNITURE_LAYOUT = [
         </div>
     </div>
     
-    <!-- Contenedor para ventanas de chats privados -->
-    <div id="private-chats-container" style="position:fixed; bottom:20px; right:20px; z-index:40000; pointer-events:none;"></div>
+    
     
     <!-- Controles de joystick -->
     <div id="mobile-controls">
@@ -277,9 +276,11 @@ const DEFAULT_FURNITURE_LAYOUT = [
         </div>
     </div>
     <div id="chat-panel">
-        <div id="chat-header">
-            Chat
-            <button id="chat-close-btn" title="Cerrar">✖</button>
+        <div id="chat-header" style="display: flex; justify-content: space-between; align-items: center; background: rgba(24,24,24,0.9); color: #fff; padding: 4px 4px 4px 10px; font-weight: bold;">
+            <div id="chat-tabs" style="display: flex; flex-grow: 1; overflow-x: auto; padding-bottom: 4px;">
+                <!-- Las pestañas se generarán dinámicamente aquí -->
+            </div>
+            <button id="chat-close-btn" title="Cerrar" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 8px; margin-left: 8px;">✖</button>
         </div>
         <div id="chat-content">
             <div id="chat-main">
@@ -3386,6 +3387,103 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
         let userAlias = localStorage.getItem('userAlias') || '';
         let chatOpen = false;
         let connectedUsers = [];
+
+        // --- NEW CHAT TAB STATE & FUNCTIONS ---
+        let chatTabs = {
+            'general': { type: 'general', unread: false, element: null, history: [] }
+        };
+        let activeChatTab = 'general';
+        const PRIVATE_TABS_KEY = 'privateChatTabs';
+
+        function savePrivateTabsToStorage() {
+            const privateTabAliases = Object.keys(chatTabs).filter(id => id !== 'general');
+            localStorage.setItem(PRIVATE_TABS_KEY, JSON.stringify(privateTabAliases));
+        }
+
+        function loadPrivateTabsFromStorage() {
+            const savedTabs = localStorage.getItem(PRIVATE_TABS_KEY);
+            if (savedTabs) {
+                try {
+                    const privateTabAliases = JSON.parse(savedTabs);
+                    privateTabAliases.forEach(alias => {
+                        if (!chatTabs[alias]) {
+                            chatTabs[alias] = {
+                                type: 'private',
+                                name: alias,
+                                unread: false,
+                                element: null,
+                                history: []
+                            };
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading private tabs from storage', e);
+                    localStorage.removeItem(PRIVATE_TABS_KEY);
+                }
+            }
+        }
+
+        function createTabElement(id, name) {
+            const tab = document.createElement('div');
+            tab.className = 'chat-tab';
+            tab.dataset.tabId = id;
+
+            const unreadIndicator = document.createElement('div');
+            unreadIndicator.className = 'unread-indicator';
+            tab.appendChild(unreadIndicator);
+
+            const tabName = document.createElement('span');
+            tabName.textContent = name;
+            tab.appendChild(tabName);
+
+            if (id !== 'general') {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'close-tab-btn';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    closeChatTab(id);
+                };
+                tab.appendChild(closeBtn);
+            }
+
+            tab.onclick = () => {
+                switchTab(id);
+            };
+
+            if(chatTabs[id]) {
+                chatTabs[id].element = tab;
+            }
+            
+            return tab;
+        }
+
+        function setupChatTabs() {
+            const tabsContainer = document.getElementById('chat-tabs');
+            if (!tabsContainer) return;
+            tabsContainer.innerHTML = '';
+
+            // Ensure General tab is always first
+            if(chatTabs['general']){
+                const generalTab = createTabElement('general', 'General');
+                tabsContainer.appendChild(generalTab);
+            }
+
+            // Create tabs for any existing private chats
+            for (const id in chatTabs) {
+                if (id !== 'general') {
+                    const privateTab = createTabElement(id, chatTabs[id].name);
+                    tabsContainer.appendChild(privateTab);
+                }
+            }
+
+            // Activate the correct tab
+            if (chatTabs[activeChatTab] && chatTabs[activeChatTab].element) {
+                chatTabs[activeChatTab].element.classList.add('active');
+            } else if (chatTabs['general'] && chatTabs['general'].element) {
+                switchTab('general');
+            }
+        }
         
         chatToggleBtn.onclick = () => {
             const simplePanel = document.getElementById('simple-panel');
@@ -3394,12 +3492,17 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
             }
             chatPanel.style.display = 'flex';
             chatOpen = true;
+            
+            // Configurar las pestañas solo si es la primera vez que se abre
+            if (!chatTabs['general'].element) {
+                setupChatTabs();
+            }
+
             chatInput.focus();
             // Forzar scroll abajo al abrir
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }, 50);
-            // El overlay NO debe mostrarse al abrir el chat
         };
         chatCloseBtn.onclick = () => {
             chatPanel.style.display = 'none';
@@ -3437,10 +3540,16 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
         // --- Firebase Chat Logic ---
         function handleSendMessage() {
             const message = chatInput.value.trim();
-            if (message.length > 0 && userAlias) {
-                    sendMessage(message);
-                chatInput.value = '';
+            if (message.length === 0 || !userAlias) return;
+
+            if (activeChatTab === 'general') {
+                sendMessage(message); // sendMessage es para el chat general
+            } else {
+                // Para chats privados, el ID de la pestaña es el alias del otro usuario
+                sendPrivateMessage(activeChatTab, message);
             }
+            chatInput.value = '';
+            emojiPanel.style.display = 'none';
         }
         if (chatSendBtn && chatInput) {
             chatSendBtn.onclick = handleSendMessage;
@@ -3461,6 +3570,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
         if (userAlias) {
             changeAliasBtn.style.display = 'flex';
         }
+        // Load saved private tabs before connecting to chat
+        loadPrivateTabsFromStorage();
         connectToChat(userAlias); // Provided by firebase-config.js
 
         // --- Funciones de personalización de avatar ---
@@ -4640,10 +4751,12 @@ function applyCustomizationToAvatar() {
 
         // Sistema de posición centralizado - manejado por updatePeriodicSystems()
 
-        // Función mejorada para mostrar mensajes en el chat
-        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+                // Función para añadir un mensaje al panel de chat visible
+        function appendMessageToView(msgData) {
+            const { alias, message, type, timestamp, isPrivate } = msgData;
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
+
             let timeStr = '';
             if (timestamp) {
                 const date = new Date(timestamp);
@@ -4652,23 +4765,72 @@ function applyCustomizationToAvatar() {
             const isOwn = (alias === userAlias || type === 'own');
             const msgDiv = document.createElement('div');
             msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
-            msgDiv.style.margin = '6px 0';
-            msgDiv.style.textAlign = isOwn ? 'right' : 'left';
+            
+            let header;
             if (isPrivate) {
-                msgDiv.style.background = 'rgba(255,215,0,0.12)';
-                msgDiv.style.border = '1px solid #FFD700';
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias} (privado):</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+                header = isOwn ? 'Tú (privado):' : `${alias} (privado):`;
             } else {
-                msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${alias}:</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
+                header = `${alias}:`;
             }
+
+            msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${header}</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             chatMessages.appendChild(msgDiv);
-            // Limitar a los últimos 10 mensajes
-            while (chatMessages.children.length > 10) {
-                chatMessages.removeChild(chatMessages.firstChild);
-            }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        window.addMessageToChat = addMessageToChat;
+
+        // Función que procesa todos los mensajes entrantes (públicos y privados)
+        function processIncomingMessage(msg) {
+            const { from, to, message, timestamp } = msg;
+            const isPrivate = !!to;
+            const isOwn = from === userAlias;
+            const otherUser = isOwn ? to : from;
+            const tabId = isPrivate ? otherUser : 'general';
+
+            const messageData = {
+                alias: from,
+                message: message,
+                type: isOwn ? 'own' : 'user',
+                timestamp: timestamp,
+                isPrivate: isPrivate,
+                recipient: to
+            };
+
+            if (!chatTabs[tabId]) {
+                if (isPrivate) {
+                    openPrivateChatTab(otherUser);
+                } else { 
+                    return; 
+                }
+            }
+
+            chatTabs[tabId].history.push(messageData);
+            if (chatTabs[tabId].history.length > 200) { // Guardar más historial
+                chatTabs[tabId].history.shift();
+            }
+
+            if (activeChatTab === tabId) {
+                appendMessageToView(messageData);
+            } else {
+                chatTabs[tabId].unread = true;
+                if (chatTabs[tabId].element) {
+                    chatTabs[tabId].element.classList.add('unread');
+                    const indicator = chatTabs[tabId].element.querySelector('.unread-indicator');
+                    if (indicator) indicator.style.display = 'block';
+                }
+            }
+        }
+                // Adaptador para compatibilidad con firebase-config.js que puede llamar a la función antigua
+        function addMessageToChat(alias, message, type = 'user', timestamp = null, isPrivate = false, recipient = null) {
+            const msg = {
+                from: alias,
+                to: isPrivate ? recipient : null,
+                message: message,
+                timestamp: timestamp
+            };
+            processIncomingMessage(msg);
+        }
+        window.addMessageToChat = addMessageToChat; // Mantener por compatibilidad
+        window.processIncomingMessage = processIncomingMessage; // Exponer también la nueva función
 
         // Listener de mensajes de Firebase - ELIMINADO para evitar duplicados
         // El listener principal está en firebase-config.js
@@ -5027,7 +5189,7 @@ function updateAvatarPositions() {
 
         // Eliminar definición duplicada de addMessageToChat y el listener de mensajes públicos en index.html
         // Dejar solo la versión de addMessageToChat que soporta mensajes privados y exponerla en window
-        window.addMessageToChat = addMessageToChat;
+        
 
         // --- Sistema de posición centralizado ---
         function sendUserPosition() {
@@ -5075,112 +5237,98 @@ function updateAvatarPositions() {
             }
         }
 
-        // --- Ventanas independientes para chats privados ---
-        const privateChatsContainer = document.getElementById('private-chats-container');
-        const privateChatWindows = {};
-        const privateChatListeners = {};
+        function switchTab(tabId) {
+            if (!chatTabs[tabId]) return;
 
-        function openPrivateChatWindow(alias) {
+            // Deactivate current tab
+            if (chatTabs[activeChatTab] && chatTabs[activeChatTab].element) {
+                chatTabs[activeChatTab].element.classList.remove('active');
+            }
+
+            // Activate new tab
+            activeChatTab = tabId;
+            const newTab = chatTabs[activeChatTab];
+            if (newTab.element) {
+                newTab.element.classList.add('active');
+                newTab.unread = false;
+                newTab.element.classList.remove('unread');
+                const indicator = newTab.element.querySelector('.unread-indicator');
+                if(indicator) indicator.style.display = 'none';
+            }
+
+            // Update chat messages
+            chatMessages.innerHTML = '';
+            const history = newTab.history || [];
+            history.forEach(msg => {
+                appendMessageToView(msg);
+            });
+        }
+
+        function openPrivateChatTab(alias, options = { setActive: true }) {
             if (!alias || alias === userAlias) return;
-            if (privateChatWindows[alias]) {
-                // Traer al frente
-                privateChatWindows[alias].style.zIndex = Date.now();
-                privateChatWindows[alias].style.display = 'block';
-                privateChatsContainer.style.pointerEvents = 'auto';
-                return;
-            }
-            // Crear ventana
-            const win = document.createElement('div');
-            win.className = 'private-chat-window';
-            win.style.cssText = `width:320px; height:380px; background:rgba(30,30,30,0.97); border-radius:10px; box-shadow:0 4px 24px #000a; position:relative; margin-bottom:16px; margin-left:16px; display:block; pointer-events:auto; overflow:hidden; border:2px solid #FFD700;`;
-            win.style.zIndex = Date.now();
-            win.innerHTML = `
-                <div style="background:#222; color:#FFD700; padding:10px 14px; font-weight:bold; display:flex; align-items:center; justify-content:space-between;">
-                    <span>Chat privado con ${alias}</span>
-                    <button style="background:none; border:none; color:#FFD700; font-size:18px; cursor:pointer;" title="Cerrar">✖</button>
-                </div>
-                <div class="private-chat-messages" style="flex:1; padding:10px; overflow-y:auto; height:260px; background:rgba(34,34,34,0.95);"></div>
-                <div style="padding:10px; border-top:1px solid #333; background:rgba(34,34,34,0.95); display:flex;">
-                    <input class="private-chat-input" type="text" placeholder="Escribe un mensaje privado..." style="flex:1; border:none; background:#333; color:#fff; border-radius:6px; padding:8px; font-size:15px;">
-                    <button class="private-chat-send-btn" style="background:#FFD700; color:#222; border:none; border-radius:6px; margin-left:8px; padding:8px 14px; font-size:15px; cursor:pointer;">Enviar</button>
-                </div>
-            `;
-            privateChatsContainer.appendChild(win);
-            privateChatsContainer.style.pointerEvents = 'auto';
-            privateChatWindows[alias] = win;
-            // Cerrar ventana
-            win.querySelector('button[title="Cerrar"]').onclick = () => closePrivateChatWindow(alias);
-            // Enviar mensaje
-            const input = win.querySelector('.private-chat-input');
-            const sendBtn = win.querySelector('.private-chat-send-btn');
-            sendBtn.onclick = () => {
-                const msg = input.value.trim();
-                if (msg) {
-                    sendPrivateMessage(alias, msg);
-                    input.value = '';
+
+            const isNewTab = !chatTabs[alias];
+
+            if (isNewTab) {
+                // Create new tab data
+                chatTabs[alias] = {
+                    type: 'private',
+                    name: alias,
+                    unread: false,
+                    element: null,
+                    history: []
+                };
+                // Add tab to UI
+                const tabsContainer = document.getElementById('chat-tabs');
+                if(tabsContainer){
+                    const newTabElement = createTabElement(alias, alias);
+                    tabsContainer.appendChild(newTabElement);
                 }
-            };
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') sendBtn.onclick();
-            });
-            // Cargar historial y escuchar nuevos mensajes
-            loadPrivateChatHistory(alias, win.querySelector('.private-chat-messages'));
-        }
-        function closePrivateChatWindow(alias) {
-            if (privateChatWindows[alias]) {
-                privateChatsContainer.removeChild(privateChatWindows[alias]);
-                delete privateChatWindows[alias];
+                // Save the new set of tabs to storage
+                savePrivateTabsToStorage();
             }
-            if (privateChatListeners[alias]) {
-                privateChatListeners[alias]();
-                delete privateChatListeners[alias];
+            
+            if (options.setActive) {
+                switchTab(alias);
             }
-            // Si no quedan ventanas, desactivar pointer-events
-            if (Object.keys(privateChatWindows).length === 0) {
-                privateChatsContainer.style.pointerEvents = 'none';
-            }
-        }
-        function loadPrivateChatHistory(alias, messagesDiv) {
-            // Limpiar mensajes previos
-            messagesDiv.innerHTML = '';
-            const chatId = getPrivateChatId(userAlias, alias);
-            const privateRef = firebase.database().ref('privateMessages').child(chatId);
-            // Cargar últimos 20 mensajes
-            const loadedTimestamps = new Set();
-            privateRef.limitToLast(20).once('value', snapshot => {
-                const msgs = [];
-                snapshot.forEach(child => {
-                    const msg = child.val();
-                    msgs.push(msg);
-                    if (msg.timestamp) loadedTimestamps.add(msg.timestamp);
+
+            // Load history only if it's a new tab and we are activating it
+            if (isNewTab && options.setActive) {
+                const chatId = getPrivateChatId(userAlias, alias);
+                const privateRef = firebase.database().ref('privateMessages').child(chatId);
+                privateRef.limitToLast(200).once('value', snapshot => {
+                    snapshot.forEach(child => {
+                        const msg = child.val();
+                        chatTabs[alias].history.push({
+                            alias: msg.from,
+                            message: msg.message,
+                            type: msg.from === userAlias ? 'own' : 'user',
+                            timestamp: msg.timestamp,
+                            isPrivate: true
+                        });
+                    });
+                    // Refresh view if the tab is still active
+                    if (activeChatTab === alias) {
+                        switchTab(alias);
+                    }
                 });
-                msgs.forEach(msg => {
-                    appendPrivateMessage(messagesDiv, msg, alias);
-                });
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            });
-            // Escuchar nuevos mensajes (solo si no están ya en el historial)
-            const listener = privateRef.limitToLast(1).on('child_added', snap => {
-                const msg = snap.val();
-                if (!msg.timestamp || !loadedTimestamps.has(msg.timestamp)) {
-                    appendPrivateMessage(messagesDiv, msg, alias);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                }
-            });
-            // Guardar función para limpiar listener
-            privateChatListeners[alias] = () => privateRef.off('child_added', listener);
+            }
         }
-        function appendPrivateMessage(messagesDiv, msg, otherAlias) {
-            const isOwn = msg.from === userAlias;
-            const div = document.createElement('div');
-            div.className = isOwn ? 'chat-message own' : 'chat-message';
-            div.style.margin = '6px 0';
-            div.style.textAlign = isOwn ? 'right' : 'left';
-            div.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${isOwn ? 'Tú' : otherAlias}:</span> <span style="color:#fff;">${msg.message}</span> <span style="color:#aaa; font-size:11px; margin-left:8px;">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>`;
-            messagesDiv.appendChild(div);
-            // Limitar a los últimos 20 mensajes
-            while (messagesDiv.children.length > 20) {
-                messagesDiv.removeChild(messagesDiv.firstChild);
+
+        function closeChatTab(tabId) {
+            if (tabId === 'general') return; // Cannot close general tab
+
+            const tabData = chatTabs[tabId];
+            if (tabData && tabData.element) {
+                tabData.element.remove();
+            }
+            delete chatTabs[tabId];
+
+            // Update storage
+            savePrivateTabsToStorage();
+
+            if (activeChatTab === tabId) {
+                switchTab('general');
             }
         }
         // UI: Al hacer clic en un usuario, abrir ventana privada
@@ -5188,7 +5336,7 @@ function updateAvatarPositions() {
             const userItem = e.target.closest('.user-item');
             if (userItem && !userItem.classList.contains('own')) {
                 const alias = userItem.textContent.replace(' (Tú)', '').trim();
-                openPrivateChatWindow(alias);
+                openPrivateChatTab(alias);
             }
         });
 
