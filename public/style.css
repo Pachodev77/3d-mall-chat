@@ -57,7 +57,7 @@ body {
             flex-direction: column;
             overflow: hidden;
             backdrop-filter: blur(10px);
-            pointer-events: none; /* Changed from auto to none */
+            pointer-events: auto; /* Aseguramos que el panel sea interactivo */
         }
         #chat-header {
             background: rgba(24,24,24,0.9);
@@ -72,6 +72,7 @@ body {
             display: flex;
             flex: 1;
             overflow: hidden;
+            pointer-events: auto; /* Aseguramos que el contenido sea interactivo */
         }
         #chat-main {
             flex: 1;
@@ -165,6 +166,7 @@ body {
             border-radius: 6px;
             padding: 8px;
             font-size: 15px;
+            pointer-events: auto; /* Aseguramos que el input sea interactivo */
         }
         #chat-send-btn {
             background: #4B0000;
