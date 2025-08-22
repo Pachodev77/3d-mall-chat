@@ -1,3 +1,9 @@
+// Global variables for movement control
+let mobileForward = false;
+let mobileBackward = false;
+let mobileLeft = false;
+let mobileRight = false;
+
 class Joystick {
     constructor(containerId, knobId, options = {}) {
         this.container = document.getElementById(containerId);
