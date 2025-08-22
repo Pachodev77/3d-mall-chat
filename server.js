@@ -23,28 +23,21 @@ const mimeTypes = {
     '.wasm': 'application/wasm'
 };
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public'), {
-    setHeaders: (res, filePath) => {
-        const extname = path.extname(filePath);
-        if (mimeTypes[extname]) {
-            res.setHeader('Content-Type', mimeTypes[extname]);
-        }
-    }
-}));
-
-// Serve index.html from the root
-app.use(express.static(__dirname, {
-    setHeaders: (res, filePath) => {
-        if (filePath.endsWith('firebase-config.js') || filePath.endsWith('joystick.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
-        }
-    }
-}));
+// Serve static files with proper MIME types
+app.use(express.static(__dirname));
 
 // Explicit route for joystick.js to ensure it's served correctly
 app.get('/public/joystick.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'joystick.js'), {
+        headers: {
+            'Content-Type': 'application/javascript'
+        }
+    });
+});
+
+// Serve firebase-config.js with correct MIME type
+app.get('/firebase-config.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'firebase-config.js'), {
         headers: {
             'Content-Type': 'application/javascript'
         }
