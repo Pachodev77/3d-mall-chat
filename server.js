@@ -36,11 +36,20 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // Serve index.html from the root
 app.use(express.static(__dirname, {
     setHeaders: (res, filePath) => {
-        if (filePath.endsWith('firebase-config.js')) {
+        if (filePath.endsWith('firebase-config.js') || filePath.endsWith('joystick.js')) {
             res.setHeader('Content-Type', 'application/javascript');
         }
     }
 }));
+
+// Explicit route for joystick.js to ensure it's served correctly
+app.get('/public/joystick.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'joystick.js'), {
+        headers: {
+            'Content-Type': 'application/javascript'
+        }
+    });
+});
 
 // Handle SPA routing - serve index.html for all routes
 app.get('*', (req, res) => {
