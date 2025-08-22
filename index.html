@@ -2038,29 +2038,22 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             let moveY = 0;
             let rotateX = 0;
 
-            // Configurar eventos del joystick izquierdo (movimiento y strafe)
+            // Configurar eventos del joystick izquierdo (solo movimiento y strafe)
             leftJoystick.on('move', function(evt, data) {
                 const force = data.force > 1 ? 1 : data.force;
                 moveX = data.vector.x * force;
                 moveY = data.vector.y * force;
                 
-                // Actualizar variables de movimiento (invertir Y para que hacia arriba sea adelante)
-                mobileForward = moveY > 0.3;  // Invertido: positivo es adelante
-                mobileBackward = moveY < -0.3; // Invertido: negativo es atrás
+                // Movimiento adelante/atrás (eje Y)
+                mobileForward = moveY > 0.3;   // Arriba: adelante
+                mobileBackward = moveY < -0.3;  // Abajo: atrás
                 
-                // Strafe lateral (sin afectar la rotación)
-                if (Math.abs(moveX) > 0.3) {
-                    if (moveX > 0) {
-                        // Strafe derecho (usamos las teclas A/D que normalmente son para rotar)
-                        // En la función de movimiento, usaremos estas variables para strafe
-                        mobileRight = true;
-                        mobileLeft = false;
-                    } else {
-                        // Strafe izquierdo
-                        mobileLeft = true;
-                        mobileRight = false;
-                    }
-                } else {
+                // Strafe lateral (eje X)
+                mobileStrafeLeft = moveX < -0.3;  // Izquierda: strafe izquierdo
+                mobileStrafeRight = moveX > 0.3;  // Derecha: strafe derecho
+                
+                // Asegurarse de que no haya rotación desde el joystick izquierdo
+                if (mobileLeft || mobileRight) {
                     mobileLeft = false;
                     mobileRight = false;
                 }
@@ -2071,8 +2064,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 moveY = 0;
                 mobileForward = false;
                 mobileBackward = false;
-                mobileLeft = false;
-                mobileRight = false;
+                mobileStrafeLeft = false;
+                mobileStrafeRight = false;
             });
 
             // Configurar eventos del joystick derecho (solo rotación)
@@ -2080,28 +2073,28 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
                 const force = data.force > 1 ? 1 : data.force;
                 rotateX = data.vector.x * force;
                 
-                // Solo actualizamos las variables de rotación
+                // Solo rotación, sin afectar el movimiento
                 if (Math.abs(rotateX) > 0.3) {
                     if (rotateX > 0) {
                         // Rotación derecha
-                        mobileRight = true;
-                        mobileLeft = false;
+                        mobileRotateRight = true;
+                        mobileRotateLeft = false;
                     } else {
                         // Rotación izquierda
-                        mobileLeft = true;
-                        mobileRight = false;
+                        mobileRotateLeft = true;
+                        mobileRotateRight = false;
                     }
                 } else {
                     // Sin rotación
-                    mobileLeft = false;
-                    mobileRight = false;
+                    mobileRotateLeft = false;
+                    mobileRotateRight = false;
                 }
             });
 
             rightJoystick.on('end', function() {
                 rotateX = 0;
-                mobileLeft = false;
-                mobileRight = false;
+                mobileRotateLeft = false;
+                mobileRotateRight = false;
             });
         }
 
@@ -2309,15 +2302,23 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             handleGlobalClick(event);
         }
 
+        // Variables para controles móviles
+        let mobileForward = false;
+        let mobileBackward = false;
+        let mobileStrafeLeft = false;
+        let mobileStrafeRight = false;
+        let mobileRotateLeft = false;
+        let mobileRotateRight = false;
+        
         function updateMovement() {
             // Si el chat está abierto, no actualizar movimiento
             if (chatOpen) {
                 return;
             }
             
-            // --- Rotación con flechas izquierda/derecha y joystick derecho ---
-            if (keys.ArrowLeft) targetRotationY -= ROTATE_SPEED;
-            if (keys.ArrowRight) targetRotationY += ROTATE_SPEED;
+            // --- Rotación con flechas y joystick derecho ---
+            if (keys.ArrowLeft || mobileRotateLeft) targetRotationY -= ROTATE_SPEED;
+            if (keys.ArrowRight || mobileRotateRight) targetRotationY += ROTATE_SPEED;
 
             // --- Movimiento con teclas y joystick izquierdo ---
             const direction = new THREE.Vector3();
@@ -2346,16 +2347,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.35 : 0.5; // Más lento en ambos, aún m
             if (keyD) velocity.add(rightDirection);
             
             // Strafe con joystick izquierdo (eje X)
-            if (mobileLeft) velocity.sub(rightDirection);
-            if (mobileRight) velocity.add(rightDirection);
-            
-            // Aplicar rotación del joystick derecho (si está activo)
-            if (mobileLeft && !keyA) {
-                targetRotationY -= ROTATE_SPEED * 1.5; // Rotación más suave
-            }
-            if (mobileRight && !keyD) {
-                targetRotationY += ROTATE_SPEED * 1.5; // Rotación más suave
-            }
+            if (mobileStrafeLeft) velocity.sub(rightDirection);
+            if (mobileStrafeRight) velocity.add(rightDirection);
             
             if (velocity.length() > 0) {
                 velocity.normalize().multiplyScalar(MOVE_SPEED);
