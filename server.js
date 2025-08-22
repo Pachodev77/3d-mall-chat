@@ -23,26 +23,25 @@ const mimeTypes = {
     '.wasm': 'application/wasm'
 };
 
-// Serve static files with proper MIME types
-app.use(express.static(__dirname));
-
-// Explicit route for joystick.js to ensure it's served correctly
-app.get('/public/joystick.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'joystick.js'), {
-        headers: {
-            'Content-Type': 'application/javascript'
+// Serve static files from public directory with proper MIME types
+app.use('/public', express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, filePath) => {
+        const extname = path.extname(filePath);
+        if (mimeTypes[extname]) {
+            res.setHeader('Content-Type', mimeTypes[extname]);
         }
-    });
-});
+    }
+}));
 
-// Serve firebase-config.js with correct MIME type
-app.get('/firebase-config.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'firebase-config.js'), {
-        headers: {
-            'Content-Type': 'application/javascript'
+// Serve root files (like firebase-config.js) with proper MIME types
+app.use(express.static(__dirname, {
+    setHeaders: (res, filePath) => {
+        const extname = path.extname(filePath);
+        if (mimeTypes[extname]) {
+            res.setHeader('Content-Type', mimeTypes[extname]);
         }
-    });
-});
+    }
+}));
 
 // Handle SPA routing - serve index.html for all routes
 app.get('*', (req, res) => {

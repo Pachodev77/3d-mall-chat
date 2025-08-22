@@ -299,6 +299,20 @@ const DEFAULT_FURNITURE_LAYOUT = [
         </div>
     </div>
     
+    <!-- Joystick Controls -->
+    <div id="joystick-container" style="position: fixed; bottom: 20px; left: 20px; z-index: 10000; display: none;">
+        <div id="left-joystick" class="joystick">
+            <div id="left-knob" class="joystick-knob"></div>
+        </div>
+    </div>
+    <div id="right-joystick-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: none;">
+        <div id="right-joystick" class="joystick">
+            <div id="right-knob" class="joystick-knob"></div>
+        </div>
+    </div>
+    
+    <link rel="stylesheet" href="/public/joystick.css">
+    
     <!-- Panel de personalización de avatar -->
     <!-- Eliminado: <div id="customization-panel">...</div> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
