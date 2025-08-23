@@ -4970,7 +4970,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
             if (idleClip) {
                 actions.idle = mixer.clipAction(idleClip);
                 actions.idle.setLoop(THREE.LoopRepeat, Infinity);
-                actions.idle.timeScale = 1.0; // Velocidad normal para ambos dispositivos
+                actions.idle.timeScale = window.IS_MOBILE ? 0.8 : 1.0; // Velocidad ajustada para móvil
                 actions.idle.clampWhenFinished = false;
                 actions.idle.play(); // Iniciar en 'idle' por defecto
                 console.log('Animación Idle cargada para:', alias);
@@ -4982,7 +4982,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 actions.run = mixer.clipAction(runClip);
                 // Configurar animación de correr para que sea más fluida
                 actions.run.setLoop(THREE.LoopRepeat, Infinity);
-                actions.run.timeScale = 1.0; // Velocidad normal para ambos dispositivos
+                actions.run.timeScale = window.IS_MOBILE ? 0.8 : 1.0; // Velocidad ajustada para móvil
                 actions.run.clampWhenFinished = false; // Evitar que se quede en la última pose
                 console.log('Animación Run cargada para:', alias);
                 
@@ -5124,7 +5124,7 @@ function updateAvatarPositions() {
         }
         
         // --- Función para mejorar la fluidez de las animaciones ---
-        function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.3) {
+        function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.5) {
             console.log(`[Animation Debug] smoothAnimationTransition called: from=${fromAction ? fromAction.name : 'none'}, to=${toAction ? toAction.name : 'none'}, duration=${duration}`);
             if (!fromAction || !toAction) {
                 console.warn(`[Animation Debug] smoothAnimationTransition: Invalid actions. fromAction=${fromAction}, toAction=${toAction}`);
