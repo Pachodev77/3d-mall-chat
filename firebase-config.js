@@ -85,9 +85,16 @@ function connectToChat(alias) {
     // Configurar listener de mensajes
     messagesListener = (snapshot) => {
         const message = snapshot.val();
+        // Solo procesar si el mensaje es de otro usuario
         if (message.alias !== currentUser.alias) {
             if (typeof window.addMessageToChat === 'function') {
-                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+                // Usar el ID del mensaje como clave para evitar duplicados
+                const messageId = snapshot.key;
+                if (!window.processedMessages) window.processedMessages = new Set();
+                if (!window.processedMessages.has(messageId)) {
+                    window.processedMessages.add(messageId);
+                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+                }
             }
         }
     };
@@ -331,20 +338,69 @@ function sendPrivateMessage(toAlias, message) {
         message: message,
         timestamp: Date.now()
     };
-    privateRef.push(messageData);
+    
+    // Generate a temporary ID for the message
+    const tempMsgId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Initialize processed messages set if it doesn't exist
+    if (!window.processedPrivateMessages) window.processedPrivateMessages = new Set();
+    
+    // Add to processed messages to prevent duplicates
+    window.processedPrivateMessages.add(tempMsgId);
+    
+    // First, immediately show the message in the sender's chat
+    if (typeof window.addMessageToChat === 'function') {
+        window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, true, toAlias);
+    }
+    
+    // Then push to Firebase
+    const newMessageRef = privateRef.push();
+    newMessageRef.set(messageData);
+    
+    // Return the message reference in case we need it
+    return newMessageRef.key;
 }
 
 function listenToPrivateMessages() {
     if (!currentUser) return;
     const privateRef = db.ref('privateMessages');
-    privateRef.on('child_added', (snapshot) => {
-        const chatId = snapshot.key;
+    
+    // Limpiar listeners anteriores para evitar duplicados
+    privateRef.off('child_added');
+    
+    // Set para rastrear mensajes ya procesados
+    if (!window.processedPrivateMessages) window.processedPrivateMessages = new Set();
+    
+    // First, set up a listener for new chat rooms
+    privateRef.on('child_added', (chatSnapshot) => {
+        const chatId = chatSnapshot.key;
         if (chatId.includes(currentUser.alias)) {
-            privateRef.child(chatId).on('child_added', (msgSnap) => {
-                const msg = msgSnap.val();
-                if (msg.to === currentUser.alias || msg.from === currentUser.alias) {
+            // For existing messages in this chat
+            chatSnapshot.forEach((msgSnapshot) => {
+                const msg = msgSnapshot.val();
+                const msgKey = msgSnapshot.key;
+                // Verificar si el mensaje ya fue procesado
+                if (!window.processedPrivateMessages.has(msgKey) && (msg.to === currentUser.alias || msg.from === currentUser.alias)) {
+                    window.processedPrivateMessages.add(msgKey);
                     if (typeof window.addMessageToChat === 'function') {
                         window.addMessageToChat(msg.from, msg.message, msg.from === currentUser.alias ? 'own' : 'user', msg.timestamp, true, msg.to);
+                    }
+                }
+            });
+            
+            // For new messages in this chat
+            chatSnapshot.ref.on('child_added', (msgSnapshot) => {
+                const msg = msgSnapshot.val();
+                const msgKey = msgSnapshot.key;
+                
+                // Skip if this is our own message (it's already handled by sendPrivateMessage)
+                if (msg.from === currentUser.alias) return;
+                
+                // Verificar si el mensaje ya fue procesado
+                if (!window.processedPrivateMessages.has(msgKey) && (msg.to === currentUser.alias || msg.from === currentUser.alias)) {
+                    window.processedPrivateMessages.add(msgKey);
+                    if (typeof window.addMessageToChat === 'function') {
+                        window.addMessageToChat(msg.from, msg.message, 'user', msg.timestamp, true, msg.to);
                     }
                 }
             });
