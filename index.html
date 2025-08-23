@@ -642,7 +642,7 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
                         const rotation = camera.rotation ? camera.rotation.y : 0;
                         sendPosition(position, currentFloor, rotation);
                     }
-                }, 10000); // cada 10 segundos
+                }, 500); // cada 0.5 segundos
             }
 
             // --- Iniciar Animación ---
@@ -2382,8 +2382,8 @@ const MOVE_SPEED = window.IS_MOBILE ? 0.15 : 0.25; // Velocidad reducida
             targetPosition.y = targetY;
 
             // --- Interpolación para suavidad ---
-            camera.position.lerp(targetPosition, 0.2);
-            camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.2);
+            camera.position.lerp(targetPosition, 0.1);
+            camera.rotation.y = lerpAngle(camera.rotation.y, targetRotationY, 0.1);
         }
 
         // --- Funciones del sistema de habitaciones personales ---
@@ -5058,7 +5058,14 @@ function updateAvatarPositions() {
                 avatar.group.rotation.y = lerpAngle(avatar.group.rotation.y, avatar.targetRotation, 0.2);
 
                 // --- LÓGICA DE CONTROL DE ANIMACIÓN MEJORADA ---
-                const isNowMoving = avatar.group.position.distanceTo(avatar.targetPosition) > 0.1;
+                const distance = avatar.group.position.distanceTo(avatar.targetPosition);
+                let isNowMoving = avatar.isMoving; // Start with current state
+
+                if (distance > 0.15) { // Threshold to start moving
+                    isNowMoving = true;
+                } else if (distance < 0.05) { // Threshold to stop moving
+                    isNowMoving = false;
+                }
 
                 if (isNowMoving && !avatar.isMoving) {
                     // Empezó a moverse: cambia de 'idle' a 'run'
@@ -5087,6 +5094,7 @@ function updateAvatarPositions() {
 
         // --- Función para actualizar animaciones de avatares ---
         function updateAvatarAnimations(deltaTime) {
+            deltaTime = Math.min(deltaTime, 0.1); // Cap deltaTime to prevent large jumps
             userAvatars.forEach((avatar, alias) => {
                 if (avatar.mixer) {
                     // deltaTime ya está en segundos desde THREE.Clock
@@ -5106,7 +5114,7 @@ function updateAvatarPositions() {
         }
         
         // --- Función para mejorar la fluidez de las animaciones ---
-        function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.15) {
+        function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.3) {
             if (!fromAction || !toAction) return;
             
             // Asegurar que las acciones estén configuradas correctamente
@@ -5116,8 +5124,8 @@ function updateAvatarPositions() {
             toAction.timeScale = 1.0; // Velocidad consistente
             
             // Transición suave con duración fija
-            fromAction.fadeOut(0.2);
-            toAction.reset().fadeIn(0.2).play();
+            fromAction.fadeOut(duration);
+            toAction.reset().fadeIn(duration).play();
             
             console.log('[Animation] Transición completada para:', avatar.group.name);
         }
