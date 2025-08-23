@@ -4062,7 +4062,7 @@ function applyCustomizationToAvatar() {
             }
         }
 
-        function updateAvatarPosition(alias, position, floor, rotation = 0, skin = null) {
+        async function updateAvatarPosition(alias, position, floor, rotation = 0, skin = null) {
             console.log('[updateAvatarPosition] Llamada para alias:', alias, 'posición:', position, 'floor:', floor, 'skin:', skin);
             console.log('[updateAvatarPosition] window.IS_MOBILE:', window.IS_MOBILE, 'userAlias:', userAlias);
             console.log('[updateAvatarPosition] Total avatares antes:', userAvatars.size);
@@ -4090,8 +4090,7 @@ function applyCustomizationToAvatar() {
                 // Solo pasar skin si existe
                 let custom = {};
                 if (skin) custom.skin = skin;
-                createUserAvatar(alias, position, floor, custom);
-                avatar = userAvatars.get(alias);
+                avatar = await createUserAvatar(alias, position, floor, custom);
             }
             if (avatar) {
                 console.log('[updateAvatarPosition] Actualizando avatar existente para:', alias);
@@ -5017,6 +5016,7 @@ console.log('--- FIN DIAGNÓSTICO RAW ---');
                 currentFloor: floor,
                 isMoving: false
             });
+            return userAvatars.get(alias); // Return the newly created avatar data
             
         }).catch(error => {
             pendingAvatarLoads.delete(alias);
@@ -5061,33 +5061,43 @@ function updateAvatarPositions() {
                 const distance = avatar.group.position.distanceTo(avatar.targetPosition);
                 let isNowMoving = avatar.isMoving; // Start with current state
 
+                console.log(`[Animation Debug] ${alias}: distance=${distance.toFixed(3)}, avatar.isMoving (before)=${avatar.isMoving}`);
+
                 if (distance > 0.15) { // Threshold to start moving
                     isNowMoving = true;
                 } else if (distance < 0.05) { // Threshold to stop moving
                     isNowMoving = false;
                 }
 
-                if (isNowMoving && !avatar.isMoving) {
-                    // Empezó a moverse: cambia de 'idle' a 'run'
-                    if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        // Transición simple sin fade para evitar cortes
-                        smoothAnimationTransition(avatar, avatar.actions.idle, avatar.actions.run, 0.2);
-                        console.log('[Animation] Transición suave idle -> run para:', alias);
-                    } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        smoothAnimationTransition(avatar, avatar.actions.default, avatar.actions.run, 0.2);
-                        console.log('[Animation] Transición suave default -> run para:', alias);
+                console.log(`[Animation Debug] ${alias}: isNowMoving (calculated)=${isNowMoving}`);
+
+                if (isNowMoving !== avatar.isMoving) { // Only transition if state changes
+                    if (isNowMoving) {
+                        // Empezó a moverse: cambia de 'idle' a 'run'
+                        console.log(`[Animation Debug] ${alias}: Attempting transition to RUN`);
+                        if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
+                            console.log(`[Animation Debug] ${alias}: idle effectiveWeight=${avatar.actions.idle.getEffectiveWeight().toFixed(2)}, run effectiveWeight=${avatar.actions.run.getEffectiveWeight().toFixed(2)}`);
+                            smoothAnimationTransition(avatar, avatar.actions.idle, avatar.actions.run, 0.3);
+                            console.log('[Animation] Transición suave idle -> run para:', alias);
+                        } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
+                            console.log(`[Animation Debug] ${alias}: default effectiveWeight=${avatar.actions.default.getEffectiveWeight().toFixed(2)}, run effectiveWeight=${avatar.actions.run.getEffectiveWeight().toFixed(2)}`);
+                            smoothAnimationTransition(avatar, avatar.actions.default, avatar.actions.run, 0.3);
+                            console.log('[Animation] Transición suave default -> run para:', alias);
+                        }
+                    } else {
+                        // Dejó de moverse: cambia de 'run' a 'idle'
+                        console.log(`[Animation Debug] ${alias}: Attempting transition to IDLE`);
+                        if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
+                            console.log(`[Animation Debug] ${alias}: run effectiveWeight=${avatar.actions.run.getEffectiveWeight().toFixed(2)}, idle effectiveWeight=${avatar.actions.idle.getEffectiveWeight().toFixed(2)}`);
+                            smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.idle, 0.3);
+                            console.log('[Animation] Transición suave run -> idle para:', alias);
+                        } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
+                            console.log(`[Animation Debug] ${alias}: run effectiveWeight=${avatar.actions.run.getEffectiveWeight().toFixed(2)}, default effectiveWeight=${avatar.actions.default.getEffectiveWeight().toFixed(2)}`);
+                            smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.default, 0.3);
+                            console.log('[Animation] Transición suave run -> default para:', alias);
+                        }
                     }
-                    avatar.isMoving = true;
-                } else if (!isNowMoving && avatar.isMoving) {
-                    // Dejó de moverse: cambia de 'run' a 'idle'
-                    if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.idle, 0.2);
-                        console.log('[Animation] Transición suave run -> idle para:', alias);
-                    } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.default, 0.2);
-                        console.log('[Animation] Transición suave run -> default para:', alias);
-                    }
-                    avatar.isMoving = false;
+                    avatar.isMoving = isNowMoving;
                 }
             });
         }
@@ -5115,7 +5125,11 @@ function updateAvatarPositions() {
         
         // --- Función para mejorar la fluidez de las animaciones ---
         function smoothAnimationTransition(avatar, fromAction, toAction, duration = 0.3) {
-            if (!fromAction || !toAction) return;
+            console.log(`[Animation Debug] smoothAnimationTransition called: from=${fromAction ? fromAction.name : 'none'}, to=${toAction ? toAction.name : 'none'}, duration=${duration}`);
+            if (!fromAction || !toAction) {
+                console.warn(`[Animation Debug] smoothAnimationTransition: Invalid actions. fromAction=${fromAction}, toAction=${toAction}`);
+                return;
+            }
             
             // Asegurar que las acciones estén configuradas correctamente
             fromAction.setLoop(THREE.LoopRepeat, Infinity);
@@ -5133,17 +5147,20 @@ function updateAvatarPositions() {
         // --- Función para asegurar que las animaciones estén siempre activas ---
         function ensureAnimationState(avatar) {
             if (!avatar.actions) return;
+            console.log(`[Animation Debug] ensureAnimationState called for ${avatar.group.name}`);
             
             // Verificar que siempre haya una animación activa
             let hasActiveAction = false;
             Object.values(avatar.actions).forEach(action => {
                 if (action.isRunning() && action.getEffectiveWeight() > 0.1) {
                     hasActiveAction = true;
+                    console.log(`[Animation Debug]   - Active action: ${action.name}, weight: ${action.getEffectiveWeight().toFixed(2)}`);
                 }
             });
             
             // Si no hay animación activa, activar idle
             if (!hasActiveAction && avatar.actions.idle) {
+                console.log('[Animation Debug] ensureAnimationState: No active action, considering reactivating idle.');
                 // No forzar play aquí, updateAvatarPositions debe manejar la transición
                 // console.log('[Animation] Posible pose T detectada, esperando transición de updateAvatarPositions');
             }
@@ -5152,17 +5169,20 @@ function updateAvatarPositions() {
         // --- Función específica para prevenir pose T en móvil ---
         function preventTPoseOnMobile(avatar) {
             if (!avatar.actions) return;
+            console.log(`[Animation Debug] preventTPoseOnMobile called for ${avatar.group.name}`);
             
             // Verificar si el avatar está en pose T (sin animación activa)
             let hasActiveAnimation = false;
             Object.values(avatar.actions).forEach(action => {
                 if (action.isRunning() && action.getEffectiveWeight() > 0.1) {
                     hasActiveAnimation = true;
+                    console.log(`[Animation Debug]   - Active action (mobile check): ${action.name}, weight: ${action.getEffectiveWeight().toFixed(2)}`);
                 }
             });
             
             // Si no hay animación activa, forzar la animación idle
             if (!hasActiveAnimation && avatar.actions.idle) {
+                console.log('[Animation Debug] preventTPoseOnMobile: No active action, considering reactivating idle.');
                 // No forzar play aquí, updateAvatarPositions debe manejar la transición
                 // console.log('[Animation] Posible pose T detectada en móvil, esperando transición de updateAvatarPositions');
             }

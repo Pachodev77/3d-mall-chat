@@ -64,12 +64,12 @@ function connectToChat(alias) {
         });
         messagesListenerSet = true;
     }
-    positionsRef.once('value', (snapshot) => {
+    positionsRef.once('value', async (snapshot) => {
         const positions = snapshot.val() || {};
-        Object.entries(positions).forEach(([alias, userData]) => {
+        for (const [alias, userData] of Object.entries(positions)) {
             if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
                 console.log('[Firebase] Loading existing user:', alias);
-                updateAvatarPosition(
+                await updateAvatarPosition(
                     alias,
                     userData.position,
                     userData.floor,
@@ -77,15 +77,15 @@ function connectToChat(alias) {
                     userData.skin // Pass skin
                 );
             }
-        });
+        }
     });
-    positionsRef.on('child_added', (snapshot) => {
+    positionsRef.on('child_added', async (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
         console.log('[Firebase] child_added recibido para:', alias, 'datos:', userData);
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] New user connected:', alias);
-            updateAvatarPosition(
+            await updateAvatarPosition(
                 alias,
                 userData.position,
                 userData.floor,
@@ -96,13 +96,13 @@ function connectToChat(alias) {
             console.log('[Firebase] child_added ignorado - alias propio o datos inválidos');
         }
     });
-    positionsRef.on('child_changed', (snapshot) => {
+    positionsRef.on('child_changed', async (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
         console.log('[Firebase] child_changed recibido para:', alias, 'datos:', userData);
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] Position updated:', alias);
-            updateAvatarPosition(
+            await updateAvatarPosition(
                 alias,
                 userData.position,
                 userData.floor,
