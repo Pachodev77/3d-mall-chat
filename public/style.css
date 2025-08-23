@@ -590,60 +590,17 @@ body {
                 font-size: 36px;
             }
         }
-        /* Estilos de mensajes de chat */
-        .message-container {
-            width: 100%;
-            margin-bottom: 12px;
-            clear: both;
-        }
-        
-        .message-container.own-message {
-            text-align: right;
-        }
-        
         .chat-message {
-            display: inline-block;
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 12px;
-            margin: 2px 0;
-            background: rgba(40, 40, 40, 0.8);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            word-break: break-word;
-            text-align: left;
-            position: relative;
-        }
-        
-        .chat-message.own {
-            background: linear-gradient(135deg, #1e88e5, #1976d2);
-            color: white;
-            float: right;
-            margin-right: 8px;
-        }
-        
-        .message-header {
-            font-size: 0.85em;
-            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 8px;
             margin-bottom: 4px;
+            background: rgba(40,40,40,0.7);
+            display: inline-block;
+            max-width: 90%;
+            word-break: break-word;
         }
-        
-        .message-body {
-            font-size: 0.95em;
-            line-height: 1.4;
-        }
-        
-        .message-footer {
-            font-size: 0.75em;
-            color: rgba(255, 255, 255, 0.6);
-            text-align: right;
-            margin-top: 4px;
-        }
-        
-        /* Limpiar floats */
-        .message-container::after {
-            content: "";
-            display: table;
-            clear: both;
+        .chat-message.own {
+            background: linear-gradient(90deg, #FFD70033, #FFD70011);
         }
         /* Overlay para bloquear clics al fondo cuando el panel de personalización está abierto */
         #ui-overlay {

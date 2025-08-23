@@ -4756,76 +4756,28 @@ function applyCustomizationToAvatar() {
             const chatMessages = document.getElementById('chat-messages');
             if (!chatMessages) return;
 
-            // Verificar si ya existe un mensaje con el mismo contenido y timestamp
-            const messageId = `${alias}-${message}-${timestamp}`;
-            if (window.displayedMessages && window.displayedMessages.has(messageId)) {
-                return; // No mostrar mensajes duplicados
-            }
-
-            // Inicializar el conjunto de mensajes mostrados si no existe
-            if (!window.displayedMessages) {
-                window.displayedMessages = new Set();
-            }
-            window.displayedMessages.add(messageId);
-
-            // Limitar el tamaño del conjunto para evitar consumo excesivo de memoria
-            if (window.displayedMessages.size > 500) {
-                const first = window.displayedMessages.values().next().value;
-                if (first) window.displayedMessages.delete(first);
-            }
-
-            // Formatear la hora
             let timeStr = '';
             if (timestamp) {
                 const date = new Date(timestamp);
-                timeStr = `<span class="message-time">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+                timeStr = `<span style="color:#aaa; font-size:11px; margin-left:8px;">${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
             }
-
             const isOwn = (alias === userAlias || type === 'own');
             const msgDiv = document.createElement('div');
-            msgDiv.className = `message-container ${isOwn ? 'own-message' : 'other-message'}`;
+            msgDiv.className = isOwn ? 'chat-message own' : 'chat-message';
             
-            // Crear contenedor de mensaje
-            const messageContent = document.createElement('div');
-            messageContent.className = `chat-message ${isOwn ? 'own' : ''}`;
-            
-            // Crear encabezado con nombre de usuario
-            const messageHeader = document.createElement('div');
-            messageHeader.className = 'message-header';
-            
-            let headerText;
+            let header;
             if (isPrivate) {
-                headerText = isOwn ? 'Tú (privado)' : `${alias} (privado)`;
+                header = isOwn ? 'Tú (privado):' : `${alias} (privado):`;
             } else {
-                headerText = isOwn ? 'Tú' : alias;
+                header = `${alias}:`;
             }
-            
-            messageHeader.innerHTML = `<span class="message-sender" style="color:${isOwn ? '#FFD700' : '#4ECDC4'}">${headerText}</span>`;
-            
-            // Crear contenido del mensaje
-            const messageBody = document.createElement('div');
-            messageBody.className = 'message-body';
-            messageBody.textContent = message;
-            
-            // Crear pie de mensaje con la hora
-            const messageFooter = document.createElement('div');
-            messageFooter.className = 'message-footer';
-            messageFooter.innerHTML = timeStr;
-            
-            // Ensamblar el mensaje
-            messageContent.appendChild(messageHeader);
-            messageContent.appendChild(messageBody);
-            messageContent.appendChild(messageFooter);
-            
-            msgDiv.appendChild(messageContent);
-            
-            // Añadir el mensaje al chat
+
+            msgDiv.innerHTML = `<span style="color:${isOwn ? '#FFD700' : '#4ECDC4'}; font-weight:bold;">${header}</span> <span style="color:#fff;">${message}</span> ${timeStr}`;
             chatMessages.appendChild(msgDiv);
-            
-            // Desplazarse al final del chat
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        // Función que procesa todos los mensajes entrantes (públicos y privados)
         function processIncomingMessage(msg) {
             const { from, to, message, timestamp } = msg;
             const isPrivate = !!to;

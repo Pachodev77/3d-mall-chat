@@ -85,26 +85,10 @@ function connectToChat(alias) {
     // Configurar listener de mensajes
     messagesListener = (snapshot) => {
         const message = snapshot.val();
-        if (!message) return;
-        
-        const messageId = snapshot.key;
-        if (!window.processedMessages) window.processedMessages = new Set();
-        
-        // Verificar si el mensaje ya fue procesado
-        if (window.processedMessages.has(messageId)) return;
-        
-        // Marcar como procesado antes de mostrarlo
-        window.processedMessages.add(messageId);
-        
-        // Limitar el tamaño del conjunto para evitar consumo excesivo de memoria
-        if (window.processedMessages.size > 1000) {
-            const first = window.processedMessages.values().next().value;
-            if (first) window.processedMessages.delete(first);
-        }
-        
-        // Solo procesar si el mensaje es de otro usuario
-        if (message.alias !== currentUser.alias && typeof window.addMessageToChat === 'function') {
-            window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+        if (message.alias !== currentUser.alias) {
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+            }
         }
     };
     messagesRef.on('child_added', messagesListener);
@@ -194,42 +178,16 @@ function connectToChat(alias) {
 }
 
 function sendMessage(message) {
-    if (!isConnected || !currentUser || !message.trim()) return;
-    
-    // Initialize processed messages set if it doesn't exist
-    if (!window.processedMessages) window.processedMessages = new Set();
-    
+    if (!isConnected || !currentUser) return;
     const messageData = {
         alias: currentUser.alias,
-        message: message.trim(),
+        message: message,
         timestamp: Date.now()
     };
-    
-    // Generate a temporary ID for the message
-    const tempMsgId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Add to processed messages to prevent duplicates
-    window.processedMessages.add(tempMsgId);
-    
-    // First, immediately show the message in the sender's chat
+    messagesRef.push(messageData);
     if (typeof window.addMessageToChat === 'function') {
-        window.addMessageToChat(currentUser.alias, messageData.message, 'own', messageData.timestamp, false, null);
+        window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, false, null);
     }
-    
-    // Then push to Firebase
-    const newMessageRef = messagesRef.push();
-    newMessageRef.set(messageData);
-    
-    // Add the actual message ID to processed messages when it's available
-    newMessageRef.then(() => {
-        if (newMessageRef.key) {
-            window.processedMessages.add(newMessageRef.key);
-            // Remove the temporary ID
-            window.processedMessages.delete(tempMsgId);
-        }
-    });
-    
-    return newMessageRef.key;
 }
 
 function sendPosition(position, floor, rotation) {
@@ -374,37 +332,18 @@ function sendPrivateMessage(toAlias, message) {
         timestamp: Date.now()
     };
     
-    // Generate a temporary ID for the message
-    const tempMsgId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Initialize processed messages set if it doesn't exist
-    if (!window.processedPrivateMessages) window.processedPrivateMessages = new Set();
-    
-    // Add to processed messages to prevent duplicates
-    window.processedPrivateMessages.add(tempMsgId);
-    
     // First, immediately show the message in the sender's chat
     if (typeof window.addMessageToChat === 'function') {
         window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, true, toAlias);
     }
     
     // Then push to Firebase
-    const newMessageRef = privateRef.push();
-    newMessageRef.set(messageData);
-    
-    // Return the message reference in case we need it
-    return newMessageRef.key;
+    privateRef.push(messageData);
 }
 
 function listenToPrivateMessages() {
     if (!currentUser) return;
     const privateRef = db.ref('privateMessages');
-    
-    // Limpiar listeners anteriores para evitar duplicados
-    privateRef.off('child_added');
-    
-    // Set para rastrear mensajes ya procesados
-    if (!window.processedPrivateMessages) window.processedPrivateMessages = new Set();
     
     // First, set up a listener for new chat rooms
     privateRef.on('child_added', (chatSnapshot) => {
@@ -413,10 +352,7 @@ function listenToPrivateMessages() {
             // For existing messages in this chat
             chatSnapshot.forEach((msgSnapshot) => {
                 const msg = msgSnapshot.val();
-                const msgKey = msgSnapshot.key;
-                // Verificar si el mensaje ya fue procesado
-                if (!window.processedPrivateMessages.has(msgKey) && (msg.to === currentUser.alias || msg.from === currentUser.alias)) {
-                    window.processedPrivateMessages.add(msgKey);
+                if (msg.to === currentUser.alias || msg.from === currentUser.alias) {
                     if (typeof window.addMessageToChat === 'function') {
                         window.addMessageToChat(msg.from, msg.message, msg.from === currentUser.alias ? 'own' : 'user', msg.timestamp, true, msg.to);
                     }
@@ -426,14 +362,10 @@ function listenToPrivateMessages() {
             // For new messages in this chat
             chatSnapshot.ref.on('child_added', (msgSnapshot) => {
                 const msg = msgSnapshot.val();
-                const msgKey = msgSnapshot.key;
-                
                 // Skip if this is our own message (it's already handled by sendPrivateMessage)
                 if (msg.from === currentUser.alias) return;
                 
-                // Verificar si el mensaje ya fue procesado
-                if (!window.processedPrivateMessages.has(msgKey) && (msg.to === currentUser.alias || msg.from === currentUser.alias)) {
-                    window.processedPrivateMessages.add(msgKey);
+                if (msg.to === currentUser.alias || msg.from === currentUser.alias) {
                     if (typeof window.addMessageToChat === 'function') {
                         window.addMessageToChat(msg.from, msg.message, 'user', msg.timestamp, true, msg.to);
                     }
