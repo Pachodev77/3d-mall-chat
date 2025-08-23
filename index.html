@@ -5064,25 +5064,21 @@ function updateAvatarPositions() {
                     // Empezó a moverse: cambia de 'idle' a 'run'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
                         // Transición simple sin fade para evitar cortes
-                        avatar.actions.idle.stop();
-                        avatar.actions.run.reset().play();
-                        console.log('[Animation] Cambio directo idle -> run para:', alias);
+                        smoothAnimationTransition(avatar, avatar.actions.idle, avatar.actions.run, 0.2);
+                        console.log('[Animation] Transición suave idle -> run para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        avatar.actions.default.stop();
-                        avatar.actions.run.reset().play();
-                        console.log('[Animation] Cambio directo default -> run para:', alias);
+                        smoothAnimationTransition(avatar, avatar.actions.default, avatar.actions.run, 0.2);
+                        console.log('[Animation] Transición suave default -> run para:', alias);
                     }
                     avatar.isMoving = true;
                 } else if (!isNowMoving && avatar.isMoving) {
                     // Dejó de moverse: cambia de 'run' a 'idle'
                     if (avatar.actions && avatar.actions.run && avatar.actions.idle) {
-                        avatar.actions.run.stop();
-                        avatar.actions.idle.reset().play();
-                        console.log('[Animation] Cambio directo run -> idle para:', alias);
+                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.idle, 0.2);
+                        console.log('[Animation] Transición suave run -> idle para:', alias);
                     } else if (avatar.actions && avatar.actions.run && avatar.actions.default) {
-                        avatar.actions.run.stop();
-                        avatar.actions.default.reset().play();
-                        console.log('[Animation] Cambio directo run -> default para:', alias);
+                        smoothAnimationTransition(avatar, avatar.actions.run, avatar.actions.default, 0.2);
+                        console.log('[Animation] Transición suave run -> default para:', alias);
                     }
                     avatar.isMoving = false;
                 }
