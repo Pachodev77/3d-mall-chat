@@ -20,11 +20,33 @@ let currentUser = null;
 let isConnected = false;
 let messagesListenerSet = false;
 
+// Variables para el throttle de posición
+if (typeof window.lastPositionUpdate === 'undefined') {
+    window.lastPositionUpdate = 0;
+}
+const POSITION_UPDATE_INTERVAL = 100; // 100ms entre actualizaciones
+
+// Variables para mantener referencias a los listeners
+let usersListener = null;
+let messagesListener = null;
+let positionsListener = null;
+let positionsChildAddedListener = null;
+let positionsChildChangedListener = null;
+let positionsChildRemovedListener = null;
+
 function connectToChat(alias) {
     if (!alias || alias.trim().length === 0) {
         alert('Please enter a valid alias');
         return;
     }
+    
+    // Limpiar listeners anteriores si existen
+    if (usersListener) usersRef.off('value', usersListener);
+    if (messagesListener) messagesRef.off('child_added', messagesListener);
+    if (positionsChildAddedListener) positionsRef.off('child_added', positionsChildAddedListener);
+    if (positionsChildChangedListener) positionsRef.off('child_changed', positionsChildChangedListener);
+    if (positionsChildRemovedListener) positionsRef.off('child_removed', positionsChildRemovedListener);
+    
     currentUser = {
         alias: alias.trim(),
         position: { x: 25, y: 1.6, z: 25 },
@@ -32,12 +54,18 @@ function connectToChat(alias) {
         rotation: 0,
         timestamp: Date.now()
     };
+    
+    // Configurar desconexión
     usersRef.child(currentUser.alias).set(currentUser);
     positionsRef.child(currentUser.alias).onDisconnect().remove();
-    usersRef.on('value', (snapshot) => {
+    
+    // Configurar listeners
+    usersListener = (snapshot) => {
         const users = snapshot.val() || {};
         updateUsersList(Object.values(users));
-    });
+    };
+    usersRef.on('value', usersListener);
+    // Cargar mensajes iniciales
     messagesRef.limitToLast(10).once('value', (snapshot) => {
         snapshot.forEach((child) => {
             const message = child.val();
@@ -53,36 +81,47 @@ function connectToChat(alias) {
             }
         });
     });
-    if (!messagesListenerSet) {
-        messagesRef.on('child_added', (snapshot) => {
-            const message = snapshot.val();
-            if (message.alias !== currentUser.alias) {
-                if (typeof window.addMessageToChat === 'function') {
-                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
-                }
+
+    // Configurar listener de mensajes
+    messagesListener = (snapshot) => {
+        const message = snapshot.val();
+        if (message.alias !== currentUser.alias) {
+            if (typeof window.addMessageToChat === 'function') {
+                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
             }
-        });
-        messagesListenerSet = true;
-    }
+        }
+    };
+    messagesRef.on('child_added', messagesListener);
+    messagesListenerSet = true;
+    // Cargar posiciones iniciales
     positionsRef.once('value', async (snapshot) => {
         const positions = snapshot.val() || {};
+        const updates = [];
+        
         for (const [alias, userData] of Object.entries(positions)) {
             if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
                 console.log('[Firebase] Loading existing user:', alias);
-                await updateAvatarPosition(
-                    alias,
-                    userData.position,
-                    userData.floor,
-                    userData.rotation,
-                    userData.skin // Pass skin
+                updates.push(
+                    updateAvatarPosition(
+                        alias,
+                        userData.position,
+                        userData.floor,
+                        userData.rotation,
+                        userData.skin
+                    )
                 );
             }
         }
+        
+        // Procesar actualizaciones en paralelo
+        await Promise.all(updates);
     });
-    positionsRef.on('child_added', async (snapshot) => {
+
+    // Configurar listeners de posición
+    positionsChildAddedListener = async (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
-        console.log('[Firebase] child_added recibido para:', alias, 'datos:', userData);
+        
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] New user connected:', alias);
             await updateAvatarPosition(
@@ -90,16 +129,15 @@ function connectToChat(alias) {
                 userData.position,
                 userData.floor,
                 userData.rotation,
-                userData.skin // Pass skin
+                userData.skin
             );
-        } else {
-            console.log('[Firebase] child_added ignorado - alias propio o datos inválidos');
         }
-    });
-    positionsRef.on('child_changed', async (snapshot) => {
+    };
+
+    positionsChildChangedListener = async (snapshot) => {
         const alias = snapshot.key;
         const userData = snapshot.val();
-        console.log('[Firebase] child_changed recibido para:', alias, 'datos:', userData);
+        
         if (alias !== currentUser.alias && userData && isValidPositionData(userData)) {
             console.log('[Firebase] Position updated:', alias);
             await updateAvatarPosition(
@@ -107,13 +145,12 @@ function connectToChat(alias) {
                 userData.position,
                 userData.floor,
                 userData.rotation,
-                userData.skin // Pass skin
+                userData.skin
             );
-        } else {
-            console.log('[Firebase] child_changed ignorado - alias propio o datos inválidos');
         }
-    });
-    positionsRef.on('child_removed', (snapshot) => {
+    };
+
+    positionsChildRemovedListener = (snapshot) => {
         const alias = snapshot.key;
         if (alias !== currentUser.alias) {
             console.log('[Firebase] User disconnected:', alias);
@@ -121,7 +158,12 @@ function connectToChat(alias) {
                 window.removeUserAvatar(alias);
             }
         }
-    });
+    };
+
+    // Asignar listeners
+    positionsRef.on('child_added', positionsChildAddedListener);
+    positionsRef.on('child_changed', positionsChildChangedListener);
+    positionsRef.on('child_removed', positionsChildRemovedListener);
     function isValidPositionData(data) {
         return data &&
                typeof data === 'object' &&
@@ -151,6 +193,13 @@ function sendMessage(message) {
 function sendPosition(position, floor, rotation) {
     if (!isConnected || !currentUser) return;
     
+    // Aplicar throttle
+    const now = Date.now();
+    if (now - window.lastPositionUpdate < POSITION_UPDATE_INTERVAL) {
+        return;
+    }
+    window.lastPositionUpdate = now;
+    
     let skin = 'humanMaleA'; // Default skin
     if (typeof window.currentCustomization === 'object' && window.currentCustomization.skin) {
         skin = window.currentCustomization.skin;
@@ -160,11 +209,14 @@ function sendPosition(position, floor, rotation) {
         position: position,
         floor: floor,
         rotation: rotation,
-        skin: skin, // Send skin instead of colors
-        timestamp: Date.now()
+        skin: skin,
+        timestamp: now
     };
-    console.log('[sendPosition] Enviando datos:', positionData, 'para usuario:', currentUser.alias);
-    positionsRef.child(currentUser.alias).set(positionData);
+    
+    // Usar set con prioridad baja para evitar bloquear la UI
+    requestIdleCallback(() => {
+        positionsRef.child(currentUser.alias).set(positionData);
+    }, { timeout: 100 });
 }
 
 function disconnectFromChat() {
@@ -179,17 +231,57 @@ function disconnectFromChat() {
     positionsRef.off('child_removed');
 }
 
+// Cache para mantener el estado actual de los usuarios
+const usersCache = new Map();
+
 function updateUsersList(users) {
     const usersList = document.getElementById('users-list');
-    if (usersList) {
-        usersList.innerHTML = '';
-        users.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.className = 'user-item' + (user.alias === currentUser?.alias ? ' own' : '');
-            userElement.textContent = user.alias + (user.alias === currentUser?.alias ? ' (Tú)' : '');
-            usersList.appendChild(userElement);
-        });
-    }
+    if (!usersList) return;
+
+    // Crear un mapa de los usuarios actuales para comparación rápida
+    const currentUsers = new Map(users.map(user => [user.alias, user]));
+    
+    // Eliminar usuarios que ya no están
+    Array.from(usersCache.keys()).forEach(cachedAlias => {
+        if (!currentUsers.has(cachedAlias)) {
+            const element = usersCache.get(cachedAlias);
+            if (element && element.parentNode) {
+                element.remove();
+            }
+            usersCache.delete(cachedAlias);
+        }
+    });
+
+    // Añadir o actualizar usuarios existentes
+    users.forEach(user => {
+        const isCurrentUser = user.alias === currentUser?.alias;
+        const userKey = user.alias;
+        
+        if (usersCache.has(userKey)) {
+            // Actualizar elemento existente si es necesario
+            const element = usersCache.get(userKey);
+            const displayName = userKey + (isCurrentUser ? ' (Tú)' : '');
+            
+            if (element.textContent !== displayName) {
+                element.textContent = displayName;
+            }
+            
+            // Actualizar clase si es necesario
+            const newClass = 'user-item' + (isCurrentUser ? ' own' : '');
+            if (element.className !== newClass) {
+                element.className = newClass;
+            }
+        } else {
+            // Crear nuevo elemento
+            const element = document.createElement('div');
+            element.className = 'user-item' + (isCurrentUser ? ' own' : '');
+            element.textContent = userKey + (isCurrentUser ? ' (Tú)' : '');
+            
+            // Añadir al DOM y al caché
+            usersList.appendChild(element);
+            usersCache.set(userKey, element);
+        }
+    });
 }
 
 function cleanupOldMessages() {
