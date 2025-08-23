@@ -5136,10 +5136,8 @@ function updateAvatarPositions() {
             
             // Si no hay animación activa, activar idle
             if (!hasActiveAction && avatar.actions.idle) {
-                avatar.actions.idle.reset().play();
-                avatar.actions.idle.timeScale = 1.0;
-                avatar.actions.idle.setEffectiveWeight(1.0);
-                console.log('[Animation] Reactivando animación idle');
+                // No forzar play aquí, updateAvatarPositions debe manejar la transición
+                // console.log('[Animation] Posible pose T detectada, esperando transición de updateAvatarPositions');
             }
         }
         
@@ -5157,10 +5155,8 @@ function updateAvatarPositions() {
             
             // Si no hay animación activa, forzar la animación idle
             if (!hasActiveAnimation && avatar.actions.idle) {
-                console.log('[Animation] Detectada pose T, forzando animación idle');
-                avatar.actions.idle.reset().play();
-                avatar.actions.idle.timeScale = 1.0;
-                avatar.actions.idle.setEffectiveWeight(1.0);
+                // No forzar play aquí, updateAvatarPositions debe manejar la transición
+                // console.log('[Animation] Posible pose T detectada en móvil, esperando transición de updateAvatarPositions');
             }
         }
 
