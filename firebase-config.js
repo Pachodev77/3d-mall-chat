@@ -85,17 +85,26 @@ function connectToChat(alias) {
     // Configurar listener de mensajes
     messagesListener = (snapshot) => {
         const message = snapshot.val();
+        if (!message) return;
+        
+        const messageId = snapshot.key;
+        if (!window.processedMessages) window.processedMessages = new Set();
+        
+        // Verificar si el mensaje ya fue procesado
+        if (window.processedMessages.has(messageId)) return;
+        
+        // Marcar como procesado antes de mostrarlo
+        window.processedMessages.add(messageId);
+        
+        // Limitar el tamaño del conjunto para evitar consumo excesivo de memoria
+        if (window.processedMessages.size > 1000) {
+            const first = window.processedMessages.values().next().value;
+            if (first) window.processedMessages.delete(first);
+        }
+        
         // Solo procesar si el mensaje es de otro usuario
-        if (message.alias !== currentUser.alias) {
-            if (typeof window.addMessageToChat === 'function') {
-                // Usar el ID del mensaje como clave para evitar duplicados
-                const messageId = snapshot.key;
-                if (!window.processedMessages) window.processedMessages = new Set();
-                if (!window.processedMessages.has(messageId)) {
-                    window.processedMessages.add(messageId);
-                    window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
-                }
-            }
+        if (message.alias !== currentUser.alias && typeof window.addMessageToChat === 'function') {
+            window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
         }
     };
     messagesRef.on('child_added', messagesListener);
@@ -185,16 +194,42 @@ function connectToChat(alias) {
 }
 
 function sendMessage(message) {
-    if (!isConnected || !currentUser) return;
+    if (!isConnected || !currentUser || !message.trim()) return;
+    
+    // Initialize processed messages set if it doesn't exist
+    if (!window.processedMessages) window.processedMessages = new Set();
+    
     const messageData = {
         alias: currentUser.alias,
-        message: message,
+        message: message.trim(),
         timestamp: Date.now()
     };
-    messagesRef.push(messageData);
+    
+    // Generate a temporary ID for the message
+    const tempMsgId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Add to processed messages to prevent duplicates
+    window.processedMessages.add(tempMsgId);
+    
+    // First, immediately show the message in the sender's chat
     if (typeof window.addMessageToChat === 'function') {
-        window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, false, null);
+        window.addMessageToChat(currentUser.alias, messageData.message, 'own', messageData.timestamp, false, null);
     }
+    
+    // Then push to Firebase
+    const newMessageRef = messagesRef.push();
+    newMessageRef.set(messageData);
+    
+    // Add the actual message ID to processed messages when it's available
+    newMessageRef.then(() => {
+        if (newMessageRef.key) {
+            window.processedMessages.add(newMessageRef.key);
+            // Remove the temporary ID
+            window.processedMessages.delete(tempMsgId);
+        }
+    });
+    
+    return newMessageRef.key;
 }
 
 function sendPosition(position, floor, rotation) {
