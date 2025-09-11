@@ -1,0 +1,74 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "users": {
+      ".indexOn": ["alias"],
+      "$userId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['alias', 'lastSeen'])",
+        "alias": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "lastSeen": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "messages": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp"],
+      "$messageId": {
+        ".validate": "newData.hasChildren(['alias', 'message', 'timestamp', 'userId'])",
+        "alias": {
+          ".validate": "newData.isString()"
+        },
+        "message": {
+          ".validate": "newData.isString()"
+        },
+        "timestamp": {
+          ".validate": "newData.isNumber()"
+        },
+        "userId": {
+          ".validate": "newData.isString()"
+        },
+        "$other": {
+          ".validate": false
+        },
+        ".read": true,
+        ".write": true
+      }
+    },
+    "positions": {
+      ".read": true,
+      ".write": true,
+      "$userId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['position', 'floor', 'rotation'])",
+        "position": {
+          ".validate": "newData.hasChildren(['x', 'y', 'z'])"
+        },
+        "floor": {
+          ".validate": "newData.isNumber()"
+        },
+        "rotation": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "privateChats": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp"]
+    }
+  }
+}

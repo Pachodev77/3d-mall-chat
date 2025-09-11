@@ -2,19 +2,30 @@
 const firebaseConfig = {
   apiKey: "AIzaSyDjPYZJeoLgisI3KZyA6_0OwmH_UESGR14",
   authDomain: "ccapp-b8301.firebaseapp.com",
+  databaseURL: "https://ccapp-b8301-default-rtdb.firebaseio.com",
   projectId: "ccapp-b8301",
-  storageBucket: "ccapp-b8301.firebasestorage.app",
+  storageBucket: "ccapp-b8301.appspot.com",
   messagingSenderId: "622692105172",
   appId: "1:622692105172:web:dceecda5e2a54630d4b441",
   measurementId: "G-5DW5PB2RB6"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.database();
-const usersRef = db.ref('users');
-const messagesRef = db.ref('messages');
-const positionsRef = db.ref('positions');
+// Initialize Realtime Database
+let db, usersRef, messagesRef, positionsRef;
+
+try {
+    db = firebase.database();
+    usersRef = db.ref('users');
+    messagesRef = db.ref('messages');
+    positionsRef = db.ref('positions');
+    
+    console.log('Firebase initialized successfully');
+} catch (error) {
+    console.error('Firebase initialization error:', error);
+}
 
 let currentUser = null;
 let isConnected = false;
@@ -82,13 +93,43 @@ function connectToChat(alias) {
         });
     });
 
+    // Track processed message IDs to prevent duplicates
+    const processedMessageIds = new Set();
+    
     // Configurar listener de mensajes
     messagesListener = (snapshot) => {
         const message = snapshot.val();
-        if (message.alias !== currentUser.alias) {
-            if (typeof window.addMessageToChat === 'function') {
-                window.addMessageToChat(message.alias, message.message, 'user', message.timestamp, false, null);
+        
+        // Skip if we've already processed this message
+        if (!message || !message.timestamp || processedMessageIds.has(snapshot.key)) {
+            return;
+        }
+        
+        // Skip if this is a private message or if it's our own message
+        if (message.recipient || message.alias === currentUser.alias) {
+            return;
+        }
+        
+        // Mark as processed
+        processedMessageIds.add(snapshot.key);
+        
+        // Keep only the last 100 message IDs to prevent memory leaks
+        if (processedMessageIds.size > 100) {
+            const ids = Array.from(processedMessageIds);
+            for (let i = 0; i < 50; i++) {
+                processedMessageIds.delete(ids[i]);
             }
+        }
+        
+        if (typeof window.addMessageToChat === 'function') {
+            window.addMessageToChat(
+                message.alias, 
+                message.message, 
+                'user', 
+                message.timestamp, 
+                false, 
+                null
+            );
         }
     };
     messagesRef.on('child_added', messagesListener);
@@ -177,14 +218,25 @@ function connectToChat(alias) {
     console.log('Connected as:', currentUser.alias);
 }
 
-function sendMessage(message) {
-    if (!isConnected || !currentUser) return;
+function sendMessage(message, isPrivate = false, recipient = null) {
+    if (!isConnected || !currentUser || !message || message.trim() === '') return;
+    
     const messageData = {
         alias: currentUser.alias,
-        message: message,
-        timestamp: Date.now()
+        message: message.trim(),
+        timestamp: Date.now(),
+        messageId: Date.now() + '-' + Math.random().toString(36).substr(2, 9)
     };
-    messagesRef.push(messageData);
+    
+    if (isPrivate && recipient) {
+        messageData.recipient = recipient;
+        messageData.type = 'private';
+        const chatId = getPrivateChatId(currentUser.alias, recipient);
+        db.ref('privateChats/' + chatId).push(messageData);
+    } else {
+        messagesRef.push(messageData);
+    }
+    
     if (typeof window.addMessageToChat === 'function') {
         window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, false, null);
     }
