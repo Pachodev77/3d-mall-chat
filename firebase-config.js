@@ -76,37 +76,13 @@ function connectToChat(alias) {
         updateUsersList(Object.values(users));
     };
     usersRef.on('value', usersListener);
-    // Cargar mensajes iniciales
-    messagesRef.limitToLast(10).once('value', (snapshot) => {
-        snapshot.forEach((child) => {
-            const message = child.val();
-            if (typeof window.addMessageToChat === 'function') {
-                window.addMessageToChat(
-                    message.alias,
-                    message.message,
-                    message.alias === currentUser.alias ? 'own' : 'user',
-                    message.timestamp,
-                    false,
-                    null
-                );
-            }
-        });
-    });
-
     // Track processed message IDs to prevent duplicates
     const processedMessageIds = new Set();
     
-    // Configurar listener de mensajes
+    // Single source of truth for message handling
     messagesListener = (snapshot) => {
         const message = snapshot.val();
-        
-        // Skip if we've already processed this message
         if (!message || !message.timestamp || processedMessageIds.has(snapshot.key)) {
-            return;
-        }
-        
-        // Skip if this is a private message or if it's our own message
-        if (message.recipient || message.alias === currentUser.alias) {
             return;
         }
         
@@ -121,11 +97,17 @@ function connectToChat(alias) {
             }
         }
         
+        // Skip if this is a private message (handled separately)
+        if (message.recipient) {
+            return;
+        }
+        
         if (typeof window.addMessageToChat === 'function') {
+            const isOwnMessage = message.alias === currentUser.alias;
             window.addMessageToChat(
                 message.alias, 
                 message.message, 
-                'user', 
+                isOwnMessage ? 'own' : 'user',
                 message.timestamp, 
                 false, 
                 null
@@ -234,11 +216,21 @@ function sendMessage(message, isPrivate = false, recipient = null) {
         const chatId = getPrivateChatId(currentUser.alias, recipient);
         db.ref('privateChats/' + chatId).push(messageData);
     } else {
+        // Don't show the message here - it will be shown by the child_added listener
         messagesRef.push(messageData);
+        return; // Early return to prevent duplicate display
     }
     
-    if (typeof window.addMessageToChat === 'function') {
-        window.addMessageToChat(currentUser.alias, message, 'own', messageData.timestamp, false, null);
+    // Only show private messages immediately (public messages are handled by the listener)
+    if (isPrivate && typeof window.addMessageToChat === 'function') {
+        window.addMessageToChat(
+            currentUser.alias, 
+            message.trim(), 
+            'own', 
+            messageData.timestamp, 
+            true, 
+            recipient
+        );
     }
 }
 
